@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+"""Таблица отчёта о стандартном наборе сцен: строки Markdown из строк прибора.
+
+    python3 validation/studies/standard_scenes_report.py build/scenes.jsonl
+
+Печатает таблицу, которая вставляется в docs/reports/standard-scenes.md: числа в отчёте берутся
+из замера, а не набираются руками.
+"""
+import json
+import sys
+
+CHECKS = {
+    "stack": "ни один куб не сдвинулся на 1 мм и не движется",
+    "pyramid": "ни один куб не сдвинулся на 1 мм и не движется",
+    "heavy": "стопка стоит при отношении масс 1 : 1000",
+    "arch": "ни один клин не сдвинулся на 2 мм",
+    "slope": "путь за секунду — по формуле, до 0,1 %",
+    "dominoes": "упали все двадцать костяшек",
+    "wall": "шар пробил стену, ничто не провалилось в пол",
+    "bullet": "шарик не прошёл сквозь пластину",
+    "cradle": "после удара движется только последний шар",
+    "chain": "звенья висят на расстоянии 2 (R − r) и покоятся",
+    "buckets": "вёдра вошли друг в друга на расчётную глубину",
+    "balls": "все шары остались в ведре и покоятся",
+    "pile": "все тела остались в ящике",
+    "gripper": "кубик поднят вместе с кареткой, не выскользнул",
+}
+
+
+def number(value, digits=3):
+    """Число для таблицы: три значащие цифры, тысячи через пробел, мелочь — как «меньше 0,01»."""
+    if value == 0:
+        return "0"
+    if value < 0.01:
+        return "< 0,01"
+    if value >= 1000:
+        return f"{round(value, -1):,.0f}".replace(",", " ")
+    return f"{value:.{digits}g}".replace(".", ",")
+
+
+def main():
+    rows = [json.loads(line) for line in open(sys.argv[1], encoding="utf-8")]
+    print("| Сцена | Тел (частей) | Что обязано получиться | Итог | мс на кадр | Худший кадр, мс | Отрезков на кадр | Перекрытие, мкм |")
+    print("|---|---:|---|---|---:|---:|---:|---:|")
+    for r in rows:
+        done = "как должно" if r["ok"] else (r["verdict"] or f"досчитано {r['frames']} кадров из {r['frames_planned']}")
+        bodies = f"{r['bodies']}" + (f" ({r['parts']})" if r["parts"] != r["bodies"] else "")
+        print(f"| {r['title']} | {bodies} | {CHECKS[r['scene']]} | {'**' + done + '**' if not r['ok'] else done} | {number(r['ms_per_frame'])} | {number(r['slowest_ms'])} | "
+              f"{number(r['segments_per_frame'])} | {number(1e6 * r['overlap_m'], 2)} |")
+
+
+if __name__ == "__main__":
+    main()

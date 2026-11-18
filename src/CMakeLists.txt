@@ -1,0 +1,59 @@
+# Библиотека движка: C++17, только стандартная библиотека. Подключается через add_subdirectory.
+# Заголовки — в include/kp/, исходники — здесь, по тем же разделам.
+cmake_minimum_required(VERSION 3.16)
+
+add_library(kinetica-physics STATIC
+  math/Matrix3x3.cpp
+  math/Quaternion.cpp
+  world/World.cpp
+  world/IslandSleep.cpp
+  collision/ContactPair.cpp
+  collision/PairFinder.cpp
+  collision/RayCast.cpp
+  collision/broadphase/DynamicTree.cpp
+  dynamics/event_driven/ContactSolver.cpp
+  dynamics/event_driven/ContactSystem.cpp
+  dynamics/event_driven/ActiveSet.cpp
+  dynamics/event_driven/BodySpaceSolve.cpp
+  dynamics/event_driven/ExactStep.cpp
+  dynamics/event_driven/EventSearch.cpp
+  dynamics/event_driven/OverlapSeparation.cpp
+  body/Body.cpp
+  body/MassFrame.cpp
+  body/PrincipalAxes.cpp
+  body/CompoundBodyBuilder.cpp
+  dynamics/time_stepping/SoftStep.cpp
+  dynamics/time_stepping/SoftContact.cpp
+  dynamics/time_stepping/SoftJoint.cpp
+  dynamics/time_stepping/DirectJoints.cpp
+  joints/Joint.cpp
+  joints/JointSet.cpp
+  joints/SingleFreedomJoint.cpp
+  joints/BallAndSocketJoint.cpp
+  joints/HingeJoint.cpp
+  joints/SliderJoint.cpp
+  joints/CylindricalJoint.cpp
+  joints/FixedJoint.cpp
+  joints/CardanJoint.cpp
+  joints/TetherJoint.cpp
+  collision/shapes/ConvexShape.cpp
+  collision/shapes/ConvexHull.cpp
+  collision/shapes/Capsule.cpp
+  collision/shapes/Cylinder.cpp
+  collision/shapes/QuickHull.cpp
+  collision/narrowphase/Gjk.cpp
+  collision/narrowphase/Sat.cpp
+  collision/narrowphase/NarrowPhaseAlgorithm.cpp
+  collision/narrowphase/HullVsHullAlgorithm.cpp
+  collision/narrowphase/HullVsRoundAlgorithm.cpp
+  collision/narrowphase/RoundVsRoundAlgorithm.cpp
+  collision/narrowphase/ContactPatch.cpp
+  collision/narrowphase/ContactCandidate.cpp
+  collision/shapes/ConvexDecomposition.cpp
+  collision/shapes/Meshes.cpp
+  debug/DebugGeometry.cpp)
+target_include_directories(kinetica-physics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+target_compile_features(kinetica-physics PUBLIC cxx_std_17)
+# Слияние умножения со сложением (FMA) меняет биты от компилятора к компилятору — запрещено
+# и движку, и всем, кто включает его заголовки.
+target_compile_options(kinetica-physics PUBLIC -ffp-contract=off PRIVATE -Wall -Wextra -Wpedantic)

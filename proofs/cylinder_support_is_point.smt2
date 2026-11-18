@@ -1,0 +1,15 @@
+; Лемма 2б. Если направление не вдоль оси и не поперёк неё (s > 0, dy != 0), цилиндр упирается
+; единственной точкой — точкой кромки. Две разные опорные точки невозможны. Ответ unsat.
+(declare-const R Real) (declare-const H Real)
+(declare-const dx Real) (declare-const dy Real) (declare-const dz Real) (declare-const s Real)
+(declare-const px Real) (declare-const py Real) (declare-const pz Real)
+(declare-const qx Real) (declare-const qy Real) (declare-const qz Real)
+(define-fun h () Real (+ (* R s) (* H (ite (>= dy 0.0) dy (- dy)))))
+(assert (> R 0.0)) (assert (> H 0.0))
+(assert (> s 0.0)) (assert (= (* s s) (+ (* dx dx) (* dz dz)))) (assert (not (= dy 0.0)))
+(assert (<= (+ (* px px) (* pz pz)) (* R R))) (assert (<= py H)) (assert (>= py (- H)))
+(assert (<= (+ (* qx qx) (* qz qz)) (* R R))) (assert (<= qy H)) (assert (>= qy (- H)))
+(assert (= (+ (* dx px) (* dy py) (* dz pz)) h))
+(assert (= (+ (* dx qx) (* dy qy) (* dz qz)) h))
+(assert (or (not (= px qx)) (not (= py qy)) (not (= pz qz))))
+(check-sat)

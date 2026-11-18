@@ -1,0 +1,30 @@
+#pragma once
+// Тело в решателе с проходами: скорости и обратная инерция в мире. У неподвижного всё нулевое, и
+// импульсы прикладываются к нему теми же формулами без проверок.
+
+#include <kp/math/Matrix3x3.h>
+#include <kp/math/Quaternion.h>
+
+namespace kp {
+
+struct SolverBody {
+    Vector3 v, w;
+    Matrix3x3 inverseInertia; // обратный тензор инерции в мире
+    Real inverseMass = 0;
+    Vector3 moved;     // смещение с начала кадра
+    Quaternion turned; // поворот с начала кадра
+
+    Vector3 spinFrom(Vector3 torque) const { return inverseInertia * torque; }
+    // Импульс P в точках с плечами rA и rB: телу b — плюс, телу a — минус.
+    static void push(SolverBody& a, SolverBody& b, Vector3 rA, Vector3 rB, Vector3 impulse) {
+        a.v -= a.inverseMass * impulse, a.w -= a.spinFrom(rA.cross(impulse));
+        b.v += b.inverseMass * impulse, b.w += b.spinFrom(rB.cross(impulse));
+    }
+    static void twist(SolverBody& a, SolverBody& b, Vector3 torque) { a.w -= a.spinFrom(torque), b.w += b.spinFrom(torque); }
+    static Real inverseMassAlong(const SolverBody& a, const SolverBody& b, Vector3 rA, Vector3 rB, Vector3 d) {
+        const Vector3 armA = rA.cross(d), armB = rB.cross(d);
+        return a.inverseMass + b.inverseMass + armA.dot(a.spinFrom(armA)) + armB.dot(b.spinFrom(armB));
+    }
+};
+
+} // namespace kp
