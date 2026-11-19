@@ -282,46 +282,43 @@ Real EventSearch::contactTurn(const std::vector<ContactPair>& pairs, const StepA
 // полосу касания или у касающейся пары коснётся ещё одна точка.
 Real EventSearch::earliestImpact(const std::vector<ContactPair>& pairs, const StepArray<Rate>& rates, Real h) const {
     Real earliest = h;
-    for (const ContactPair& pair : pairs) {
-        const Body a = bodies_[size_t(pair.a)].part(pair.partA);
-        const Body b = bodies_[size_t(pair.b)].part(pair.partB);
-        const Rate& ra = rates[size_t(pair.a)];
-        const Rate& rb = rates[size_t(pair.b)];
-        // Импульс на отрезке линеен по времени, поэтому скорость тела не больше, чем в начале
-        // отрезка или в его конце.
-        const auto fastest = [&](const Body& body, const Rate& rate) {
-            Body later = body;
-            integrateVelocity(later, rate.force, rate.torque, h);
-            return std::max(maxPointSpeed(body), maxPointSpeed(later));
-        };
-        const Real closing = fastest(a, ra) + fastest(b, rb);
-        const auto bodiesAt = [&](Real t) { return std::make_pair(advanced(a, ra.force, ra.torque, t), advanced(b, rb.force, rb.torque, t)); };
-        if (pair.inContact()) {
-            earliest = nextPointContact(pair, a, b, bodiesAt, closing, earliest);
-            earliest = crossingStart(a, b, bodiesAt, motionBounds(a, ra.force, ra.torque, h), motionBounds(b, rb.force, rb.torque, h), earliest, -kOverlap, kOverlap);
-            continue;
-        }
-        const auto distanceAt = [&](Real t) {
-            const auto [at, bt] = bodiesAt(t);
-            const ClosestPoints gap = closestPoints(*at.shape, at.pose(), *bt.shape, bt.pose());
-            return gap.coresOverlap ? Real(0) : gap.distance;
-        };
-        // Сначала — продвижение «расстояние, делённое на скорость»: обычно ему хватает десятка
-        // шагов. Если тела летят вплотную и быстро вращаются, шаги мельчают до сотых долей
-        // радиана поворота; тогда остаток интервала проходит поиск с доказанной границей, которому
-        // хватает участка на десятые доли радиана. Он останавливается в середине полосы касания.
-        Real reached = -1;
-        const Real impact = timeOfImpact(distanceAt, closing, earliest, kContactDistance, kAdvancePatience, &reached);
-        if (reached < 0) {
-            earliest = std::min(earliest, impact);
-            continue;
-        }
-        const auto [as, bs] = bodiesAt(reached);
-        const auto later = [&](Real t) { return bodiesAt(reached + t); };
-        earliest = reached + crossingStart(as, bs, later, motionBounds(a, ra.force, ra.torque, h), motionBounds(b, rb.force, rb.torque, h), earliest - reached,
-                                           kContactDistance / 2, kContactDistance / 4);
-    }
+    for (const ContactPair& pair : pairs) earliest = impactOf(pair, rates[size_t(pair.a)], rates[size_t(pair.b)], h, earliest);
     return earliest;
+}
+
+// Время удара одной пары, если оно раньше earliest; иначе earliest.
+Real EventSearch::impactOf(const ContactPair& pair, const Rate& ra, const Rate& rb, Real h, Real earliest) const {
+    const Body a = bodies_[size_t(pair.a)].part(pair.partA);
+    const Body b = bodies_[size_t(pair.b)].part(pair.partB);
+    // Импульс на отрезке линеен по времени, поэтому скорость тела не больше, чем в начале
+    // отрезка или в его конце.
+    const auto fastest = [&](const Body& body, const Rate& rate) {
+        Body later = body;
+        integrateVelocity(later, rate.force, rate.torque, h);
+        return std::max(maxPointSpeed(body), maxPointSpeed(later));
+    };
+    const Real closing = fastest(a, ra) + fastest(b, rb);
+    const auto bodiesAt = [&](Real t) { return std::make_pair(advanced(a, ra.force, ra.torque, t), advanced(b, rb.force, rb.torque, t)); };
+    if (pair.inContact()) {
+        earliest = nextPointContact(pair, a, b, bodiesAt, closing, earliest);
+        return crossingStart(a, b, bodiesAt, motionBounds(a, ra.force, ra.torque, h), motionBounds(b, rb.force, rb.torque, h), earliest, -kOverlap, kOverlap);
+    }
+    const auto distanceAt = [&](Real t) {
+        const auto [at, bt] = bodiesAt(t);
+        const ClosestPoints gap = closestPoints(*at.shape, at.pose(), *bt.shape, bt.pose());
+        return gap.coresOverlap ? Real(0) : gap.distance;
+    };
+    // Сначала — продвижение «расстояние, делённое на скорость»: обычно ему хватает десятка
+    // шагов. Если тела летят вплотную и быстро вращаются, шаги мельчают до сотых долей
+    // радиана поворота; тогда остаток интервала проходит поиск с доказанной границей, которому
+    // хватает участка на десятые доли радиана. Он останавливается в середине полосы касания.
+    Real reached = -1;
+    const Real impact = timeOfImpact(distanceAt, closing, earliest, kContactDistance, kAdvancePatience, &reached);
+    if (reached < 0) return std::min(earliest, impact);
+    const auto [as, bs] = bodiesAt(reached);
+    const auto later = [&](Real t) { return bodiesAt(reached + t); };
+    return reached + crossingStart(as, bs, later, motionBounds(a, ra.force, ra.torque, h), motionBounds(b, rb.force, rb.torque, h), earliest - reached, kContactDistance / 2,
+                                   kContactDistance / 4);
 }
 
 // Когда сочленение дойдёт до предела хода. Это событие того же рода, что удар: отрезок обрывается
@@ -336,6 +333,23 @@ Real EventSearch::earliestImpact(const std::vector<ContactPair>& pairs, const St
 // Шарнир: g = ±(угол − предел), dg/dt = ±e·(ω_b − ω_a) (proofs/hinge_angle_rate.smt2), а
 // d²g/dt² = ±((ω_a × e)·ω_b + e·(α_b − α_a)). Ползун: g = ±(e·d − предел), d — от точки
 // сочленения тела a до точки тела b; ось e вращается с телом a.
+namespace {
+
+// Границы изменения зазора предела хода на отрезке h: |dg/dt| ≤ speed, |d²g/dt²| ≤ curvature.
+struct GapBounds {
+    Real speed, curvature;
+};
+GapBounds limitBounds(const SingleFreedomJoint& joint, const Body& a, const Body& b, const MotionBounds& ma, const MotionBounds& mb, Real h) {
+    if (joint.angular()) return {ma.spin + mb.spin, ma.spinUp + mb.spinUp + ma.spin * mb.spin};
+    const Real armA = joint.anchorA.length(), armB = joint.anchorB.length();
+    const Real parting = ma.speed + mb.speed + ma.spin * armA + mb.spin * armB; // |dd/dt|
+    const Real apart = (b.pose().point(joint.anchorB) - a.pose().point(joint.anchorA)).length() + parting * h; // |d|
+    return {parting + ma.spin * apart,
+            (mb.acceleration - ma.acceleration).length() + (ma.spinUp + ma.spin * ma.spin) * (armA + apart) + (mb.spinUp + mb.spin * mb.spin) * armB + 2 * ma.spin * parting};
+}
+
+} // namespace
+
 Real EventSearch::earliestLimit(const StepArray<Rate>& rates, Real h) const {
     constexpr Real level = kLimitBand / 2, allowance = kLimitBand / 4;
     Real earliest = h;
@@ -347,18 +361,8 @@ Real EventSearch::earliestLimit(const StepArray<Rate>& rates, Real h) const {
         if (joint.limitGap(a, b).gap <= kLimitBand) continue;
         const Rate &ra = rates[size_t(joint.a)], &rb = rates[size_t(joint.b)];
         const MotionBounds ma = motionBounds(a, ra.force, ra.torque, h), mb = motionBounds(b, rb.force, rb.torque, h);
-        Real speed, curvature;
-        if (joint.angular()) {
-            speed = ma.spin + mb.spin;
-            curvature = ma.spinUp + mb.spinUp + ma.spin * mb.spin;
-        } else {
-            const Real armA = joint.anchorA.length(), armB = joint.anchorB.length();
-            const Real parting = ma.speed + mb.speed + ma.spin * armA + mb.spin * armB; // |dd/dt|
-            const Real apart = (b.pose().point(joint.anchorB) - a.pose().point(joint.anchorA)).length() + parting * h; // |d|
-            speed = parting + ma.spin * apart;
-            curvature = (mb.acceleration - ma.acceleration).length() + (ma.spinUp + ma.spin * ma.spin) * (armA + apart) +
-                        (mb.spinUp + mb.spin * mb.spin) * armB + 2 * ma.spin * parting;
-        }
+        const GapBounds bound = limitBounds(joint, a, b, ma, mb, h);
+        const Real speed = bound.speed, curvature = bound.curvature;
         const auto gapAt = [&](Real t) { return joint.limitGap(advanced(a, ra.force, ra.torque, t), advanced(b, rb.force, rb.torque, t)).gap; };
         Real time = 0;
         while (time < earliest) {

@@ -19,6 +19,7 @@ public:
     Real contactTurn(const std::vector<ContactPair>& pairs, const StepArray<Rate>& rates, Real t) const;
 
 private:
+    Real impactOf(const ContactPair& pair, const Rate& ra, const Rate& rb, Real h, Real earliest) const;
     const std::vector<Body>& bodies_;
     const JointSet& joints_;
 };
