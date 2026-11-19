@@ -49,6 +49,8 @@ public:
         bool leaf() const { return left < 0; }
     };
 
+    // Место под items листьев сразу: дерево из n листьев — это 2n − 1 узел.
+    void reserve(int items) { nodes_.reserve(size_t(2 * items)); }
     void insert(const Bounds& bounds, int item);
 
     // Вызывает visit(item) для каждого листа, брусок которого пересекается с bounds.

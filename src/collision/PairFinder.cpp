@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <collision/PairFinder.h>
 
 #include <math/WorkerPool.h>
@@ -26,6 +27,7 @@ Bounds reachBounds(const Body& body, Vector3 gravity, Real h) {
 
 DynamicTree PairFinder::tree(Real h) const {
     DynamicTree tree;
+    tree.reserve(int(bodies_.size()));
     for (int i = 0; i < int(bodies_.size()); ++i)
         if (bodies_[size_t(i)].shape) tree.insert(reachBounds(bodies_[size_t(i)], gravity_, h), i);
     return tree;
@@ -36,8 +38,8 @@ namespace {
 // Пары частей двух тел, из которых хотя бы одно составное: каждая часть одного с каждой частью
 // другого. Если у одного из тел есть дерево частей, кандидатов отбирает оно; проверяет их тот же
 // examinePair, и пары идут в том же порядке, поэтому ответ тот же, что у перебора.
-std::vector<std::pair<int, int>> partPairs(const Body& a, const Body& b, Vector3 gravity, Real h) {
-    std::vector<std::pair<int, int>> together;
+StepArray<std::pair<int, int>> partPairs(const Body& a, const Body& b, Vector3 gravity, Real h) {
+    StepArray<std::pair<int, int>> together;
     const Body& treed = a.partTree ? a : b;
     if (treed.partTree) {
         const Body& other = a.partTree ? b : a;
@@ -62,8 +64,8 @@ std::vector<std::pair<int, int>> partPairs(const Body& a, const Body& b, Vector3
 } // namespace
 
 // Пары частей тел i и j — в порядке partPairs.
-std::vector<ContactPair> PairFinder::between(int i, int j, Real h) const {
-    std::vector<ContactPair> pairs;
+StepArray<ContactPair> PairFinder::between(int i, int j, Real h) const {
+    StepArray<ContactPair> pairs;
     const Body &a = bodies_[size_t(i)], &b = bodies_[size_t(j)];
     if (!a.parts && !b.parts) {
         if (const std::optional<ContactPair> pair = examinePair(bodies_, i, j, gravity_, h, boundary)) pairs.push_back(*pair);
@@ -84,7 +86,7 @@ std::vector<ContactPair> PairFinder::between(int i, int j, Real h) const {
 std::vector<ContactPair> PairFinder::pairs(Real h) const {
     constexpr int kParallelParts = 64;
     const DynamicTree tree = this->tree(h);
-    std::vector<std::pair<int, int>> candidates;
+    StepArray<std::pair<int, int>> candidates;
     int parts = 0;
     for (int i = 0; i < int(bodies_.size()); ++i) {
         if (!bodies_[size_t(i)].shape) continue;
@@ -96,12 +98,15 @@ std::vector<ContactPair> PairFinder::pairs(Real h) const {
         // Кандидаты — по возрастанию номера: порядок пар не должен зависеть от формы дерева.
         std::sort(candidates.begin() + std::ptrdiff_t(first), candidates.end());
     }
-    std::vector<std::vector<ContactPair>> found(candidates.size());
+    StepArray<StepArray<ContactPair>> found(candidates.size());
     const auto examine = [&](size_t k) { found[k] = between(candidates[k].first, candidates[k].second, h); };
     if (parts < kParallelParts) for (size_t k = 0; k < candidates.size(); ++k) examine(k);
     else WorkerPool::shared().run(candidates.size(), examine);
-    std::vector<ContactPair> pairs;
-    for (const std::vector<ContactPair>& some : found) pairs.insert(pairs.end(), some.begin(), some.end());
+    size_t total = 0;
+    for (const StepArray<ContactPair>& some : found) total += some.size();
+    std::vector<ContactPair> pairs; // ответ уходит наружу и живёт дольше шага: он в куче, одним куском
+    pairs.reserve(total);
+    for (const StepArray<ContactPair>& some : found) pairs.insert(pairs.end(), some.begin(), some.end());
     return pairs;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 // Поиск всех пар тел, которые за время h могут сблизиться до касания.
 
+#include <math/StepMemory.h>
 #include <collision/ContactPair.h>
 #include <collision/broadphase/DynamicTree.h>
 #include <joints/JointSet.h>
@@ -28,7 +29,7 @@ public:
     std::vector<ContactPair> pairs(Real h, const JointSet& joints) const;
 
 private:
-    std::vector<ContactPair> between(int i, int j, Real h) const;
+    StepArray<ContactPair> between(int i, int j, Real h) const;
 
     const std::vector<Body>& bodies_;
     Vector3 gravity_;

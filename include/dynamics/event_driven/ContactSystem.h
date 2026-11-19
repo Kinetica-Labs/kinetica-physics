@@ -1,6 +1,7 @@
 #pragma once
 // Линейная система одного решения сил контакта: линии ограничений и матрица их откликов.
 
+#include <math/Span.h>
 #include <math/StepMemory.h>
 #include <body/Body.h>
 
@@ -43,7 +44,7 @@ struct ContactSystem {
     StepArray<size_t> order;       // линии в том порядке, в каком их исключает разложение
 
     // Матрица откликов линий по телам.
-    static SparseMatrix responseMatrix(const std::vector<Body>& bodies, const StepArray<Line>& lines);
+    static SparseMatrix responseMatrix(Span<Body> bodies, const StepArray<Line>& lines);
 };
 
 } // namespace kp

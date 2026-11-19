@@ -36,7 +36,7 @@ public:
     bool find(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, Real h, const Maker& make);
 
 private:
-    std::vector<ContactPair> pairs_;
+    StepArray<ContactPair> pairs_;
     StepArray<size_t> owner_;
     StepArray<Real> radiusA_, radiusB_; // охватывающие радиусы частей пары от центров масс тел
     StepArray<Real> known_;             // глубина пары до сдвига

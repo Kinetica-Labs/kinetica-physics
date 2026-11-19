@@ -2,6 +2,7 @@
 // Решение системы линий в пространстве тел (тождество Вудбери): шесть неизвестных на тело вместо
 // одной на линию.
 
+#include <math/Span.h>
 #include <math/StepMemory.h>
 #include <dynamics/event_driven/ContactSystem.h>
 
@@ -13,7 +14,7 @@ namespace kp {
 
 class BodySpaceSolve {
 public:
-    BodySpaceSolve(const std::vector<Body>& bodies, const ContactSystem& system) : bodies_(bodies), system_(system) {}
+    BodySpaceSolve(Span<Body> bodies, const ContactSystem& system) : bodies_(bodies), system_(system) {}
     // active — участвующие линии; cost — цена разложения в пространстве линий; x — правая часть,
     // на выходе решение. Возвращает false, если в пространстве линий дешевле: x не тронут.
     bool solve(const StepArray<size_t>& active, Real cost, StepArray<Real>& x) const;
@@ -30,7 +31,7 @@ private:
     void solveFor(const StepArray<size_t>& active, const Layout& layout, StepArray<Real>& x) const;
     StepArray<Real> residualOf(const StepArray<size_t>& active, const StepArray<Real>& b, const StepArray<Real>& x) const;
 
-    const std::vector<Body>& bodies_;
+    Span<Body> bodies_;
     const ContactSystem& system_;
 };
 

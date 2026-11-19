@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <collision/narrowphase/ContactPatch.h>
 
 #include <collision/narrowphase/ContactCandidate.h>
@@ -9,8 +10,8 @@ namespace kp {
 namespace {
 
 // Доли отрезка from—to, на которых он пересекает границу плоского элемента, по возрастанию.
-std::vector<Real> crossings(const Flat& flat, Vector3 from, Vector3 to) {
-    std::vector<Real> found;
+StepArray<Real> crossings(const Flat& flat, Vector3 from, Vector3 to) {
+    StepArray<Real> found;
     const Vector3 along = to - from;
     if (flat.disc()) {
         // Проекция отрезка на плоскость круга: |q + t d|² = R².
@@ -86,7 +87,7 @@ void addCircleOverDisc(const Flat& flat, const Outline& outline, Add&& add) {
 // самым низким местом контура.
 template <class Add>
 void addCornersUnder(const Flat& flat, const Outline& outline, Add&& add) {
-    const std::vector<Vector3> corners = flat.disc() ? Flat::quarterPoints(flat.centre, flat.normal, flat.radius, Flat::inPlane(-1 * outline.normal, flat.normal, flat.side)) : flat.corners;
+    const StepArray<Vector3> corners = flat.disc() ? Flat::quarterPoints(flat.centre, flat.normal, flat.radius, Flat::inPlane(-1 * outline.normal, flat.normal, flat.side)) : flat.corners;
     Flat contour; // сам контур как плоский элемент: лежит ли точка внутри него
     contour.normal = outline.normal, contour.centre = outline.centre, contour.radius = outline.radius;
     if (outline.kind == Outline::Kind::Loop) contour.corners = outline.points;
@@ -98,8 +99,8 @@ void addCornersUnder(const Flat& flat, const Outline& outline, Add&& add) {
 
 } // namespace
 
-std::vector<ContactPatch::Point> ContactPatch::pointsOf(const Flat& flat, const Outline& outline) {
-    std::vector<Point> points;
+StepArray<ContactPatch::Point> ContactPatch::pointsOf(const Flat& flat, const Outline& outline) {
+    StepArray<Point> points;
     using Kind = Outline::Kind;
     // Одна и та же вершина площадки бывает получена дважды — как точка контура над элементом и как
     // угол элемента под контуром (два равных торца друг на друге). В контакт она идёт один раз.
@@ -134,7 +135,7 @@ ContactManifold ContactPatch::manifold(bool onReferenceB, Real margin, Real touc
     ContactManifold manifold;
     manifold.faceOnB = onReferenceB;
     manifold.normal = (onReferenceB ? Real(-1) : Real(1)) * flat.normal;
-    std::vector<ContactPoint> found;
+    StepArray<ContactPoint> found;
     ContactCandidates candidates;
     for (const Point& p : points) {
         const Real height = flat.height(p.core);

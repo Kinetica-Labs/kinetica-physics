@@ -5,10 +5,29 @@
 
 namespace kp {
 
+namespace {
+
+// Отклик через два общих тела складывается: одинаковые столбцы строки сливаются. Строка — два куска,
+// каждый уже по возрастанию столбца (линии первого тела, затем второго); они сливаются устойчиво,
+// как при std::stable_sort, но без обращения к куче. merged — рабочий массив.
+void mergeColumns(StepArray<ContactSystem::Entry>& row, StepArray<ContactSystem::Entry>& merged) {
+    size_t second = 1;
+    while (second < row.size() && !(row[second].column < row[second - 1].column)) ++second;
+    merged.clear();
+    for (size_t x = 0, y = second; x < second || y < row.size();) {
+        const ContactSystem::Entry& entry = y == row.size() || (x < second && !(row[y].column < row[x].column)) ? row[x++] : row[y++];
+        if (!merged.empty() && merged.back().column == entry.column) merged.back().value += entry.value;
+        else merged.push_back(entry);
+    }
+    row.assign(merged.begin(), merged.end());
+}
+
+} // namespace
+
 // Матрица откликов A = J M⁻¹ Jᵀ: A[i][j] — на сколько изменится скорость вдоль линии i от
 // единичного импульса вдоль линии j. Ненулевая, только если у линий есть общее подвижное тело,
 // поэтому матрица разреженная и строится по телам: каждое тело связывает лишь свои линии.
-ContactSystem::SparseMatrix ContactSystem::responseMatrix(const std::vector<Body>& bodies, const StepArray<Line>& lines) {
+ContactSystem::SparseMatrix ContactSystem::responseMatrix(Span<Body> bodies, const StepArray<Line>& lines) {
     StepArray<StepArray<size_t>> onBody(bodies.size());
     for (size_t i = 0; i < lines.size(); ++i) onBody[size_t(lines[i].a)].push_back(i), onBody[size_t(lines[i].b)].push_back(i);
 
@@ -32,21 +51,8 @@ ContactSystem::SparseMatrix ContactSystem::responseMatrix(const std::vector<Body
             }
         }
     }
-    // Отклик через два общих тела складывается: одинаковые столбцы строки сливаются. Строка — два
-    // куска, каждый уже по возрастанию столбца (линии первого тела, затем второго); они сливаются
-    // устойчиво, как при std::stable_sort, но без обращения к куче.
     StepArray<Entry> merged;
-    for (StepArray<Entry>& row : matrix) {
-        size_t second = 1;
-        while (second < row.size() && !(row[second].column < row[second - 1].column)) ++second;
-        merged.clear();
-        for (size_t x = 0, y = second; x < second || y < row.size();) {
-            const Entry& entry = y == row.size() || (x < second && !(row[y].column < row[x].column)) ? row[x++] : row[y++];
-            if (!merged.empty() && merged.back().column == entry.column) merged.back().value += entry.value;
-            else merged.push_back(entry);
-        }
-        row.assign(merged.begin(), merged.end());
-    }
+    for (StepArray<Entry>& row : matrix) mergeColumns(row, merged);
     return matrix;
 }
 

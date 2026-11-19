@@ -31,7 +31,7 @@ public:
     void spend();
     // Пары заново, на время remaining; возвращает те, которых в списке не было. Границы всех тел
     // ставятся по нынешним скоростям. boundary — PairFinder::boundary.
-    std::vector<ContactPair> discover(const std::vector<Body>& bodies, const JointSet& joints, Real remaining, Real boundary);
+    StepArray<ContactPair> discover(const std::vector<Body>& bodies, const JointSet& joints, Real remaining, Real boundary);
 
 private:
     // Путь точки тела: linear + c · angular, c — от наименьшего до наибольшего у частей тела.

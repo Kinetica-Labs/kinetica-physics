@@ -53,10 +53,10 @@ void PairReach::spend() {
     for (size_t i = 0; i < spent_.size(); ++i) spent_[i].linear += next_[i].linear, spent_[i].angular += next_[i].angular;
 }
 
-std::vector<ContactPair> PairReach::discover(const std::vector<Body>& bodies, const JointSet& joints, Real remaining, Real boundary) {
+StepArray<ContactPair> PairReach::discover(const std::vector<Body>& bodies, const JointSet& joints, Real remaining, Real boundary) {
     PairFinder finder(bodies, gravity_);
     finder.boundary = boundary;
-    std::vector<ContactPair> fresh;
+    StepArray<ContactPair> fresh;
     for (const ContactPair& pair : finder.pairs(remaining, joints))
         if (!std::binary_search(listed_.begin(), listed_.end(), Key{pair.a, pair.b, pair.partA, pair.partB})) fresh.push_back(pair);
     for (const ContactPair& pair : fresh) listed_.push_back({pair.a, pair.b, pair.partA, pair.partB});

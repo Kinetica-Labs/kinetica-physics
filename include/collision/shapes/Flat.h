@@ -1,6 +1,7 @@
 #pragma once
 // Плоский элемент, которым тело упирается в касательную плоскость.
 
+#include <math/StepMemory.h>
 #include <math/Vector3.h>
 
 #include <vector>
@@ -20,7 +21,7 @@ constexpr Real kFaceAligned = Real(1e-6);
 struct Flat {
     Vector3 normal, origin;       // нормаль наружу и точка плоскости ядра
     Real rounding = 0;         // поверхность тела выше плоскости ядра на радиус скругления
-    std::vector<Vector3> corners; // контур грани против часовой стрелки, если смотреть снаружи; пусто — круг
+    StepArray<Vector3> corners;   // контур грани против часовой стрелки, если смотреть снаружи; пусто — круг
     Vector3 centre, side;         // круг: центр и направление в его плоскости, связанное с телом
     Real radius = 0;
 
@@ -41,7 +42,7 @@ struct Flat {
     }
 
     // Четыре точки окружности через четверть оборота, первая — в направлении first.
-    static std::vector<Vector3> quarterPoints(Vector3 centre, Vector3 normal, Real radius, Vector3 first) {
+    static StepArray<Vector3> quarterPoints(Vector3 centre, Vector3 normal, Real radius, Vector3 first) {
         const Vector3 second = normal.cross(first);
         return {centre + radius * first, centre + radius * second, centre - radius * first, centre - radius * second};
     }

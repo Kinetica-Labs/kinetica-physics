@@ -46,7 +46,7 @@ private:
     struct Island {
         StepArray<Row> rows;      // в порядке контактов
         StepArray<int> members;   // номера тел мира
-        std::vector<Body> bodies;   // их масса, инерция и нынешняя ориентация — всё, что берёт решатель
+        StepArray<Body> bodies;     // их масса, инерция и нынешняя ориентация — всё, что берёт решатель
         StepArray<char> working;  // по rows: рабочий набор
     };
     struct Pass {

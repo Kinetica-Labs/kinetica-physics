@@ -2,6 +2,7 @@
 // Перебор активного набора односторонних линий системы: какие точки контакта и пределы хода
 // давят, а какие расходятся.
 
+#include <math/Span.h>
 #include <math/StepMemory.h>
 #include <joints/Bond.h>
 #include <dynamics/event_driven/ContactSystem.h>
@@ -13,7 +14,7 @@ namespace kp {
 class ActiveSet {
 public:
     // pressing — набор по строкам решателя, bondPressing — по связям; оба уточняются на месте.
-    ActiveSet(const std::vector<Body>& bodies, const ContactSystem& system, const std::vector<Bond>& bonds, StepArray<char>& pressing, StepArray<char>& bondPressing)
+    ActiveSet(Span<Body> bodies, const ContactSystem& system, const std::vector<Bond>& bonds, StepArray<char>& pressing, StepArray<char>& bondPressing)
         : bodies_(bodies), system_(system), bonds_(bonds), pressing_(pressing), bondPressing_(bondPressing) {}
     // unknown — какие линии участвуют; free — скорость вдоль линии без искомых сил; force — ответ.
     void solve(const StepArray<char>& unknown, const StepArray<Real>& free, StepArray<Real>& force);
@@ -25,7 +26,7 @@ private:
     bool permute(StepArray<Real>& force);
     void descend(StepArray<Real>& force);
 
-    const std::vector<Body>& bodies_;
+    Span<Body> bodies_;
     const ContactSystem& system_;
     const std::vector<Bond>& bonds_;
     StepArray<char>& pressing_;
