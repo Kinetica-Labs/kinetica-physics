@@ -72,6 +72,7 @@ public:
     void remember(ContactForces& memory, Real h) const;
 
 private:
+    Vector3 takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, const ContactForces& memory, Real h, bool fourPoints);
     // Нынешние нормаль и касательные; found — ближайшие точки форм, найденные заново, или nullptr.
     void aim(const BodyMotion& a, const BodyMotion& b, Vector3 apart, const ClosestPoints* found);
 

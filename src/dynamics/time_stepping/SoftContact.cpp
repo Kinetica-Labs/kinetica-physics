@@ -46,6 +46,21 @@ struct BlockWork {
 thread_local BlockWork work;
 constexpr std::uint32_t kEdgePair = 0xC0000000u; // номер точки пары рёбер (HullVsHullAlgorithm::clipFaces)
 
+// Отклик трения в центре площадки: обратная матрица 2 × 2 в касательной плоскости и обратный отклик
+// вращения вокруг нормали.
+struct FrictionMass {
+    Matrix2x2 tangent;
+    Real twist;
+};
+FrictionMass frictionMassOf(const SolverBody& a, const SolverBody& b, Vector3 centreA, Vector3 centreB, Vector3 t1, Vector3 t2, Vector3 n) {
+    const Vector3 a1 = centreA.cross(t1), a2 = centreA.cross(t2), b1 = centreB.cross(t1), b2 = centreB.cross(t2);
+    const Real k11 = a.inverseMass + b.inverseMass + a1.dot(a.spinFrom(a1)) + b1.dot(b.spinFrom(b1));
+    const Real k22 = a.inverseMass + b.inverseMass + a2.dot(a.spinFrom(a2)) + b2.dot(b.spinFrom(b2));
+    const Real k12 = a1.dot(a.spinFrom(a2)) + b1.dot(b.spinFrom(b2));
+    const Real around = n.dot(a.spinFrom(n) + b.spinFrom(n));
+    return {Matrix2x2{k11, k12, k12, k22}.inverse(), around > 0 ? 1 / around : 0};
+}
+
 } // namespace
 
 SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, const Softness& soft, const ContactForces& memory, Real h, bool fourPoints,
@@ -54,10 +69,23 @@ SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodie
     const Body &bodyA = bodies[size_t(pair.a)], &bodyB = bodies[size_t(pair.b)];
     const SolverBody &a = states[size_t(pair.a)], &b = states[size_t(pair.b)];
     if (tracked && ((roundA_ > 0 && roundB_ > 0) || (roundA_ + roundB_ > 0 && pair.manifold.count == 1))) shapes_.track(bodyA.part(pair.partA), bodyB.part(pair.partB));
-    const Vector3 n = normal_;
-    const Vector3 aside = abs(n.x) < Real(0.57) ? Vector3{1, 0, 0} : Vector3{0, 1, 0};
-    tangent1_ = n.cross(aside), tangent1_ = (1 / tangent1_.length()) * tangent1_, tangent2_ = n.cross(tangent1_);
+    const Vector3 aside = abs(normal_.x) < Real(0.57) ? Vector3{1, 0, 0} : Vector3{0, 1, 0};
+    tangent1_ = normal_.cross(aside), tangent1_ = (1 / tangent1_.length()) * tangent1_, tangent2_ = normal_.cross(tangent1_);
     friction_ = sqrt(bodyA.friction * bodyB.friction), restitution_ = std::max(bodyA.restitution, bodyB.restitution);
+    const Vector3 rubbed = takePoints(pair, bodyA.position, bodyB.position, a, b, memory, h, fourPoints);
+    normal0_ = normal_, tangent10_ = tangent1_, tangent20_ = tangent2_, apart_ = bodyB.position - bodyA.position;
+    createdA_ = {a.moved, a.turned}, createdB_ = {b.moved, b.turned};
+    edges_ = points_.size() == 1 && roundA_ == 0 && roundB_ == 0 && (points_[0].key.id & kEdgePair) == kEdgePair;
+    rub_ = {rubbed.dot(tangent1_), rubbed.dot(tangent2_)};
+    const FrictionMass mass = frictionMassOf(a, b, centreA_, centreB_, tangent1_, tangent2_, normal_);
+    tangentMass_ = mass.tangent, twistMass_ = mass.twist;
+    rolling_.prepare(a, b, tangent1_, tangent2_);
+}
+
+// Точки площадки с плечами от центров масс xA и xB, их массы и накопленные импульсы из memory; центр
+// трения — среднее точек с весом по зазору. Возвращает накопленный импульс трения пары, мир.
+Vector3 SoftContact::takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, const ContactForces& memory, Real h, bool fourPoints) {
+    const Vector3 n = normal_;
     Real weights = 0;
     Vector3 rubbed{};
     StepArray<int> kept;
@@ -69,7 +97,7 @@ SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodie
         Point p{};
         p.key = {pair.a, pair.b, contact.id, pair.partA, pair.partB};
         const Vector3 at = Real(0.5) * (contact.onA + contact.onB);
-        p.rA = at - bodyA.position, p.rB = at - bodyB.position;
+        p.rA = at - xA, p.rB = at - xB;
         p.coreA = p.rA - roundA_ * n, p.coreB = p.rB + roundB_ * n;
         p.base = p.gap = p.found = contact.separation;
         const Real response = SolverBody::inverseMassAlong(a, b, p.rA, p.rB, n);
@@ -83,21 +111,10 @@ SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodie
     }
     centreA_ = (1 / weights) * centreA_, centreB_ = (1 / weights) * centreB_;
     centreCoreA_ = centreA_ - roundA_ * n, centreCoreB_ = centreB_ + roundB_ * n;
-    normal0_ = normal_, tangent10_ = tangent1_, tangent20_ = tangent2_, apart_ = bodyB.position - bodyA.position;
-    createdA_ = {a.moved, a.turned}, createdB_ = {b.moved, b.turned};
-    edges_ = points_.size() == 1 && roundA_ == 0 && roundB_ == 0 && (points_[0].key.id & kEdgePair) == kEdgePair;
     for (Point& p : points_) p.lever = (p.rA - centreA_).length();
-    rub_ = {rubbed.dot(tangent1_), rubbed.dot(tangent2_)};
-    // Отклик трения в центре: матрица 2 × 2 и её обратная.
-    const Vector3 a1 = centreA_.cross(tangent1_), a2 = centreA_.cross(tangent2_), b1 = centreB_.cross(tangent1_), b2 = centreB_.cross(tangent2_);
-    const Real k11 = a.inverseMass + b.inverseMass + a1.dot(a.spinFrom(a1)) + b1.dot(b.spinFrom(b1));
-    const Real k22 = a.inverseMass + b.inverseMass + a2.dot(a.spinFrom(a2)) + b2.dot(b.spinFrom(b2));
-    const Real k12 = a1.dot(a.spinFrom(a2)) + b1.dot(b.spinFrom(b2));
-    tangentMass_ = Matrix2x2{k11, k12, k12, k22}.inverse();
-    const Real around = n.dot(a.spinFrom(n) + b.spinFrom(n));
-    twistMass_ = around > 0 ? 1 / around : 0;
-    rolling_.prepare(a, b, tangent1_, tangent2_);
+    return rubbed;
 }
+
 
 void SoftContact::aim(const BodyMotion& a, const BodyMotion& b, Vector3 apart, const ClosestPoints* found) {
     if (roundA_ > 0 && roundB_ > 0) {
