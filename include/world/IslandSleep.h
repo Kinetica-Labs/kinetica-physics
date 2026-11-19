@@ -22,6 +22,8 @@ public:
 
 private:
     void wakeIsland(std::vector<Body>& bodies, int island);
+    bool restingLongEnough(const std::vector<Body>& bodies, Real dt, Real speedLimit, Real time);
+    void putToSleep(std::vector<Body>& bodies, const std::vector<int>& top, const std::vector<char>& restless);
 
     // Спит ли тело, его масса на время сна, сколько оно уже медленнее порога и остров, с
     // которым оно уснуло.
