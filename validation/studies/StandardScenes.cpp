@@ -12,6 +12,8 @@
 // Рядом с замерами пишется файл <scenes>.shapes.jsonl — очертания тел каждой сцены в начале и в
 // момент проверки, сбоку (вдоль оси z) и с торца (вдоль оси x): по ним строится рисунок сцен.
 
+#include <math/WorkerPool.h>
+#include <cstdlib>
 #include <collision/PairFinder.h>
 #include "../../examples/scenes/StandardScenes.h"
 #include "OverlapDepth.h"
@@ -80,6 +82,7 @@ void shapes(std::FILE* file, const char* scene, const char* when, const World& w
 } // namespace
 
 int main(int argc, char** argv) {
+    if (const char* threads = std::getenv("KP_THREADS")) kp::WorkerPool::shared().resize(std::atoi(threads)); // число потоков пула
     std::FILE* rows = argc > 1 ? std::fopen(argv[1], "w") : nullptr;
     const double budget = argc > 2 ? std::atof(argv[2]) : 120;
     std::FILE* drawn = rows ? std::fopen((std::string(argv[1]) + ".shapes.jsonl").c_str(), "w") : nullptr;

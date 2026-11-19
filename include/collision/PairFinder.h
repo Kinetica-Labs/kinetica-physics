@@ -28,6 +28,8 @@ public:
     std::vector<ContactPair> pairs(Real h, const JointSet& joints) const;
 
 private:
+    std::vector<ContactPair> between(int i, int j, Real h) const;
+
     const std::vector<Body>& bodies_;
     Vector3 gravity_;
 };

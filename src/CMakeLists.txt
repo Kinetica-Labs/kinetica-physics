@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 add_library(kinetica-physics STATIC
   math/Matrix3x3.cpp
   math/Quaternion.cpp
+  math/WorkerPool.cpp
   world/World.cpp
   world/IslandSleep.cpp
   collision/ContactPair.cpp
@@ -66,6 +67,8 @@ add_library(kinetica-physics STATIC
   debug/DebugGeometry.cpp)
 target_include_directories(kinetica-physics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_compile_features(kinetica-physics PUBLIC cxx_std_17)
+find_package(Threads REQUIRED)
+target_link_libraries(kinetica-physics PUBLIC Threads::Threads) # пул потоков (math/WorkerPool.h)
 # Слияние умножения со сложением (FMA) меняет биты от компилятора к компилятору — запрещено
 # и движку, и всем, кто включает его заголовки.
 target_compile_options(kinetica-physics PUBLIC -ffp-contract=off PRIVATE -Wall -Wextra -Wpedantic)

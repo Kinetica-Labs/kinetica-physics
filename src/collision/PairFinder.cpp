@@ -1,5 +1,7 @@
 #include <collision/PairFinder.h>
 
+#include <math/WorkerPool.h>
+
 #include <algorithm>
 
 namespace kp {
@@ -59,32 +61,47 @@ std::vector<std::pair<int, int>> partPairs(const Body& a, const Body& b, Vector3
 
 } // namespace
 
-std::vector<ContactPair> PairFinder::pairs(Real h) const {
-    const DynamicTree tree = this->tree(h);
+// Пары частей тел i и j — в порядке partPairs.
+std::vector<ContactPair> PairFinder::between(int i, int j, Real h) const {
     std::vector<ContactPair> pairs;
-    std::vector<int> candidates;
+    const Body &a = bodies_[size_t(i)], &b = bodies_[size_t(j)];
+    if (!a.parts && !b.parts) {
+        if (const std::optional<ContactPair> pair = examinePair(bodies_, i, j, gravity_, h, boundary)) pairs.push_back(*pair);
+        return pairs;
+    }
+    for (const auto& [p, q] : partPairs(a, b, gravity_, h)) {
+        std::optional<ContactPair> pair = examinePair(a.part(p), b.part(q), gravity_, h, boundary);
+        if (!pair) continue;
+        pair->a = i, pair->b = j, pair->partA = p, pair->partB = q;
+        pairs.push_back(*pair);
+    }
+    return pairs;
+}
+
+// Кандидатов отбирает дерево, в одном потоке; проверка каждой пары тел — отдельное задание пула
+// (WorkerPool). Ответы склеиваются в порядке кандидатов, поэтому от числа потоков список не зависит.
+// Сцену меньше kParallelParts частей дешевле проверить в одном потоке, чем будить остальные.
+std::vector<ContactPair> PairFinder::pairs(Real h) const {
+    constexpr int kParallelParts = 64;
+    const DynamicTree tree = this->tree(h);
+    std::vector<std::pair<int, int>> candidates;
+    int parts = 0;
     for (int i = 0; i < int(bodies_.size()); ++i) {
         if (!bodies_[size_t(i)].shape) continue;
-        candidates.clear();
+        parts += bodies_[size_t(i)].partCount();
+        const size_t first = candidates.size();
         tree.query(reachBounds(bodies_[size_t(i)], gravity_, h), [&](int j) {
-            if (j > i) candidates.push_back(j);
+            if (j > i) candidates.push_back({i, j});
         });
         // Кандидаты — по возрастанию номера: порядок пар не должен зависеть от формы дерева.
-        std::sort(candidates.begin(), candidates.end());
-        for (int j : candidates) {
-            const Body &a = bodies_[size_t(i)], &b = bodies_[size_t(j)];
-            if (!a.parts && !b.parts) {
-                if (const std::optional<ContactPair> pair = examinePair(bodies_, i, j, gravity_, h, boundary)) pairs.push_back(*pair);
-                continue;
-            }
-            for (const auto& [p, q] : partPairs(a, b, gravity_, h)) {
-                std::optional<ContactPair> pair = examinePair(a.part(p), b.part(q), gravity_, h, boundary);
-                if (!pair) continue;
-                pair->a = i, pair->b = j, pair->partA = p, pair->partB = q;
-                pairs.push_back(*pair);
-            }
-        }
+        std::sort(candidates.begin() + std::ptrdiff_t(first), candidates.end());
     }
+    std::vector<std::vector<ContactPair>> found(candidates.size());
+    const auto examine = [&](size_t k) { found[k] = between(candidates[k].first, candidates[k].second, h); };
+    if (parts < kParallelParts) for (size_t k = 0; k < candidates.size(); ++k) examine(k);
+    else WorkerPool::shared().run(candidates.size(), examine);
+    std::vector<ContactPair> pairs;
+    for (const std::vector<ContactPair>& some : found) pairs.insert(pairs.end(), some.begin(), some.end());
     return pairs;
 }
 

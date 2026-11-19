@@ -5,6 +5,8 @@
 //
 //   study-state-hash [кадров на сцену, по умолчанию 60]
 
+#include <math/WorkerPool.h>
+#include <cstdlib>
 #include "../../examples/scenes/ExactScenes.h"
 #include "../../examples/scenes/StandardScenes.h"
 
@@ -54,6 +56,7 @@ void print(const char* key, const char* step, std::uint64_t value) {
 } // namespace
 
 int main(int argc, char** argv) {
+    if (const char* threads = std::getenv("KP_THREADS")) kp::WorkerPool::shared().resize(std::atoi(threads)); // число потоков пула
     const int frames = argc > 1 ? std::atoi(argv[1]) : 60;
     for (const StandardScene& scene : standardScenes()) {
         // Стена точным шагом считается минутами: её отпечаток берётся только у быстрого шага.
