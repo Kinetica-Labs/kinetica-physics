@@ -1,4 +1,4 @@
-#include <kp/collision/PairFinder.h>
+#include <collision/PairFinder.h>
 
 #include <algorithm>
 
@@ -29,6 +29,36 @@ DynamicTree PairFinder::tree(Real h) const {
     return tree;
 }
 
+namespace {
+
+// Пары частей двух тел, из которых хотя бы одно составное: каждая часть одного с каждой частью
+// другого. Если у одного из тел есть дерево частей, кандидатов отбирает оно; проверяет их тот же
+// examinePair, и пары идут в том же порядке, поэтому ответ тот же, что у перебора.
+std::vector<std::pair<int, int>> partPairs(const Body& a, const Body& b, Vector3 gravity, Real h) {
+    std::vector<std::pair<int, int>> together;
+    const Body& treed = a.partTree ? a : b;
+    if (treed.partTree) {
+        const Body& other = a.partTree ? b : a;
+        // Наибольший путь сближения, какой examinePair насчитает паре частей этих тел.
+        const Vector3 inverse = treed.mass.inverseInertia;
+        const Real fastest = treed.linearVelocity().length() + treed.angularMomentum.length() * std::max({inverse.x, inverse.y, inverse.z}) * treed.shape->boundingRadius();
+        for (int q = 0; q < other.partCount(); ++q) {
+            const Body part = other.part(q);
+            const Vector3 centre = frameOf(treed).localPoint(part.pose().position);
+            const Real reach = part.shape->boundingRadius() + (fastest + maxPointSpeed(part) + gravity.length() * h) * h + kContactDistance;
+            const Vector3 grow{reach, reach, reach};
+            treed.partTree->query({centre - grow, centre + grow}, [&](int p) { together.push_back(a.partTree ? std::make_pair(p, q) : std::make_pair(q, p)); });
+        }
+        std::sort(together.begin(), together.end());
+    } else {
+        for (int p = 0; p < a.partCount(); ++p)
+            for (int q = 0; q < b.partCount(); ++q) together.push_back({p, q});
+    }
+    return together;
+}
+
+} // namespace
+
 std::vector<ContactPair> PairFinder::pairs(Real h) const {
     const DynamicTree tree = this->tree(h);
     std::vector<ContactPair> pairs;
@@ -47,29 +77,7 @@ std::vector<ContactPair> PairFinder::pairs(Real h) const {
                 if (const std::optional<ContactPair> pair = examinePair(bodies_, i, j, gravity_, h, boundary)) pairs.push_back(*pair);
                 continue;
             }
-            // Составные тела: каждая часть одного с каждой частью другого. Если у одного из тел
-            // есть дерево частей, кандидатов отбирает оно; проверяет их тот же examinePair, и
-            // пары идут в том же порядке, поэтому ответ тот же, что у перебора.
-            std::vector<std::pair<int, int>> together;
-            const Body& treed = a.partTree ? a : b;
-            if (treed.partTree) {
-                const Body& other = a.partTree ? b : a;
-                // Наибольший путь сближения, какой examinePair насчитает паре частей этих тел.
-                const Vector3 inverse = treed.mass.inverseInertia;
-                const Real fastest = treed.linearVelocity().length() + treed.angularMomentum.length() * std::max({inverse.x, inverse.y, inverse.z}) * treed.shape->boundingRadius();
-                for (int q = 0; q < other.partCount(); ++q) {
-                    const Body part = other.part(q);
-                    const Vector3 centre = treed.frame().localPoint(part.pose().position);
-                    const Real reach = part.shape->boundingRadius() + (fastest + maxPointSpeed(part) + gravity_.length() * h) * h + kContactDistance;
-                    const Vector3 grow{reach, reach, reach};
-                    treed.partTree->query({centre - grow, centre + grow}, [&](int p) { together.push_back(a.partTree ? std::make_pair(p, q) : std::make_pair(q, p)); });
-                }
-                std::sort(together.begin(), together.end());
-            } else {
-                for (int p = 0; p < a.partCount(); ++p)
-                    for (int q = 0; q < b.partCount(); ++q) together.push_back({p, q});
-            }
-            for (const auto& [p, q] : together) {
+            for (const auto& [p, q] : partPairs(a, b, gravity_, h)) {
                 std::optional<ContactPair> pair = examinePair(a.part(p), b.part(q), gravity_, h, boundary);
                 if (!pair) continue;
                 pair->a = i, pair->b = j, pair->partA = p, pair->partB = q;

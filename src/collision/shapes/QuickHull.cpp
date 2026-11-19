@@ -11,7 +11,7 @@
 // настоящие грани тела — у куба их шесть, а не двенадцать треугольников. Образец слияния —
 // построитель оболочки в ReactPhysics3D (src/utils/quickhull).
 
-#include <kp/collision/shapes/ConvexHull.h>
+#include <collision/shapes/ConvexHull.h>
 
 #include <algorithm>
 #include <map>
@@ -43,6 +43,7 @@ public:
 
 private:
     Real distance(const Triangle& face, int point) const { return face.normal.dot(points_[size_t(point)]) - face.offset; }
+    std::vector<int> coplanarGroups() const;
 
     int addFace(int a, int b, int c) {
         const Vector3 pa = points_[size_t(a)];
@@ -129,10 +130,9 @@ void Builder::addVertex(int point) {
     for (int orphan : orphans) assign(orphan, created);
 }
 
-// Треугольники сливаются в грани, грани переводятся в обходы вершин.
-ConvexHull Builder::hull() const {
-    // Группы копланарных треугольников: два соседа сливаются, если противолежащая вершина каждого
-    // лежит в плоскости другого.
+// Группы копланарных треугольников: два соседа сливаются, если противолежащая вершина каждого лежит
+// в плоскости другого. Возвращает для каждого треугольника младший треугольник его группы.
+std::vector<int> Builder::coplanarGroups() const {
     std::vector<int> group(faces_.size());
     for (size_t f = 0; f < group.size(); ++f) group[f] = int(f);
     const auto root = [&](int f) {
@@ -153,6 +153,14 @@ ConvexHull Builder::hull() const {
             abs(distance(other, apex(face, edge.first, edge.second))) <= tolerance_)
             group[size_t(std::max(root(f), root(g)))] = std::min(root(f), root(g));
     }
+    for (size_t f = 0; f < group.size(); ++f) group[f] = root(int(f));
+    return group;
+}
+
+// Треугольники сливаются в грани, грани переводятся в обходы вершин.
+ConvexHull Builder::hull() const {
+    const std::vector<int> group = coplanarGroups();
+    const auto root = [&](int f) { return group[size_t(f)]; };
 
     // Край группы: рёбра, за которыми лежит другая группа. next — следующая вершина обхода,
     // across — группа за ребром, выходящим из вершины.

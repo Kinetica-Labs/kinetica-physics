@@ -1,4 +1,4 @@
-#include <kp/joints/Joint.h>
+#include <joints/Joint.h>
 
 namespace kp {
 namespace {
@@ -8,7 +8,7 @@ Vector3 basis(int k) { return {Real(k == 0), Real(k == 1), Real(k == 2)}; }
 // Угловое ускорение свободного тела: у тела с неравными моментами инерции угловая скорость
 // меняется и без сил, α = I⁻¹ (L × ω).
 Vector3 freeSpinUp(const Body& body) {
-    return body.isStatic() ? Vector3{} : body.inverseInertiaTimes(body.angularMomentum.cross(body.angularVelocity()));
+    return body.isStatic() ? Vector3{} : inverseInertiaTimes(body, body.angularMomentum.cross(body.angularVelocity()));
 }
 
 } // namespace

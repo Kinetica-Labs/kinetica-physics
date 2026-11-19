@@ -1,17 +1,17 @@
 // Геометрия против формул: расстояния и глубины, у которых есть точный ответ.
 
-#include <kp/body/CompoundBodyBuilder.h>
-#include <kp/collision/narrowphase/HullVsHullAlgorithm.h>
+#include <body/CompoundBodyBuilder.h>
+#include <collision/narrowphase/HullVsHullAlgorithm.h>
 #include "Check.h"
 
-#include <kp/collision/shapes/Capsule.h>
-#include <kp/collision/shapes/Sphere.h>
-#include <kp/body/Body.h>
-#include <kp/body/MassFrame.h>
-#include <kp/collision/narrowphase/Gjk.h>
-#include <kp/collision/narrowphase/ContactManifold.h>
-#include <kp/collision/shapes/Meshes.h>
-#include <kp/collision/narrowphase/Sat.h>
+#include <collision/shapes/Capsule.h>
+#include <collision/shapes/Sphere.h>
+#include <body/Body.h>
+#include <body/MassFrame.h>
+#include <collision/narrowphase/Gjk.h>
+#include <collision/narrowphase/ContactManifold.h>
+#include <collision/shapes/Meshes.h>
+#include <collision/narrowphase/Sat.h>
 
 #include <algorithm>
 #include <cmath>

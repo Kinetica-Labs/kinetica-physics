@@ -1,6 +1,6 @@
 // Первый пример: куб падает на пол. Показывает весь путь — мир, тела, шаг, чтение результата.
 
-#include <kp/world/World.h>
+#include <world/World.h>
 
 #include <cstdio>
 

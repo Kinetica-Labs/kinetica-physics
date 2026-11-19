@@ -2,7 +2,7 @@
 //
 //   compare-ours [realtime ПОДШАГОВ [sleep] | exact]     по умолчанию realtime 8; sleep — со сном островов, как в окне
 #include "common.h"
-#include <kp/physics.h>
+#include <physics.h>
 
 #include <cstdlib>
 
@@ -27,8 +27,8 @@ int main(int argc, char** argv) {
         }
         for (const JointSpec& j : s.joints) {
             const Vector3 at{j.anchor.x, j.anchor.y, j.anchor.z};
-            if (j.weld) world.addWeld(BodyId(j.a), BodyId(j.b), at);
-            else world.addHinge(BodyId(j.a), BodyId(j.b), at, {0, 0, 1});
+            if (j.weld) addWeld(world, BodyId(j.a), BodyId(j.b), at);
+            else addHinge(world, BodyId(j.a), BodyId(j.b), at, {0, 0, 1});
         }
         play([&](double dt) { world.step(Real(dt)); }, [&] {
             std::vector<State> st;

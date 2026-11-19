@@ -9,8 +9,8 @@
 //
 // Три популяции поз: случайные, почти параллельные грани, далеко от начала координат.
 
-#include <kp/collision/narrowphase/Gjk.h>
-#include <kp/collision/narrowphase/Sat.h>
+#include <collision/narrowphase/Gjk.h>
+#include <collision/narrowphase/Sat.h>
 
 #include <algorithm>
 #include <cmath>

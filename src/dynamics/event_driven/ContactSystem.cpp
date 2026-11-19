@@ -1,4 +1,4 @@
-#include <kp/dynamics/event_driven/ContactSystem.h>
+#include <dynamics/event_driven/ContactSystem.h>
 
 #include <algorithm>
 
@@ -22,7 +22,7 @@ ContactSystem::SparseMatrix ContactSystem::responseMatrix(const std::vector<Body
             const bool sourceIsB = source.b == int(index);
             const Real sign = sourceIsB ? Real(1) : Real(-1);
             const Vector3 velocity = (sign * body.mass.inverseMass) * source.linear;
-            const Vector3 spin = sign * body.inverseInertiaTimes(sourceIsB ? source.angularB : source.angularA);
+            const Vector3 spin = sign * inverseInertiaTimes(body, sourceIsB ? source.angularB : source.angularA);
             for (size_t i : onBody[index]) {
                 const Line& target = lines[i];
                 const bool targetIsB = target.b == int(index);

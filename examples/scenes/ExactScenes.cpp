@@ -25,7 +25,7 @@ void spin(Body& body, Vector3 omega, Vector3 about) {
 double energy(const World& world) {
     double total = 0;
     for (const Body& body : world.bodies())
-        if (!body.isStatic()) total += double(body.kineticEnergy()) + massOf(body) * kG * double(body.position.y);
+        if (!body.isStatic()) total += double(kineticEnergyOf(body)) + massOf(body) * kG * double(body.position.y);
     return total;
 }
 
@@ -45,7 +45,7 @@ Body rodAt(double angle, Vector3 pivot) {
 World pendulum() {
     World world;
     const BodyId base = anchor(world);
-    world.addHinge(base, world.addBody(rodAt(kRelease, kPivot)), kPivot, {0, 0, 1});
+    addHinge(world, base, world.addBody(rodAt(kRelease, kPivot)), kPivot, {0, 0, 1});
     return world;
 }
 
@@ -74,7 +74,7 @@ World heavyChain() {
     for (int i = 0; i < 10; ++i) {
         Body link = Body::box({Real(0.1), Real(0.03), Real(0.03)}, i == 9 ? 100000 : 1000, kPivot + Vector3{Real(0.1 + 0.2 * i), 0, 0});
         const BodyId id = world.addBody(link);
-        world.addHinge(previous, id, kPivot + Vector3{Real(0.2 * i), 0, 0}, {0, 0, 1});
+        addHinge(world, previous, id, kPivot + Vector3{Real(0.2 * i), 0, 0}, {0, 0, 1});
         previous = id;
     }
     return world;
@@ -97,7 +97,7 @@ World gyroscope() {
     Body disc = Body::cylinder(Real(0.03), Real(kGyroRadius), 1000, kPivot + Vector3{Real(kGyroArm), 0, 0});
     disc.orientation = Quaternion::fromRotationVector({0, 0, Real(-kPiD / 2)}); // ось диска — вдоль x
     spin(disc, {Real(kGyroSpin), Real(kGyroTurn), 0}, kPivot);
-    world.addBallJoint(base, world.addBody(disc), kPivot);
+    addBallJoint(world, base, world.addBody(disc), kPivot);
     return world;
 }
 
@@ -118,7 +118,7 @@ World conicalPendulum() {
     const BodyId base = anchor(world);
     Body rod = rodAt(kConeTilt, kPivot);
     spin(rod, {0, Real(coneTurn()), 0}, kPivot);
-    world.addBallJoint(base, world.addBody(rod), kPivot);
+    addBallJoint(world, base, world.addBody(rod), kPivot);
     return world;
 }
 
@@ -139,11 +139,11 @@ World sliderCrank() {
     Body rod = Body::box({Real(kRod / 2), Real(0.02), Real(0.02)}, 1000, tip + Vector3{Real(kRod / 2), 0, 0});
     spin(rod, {0, 0, Real(-kCrankSpeed * kCrank / kRod)}, pin); // в этот миг шатун поворачивается вокруг пальца поршня
     const BodyId crankId = world.addBody(crank), rodId = world.addBody(rod), piston = world.addBody(Body::box({Real(0.06), Real(0.05), Real(0.05)}, 1000, pin));
-    HingeJoint& drive = world.addHinge(base, crankId, kPivot, {0, 0, 1});
+    HingeJoint& drive = addHinge(world, base, crankId, kPivot, {0, 0, 1});
     drive.holdSpeed = true, drive.driveSpeed = Real(kCrankSpeed);
-    world.addBallJoint(crankId, rodId, tip);
-    world.addBallJoint(rodId, piston, pin);
-    world.addSlider(base, piston, pin, {1, 0, 0});
+    addBallJoint(world, crankId, rodId, tip);
+    addBallJoint(world, rodId, piston, pin);
+    addSlider(world, base, piston, pin, {1, 0, 0});
     return world;
 }
 
@@ -160,7 +160,7 @@ World weldedBeam() {
     BodyId previous = anchor(world);
     for (int i = 0; i < 6; ++i) {
         const BodyId link = world.addBody(Body::box({Real(0.1), Real(0.03), Real(0.03)}, 1000, kPivot + Vector3{Real(0.1 + 0.2 * i), 0, 0}));
-        world.addWeld(previous, link, kPivot + Vector3{Real(0.2 * i), 0, 0});
+        addWeld(world, previous, link, kPivot + Vector3{Real(0.2 * i), 0, 0});
         previous = link;
     }
     return world;

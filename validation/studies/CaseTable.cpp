@@ -24,9 +24,9 @@
 //   числа          — в состоянии нет бесконечностей и «не чисел»;
 //   конец шага     — в шаге не больше 10 000 отрезков, и движок не остановил его сам.
 
-#include <kp/collision/ContactPair.h>
-#include <kp/collision/narrowphase/Gjk.h>
-#include <kp/world/World.h>
+#include <collision/ContactPair.h>
+#include <collision/narrowphase/Gjk.h>
+#include <world/World.h>
 
 #include <atomic>
 #include <chrono>
@@ -167,7 +167,7 @@ struct Cell {
 double energy(const World& world) {
     double sum = 0;
     for (const Body& body : world.bodies())
-        if (!body.isStatic()) sum += body.kineticEnergy() - world.gravity.dot(body.position) / body.mass.inverseMass;
+        if (!body.isStatic()) sum += kineticEnergyOf(body) - world.gravity.dot(body.position) / body.mass.inverseMass;
     return sum;
 }
 
@@ -217,7 +217,7 @@ Outcome run(World world, Real dt, int steps) {
         out.deepest = watch.deepest;
         out.hit = (body.linearMomentum - before).length() > 1e-9 * (before.length() + 1e-300);
     };
-    const double scale = body.kineticEnergy() + world.gravity.length() * body.shape->boundingRadius() / body.mass.inverseMass;
+    const double scale = kineticEnergyOf(body) + world.gravity.length() * body.shape->boundingRadius() / body.mass.inverseMass;
     Outcome out;
     double lowest = energy(world); // самый низкий уровень энергии за пробу
     double weight = 0;             // вес подвижных тел, Н

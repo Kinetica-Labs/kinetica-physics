@@ -1,4 +1,4 @@
-#include <kp/joints/SingleFreedomJoint.h>
+#include <joints/SingleFreedomJoint.h>
 
 #include <algorithm>
 

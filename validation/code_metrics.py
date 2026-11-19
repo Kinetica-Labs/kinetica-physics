@@ -24,7 +24,7 @@ LAYERS = ["math", "collision/broadphase", "collision/shapes", "collision/narrowp
 
 
 def sources():
-    files = sorted(ROOT.glob("src/**/*.cpp")) + sorted(ROOT.glob("include/kp/**/*.h"))
+    files = sorted(ROOT.glob("src/**/*.cpp")) + sorted(ROOT.glob("include/**/*.h"))
     return {f.relative_to(ROOT).as_posix(): f.read_text(encoding="utf-8") for f in files}
 
 
@@ -85,7 +85,7 @@ def publicMethods(body, isStruct):
 
 
 def layerOf(path):
-    parts = path.replace("include/kp/", "").replace("src/", "").split("/")
+    parts = path.replace("include/", "").replace("src/", "").split("/")
     return "/".join(parts[:2]) if parts[0] == "collision" and len(parts) > 2 else parts[0]
 
 
@@ -95,8 +95,8 @@ def upwardIncludes(files):
     for path, text in files.items():
         if path.count("/") < 3 and path.startswith("include"):
             continue  # общий заголовок physics.h включает всё
-        for header in re.findall(r'#include\s*[<"]kp/([\w/]+\.h)', text):
-            if rank[layerOf("include/kp/" + header)] > rank[layerOf(path)]:
+        for header in re.findall(r'#include\s*<((?:math|collision|body|joints|dynamics|world|debug)/[\w/]+\.h)', text):
+            if rank[layerOf("include/" + header)] > rank[layerOf(path)]:
                 found.append((path, header))
     return found
 

@@ -1,7 +1,7 @@
 #pragma once
 // Камера окна просмотра: смотрит на точку target с расстояния distance, вращается вокруг неё.
 
-#include <kp/math/Vector3.h>
+#include <math/Vector3.h>
 
 #include <array>
 #include <cmath>

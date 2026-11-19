@@ -2,8 +2,8 @@
 // Те же сцены, что в сериях A и C табло, но с числами о работе решателя.
 //   study-stack [наибольшее N стопки]
 
-#include <kp/collision/shapes/ConvexHull.h>
-#include <kp/world/World.h>
+#include <collision/shapes/ConvexHull.h>
+#include <world/World.h>
 
 #include <algorithm>
 #include <chrono>
@@ -34,7 +34,7 @@ struct Outcome {
 double energy(const World& world) {
     double total = 0;
     for (const Body& b : world.bodies())
-        if (!b.isStatic()) total += b.kineticEnergy() - world.gravity.dot(b.position) / b.mass.inverseMass;
+        if (!b.isStatic()) total += kineticEnergyOf(b) - world.gravity.dot(b.position) / b.mass.inverseMass;
     return total;
 }
 

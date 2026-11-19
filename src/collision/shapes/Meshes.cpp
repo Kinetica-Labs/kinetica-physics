@@ -1,6 +1,6 @@
-#include <kp/collision/shapes/Meshes.h>
+#include <collision/shapes/Meshes.h>
 
-#include <kp/math/math_functions.h>
+#include <math/math_functions.h>
 
 namespace kp {
 

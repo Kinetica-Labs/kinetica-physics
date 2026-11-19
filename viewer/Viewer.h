@@ -3,7 +3,7 @@
 
 #include "Camera.h"
 #include "Scenes.h"
-#include <kp/debug/DebugGeometry.h>
+#include <debug/DebugGeometry.h>
 
 struct Viewer {
     size_t scene = 0;
@@ -17,13 +17,16 @@ struct Viewer {
     bool sleeping = true;          // покоящиеся острова тел засыпают (World::sleeping)
     int segmentLimit = 8;          // отрезков на кадр точного шага, не больше (World::maxSegments)
     bool realtime = true;          // шаг с постоянной ценой кадра (World::realtime); без него шаг точный
-    float rollingResistance = 1;   // плечо трения качения, мм (SoftStep::rollingResistance); 0 — качение без потерь
-    // Сколько раз за кадр шаг с постоянной ценой заново ищет точки и нормали контакта (мир шагает
-    // kFrame / contactUpdates, подшагов во столько же раз меньше). Нормаль контакта за шаг мира не
-    // поворачивается вместе с телами: при одном обновлении на кадр качающаяся цепь из торов набирала
-    // энергию (54 → 141 Дж за 30 с), при четырёх — теряет.
-    int contactUpdates = 4;
-    int substeps = 8;              // подшагов на кадр всего (SoftStep::substeps на шаг мира — substeps / contactUpdates)
+    // Плечо трения качения, мм (SoftStep::rollingResistance). По умолчанию ноль, как в Bullet и
+    // ReactPhysics3D: это сухое трение, и на остром ребре оно держит куб в неустойчивом равновесии
+    // (при 1 мм — в окне ±0,3° вместе со сном). Движение гасит сопротивление среды.
+    float rollingResistance = 0;
+    // Сопротивление среды, 1/с (Body::linearDamping и angularDamping всех тел). Раскачанная цепь при
+    // 0,1 теряет 99 % энергии за 33 с, при 0,2 — за 18 с, без него не успокаивается. У сцен с точным
+    // ответом выключено: формула — без воздуха.
+    float damping = 0.1f;
+    int contactUpdates = 4;        // обновлений контакта на кадр (SoftStep::contactUpdates)
+    int substeps = 8;              // подшагов на кадр всего (SoftStep::substeps)
     double lag = 0;                // на сколько сцена отстала от часов из-за этого предела, с
 
     // Захват тела мышью. Луч от курсора находит тело и точку на нём; к точке цепляется упругая

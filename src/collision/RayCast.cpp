@@ -1,7 +1,7 @@
-#include <kp/collision/shapes/Sphere.h>
-#include <kp/collision/RayCast.h>
+#include <collision/shapes/Sphere.h>
+#include <collision/RayCast.h>
 
-#include <kp/collision/narrowphase/Gjk.h>
+#include <collision/narrowphase/Gjk.h>
 
 namespace kp {
 namespace {

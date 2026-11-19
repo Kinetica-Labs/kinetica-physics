@@ -35,6 +35,12 @@ void drawPanel(Viewer& viewer, const DebugGeometry& all, int width, int height) 
     ImGui::SameLine();
     if (ImGui::Button("Заново")) viewer.load(viewer.scene);
 
+    // Режим — двумя кнопками, а не галочкой: смена режима начинает сцену заново, иначе точный шаг
+    // получил бы тела, уже вдавленные друг в друга быстрым.
+    ImGui::SeparatorText("Режим шага");
+    if (ImGui::RadioButton("быстрый: цена кадра постоянна, тела могут войти друг в друга", viewer.realtime) && !viewer.realtime) viewer.realtime = true, viewer.load(viewer.scene);
+    if (ImGui::RadioButton("точный: без перекрытий, цена кадра растёт с числом событий", !viewer.realtime) && viewer.realtime) viewer.realtime = false, viewer.load(viewer.scene);
+
     ImGui::SeparatorText("Показывать");
     ImGui::Checkbox("заливка и свет", &viewer.fill);
     ImGui::Checkbox("тела", &viewer.show[int(DebugKind::Shape)]);
@@ -56,8 +62,8 @@ void drawPanel(Viewer& viewer, const DebugGeometry& all, int width, int height) 
     ImGui::Text("отрезков шага %d, проходов решателя %d", viewer.world.report().segments, viewer.world.report().solverIterations);
     ImGui::Text("счёт шага %.2f мс, самый долгий %.2f мс", viewer.lastStep, viewer.slowestStep);
     ImGui::Text("отрезков в шаге не больше %d", viewer.mostSegments);
-    ImGui::Checkbox("шаг с постоянной ценой кадра (иначе точный)", &viewer.realtime);
-    ImGui::SliderFloat("трение качения, мм (0 - как на Луне)", &viewer.rollingResistance, 0, 5, "%.1f");
+    ImGui::SliderFloat("сопротивление воздуха, 1/с (0 - как на Луне)", &viewer.damping, 0, 2, "%.2f");
+    ImGui::SliderFloat("трение качения, мм", &viewer.rollingResistance, 0, 5, "%.1f");
     ImGui::SliderInt("обновлений контакта на кадр", &viewer.contactUpdates, 1, 4);
     ImGui::Checkbox("четыре точки контакта на пару (иначе все)", &viewer.world.soft.fourContactPoints);
     ImGui::SliderInt("подшагов на кадр", &viewer.substeps, 1, 16);

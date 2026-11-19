@@ -1,7 +1,7 @@
-#include <kp/collision/PairFinder.h>
-#include <kp/collision/shapes/Capsule.h>
-#include <kp/collision/shapes/Cylinder.h>
-#include <kp/debug/DebugGeometry.h>
+#include <collision/PairFinder.h>
+#include <collision/shapes/Capsule.h>
+#include <collision/shapes/Cylinder.h>
+#include <debug/DebugGeometry.h>
 
 #include <cstdio>
 

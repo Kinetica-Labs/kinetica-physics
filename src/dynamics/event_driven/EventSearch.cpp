@@ -1,11 +1,11 @@
-#include <kp/dynamics/event_driven/EventSearch.h>
+#include <dynamics/event_driven/EventSearch.h>
 
-#include <kp/collision/narrowphase/Gjk.h>
-#include <kp/collision/narrowphase/TimeOfImpact.h>
-#include <kp/collision/shapes/ConvexHull.h>
-#include <kp/collision/shapes/Cylinder.h>
-#include <kp/joints/SingleFreedomJoint.h>
-#include <kp/dynamics/Integrator.h>
+#include <collision/narrowphase/Gjk.h>
+#include <collision/narrowphase/TimeOfImpact.h>
+#include <collision/shapes/ConvexHull.h>
+#include <collision/shapes/Cylinder.h>
+#include <joints/SingleFreedomJoint.h>
+#include <dynamics/Integrator.h>
 
 #include <algorithm>
 #include <limits>

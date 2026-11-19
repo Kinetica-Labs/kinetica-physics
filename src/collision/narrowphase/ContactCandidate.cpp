@@ -1,4 +1,4 @@
-#include <kp/collision/narrowphase/ContactCandidate.h>
+#include <collision/narrowphase/ContactCandidate.h>
 
 #include <algorithm>
 #include <limits>

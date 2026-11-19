@@ -1,6 +1,6 @@
 // Зонд: какое отображение «вектор поворота -> кватернион» ставить в правило средней точки.
-#include <kp/body/Body.h>
-#include <kp/dynamics/Integrator.h>
+#include <body/Body.h>
+#include <dynamics/Integrator.h>
 #include <cmath>
 #include <cstdio>
 using namespace kp;
@@ -23,7 +23,7 @@ Quaternion mapExp(Vector3 t) {
 template <class Map> void integratePosition(Body& b, Real dt, Map map, int iterations = 4) {
     const Quaternion start = b.orientation;
     Quaternion end = start;
-    for (int i = 0; i < iterations; ++i) end = (map(dt * b.angularVelocityAt(midpoint(start, end))) * start).unit();
+    for (int i = 0; i < iterations; ++i) end = (map(dt * angularVelocityAt(b, midpoint(start, end))) * start).unit();
     b.orientation = end;
 }
 double angleBetween(Quaternion a, Quaternion b) {
@@ -47,13 +47,13 @@ template <class Map> void study(const char* name, Map map) {
     for (double w : {5.0, 30.0}) { // кувырок около средней оси; эталон — то же правило с шагом в 256 раз мельче
         for (int substeps : {1, 2, 4}) {
             Body b = box({w, 0.2 * w, 0.2 * w}), ref = b;
-            const double e0 = b.kineticEnergy();
+            const double e0 = kineticEnergyOf(b);
             double worst = 0;
             const int frames = 600;
             for (int f = 0; f < frames; ++f) {
                 for (int s = 0; s < substeps; ++s) integratePosition(b, 1.0 / 60 / substeps, map);
                 for (int s = 0; s < 256; ++s) integratePosition(ref, 1.0 / 60 / 256, mapExp);
-                worst = std::fmax(worst, std::fabs(b.kineticEnergy() - e0) / e0);
+                worst = std::fmax(worst, std::fabs(kineticEnergyOf(b) - e0) / e0);
             }
             std::printf("  прецессия, ω=%g, подшагов %d: энергия %.3g, ориентация через 10 с %.3g град\n", w, substeps, worst,
                         angleBetween(b.orientation, ref.orientation) * 180 / M_PI);

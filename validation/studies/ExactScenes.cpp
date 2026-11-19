@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
             for (int frame = 1; frame <= frames; ++frame) {
                 world.step(Real(1) / 60);
                 unfinished += double(world.report().unfinished);
-                const double exact = scene.exact(frame / 60.0);
+                const double exact = scene.exact(frame / 60.0 - unfinished); // ответ — в пройденный сценой момент времени
                 worst = std::max(worst, std::fabs(scene.measured(world) - exact));
                 low = std::min(low, exact), high = std::max(high, exact);
                 gap = std::max(gap, double(world.joints().largestError(world.bodies())));

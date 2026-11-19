@@ -1,9 +1,9 @@
-#include <kp/collision/PairFinder.h>
+#include <collision/PairFinder.h>
 // Проверки слоя collision: дерево поиска пар.
 
 #include "Check.h"
 
-#include <kp/collision/ContactPair.h>
+#include <collision/ContactPair.h>
 
 #include <cmath>
 #include <cstdint>

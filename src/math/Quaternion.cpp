@@ -1,4 +1,4 @@
-#include <kp/math/Quaternion.h>
+#include <math/Quaternion.h>
 
 namespace kp {
 

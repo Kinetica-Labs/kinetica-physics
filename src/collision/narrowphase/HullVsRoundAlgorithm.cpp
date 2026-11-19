@@ -1,6 +1,6 @@
-#include <kp/collision/narrowphase/HullVsRoundAlgorithm.h>
+#include <collision/narrowphase/HullVsRoundAlgorithm.h>
 
-#include <kp/collision/narrowphase/ContactPatch.h>
+#include <collision/narrowphase/ContactPatch.h>
 
 #include <limits>
 #include <utility>

@@ -1,6 +1,6 @@
 // Слой math: поворот вектора кватернионом и перевод точки из осей тела в мир.
 
-#include <kp/math/Transform.h>
+#include <math/Transform.h>
 
 #include <cstdio>
 

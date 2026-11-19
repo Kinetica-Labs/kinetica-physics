@@ -1,6 +1,6 @@
-#include <kp/world/IslandSleep.h>
+#include <world/IslandSleep.h>
 
-#include <kp/collision/PairFinder.h>
+#include <collision/PairFinder.h>
 
 #include <algorithm>
 

@@ -1,6 +1,6 @@
-#include <kp/collision/narrowphase/Sat.h>
+#include <collision/narrowphase/Sat.h>
 
-#include <kp/collision/narrowphase/TransformedHull.h>
+#include <collision/narrowphase/TransformedHull.h>
 
 namespace kp {
 namespace {

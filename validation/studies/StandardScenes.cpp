@@ -1,7 +1,8 @@
 // Прибор стандартного набора сцен (examples/scenes): каждая сцена считается шагами по 1/60 с, и
 // записывается, чем она кончилась и чего стоила.
 //   study-standard-scenes [scenes.jsonl [предел времени на сцену, с [имя сцены]]]
-// С переменной окружения KP_SLEEP=1 сцены считаются со сном островов (World::sleeping).
+// С переменной окружения KP_SLEEP=1 сцены считаются со сном островов (World::sleeping);
+// KP_DIRECT_ROWS=N — предел числа точек для общего решения нормалей (SoftStep::directContactRows).
 // Мерки те же, что в таблице случаев (CaseTable.cpp):
 //   перекрытие — наибольшая глубина, на которую тела вошли друг в друга, по всем кадрам;
 //   энергия    — наибольший подъём механической энергии над уже достигнутым низшим уровнем, доля
@@ -11,8 +12,9 @@
 // Рядом с замерами пишется файл <scenes>.shapes.jsonl — очертания тел каждой сцены в начале и в
 // момент проверки, сбоку (вдоль оси z) и с торца (вдоль оси x): по ним строится рисунок сцен.
 
-#include <kp/collision/PairFinder.h>
+#include <collision/PairFinder.h>
 #include "../../examples/scenes/StandardScenes.h"
+#include "OverlapDepth.h"
 
 #include <chrono>
 #include <cmath>
@@ -31,7 +33,7 @@ double energy(const World& world) {
     for (size_t i = 0; i < world.bodies().size(); ++i) {
         const Body& b = world.bodies()[i];
         const Real inverseMass = world.mass(BodyId(int(i))).inverseMass;
-        if (inverseMass != 0) total += double(b.kineticEnergy()) - double(world.gravity.dot(b.position) / inverseMass);
+        if (inverseMass != 0) total += double(kineticEnergyOf(b)) - double(world.gravity.dot(b.position) / inverseMass);
     }
     return total;
 }
@@ -39,7 +41,7 @@ double energy(const World& world) {
 double deepestOverlap(const World& world) {
     double deepest = 0;
     for (const ContactPair& pair : PairFinder(world.bodies(), world.gravity).pairs(0))
-        if (pair.inContact()) deepest = std::fmax(deepest, double(overlapDepth(world.bodies()[size_t(pair.a)].part(pair.partA), world.bodies()[size_t(pair.b)].part(pair.partB))));
+        if (pair.inContact()) deepest = std::fmax(deepest, depthOf(pair, world.bodies()[size_t(pair.a)].part(pair.partA), world.bodies()[size_t(pair.b)].part(pair.partB)));
     return deepest;
 }
 
@@ -87,13 +89,14 @@ int main(int argc, char** argv) {
         World world = scene.build();
         world.sleeping = std::getenv("KP_SLEEP") != nullptr;
         world.realtime = std::getenv("KP_REALTIME") != nullptr;
+        if (const char* rows = std::getenv("KP_DIRECT_ROWS")) world.soft.directContactRows = std::atoi(rows);
         const World start = world;
         shapes(drawn, scene.key, "start", world);
         int parts = 0;
         double scale = 0;
         for (const Body& b : world.bodies()) {
             parts += b.partCount();
-            if (!b.isStatic()) scale += double(b.kineticEnergy()) + double(world.gravity.length()) * double(b.boundingRadius()) / double(b.mass.inverseMass);
+            if (!b.isStatic()) scale += double(kineticEnergyOf(b)) + double(world.gravity.length()) * double(b.boundingRadius()) / double(b.mass.inverseMass);
         }
         const int frames = int(std::lround(scene.seconds * 60)), checkFrame = int(std::lround(scene.checkAt * 60));
         double lowest = energy(world), gain = 0, deepest = 0, slowest = 0, total = 0;

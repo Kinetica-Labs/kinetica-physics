@@ -1,7 +1,7 @@
 // Слой geometry: точки контакта двух брусков. Верхний лежит на нижнем со сдвигом и поворотом,
 // поэтому пятно контакта — не квадрат, а обрезанный многоугольник; от него остаются четыре точки.
 
-#include <kp/collision/narrowphase/HullVsHullAlgorithm.h>
+#include <collision/narrowphase/HullVsHullAlgorithm.h>
 #include "HtmlViewer.h"
 
 using namespace kp;

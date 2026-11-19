@@ -1,4 +1,4 @@
-#include <kp/joints/CardanJoint.h>
+#include <joints/CardanJoint.h>
 
 namespace kp {
 

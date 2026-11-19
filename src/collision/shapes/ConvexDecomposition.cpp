@@ -1,6 +1,6 @@
-#include <kp/collision/shapes/ConvexDecomposition.h>
+#include <collision/shapes/ConvexDecomposition.h>
 
-#include <kp/collision/shapes/ConvexHull.h>
+#include <collision/shapes/ConvexHull.h>
 
 #include <algorithm>
 #include <limits>

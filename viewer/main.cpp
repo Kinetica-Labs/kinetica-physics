@@ -1,6 +1,6 @@
 // Окно просмотра: сцены движка в реальном времени на OpenGL.
 //
-//   viewer [--scene N] [--frames N] [--screenshot файл.ppm] [--record префикс]
+//   viewer [--scene N] [--exact 1] [--frames N] [--screenshot файл.ppm] [--record префикс]
 //
 // Управление — на панели в окне и клавишами: 1–9 — сцена, пробел — пауза, → — один шаг,
 // R — сцена заново, T — состояние мира в консоль, левая кнопка мыши на теле — взять и тянуть его,
@@ -107,11 +107,13 @@ void stopPanel() {
 int main(int argc, char** argv) {
     size_t firstScene = 0;
     int frameLimit = 0;
+    bool exact = false;
     std::string screenshot, record;
     for (int i = 1; i + 1 < argc; i += 2) {
         const std::string key = argv[i];
         if (key == "--scene") firstScene = size_t(std::clamp(std::atoi(argv[i + 1]), 1, int(scenes().size())) - 1);
         if (key == "--frames") frameLimit = std::atoi(argv[i + 1]);
+        if (key == "--exact") exact = std::atoi(argv[i + 1]) != 0;
         if (key == "--screenshot") screenshot = argv[i + 1];
         if (key == "--record") record = argv[i + 1];
     }
@@ -123,6 +125,7 @@ int main(int argc, char** argv) {
     glfwSwapInterval(1); // кадр окна на кадр экрана: при 60 Гц сцена идёт в реальном времени
 
     Viewer viewer;
+    viewer.realtime = !exact;
     viewer.load(firstScene);
     glfwSetWindowUserPointer(window, &viewer);
     glfwSetKeyCallback(window, onKey);

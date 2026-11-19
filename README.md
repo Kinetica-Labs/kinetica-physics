@@ -56,7 +56,7 @@ cmake -B build -DKP_VIEWER=ON && cmake --build build -j
 Куб падает на пол — [`examples/05_world/FallingBox.cpp`](examples/05_world/FallingBox.cpp):
 
 ```cpp
-#include <kp/world/World.h>
+#include <world/World.h>
 using namespace kp;
 
 int main() {
@@ -94,7 +94,7 @@ target_link_libraries(my_program PRIVATE kinetica-physics)
 
 | Клавиша | Действие |
 |---|---|
-| `1`–`6` | сцена |
+| `1`–`9` | первые девять сцен (остальные — в панели) |
 | пробел, `→` | пауза, один шаг |
 | `R` | сцена заново |
 | `T` | состояние мира текстом в консоль |
@@ -185,7 +185,7 @@ flowchart LR
 
 | Каталог | Что там |
 |---|---|
-| `include/kp/` | заголовки движка по разделам; всё сразу — `#include <kp/physics.h>` |
+| `include/` | заголовки движка по разделам; всё сразу — `#include <physics.h>` |
 | `src/` | исходный код движка по тем же разделам; собирается в библиотеку `libkinetica-physics.a` |
 | `examples/` | короткие программы-примеры по слоям движка; `examples/scenes` — стандартный набор сцен |
 | `viewer/` | окно просмотра на OpenGL |

@@ -1,8 +1,8 @@
-#include <kp/collision/shapes/Capsule.h>
+#include <collision/shapes/Capsule.h>
 
-#include <kp/collision/shapes/Flat.h>
-#include <kp/collision/shapes/Outline.h>
-#include <kp/collision/shapes/Tube.h>
+#include <collision/shapes/Flat.h>
+#include <collision/shapes/Outline.h>
+#include <collision/shapes/Tube.h>
 
 namespace kp {
 

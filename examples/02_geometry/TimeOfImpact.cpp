@@ -4,10 +4,10 @@
 // Метод безопасных шагов: если до препятствия d метров, а скорость сближения не больше v,
 // то d / v секунд можно лететь, не опасаясь столкновения. Шаги повторяются до касания.
 
-#include <kp/collision/shapes/Sphere.h>
-#include <kp/collision/shapes/ConvexHull.h>
-#include <kp/collision/narrowphase/Gjk.h>
-#include <kp/collision/narrowphase/TimeOfImpact.h>
+#include <collision/shapes/Sphere.h>
+#include <collision/shapes/ConvexHull.h>
+#include <collision/narrowphase/Gjk.h>
+#include <collision/narrowphase/TimeOfImpact.h>
 
 #include <cstdio>
 

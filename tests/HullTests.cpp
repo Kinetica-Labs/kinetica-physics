@@ -2,8 +2,8 @@
 
 #include "Check.h"
 
-#include <kp/body/Body.h>
-#include <kp/body/MassFrame.h>
+#include <body/Body.h>
+#include <body/MassFrame.h>
 
 #include <cmath>
 #include <cstdint>

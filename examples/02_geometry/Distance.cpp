@@ -1,6 +1,6 @@
 // Слой geometry: расстояние между двумя выпуклыми формами и ближайшие точки на них (алгоритм GJK).
 
-#include <kp/collision/shapes/Sphere.h>
+#include <collision/shapes/Sphere.h>
 #include "HtmlViewer.h"
 
 using namespace kp;

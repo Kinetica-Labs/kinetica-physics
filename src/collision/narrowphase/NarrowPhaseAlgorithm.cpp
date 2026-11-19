@@ -1,8 +1,8 @@
-#include <kp/collision/narrowphase/NarrowPhaseAlgorithm.h>
+#include <collision/narrowphase/NarrowPhaseAlgorithm.h>
 
-#include <kp/collision/narrowphase/HullVsHullAlgorithm.h>
-#include <kp/collision/narrowphase/HullVsRoundAlgorithm.h>
-#include <kp/collision/narrowphase/RoundVsRoundAlgorithm.h>
+#include <collision/narrowphase/HullVsHullAlgorithm.h>
+#include <collision/narrowphase/HullVsRoundAlgorithm.h>
+#include <collision/narrowphase/RoundVsRoundAlgorithm.h>
 
 namespace kp {
 

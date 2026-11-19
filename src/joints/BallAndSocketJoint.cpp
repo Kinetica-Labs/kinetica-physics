@@ -1,4 +1,4 @@
-#include <kp/joints/BallAndSocketJoint.h>
+#include <joints/BallAndSocketJoint.h>
 
 namespace kp {
 

@@ -1,8 +1,8 @@
-#include <kp/collision/PairFinder.h>
+#include <collision/PairFinder.h>
 // Слой collision: какие тела касаются или успеют коснуться за шаг. Только эти пары идут дальше,
 // в решатель; остальные тела друг о друге не знают.
 
-#include <kp/collision/ContactPair.h>
+#include <collision/ContactPair.h>
 
 #include <cstdio>
 

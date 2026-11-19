@@ -1,6 +1,6 @@
-#include <kp/dynamics/event_driven/BodySpaceSolve.h>
+#include <dynamics/event_driven/BodySpaceSolve.h>
 
-#include <kp/math/ProfileMatrix.h>
+#include <math/ProfileMatrix.h>
 
 #include <algorithm>
 

@@ -1,4 +1,4 @@
-#include <kp/math/Matrix3x3.h>
+#include <math/Matrix3x3.h>
 
 namespace kp {
 

@@ -3,9 +3,9 @@
 // только отнимать) и каким был кадр. Корреляция прироста с признаками кадра показывает, что его
 // вызывает; так же искались ошибки геометрии (docs/experiments/20-geometry-error-analysis.md).
 
-#include <kp/collision/PairFinder.h>
-#include <kp/collision/ContactPair.h>
-#include <kp/world/World.h>
+#include <collision/PairFinder.h>
+#include <collision/ContactPair.h>
+#include <world/World.h>
 
 #include <cmath>
 #include <cstdint>
@@ -20,7 +20,7 @@ namespace {
 
 Real cubeEnergy(const World& world) {
     const Body& b = world.bodies()[1];
-    return b.kineticEnergy() + Real(9.81) * b.position.y / b.mass.inverseMass;
+    return kineticEnergyOf(b) + Real(9.81) * b.position.y / b.mass.inverseMass;
 }
 
 // Сколько энергии добавила и отняла стадия движения за кадр.

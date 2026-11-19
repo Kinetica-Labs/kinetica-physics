@@ -1,6 +1,6 @@
-#include <kp/body/MassFrame.h>
+#include <body/MassFrame.h>
 
-#include <kp/body/PrincipalAxes.h>
+#include <body/PrincipalAxes.h>
 
 namespace kp {
 

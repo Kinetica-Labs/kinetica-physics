@@ -1,0 +1,81 @@
+(* Модель solveComplementarity (include/math/Complementarity.h): перебор набора давящих строк по
+   Мурти. Доказано в точных вещественных числах: если перебор вышел сам, ответ решает задачу
+   дополнительности — λ ≥ 0, w = A λ + q ≥ 0, λᵢ wᵢ = 0; если он исчерпал свои 2ⁿ кругов, про ответ
+   известно только λ ≥ 0. Что для положительно определённой A перебор всегда выходит сам, здесь не
+   доказано: это проверено случайными входами (tests/PropertyTests.cpp).
+
+   Решение блока (solveDenseBlock) принято точным: на строках набора остаток нулевой, вне набора
+   λ = 0. Договор функции требует положительно определённой матрицы, а при ней отбрасывание
+   зависимых строк (kDependent) не срабатывает. *)
+module Complementarity
+
+  use int.Int
+  use int.Power
+  use real.RealInfix
+  use real.Sum
+  use array.Array
+  use ref.Ref
+
+  (* Элемент (i, j) матрицы n × n, лежащей по строкам, — внутри массива. *)
+  let lemma row_index (n i j: int)
+    requires { 0 <= i < n /\ 0 <= j < n }
+    ensures  { 0 <= i * n + j < n * n }
+  = assert { (n - 1 - i) * n >= 0 };
+    assert { i * n <= (n - 1) * n }
+
+  (* Слагаемое j строки i: A[i n + j] λ[j]; матрица лежит по строкам, как в коде. *)
+  function term (a l: array real) (n i: int) : int -> real = fun j -> a[i * n + j] *. l[j]
+
+  (* Остаток w_i = q_i + Σ_j A_ij λ_j. *)
+  function residual (a q l: array real) (n i: int) : real = q[i] +. sum (term a l n i) 0 n
+
+  predicate complementary (a q l: array real) (n: int) =
+    forall i. 0 <= i < n -> l[i] >=. 0.0 /\ residual a q l n i >=. 0.0 /\ l[i] *. residual a q l n i = 0.0
+
+  val solve_block (a q: array real) (n: int) (active: array bool) (l: array real) : unit
+    requires { length a = n * n /\ length q = n /\ length active = n /\ length l = n }
+    writes   { l }
+    ensures  { forall i. 0 <= i < n -> if active[i] then residual a q l n i = 0.0 else l[i] = 0.0 }
+
+  exception Solved
+
+  (* true — перебор вышел сам; false — исчерпан, ответ только обрезан снизу нулём. *)
+  let solve_complementarity (a q: array real) (n: int) (l: array real) : bool
+    requires { 0 <= n /\ length a = n * n /\ length q = n /\ length l = n }
+    ensures  { result -> complementary a q l n }
+    ensures  { forall i. 0 <= i < n -> l[i] >=. 0.0 }
+  =
+    let active = Array.make n false in
+    for i = 0 to n - 1 do (* тёплый старт: давят точки с прошлым λ > 0 и сближающиеся *)
+      active[i] <- (l[i] >. 0.0 || q[i] <. 0.0)
+    done;
+    try
+      for round = 0 to power 2 n - 1 do
+        solve_block a q n active l;
+        let broken = ref n in (* первая строка, нарушившая условие своего набора *)
+        let i = ref 0 in
+        while !i < n && !broken = n do
+          invariant { 0 <= !i <= n }
+          invariant { !broken = n \/ 0 <= !broken < n }
+          invariant { !broken = n -> forall k. 0 <= k < !i ->
+                        if active[k] then l[k] >=. 0.0 else residual a q l n k >=. 0.0 }
+          variant   { n - !i }
+          let w = ref q[!i] in
+          for j = 0 to n - 1 do
+            invariant { !w = q[!i] +. sum (term a l n !i) 0 j }
+            w := !w +. a[!i * n + j] *. l[j]
+          done;
+          if (if active[!i] then l[!i] <. 0.0 else !w <. 0.0) then broken := !i;
+          i := !i + 1
+        done;
+        if !broken = n then raise Solved;
+        active[!broken] <- not active[!broken]
+      done;
+      for i = 0 to n - 1 do
+        invariant { forall k. 0 <= k < i -> l[k] >=. 0.0 }
+        if l[i] <. 0.0 then l[i] <- 0.0
+      done;
+      false
+    with Solved -> true end
+
+end

@@ -1,4 +1,4 @@
-#include <kp/collision/broadphase/DynamicTree.h>
+#include <collision/broadphase/DynamicTree.h>
 
 namespace kp {
 

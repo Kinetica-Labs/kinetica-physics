@@ -1,5 +1,6 @@
-#include <kp/body/CompoundBodyBuilder.h>
-#include <kp/collision/shapes/Meshes.h>
+#include <body/CompoundBodyBuilder.h>
+#include <collision/ContactPair.h>
+#include <collision/shapes/Meshes.h>
 #include "StandardScenes.h"
 
 #include <algorithm>
@@ -31,6 +32,14 @@ World withFloor() {
     World world;
     world.addBody(Body::box({10, 0.5, 10}, 0, {0, -0.5, 0}));
     return world;
+}
+
+// Тело не должно появляться внутри другого: начальное перекрытие шаг потом выталкивает, а в мерку
+// перекрытия сцены оно попадало как наибольшее значение (куча без тяжести — 117 мм ещё до первого шага).
+bool overlapsPlaced(const World& world, const Body& body) {
+    for (const Body& other : world.bodies())
+        if (!other.isStatic() && overlapDepth(other, body) > 0) return true;
+    return false;
 }
 
 double speedOf(const Body& body) { return double(body.linearVelocity().length()) + double(body.angularVelocity().length()) * double(body.boundingRadius()); }
@@ -178,7 +187,7 @@ World cradle() {
         ball.restitution = 1, ball.friction = 0;
         const Vector3 pivot{ball.position.x, 1.5, 0};
         if (k == 0) ball.position = pivot + about({0, 0, 1}, -30).rotate({0, -1, 0});
-        world.addBallJoint(beam, world.addBody(ball), pivot);
+        addBallJoint(world, beam, world.addBody(ball), pivot);
     }
     return world;
 }
@@ -247,7 +256,11 @@ std::string ballsVerdict(const World&, const World& now) {
     for (size_t i = 2; i < now.bodies().size(); ++i) {
         const Vector3 p = now.bodies()[i].position - bucket.position;
         if (std::hypot(double(p.x), double(p.z)) > 0.25 || double(now.bodies()[i].position.y) < 0.04) return text("шар %zu выпал из ведра", i - 1);
-        if (speedOf(now.bodies()[i]) > 0.05) return text("шар %zu движется: %.3f м/с", i - 1, speedOf(now.bodies()[i]));
+        // Покой — по скорости центра. Вращение шара на месте вокруг нормали контакта модель не гасит:
+        // у точечного контакта нет момента трения вокруг нормали, и без сопротивления среды шар
+        // крутится вечно (1,3 рад/с на замере) — это не движение по ведру.
+        const double speed = double(now.bodies()[i].linearVelocity().length());
+        if (speed > 0.05) return text("шар %zu движется: %.3f м/с", i - 1, speed);
     }
     return "";
 }
@@ -279,7 +292,8 @@ World pile() {
         }
         }
         body.orientation = (Quaternion{1, Real(uniform() - 0.5), Real(uniform() - 0.5), Real(uniform() - 0.5)} * body.orientation).unit();
-        body.position = {Real(0.9 * uniform() - 0.45), Real(0.5 + 0.25 * k), Real(0.9 * uniform() - 0.45)};
+        do body.position = {Real(0.9 * uniform() - 0.45), Real(0.5 + 0.25 * k), Real(0.9 * uniform() - 0.45)};
+        while (overlapsPlaced(world, body));
         world.addBody(body);
     }
     return world;
@@ -299,11 +313,11 @@ World gripper() {
     World world = withFloor();
     const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0, {0, 2, 0}));
     const BodyId carriage = world.addBody(Body::box({0.3, 0.03, 0.1}, 500, {0, 0.5, 0}));
-    SliderJoint& lift = world.addSlider(base, carriage, {0, 0.5, 0}, {0, 1, 0});
+    SliderJoint& lift = addSlider(world, base, carriage, {0, 0.5, 0}, {0, 1, 0});
     lift.holdSpeed = true;
     for (int side = -1; side <= 1; side += 2) {
         const BodyId finger = world.addBody(Body::box({0.02, 0.2, 0.05}, 500, {Real(0.15 * side), 0.26, 0}));
-        SliderJoint& slide = world.addSlider(carriage, finger, {Real(0.15 * side), 0.5, 0}, {Real(-side), 0, 0});
+        SliderJoint& slide = addSlider(world, carriage, finger, {Real(0.15 * side), 0.5, 0}, {Real(-side), 0, 0});
         slide.holdSpeed = true, slide.driveSpeed = Real(0.1), slide.driveStrength = 50;
     }
     world.addBody(Body::box({0.05, 0.05, 0.05}, 1000, {0, 0.05, 0}));
@@ -435,6 +449,69 @@ std::string hillsVerdict(const World&, const World& now) {
     return "";
 }
 
+// --- сторожа сохранения ----------------------------------------------------------------------------
+// Полная механическая энергия: движения плюс высоты в поле тяжести мира.
+double mechanicalEnergy(const World& world) {
+    double energy = 0;
+    for (const Body& body : world.bodies())
+        if (!body.isStatic()) energy += double(kineticEnergyOf(body)) - double(world.gravity.dot(body.position)) / double(body.mass.inverseMass);
+    return energy;
+}
+
+// Раскачанная цепь: та же цепь из торов, нижнему звену дана скорость 4 м/с вбок (101 Дж). Трение и
+// удары энергию только отбирают, поэтому в конце её не может быть больше, чем в начале. Замороженный
+// на шаг мира контакт быстрого шага её подкачивал: 54 Дж на 10-й секунде и 141 на 40-й.
+World swingingChain() {
+    World world = torusChain();
+    Body& last = world.body(BodyId(int(world.bodies().size()) - 1));
+    last.linearMomentum = {4 / last.mass.inverseMass, 0, 0};
+    return world;
+}
+std::string swingVerdict(const World& start, const World& now) {
+    const double before = mechanicalEnergy(start), after = mechanicalEnergy(now), put = double(kineticEnergyOf(start.bodies().back()));
+    if (after > before + 1e-3 * put) return text("энергия выросла на %.1f Дж при вложенных %.1f", after - before, put);
+    return "";
+}
+
+// Куча без тяжести и без неподвижных тел: двадцать тел летят к центру и сталкиваются. Внешних сил нет,
+// поэтому импульс и момент импульса системы обязаны остаться прежними; допуск — 10⁻⁹ от суммы модулей
+// импульсов тел (момента — на метр плеча).
+World weightlessPile() {
+    World world;
+    world.gravity = {};
+    Dice dice{2029};
+    for (int k = 0; k < 20; ++k) {
+        Body body = k % 4 == 0 ? Body::sphere(0.1, 1000) : k % 4 == 1 ? Body::capsule(0.12, 0.06, 1000) : k % 4 == 2 ? dice.hull(0.25) : Body::box({0.1, 0.07, 0.12}, 1000);
+        body.orientation = (dice.turn() * body.orientation).unit();
+        do body.position = {Real(1.6 * dice.roll() - 0.8), Real(1.6 * dice.roll() - 0.8), Real(1.6 * dice.roll() - 0.8)};
+        while (overlapsPlaced(world, body));
+        const Vector3 from = body.position;
+        body.linearMomentum = (Real(-1.5 - dice.roll()) / body.mass.inverseMass) * from;
+        body.angularMomentum = {Real(0.05 * (dice.roll() - 0.5)), Real(0.05 * (dice.roll() - 0.5)), Real(0.05 * (dice.roll() - 0.5))};
+        world.addBody(body);
+    }
+    return world;
+}
+struct Momenta {
+    Vector3 linear, angular;
+    double scale = 0;
+};
+Momenta momentaOf(const World& world) {
+    Momenta m;
+    for (const Body& body : world.bodies()) {
+        m.linear += body.linearMomentum, m.angular += body.position.cross(body.linearMomentum) + body.angularMomentum;
+        m.scale += double(body.linearMomentum.length());
+    }
+    return m;
+}
+std::string driftVerdict(const World& start, const World& now) {
+    const Momenta before = momentaOf(start), after = momentaOf(now);
+    const double linear = double((after.linear - before.linear).length()) / before.scale, angular = double((after.angular - before.angular).length()) / before.scale;
+    if (linear > 1e-9) return text("импульс системы ушёл на %.2e от суммы импульсов тел", linear);
+    if (angular > 1e-9) return text("момент импульса системы ушёл на %.2e (на метр плеча)", angular);
+    return "";
+}
+
 } // namespace
 
 const std::vector<StandardScene>& standardScenes() {
@@ -455,6 +532,8 @@ const std::vector<StandardScene>& standardScenes() {
         {"gripper", "захват поднимает кубик", gripper, 2.5, 2.5, gripperVerdict, gripperControl, {0, 0.4, 0}, 3},
         {"bowl", "чаша: чайники, лошадки, торы, чашки, ежи", bowl, 10, 10, bowlVerdict, nullptr, {0, 0.5, 0}, 4},
         {"hills", "холмы по карте высот", hills, 8, 8, hillsVerdict, nullptr, {0, 0.6, 0}, 9},
+        {"swing", "раскачанная цепь: энергия не растёт", swingingChain, 40, 40, swingVerdict, nullptr, {0, 2, 0}, 6},
+        {"drift", "куча без тяжести: импульс сохраняется", weightlessPile, 5, 5, driftVerdict, nullptr, {0, 0, 0}, 6},
     };
     return all;
 }

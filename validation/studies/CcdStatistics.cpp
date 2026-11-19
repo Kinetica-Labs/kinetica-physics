@@ -6,10 +6,10 @@
 // промах — и не допустить перекрытия тел. Удар — это изменение скорости снаряда: после скользящего
 // удара о круглую мишень снаряд законно летит дальше, поэтому «оказался за мишенью» — не признак.
 
-#include <kp/collision/ContactPair.h>
-#include <kp/collision/narrowphase/Gjk.h>
-#include <kp/collision/narrowphase/Sat.h>
-#include <kp/world/World.h>
+#include <collision/ContactPair.h>
+#include <collision/narrowphase/Gjk.h>
+#include <collision/narrowphase/Sat.h>
+#include <world/World.h>
 
 #include <cmath>
 #include <cstdint>

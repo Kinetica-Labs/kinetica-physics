@@ -1,4 +1,4 @@
-#include <kp/joints/JointSet.h>
+#include <joints/JointSet.h>
 
 #include <algorithm>
 #include <cmath>

@@ -1,8 +1,8 @@
-#include <kp/dynamics/event_driven/ExactStep.h>
+#include <dynamics/event_driven/ExactStep.h>
 
-#include <kp/collision/PairFinder.h>
-#include <kp/dynamics/Integrator.h>
-#include <kp/dynamics/event_driven/OverlapSeparation.h>
+#include <collision/PairFinder.h>
+#include <dynamics/Integrator.h>
+#include <dynamics/event_driven/OverlapSeparation.h>
 
 #include <algorithm>
 #include <cmath>
@@ -12,6 +12,7 @@ namespace kp {
 namespace {
 
 // Сколько раз отрезок укорачивается до ближайшего события — удара или остановки скольжения.
+constexpr std::uint32_t kEdgePair = 0xC0000000u; // номер точки пары рёбер (HullVsHullAlgorithm::clipFaces)
 constexpr int kMaxRefinements = 8;
 
 // На сколько радиан тело, которое чего-то касается, может повернуться за один отрезок. Силы
@@ -56,23 +57,12 @@ void ExactStep::run(Real dt) {
 
 std::vector<ContactPair> ExactStep::contacts(Real h) const { return PairFinder(bodies_, gravity_).pairs(h, joints_); }
 
-// Один отрезок шага длиной не больше h; возвращает, сколько времени пройдено.
-Real ExactStep::advance(Real h) {
-    std::vector<ContactPair> touching = contacts(0);
-    if (OverlapSeparation(bodies_, joints_, up()).separate(touching)) touching = contacts(0);
-    notify(StepStage::Separation);
-    resolveImpacts(touching);
-    notify(StepStage::Impact);
-
-    const std::vector<ContactPair> pairs = contacts(h);
-    Real time = h;
-    Forces forces = forcesWithin(pairs, time);
-    // Отрезок укорачивается, пока тело в контакте поворачивается на нём больше предела. Силы,
-    // найденные на длинный отрезок для быстро вращающегося тела, огромны, и поворот от них растёт
-    // куда быстрее времени: деление длины на «во сколько раз превышен предел» бросало отрезок с
-    // 1/60 с сразу на пикосекунды, хотя при нынешней угловой скорости ω телу хватило бы предел / ω.
-    // Поэтому короче половины этого времени отрезок за один раз не делается.
-    enum class Cut { None, Impact, SlidingStop, Turn } cut = Cut::None; // чем оборван отрезок
+// Отрезок укорачивается, пока тело в контакте поворачивается на нём больше предела. Силы,
+// найденные на длинный отрезок для быстро вращающегося тела, огромны, и поворот от них растёт
+// куда быстрее времени: деление длины на «во сколько раз превышен предел» бросало отрезок с
+// 1/60 с сразу на пикосекунды, хотя при нынешней угловой скорости ω телу хватило бы предел / ω.
+// Поэтому короче половины этого времени отрезок за один раз не делается.
+void ExactStep::limitTurn(const std::vector<ContactPair>& pairs, Real& time, Forces& forces, Cut& cut) {
     for (Real turn; (turn = events_.contactTurn(pairs, forces.rates, time)) > kMaxContactTurn;) {
         const Real atPresentSpin = events_.contactTurn(pairs, std::vector<Rate>(bodies_.size()), time); // поворот без сил
         const Real unforced = atPresentSpin > 0 ? time * kMaxContactTurn / atPresentSpin : time;
@@ -80,14 +70,16 @@ Real ExactStep::advance(Real h) {
         forces = forcesWithin(pairs, time);
         cut = Cut::Turn;
     }
-    ContactSolver::SlidingStop stopped;
-    // Событие — удар или остановка скольжения — обрывает отрезок раньше, чем кончается h. Силы
-    // найдены так, чтобы точки контакта не сместились за всё h; приложенные лишь на часть этого
-    // времени, они совершают работу и добавляют телам энергию. Поэтому отрезок укорачивается до
-    // события, а силы пересчитываются на новую длину — пока внутри отрезка событий не останется.
-    // Остановка скольжения, до которой на часах отрезка не дойти (h − t = h), считается уже
-    // наступившей и событием не является. Удар — жёсткая граница: отрезок не идёт дальше него
-    // никогда, даже если удар наступает сразу и отрезок выходит нулевым.
+}
+
+// Событие — удар или остановка скольжения — обрывает отрезок раньше, чем кончается h. Силы
+// найдены так, чтобы точки контакта не сместились за всё h; приложенные лишь на часть этого
+// времени, они совершают работу и добавляют телам энергию. Поэтому отрезок укорачивается до
+// события, а силы пересчитываются на новую длину — пока внутри отрезка событий не останется.
+// Остановка скольжения, до которой на часах отрезка не дойти (h − t = h), считается уже
+// наступившей и событием не является. Удар — жёсткая граница: отрезок не идёт дальше него
+// никогда, даже если удар наступает сразу и отрезок выходит нулевым.
+void ExactStep::cutAtEvents(const std::vector<ContactPair>& pairs, Real h, Real& time, Forces& forces, Cut& cut, ContactSolver::SlidingStop& stopped) {
     bool verified = false; // при нынешних силах на отрезке нет событий
     for (int refinement = 0; refinement < kMaxRefinements && time > 0 && !verified; ++refinement) {
         const Real impact = std::min(events_.earliestImpact(pairs, forces.rates, time), events_.earliestLimit(forces.rates, time));
@@ -105,14 +97,74 @@ Real ExactStep::advance(Real h) {
         const Real impact = std::min(events_.earliestImpact(pairs, forces.rates, time), events_.earliestLimit(forces.rates, time));
         if (impact < time) time = impact, cut = Cut::Impact;
     }
+}
+
+// Движение тел на отрезке при постоянных силах: половина толчка, полёт, вторая половина (advanced).
+//
+// Сила связи сочленения направлена так, как связь стояла в начале отрезка;
+// в конце отрезка тело повёрнуто, и та же сила уже не перпендикулярна связи — её вторая половина
+// толкала бы тело вдоль разрешённого движения и накачивала энергию (маятник за 20 с набирал
+// полторы своей энергии). Поэтому сила связи участвует только в первой половине толчка — от неё
+// зависит, куда тело придёт, — а вторую половину даёт связь в новом положении: следующий отрезок
+// начинается с удара, который обнуляет скорость вдоль связей. Вместе это схема RATTLE: она
+// симметрична во времени, и энергия в ней не растёт. Andersen, «Rattle: a "velocity" version of
+// the Shake algorithm for molecular dynamics calculations», J. Comput. Phys. 52, 1983.
+//
+// Силы опоры и трения пары приложены к двум телам в общей точке; на отрезке она идёт вместе с телом,
+// лежащим на грани другого (у пары рёбер и у двух круглых тел — посередине между телами). Центры масс
+// двух тел за отрезок расходятся, и плечо тела до этой точки ко второй половине толчка меняется на
+// Δc − Δr: без этой поправки пара сил ±F меняла момент импульса системы (куча без тяжести — 5·10⁻⁶
+// за 5 с). С поправкой момент импульса пары не меняется при любом смещении общей точки
+// (proofs/half_kick_keeps_momenta.smt2); выбор точки решает другое — энергию: у тела, которое само
+// несёт точку, плечо прежнее, и шар катится по полу, как катился.
+void ExactStep::move(const std::vector<ContactPair>& pairs, const Forces& forces, Real time) {
+    std::vector<Vector3> from(bodies_.size()), lever(bodies_.size());
+    for (size_t i = 0; i < bodies_.size(); ++i) {
+        from[i] = bodies_[i].position;
+        integrateVelocity(bodies_[i], forces.rates[i].force, forces.rates[i].torque, time / 2);
+        integratePosition(bodies_[i], time);
+    }
+    for (const ContactPair& pair : pairs) {
+        Vector3 push; // сила пары на тело b
+        for (int k = 0; k < pair.manifold.count; ++k) {
+            const auto found = contactForces_.find({pair.a, pair.b, pair.manifold.points[size_t(k)].id, pair.partA, pair.partB});
+            if (found != contactForces_.end()) push += found->second.normal * pair.manifold.normal + found->second.tangent;
+        }
+        const bool round = pair.manifold.roundA > 0 && pair.manifold.roundB > 0;
+        const bool edges = pair.manifold.count == 1 && pair.manifold.roundA == 0 && pair.manifold.roundB == 0 && (pair.manifold.points[0].id & kEdgePair) == kEdgePair;
+        const Real withB = edges || round ? Real(0.5) : pair.manifold.faceOnB ? Real(0) : Real(1);
+        const Vector3 movedA = bodies_[size_t(pair.a)].position - from[size_t(pair.a)], movedB = bodies_[size_t(pair.b)].position - from[size_t(pair.b)];
+        const Vector3 carried = (1 - withB) * movedA + withB * movedB;
+        lever[size_t(pair.a)] -= (carried - movedA).cross(push), lever[size_t(pair.b)] += (carried - movedB).cross(push);
+    }
+    for (size_t i = 0; i < bodies_.size(); ++i) {
+        integrateVelocity(bodies_[i], forces.rates[i].force - forces.bonds[i].force, forces.rates[i].torque - forces.bonds[i].torque + lever[i], time / 2);
+        // Сопротивление среды за пройденное время (Body::linearDamping): p ← p / (1 + t c).
+        bodies_[i].linearMomentum = (1 / (1 + time * bodies_[i].linearDamping)) * bodies_[i].linearMomentum;
+        bodies_[i].angularMomentum = (1 / (1 + time * bodies_[i].angularDamping)) * bodies_[i].angularMomentum;
+    }
+}
+
+// Один отрезок шага длиной не больше h; возвращает, сколько времени пройдено.
+Real ExactStep::advance(Real h) {
+    std::vector<ContactPair> touching = contacts(0);
+    if (OverlapSeparation(bodies_, joints_, up()).separate(touching)) touching = contacts(0);
+    notify(StepStage::Separation);
+    resolveImpacts(touching);
+    notify(StepStage::Impact);
+
+    const std::vector<ContactPair> pairs = contacts(h);
+    Real time = h;
+    Forces forces = forcesWithin(pairs, time);
+    Cut cut = Cut::None;
+    limitTurn(pairs, time, forces, cut);
+    ContactSolver::SlidingStop stopped;
+    cutAtEvents(pairs, h, time, forces, cut, stopped);
     report_.impacts += cut == Cut::Impact, report_.slidingStops += cut == Cut::SlidingStop, report_.turnLimits += cut == Cut::Turn;
     if (cut == Cut::SlidingStop) stoppedThisStep_.push_back({stopped.a, stopped.b});
     stopped_ = stopped;
-    const std::vector<Rate>& rates = forces.rates;
     notify(StepStage::Forces);
-
-    for (size_t i = 0; i < bodies_.size(); ++i)
-        bodies_[i] = advanced(bodies_[i], rates[i].force, rates[i].torque, forces.bonds[i].force, forces.bonds[i].torque, time);
+    move(pairs, forces, time);
     notify(StepStage::Motion);
     return time;
 }

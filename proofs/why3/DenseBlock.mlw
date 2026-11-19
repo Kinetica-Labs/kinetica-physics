@@ -1,0 +1,193 @@
+(* Модель solveDenseBlock (include/math/Complementarity.h): плотное разложение Холецкого блока
+   матрицы A по строкам rows и решение системы двумя подстановками. Арифметика — точные
+   вещественные числа. Матрицы, лежащие в коде по строкам (L[i k + j]), здесь двумерные.
+
+   Строка, чей ведущий элемент не больше доли dependent от диагонального, считается зависимой: её
+   диагональный элемент L обнуляется. Утверждения поэтому условные — «если строку не отбросили». *)
+module DenseBlock
+
+  use int.Int
+  use real.RealInfix
+  use real.Square
+  use real.Sum
+  use array.Array
+  use matrix.Matrix
+  use ref.Ref
+
+  (* kDependent *)
+  let constant dependent : real = 0.0001
+
+  (* Суммы с равными слагаемыми равны. *)
+  let rec lemma sum_ext (f g: int -> real) (a b: int)
+    requires { forall m. a <= m < b -> f m = g m }
+    ensures  { sum f a b = sum g a b }
+    variant  { b - a }
+  = if a < b then sum_ext f g a (b - 1)
+
+  (* (L Lᵀ)_ij при j ≤ i: Σ_{m ≤ j} L_im L_jm — правее диагонали L нулевая. *)
+  function lterm (e: int -> int -> real) (i j: int) : int -> real = fun m -> e i m *. e j m
+  function product (e: int -> int -> real) (i j: int) : real = sum (lterm e i j) 0 (j + 1)
+
+  (* Произведение зависит только от начал строк i и j. *)
+  let lemma product_frame (e1 e2: int -> int -> real) (i j: int)
+    requires { forall m. 0 <= m <= j -> e1 i m = e2 i m /\ e1 j m = e2 j m }
+    ensures  { product e1 i j = product e2 i j }
+  = sum_ext (lterm e1 i j) (lterm e2 i j) 0 (j + 1)
+
+  (* Элемент блока: A[rows[i] n + rows[j]]. *)
+  function block (a: matrix real) (rows: array int) (i j: int) : real = a.elts rows[i] rows[j]
+
+  (* Элемент (i, j) множителя верен: (L Lᵀ)_ij = A_ij — если не отброшена строка, на чей ведущий
+     элемент пришлось делить (j < i), и сама строка (j = i). *)
+  predicate entry_ok (e: int -> int -> real) (a: matrix real) (rows: array int) (i j: int) =
+    (j < i -> e j j <> 0.0 -> product e i j = block a rows i j) /\
+    (j = i -> e i i >. 0.0 -> product e i i = block a rows i i)
+
+  (* Разложение: первый цикл solveDenseBlock. *)
+  let factor (a: matrix real) (rows: array int) (l: matrix real) : unit
+    requires { a.rows = a.columns }
+    requires { l.rows = length rows /\ l.columns = length rows }
+    requires { forall r. 0 <= r < length rows -> 0 <= rows[r] < a.rows }
+    requires { forall r. 0 <= r < length rows -> block a rows r r >=. 0.0 }
+    writes   { l }
+    ensures  { forall i j. 0 <= j <= i < length rows -> entry_ok l.elts a rows i j }
+  =
+    let k = length rows in
+    for i = 0 to k - 1 do
+      invariant { forall i' j'. 0 <= j' <= i' < i -> entry_ok l.elts a rows i' j' }
+      for j = 0 to i do
+        invariant { forall i' j'. 0 <= j' <= i' < i -> entry_ok l.elts a rows i' j' }
+        invariant { forall j'. 0 <= j' < j -> entry_ok l.elts a rows i j' }
+        let value = ref (get a rows[i] rows[j]) in
+        for m = 0 to j - 1 do
+          invariant { !value = block a rows i j -. sum (lterm l.elts i j) 0 m }
+          value := !value -. get l i m *. get l j m
+        done;
+        label Before in
+        if i <> j then begin
+          let pivot = get l j j in
+          let entry = if pivot =. 0.0 then 0.0 else !value /. pivot in
+          assert { pivot <> 0.0 -> entry *. pivot = !value };
+          set l i j entry;
+          assert { l.elts i j = entry /\ l.elts j j = pivot }
+        end else
+          set l i i (if !value >. dependent *. get a rows[i] rows[i] then sqrt !value else 0.0);
+        (* запись в (i, j) не трогает ни готовые строки, ни начало этой *)
+        assert { forall i' j'. 0 <= j' <= i' < i -> product l.elts i' j' = product (l.elts at Before) i' j' };
+        assert { forall j'. 0 <= j' < j -> product l.elts i j' = product (l.elts at Before) i j' };
+        assert { sum (lterm l.elts i j) 0 j = sum (lterm (l.elts at Before) i j) 0 j };
+        assert { product l.elts i j = sum (lterm l.elts i j) 0 j +. l.elts i j *. l.elts j j };
+        (* новый элемент: деление и корень возвращают то, что вычли из A_ij *)
+        assert { i <> j -> l.elts j j <> 0.0 -> l.elts i j *. l.elts j j = !value };
+        assert { i = j -> l.elts i i >. 0.0 -> l.elts i i *. l.elts i i = !value
+                 by !value >=. 0.0 /\ l.elts i i = sqrt !value /\ sqr (sqrt !value) = !value };
+        assert { entry_ok l.elts a rows i j };
+        assert { forall j'. 0 <= j' < j -> l.elts j' j' = (l.elts at Before) j' j' };
+        assert { forall j'. 0 <= j' < j -> entry_ok l.elts a rows i j' }
+      done
+    done
+
+  (* --- Подстановки ----------------------------------------------------------------------------- *)
+
+  (* Первое слагаемое суммы отделяется так же, как последнее. *)
+  let rec lemma sum_left (f: int -> real) (a b: int)
+    requires { a < b }
+    ensures  { sum f a b = f a +. sum f (a + 1) b }
+    variant  { b - a }
+  = if a + 1 < b then sum_left f a (b - 1)
+
+  (* (L y)_i = Σ_{m ≤ i} L_im y_m: строка i множителя на вектор. *)
+  function fterm (e: int -> int -> real) (y: int -> real) (i: int) : int -> real = fun m -> e i m *. y m
+
+  let lemma forward_frame (e: int -> int -> real) (y1 y2: int -> real) (i b: int)
+    requires { forall m. 0 <= m < b -> y1 m = y2 m }
+    ensures  { sum (fterm e y1 i) 0 b = sum (fterm e y2 i) 0 b }
+  = sum_ext (fterm e y1 i) (fterm e y2 i) 0 b
+
+  (* L y = b: второй цикл solveDenseBlock. Строка с нулевым ведущим элементом отброшена: y_i = 0. *)
+  let forward (l: matrix real) (rhs: array real) : unit
+    requires { l.rows = length rhs /\ l.columns = length rhs }
+    writes   { rhs }
+    ensures  { forall i. 0 <= i < length rhs -> l.elts i i <> 0.0 ->
+                 sum (fterm l.elts rhs.Array.elts i) 0 (i + 1) = (old rhs)[i] }
+  =
+    let k = length rhs in
+    label Start in
+    for i = 0 to k - 1 do
+      invariant { forall i'. 0 <= i' < i -> l.elts i' i' <> 0.0 ->
+                    sum (fterm l.elts rhs.Array.elts i') 0 (i' + 1) = (rhs at Start)[i'] }
+      invariant { forall i'. i <= i' < k -> rhs[i'] = (rhs at Start)[i'] }
+      label Row in
+      for m = 0 to i - 1 do
+        invariant { rhs[i] = (rhs at Row)[i] -. sum (fterm l.elts rhs.Array.elts i) 0 m }
+        invariant { forall i'. 0 <= i' < k -> i' <> i -> rhs[i'] = (rhs at Row)[i'] }
+        label In in
+        rhs[i] <- rhs[i] -. get l i m *. rhs[m];
+        assert { sum (fterm l.elts rhs.Array.elts i) 0 m = sum (fterm l.elts (rhs at In).Array.elts i) 0 m }
+      done;
+      let pivot = get l i i in
+      let entry = if pivot =. 0.0 then 0.0 else rhs[i] /. pivot in
+      assert { pivot <> 0.0 -> pivot *. entry = rhs[i] };
+      label Before in
+      rhs[i] <- entry;
+      assert { sum (fterm l.elts rhs.Array.elts i) 0 i = sum (fterm l.elts (rhs at Before).Array.elts i) 0 i };
+      assert { sum (fterm l.elts rhs.Array.elts i) 0 (i + 1) = sum (fterm l.elts rhs.Array.elts i) 0 i +. l.elts i i *. rhs[i] };
+      assert { forall i'. 0 <= i' < i ->
+                 sum (fterm l.elts rhs.Array.elts i') 0 (i' + 1) = sum (fterm l.elts (rhs at Before).Array.elts i') 0 (i' + 1) }
+    done
+
+  (* (Lᵀ x)_m = Σ_{i ≥ m} L_im x_i: столбец m множителя на вектор. *)
+  function bterm (e: int -> int -> real) (x: int -> real) (m: int) : int -> real = fun i -> e i m *. x i
+
+  let lemma backward_frame (e: int -> int -> real) (x1 x2: int -> real) (m a b: int)
+    requires { forall i. a <= i < b -> x1 i = x2 i }
+    ensures  { sum (bterm e x1 m) a b = sum (bterm e x2 m) a b }
+  = sum_ext (bterm e x1 m) (bterm e x2 m) a b
+
+  (* Lᵀ x = y: третий цикл solveDenseBlock; найденное x_i сразу вычитается из строк выше. *)
+  let backward (l: matrix real) (rhs: array real) : unit
+    requires { l.rows = length rhs /\ l.columns = length rhs }
+    writes   { rhs }
+    ensures  { forall m. 0 <= m < length rhs -> l.elts m m <> 0.0 ->
+                 sum (bterm l.elts rhs.Array.elts m) m (length rhs) = (old rhs)[m] }
+  =
+    let k = length rhs in
+    label Start in
+    for i = k - 1 downto 0 do
+      invariant { forall m. i < m < k -> l.elts m m <> 0.0 ->
+                    sum (bterm l.elts rhs.Array.elts m) m k = (rhs at Start)[m] }
+      invariant { forall m. 0 <= m <= i ->
+                    rhs[m] = (rhs at Start)[m] -. sum (bterm l.elts rhs.Array.elts m) (i + 1) k }
+      let pivot = get l i i in
+      let entry = if pivot =. 0.0 then 0.0 else rhs[i] /. pivot in
+      assert { pivot <> 0.0 -> pivot *. entry = rhs[i] };
+      label Before in
+      rhs[i] <- entry;
+      assert { forall m. 0 <= m < k ->
+                 sum (bterm l.elts rhs.Array.elts m) (i + 1) k = sum (bterm l.elts (rhs at Before).Array.elts m) (i + 1) k };
+      assert { forall m. 0 <= m <= i ->
+                 sum (bterm l.elts rhs.Array.elts m) i k = l.elts i m *. rhs[i] +. sum (bterm l.elts rhs.Array.elts m) (i + 1) k };
+      assert { forall m. 0 <= m < i ->
+                 rhs[m] = (rhs at Start)[m] -. sum (bterm l.elts rhs.Array.elts m) (i + 1) k };
+      label Divided in
+      for m = 0 to i - 1 do
+        (* суммы — по состоянию до цикла: он пишет только выше строки i *)
+        invariant { forall m'. 0 <= m' < m ->
+                      rhs[m'] = (rhs at Start)[m'] -. sum (bterm l.elts (rhs at Divided).Array.elts m') i k }
+        invariant { forall m'. m <= m' < i -> rhs[m'] = (rhs at Divided)[m'] }
+        invariant { forall i'. i <= i' < k -> rhs[i'] = (rhs at Divided)[i'] }
+        rhs[m] <- rhs[m] -. get l i m *. rhs[i];
+        assert { rhs[m] = (rhs at Divided)[m] -. l.elts i m *. (rhs at Divided)[i] };
+        assert { (rhs at Divided)[m] =
+                   (rhs at Start)[m] -. sum (bterm l.elts (rhs at Divided).Array.elts m) (i + 1) k };
+        assert { sum (bterm l.elts (rhs at Divided).Array.elts m) i k =
+                   l.elts i m *. (rhs at Divided)[i] +. sum (bterm l.elts (rhs at Divided).Array.elts m) (i + 1) k };
+        assert { rhs[m] = (rhs at Start)[m] -. sum (bterm l.elts (rhs at Divided).Array.elts m) i k }
+      done;
+      assert { forall m. 0 <= m < k ->
+                 sum (bterm l.elts rhs.Array.elts m) i k = sum (bterm l.elts (rhs at Divided).Array.elts m) i k };
+      assert { forall m. i < m < k ->
+                 sum (bterm l.elts rhs.Array.elts m) m k = sum (bterm l.elts (rhs at Before).Array.elts m) m k }
+    done
+
+end

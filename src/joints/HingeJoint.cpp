@@ -1,4 +1,4 @@
-#include <kp/joints/HingeJoint.h>
+#include <joints/HingeJoint.h>
 
 namespace kp {
 

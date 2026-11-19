@@ -1,8 +1,8 @@
-#include <kp/collision/ContactPair.h>
+#include <collision/ContactPair.h>
 
-#include <kp/collision/narrowphase/Gjk.h>
-#include <kp/collision/narrowphase/NarrowPhaseAlgorithm.h>
-#include <kp/collision/narrowphase/Sat.h>
+#include <collision/narrowphase/Gjk.h>
+#include <collision/narrowphase/NarrowPhaseAlgorithm.h>
+#include <collision/narrowphase/Sat.h>
 
 #include <algorithm>
 

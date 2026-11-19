@@ -1,8 +1,8 @@
-#include <kp/collision/narrowphase/HullVsHullAlgorithm.h>
+#include <collision/narrowphase/HullVsHullAlgorithm.h>
 
-#include <kp/collision/narrowphase/ContactCandidate.h>
-#include <kp/collision/narrowphase/Sat.h>
-#include <kp/collision/narrowphase/TransformedHull.h>
+#include <collision/narrowphase/ContactCandidate.h>
+#include <collision/narrowphase/Sat.h>
+#include <collision/narrowphase/TransformedHull.h>
 
 #include <algorithm>
 #include <limits>

@@ -1,4 +1,4 @@
-#include <kp/joints/SliderJoint.h>
+#include <joints/SliderJoint.h>
 
 namespace kp {
 
@@ -13,8 +13,8 @@ void SliderJoint::applyDrive(std::vector<Body>& bodies, Real h) const {
     Body &bodyA = bodies[size_t(a)], &bodyB = bodies[size_t(b)];
     const Vector3 push = (h * driveForce) * (bodyA.orientation * frameA).rotate({1, 0, 0});
     const Vector3 at = bodyB.pose().point(anchorB);
-    bodyB.applyImpulse(push, at);
-    bodyA.applyImpulse(-1 * push, at);
+    applyImpulse(bodyB, push, at);
+    applyImpulse(bodyA, -1 * push, at);
 }
 
 void SliderJoint::build(const Motion& m, std::vector<Bond>& bonds) const {

@@ -4,7 +4,7 @@
 // Сцена — функция, которая строит мир, и проверка того, чем опыт обязан кончиться. Сцены общие
 // для окна просмотра (viewer) и для прибора с замерами (validation/studies/StandardScenes.cpp).
 
-#include <kp/world/World.h>
+#include <world/World.h>
 
 #include <string>
 #include <vector>

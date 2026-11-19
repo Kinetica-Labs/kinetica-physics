@@ -1,0 +1,27 @@
+# Сборка и проверки на каждый пуш и запрос на слияние.
+#   unit-tests  — модульные проверки и случайные проверки утверждений;
+#   no-libm     — в библиотеке нет функций libm (детерминизм);
+#   contact-patch-lemmas — леммы Z3 (proofs/check.sh);
+#   state-hash  — состояние сцен после 60 кадров бит в бит совпадает с эталоном.
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Средства
+        run: sudo apt-get update && sudo apt-get install -y z3
+      - name: Сборка
+        run: cmake -B build && cmake --build build -j
+      - name: Проверки
+        run: ctest --test-dir build --output-on-failure
+      - name: Хэш состояния
+        run: ./build/validation/studies/study-state-hash 60 | diff - docs/reports/data/state-hash.txt
+      - name: Стандарт кода
+        run: python3 validation/code_metrics.py

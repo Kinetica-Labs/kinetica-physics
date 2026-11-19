@@ -2,9 +2,9 @@
 // до пола, энергия и работа шага. При нулевом коэффициенте восстановления энергия обязана только
 // убывать, и только в моменты ударов; между ударами — сохраняться.
 
-#include <kp/collision/PairFinder.h>
-#include <kp/collision/ContactPair.h>
-#include <kp/world/World.h>
+#include <collision/PairFinder.h>
+#include <collision/ContactPair.h>
+#include <world/World.h>
 
 #include <algorithm>
 #include <cstdio>
@@ -26,7 +26,7 @@ struct EnergyLedger final : StepObserver {
 
 Real cubeEnergy(const World& world) {
     const Body& b = world.bodies()[1];
-    return b.kineticEnergy() + Real(9.81) * b.position.y / b.mass.inverseMass;
+    return kineticEnergyOf(b) + Real(9.81) * b.position.y / b.mass.inverseMass;
 }
 
 int main() {
@@ -39,7 +39,7 @@ int main() {
 
     const auto energy = [&] {
         const Body& b = world.body(id);
-        return b.kineticEnergy() + Real(9.81) * b.position.y / b.mass.inverseMass;
+        return kineticEnergyOf(b) + Real(9.81) * b.position.y / b.mass.inverseMass;
     };
     const auto gaps = [&](Real& lowest, int& near) { // зазор нижней вершины и число вершин ближе 1 мм к полу
         lowest = 1e9, near = 0;

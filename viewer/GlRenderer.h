@@ -4,8 +4,8 @@
 // не знает ничего.
 
 #include "Camera.h"
-#include <kp/debug/DebugGeometry.h>
-#include <kp/world/World.h>
+#include <debug/DebugGeometry.h>
+#include <world/World.h>
 
 #include <string>
 

@@ -1,7 +1,7 @@
-#include <kp/dynamics/event_driven/ActiveSet.h>
+#include <dynamics/event_driven/ActiveSet.h>
 
-#include <kp/math/ProfileMatrix.h>
-#include <kp/dynamics/event_driven/BodySpaceSolve.h>
+#include <math/ProfileMatrix.h>
+#include <dynamics/event_driven/BodySpaceSolve.h>
 
 #include <algorithm>
 

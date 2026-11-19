@@ -1,10 +1,10 @@
-#include <kp/collision/shapes/Sphere.h>
-#include <kp/body/CompoundBodyBuilder.h>
+#include <collision/shapes/Sphere.h>
+#include <body/CompoundBodyBuilder.h>
 
-#include <kp/body/MassFrame.h>
-#include <kp/body/PrincipalAxes.h>
+#include <body/MassFrame.h>
+#include <body/PrincipalAxes.h>
 
-#include <kp/math/math_functions.h>
+#include <math/math_functions.h>
 
 #include <algorithm>
 
@@ -16,35 +16,56 @@ constexpr size_t kTreeParts = 8; // с какого числа частей со
 // части относительно общего центра масс — её собственный тензор R diag(I) Rᵀ плюс перенос по
 // теореме Штейнера m (|d|² E − d dᵀ), где d — от общего центра масс до центра масс части. Сумма
 // приводится к главным осям: они и становятся осями тела.
-Body CompoundBodyBuilder::compound(const std::vector<Body>& pieces) {
-    Body body;
-    if (pieces.empty()) return body;
-    body.friction = pieces[0].friction, body.restitution = pieces[0].restitution;
-    const bool fixed = std::any_of(pieces.begin(), pieces.end(), [](const Body& piece) { return piece.isStatic(); });
-    // У неподвижного тела масс нет; началом его осей служит среднее положение частей.
+namespace {
+
+// Начало осей, главные оси и массы составного тела по его частям. У неподвижного тела масс нет;
+// началом его осей служит среднее положение частей.
+void placeFrame(Body& body, const std::vector<Body>& pieces, bool fixed) {
     const auto massOf = [&](const Body& piece) { return fixed ? Real(1) : 1 / piece.mass.inverseMass; };
     Real mass = 0;
     Vector3 moment;
     for (const Body& piece : pieces) mass += massOf(piece), moment += massOf(piece) * piece.position;
     body.position = (1 / mass) * moment;
-    if (!fixed) {
-        Real inertia[3][3] = {};
-        for (const Body& piece : pieces) {
-            const Vector3 d = piece.position - body.position;
-            const Real offset[3] = {d.x, d.y, d.z}, own[3] = {1 / piece.mass.inverseInertia.x, 1 / piece.mass.inverseInertia.y, 1 / piece.mass.inverseInertia.z};
-            for (int k = 0; k < 3; ++k) {
-                const Vector3 axis = piece.orientation.rotate({Real(k == 0), Real(k == 1), Real(k == 2)});
-                const Real e[3] = {axis.x, axis.y, axis.z};
-                for (int r = 0; r < 3; ++r)
-                    for (int s = 0; s < 3; ++s) inertia[r][s] += own[k] * e[r] * e[s];
-            }
+    if (fixed) return;
+    Real inertia[3][3] = {};
+    for (const Body& piece : pieces) {
+        const Vector3 d = piece.position - body.position;
+        const Real offset[3] = {d.x, d.y, d.z}, own[3] = {1 / piece.mass.inverseInertia.x, 1 / piece.mass.inverseInertia.y, 1 / piece.mass.inverseInertia.z};
+        for (int k = 0; k < 3; ++k) {
+            const Vector3 axis = piece.orientation.rotate({Real(k == 0), Real(k == 1), Real(k == 2)});
+            const Real e[3] = {axis.x, axis.y, axis.z};
             for (int r = 0; r < 3; ++r)
-                for (int s = 0; s < 3; ++s) inertia[r][s] += massOf(piece) * ((r == s ? d.dot(d) : Real(0)) - offset[r] * offset[s]);
+                for (int s = 0; s < 3; ++s) inertia[r][s] += own[k] * e[r] * e[s];
         }
-        const PrincipalAxes axes = PrincipalAxes::of(inertia);
-        body.orientation = axes.orientation;
-        body.mass = {1 / mass, {1 / axes.moments.x, 1 / axes.moments.y, 1 / axes.moments.z}};
+        for (int r = 0; r < 3; ++r)
+            for (int s = 0; s < 3; ++s) inertia[r][s] += massOf(piece) * ((r == s ? d.dot(d) : Real(0)) - offset[r] * offset[s]);
     }
+    const PrincipalAxes axes = PrincipalAxes::of(inertia);
+    body.orientation = axes.orientation;
+    body.mass = {1 / mass, {1 / axes.moments.x, 1 / axes.moments.y, 1 / axes.moments.z}};
+}
+
+// Дерево брусков частей: брусок части — её точные габариты вдоль осей тела.
+std::shared_ptr<DynamicTree> treeOf(const std::vector<Body::Part>& parts) {
+    auto tree = std::make_shared<DynamicTree>();
+    for (size_t i = 0; i < parts.size(); ++i) {
+        const Body::Part& part = parts[i];
+        const auto reach = [&](Vector3 axis) {
+            const Vector3 local = part.placement.localDirection(axis);
+            return axis.dot(part.placement.point(part.shape->support(local))) + part.shape->radius;
+        };
+        tree->insert({{-reach({-1, 0, 0}), -reach({0, -1, 0}), -reach({0, 0, -1})}, {reach({1, 0, 0}), reach({0, 1, 0}), reach({0, 0, 1})}}, int(i));
+    }
+    return tree;
+}
+
+} // namespace
+
+Body CompoundBodyBuilder::compound(const std::vector<Body>& pieces) {
+    Body body;
+    if (pieces.empty()) return body;
+    body.friction = pieces[0].friction, body.restitution = pieces[0].restitution;
+    placeFrame(body, pieces, std::any_of(pieces.begin(), pieces.end(), [](const Body& piece) { return piece.isStatic(); }));
     // Части: каждая форма — в осях нового тела. Составная часть входит своими частями.
     auto parts = std::make_shared<std::vector<Body::Part>>();
     Real radius = 0;
@@ -52,24 +73,12 @@ Body CompoundBodyBuilder::compound(const std::vector<Body>& pieces) {
         for (int i = 0; i < piece.partCount(); ++i) {
             const Body part = piece.part(i);
             if (!part.shape) continue;
-            parts->push_back({part.shape, body.frame().relative(part.pose())});
+            parts->push_back({part.shape, frameOf(body).relative(part.pose())});
             radius = std::max(radius, parts->back().placement.position.length() + part.shape->boundingRadius());
         }
     }
     body.shape = std::make_shared<Sphere>(radius);
-    if (parts->size() >= kTreeParts) {
-        // Брусок части — её точные габариты вдоль осей тела.
-        auto tree = std::make_shared<DynamicTree>();
-        for (size_t i = 0; i < parts->size(); ++i) {
-            const Body::Part& part = (*parts)[i];
-            const auto reach = [&](Vector3 axis) {
-                const Vector3 local = part.placement.localDirection(axis);
-                return axis.dot(part.placement.point(part.shape->support(local))) + part.shape->radius;
-            };
-            tree->insert({{-reach({-1, 0, 0}), -reach({0, -1, 0}), -reach({0, 0, -1})}, {reach({1, 0, 0}), reach({0, 1, 0}), reach({0, 0, 1})}}, int(i));
-        }
-        body.partTree = std::move(tree);
-    }
+    if (parts->size() >= kTreeParts) body.partTree = treeOf(*parts);
     body.parts = std::move(parts);
     return body;
 }

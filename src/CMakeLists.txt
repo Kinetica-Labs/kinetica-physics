@@ -1,5 +1,5 @@
 # Библиотека движка: C++17, только стандартная библиотека. Подключается через add_subdirectory.
-# Заголовки — в include/kp/, исходники — здесь, по тем же разделам.
+# Заголовки — в include/, исходники — здесь, по тем же разделам.
 cmake_minimum_required(VERSION 3.16)
 
 add_library(kinetica-physics STATIC
@@ -12,6 +12,13 @@ add_library(kinetica-physics STATIC
   collision/RayCast.cpp
   collision/broadphase/DynamicTree.cpp
   dynamics/event_driven/ContactSolver.cpp
+  dynamics/event_driven/ContactRows.cpp
+  dynamics/event_driven/PairFriction.cpp
+  dynamics/event_driven/ContactAssembly.cpp
+  dynamics/event_driven/CoupledSolve.cpp
+  dynamics/event_driven/SlidingStopSearch.cpp
+  dynamics/event_driven/WarmStart.cpp
+  dynamics/event_driven/ShockPropagation.cpp
   dynamics/event_driven/ContactSystem.cpp
   dynamics/event_driven/ActiveSet.cpp
   dynamics/event_driven/BodySpaceSolve.cpp
@@ -24,6 +31,11 @@ add_library(kinetica-physics STATIC
   body/CompoundBodyBuilder.cpp
   dynamics/time_stepping/SoftStep.cpp
   dynamics/time_stepping/SoftContact.cpp
+  dynamics/time_stepping/IslandNormals.cpp
+  dynamics/time_stepping/MissedContacts.cpp
+  dynamics/time_stepping/PairReach.cpp
+  dynamics/time_stepping/RollingFriction.cpp
+  dynamics/time_stepping/TrackedShapes.cpp
   dynamics/time_stepping/SoftJoint.cpp
   dynamics/time_stepping/DirectJoints.cpp
   joints/Joint.cpp

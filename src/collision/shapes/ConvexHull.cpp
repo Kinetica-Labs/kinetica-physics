@@ -1,7 +1,7 @@
-#include <kp/collision/shapes/ConvexHull.h>
+#include <collision/shapes/ConvexHull.h>
 
-#include <kp/collision/shapes/Flat.h>
-#include <kp/collision/shapes/Outline.h>
+#include <collision/shapes/Flat.h>
+#include <collision/shapes/Outline.h>
 
 #include <algorithm>
 #include <map>

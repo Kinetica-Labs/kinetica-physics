@@ -9,6 +9,8 @@ add_executable(study-standard-scenes StandardScenes.cpp)
 target_link_libraries(study-standard-scenes PRIVATE kinetica-scenes)
 add_executable(study-state-hash StateHash.cpp)
 target_link_libraries(study-state-hash PRIVATE kinetica-scenes)
+add_executable(study-overlap-spread OverlapSpread.cpp)
+target_link_libraries(study-overlap-spread PRIVATE kinetica-scenes)
 find_package(Threads REQUIRED)
 target_link_libraries(study-case-table PRIVATE Threads::Threads) # клетки таблицы считаются параллельно
 add_executable(study-exact-scenes ExactScenes.cpp)

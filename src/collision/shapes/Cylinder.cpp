@@ -1,8 +1,8 @@
-#include <kp/collision/shapes/Cylinder.h>
+#include <collision/shapes/Cylinder.h>
 
-#include <kp/collision/shapes/Flat.h>
-#include <kp/collision/shapes/Outline.h>
-#include <kp/collision/shapes/Tube.h>
+#include <collision/shapes/Flat.h>
+#include <collision/shapes/Outline.h>
+#include <collision/shapes/Tube.h>
 
 #include <cmath>
 #include <vector>

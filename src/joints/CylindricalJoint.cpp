@@ -1,4 +1,4 @@
-#include <kp/joints/CylindricalJoint.h>
+#include <joints/CylindricalJoint.h>
 
 namespace kp {
 

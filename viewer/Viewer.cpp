@@ -27,11 +27,15 @@ void Viewer::step() {
     // Порог сна у шага с проходами — как у Box3D, 5 см/с: остаточная дрожь мягких контактов ниже
     // него. Точному шагу хватает десятой доли миллиметра в секунду.
     world.sleepSpeed = realtime ? Real(0.05) : Real(1e-4);
+    // Время до сна — 2 с, как у Bullet: за полсекунды засыпал куб, поставленный на ребро с наклоном до
+    // 0,1° от равновесия; за 2 с он успевает упасть уже с 0,001°.
+    world.sleepTime = 2;
+    const Real drag = scenes()[scene].exact ? Real(0) : Real(damping);
+    for (size_t i = 0; i < world.bodies().size(); ++i) world.body(BodyId(int(i))).linearDamping = world.body(BodyId(int(i))).angularDamping = drag;
     if (scenes()[scene].control) scenes()[scene].control(world, frame * double(kFrame));
-    const int updates = realtime ? contactUpdates : 1;
-    world.soft.substeps = std::max(1, substeps / updates);
+    world.soft.contactUpdates = contactUpdates, world.soft.substeps = substeps;
     const auto start = std::chrono::steady_clock::now();
-    for (int k = 0; k < updates; ++k) world.step(kFrame / Real(updates));
+    world.step(kFrame);
     lastStep = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
     slowestStep = std::max(slowestStep, lastStep);
     mostSegments = std::max(mostSegments, world.report().segments);
@@ -43,7 +47,7 @@ void Viewer::step() {
 }
 
 bool Viewer::grabAt(Vector3 direction) {
-    const RayHit hit = world.castRay({camera.eye(), direction});
+    const RayHit hit = castRay(world, {camera.eye(), direction});
     if (!hit) return false;
     world.wake(BodyId(hit.body)); // спящее тело на время сна неподвижно: сначала разбудить
     if (world.bodies()[size_t(hit.body)].isStatic()) return false;
@@ -53,9 +57,9 @@ bool Viewer::grabAt(Vector3 direction) {
     if (hand == int(world.bodies().size())) world.addBody(Body{});
     const BodyId held = BodyId(hit.body);
     const double mass = 1 / double(world.body(held).mass.inverseMass), omega = 2 * 3.14159265358979323846 * kGrabFrequency;
-    const TetherJoint tether(hand, world.body(BodyId(hand)), hit.point, hit.body, world.body(held), hit.point, Real(mass * omega * omega), Real(2 * mass * omega));
+    const TetherJoint tether(hand, world.body(BodyId(hand)), hit.body, world.body(held), hit.point, hit.point, Real(mass * omega * omega), Real(2 * mass * omega));
     if (grab.tether) *grab.tether = tether;
-    else grab.tether = &world.addTether(BodyId(hand), hit.point, held, hit.point, tether.stiffness, tether.damping);
+    else grab.tether = &addTether(world, BodyId(hand), hit.point, held, hit.point, tether.stiffness, tether.damping);
     grab.body = hit.body;
     grab.depth = double(camera.axes().forward.dot(hit.point - camera.eye()));
     return true;

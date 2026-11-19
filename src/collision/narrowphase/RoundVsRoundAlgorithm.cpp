@@ -1,8 +1,8 @@
-#include <kp/collision/narrowphase/RoundVsRoundAlgorithm.h>
+#include <collision/narrowphase/RoundVsRoundAlgorithm.h>
 
-#include <kp/collision/narrowphase/ContactCandidate.h>
-#include <kp/collision/narrowphase/ContactPatch.h>
-#include <kp/collision/shapes/Tube.h>
+#include <collision/narrowphase/ContactCandidate.h>
+#include <collision/narrowphase/ContactPatch.h>
+#include <collision/shapes/Tube.h>
 
 #include <algorithm>
 #include <cmath>

@@ -2,9 +2,9 @@
 
 #include <GLFW/glfw3.h>
 
-#include <kp/collision/shapes/Capsule.h>
-#include <kp/collision/shapes/ConvexHull.h>
-#include <kp/collision/shapes/Cylinder.h>
+#include <collision/shapes/Capsule.h>
+#include <collision/shapes/ConvexHull.h>
+#include <collision/shapes/Cylinder.h>
 
 #include <cmath>
 #include <cstdio>

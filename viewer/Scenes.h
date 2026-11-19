@@ -3,7 +3,7 @@
 
 #include "../examples/scenes/ExactScenes.h"
 
-#include <kp/world/World.h>
+#include <world/World.h>
 
 #include <vector>
 

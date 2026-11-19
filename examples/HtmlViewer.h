@@ -5,7 +5,7 @@
 // и раскрашиваются. Любой другой рендер — OpenGL, Vulkan — подключается так же: получает тот же
 // список и рисует его по-своему.
 
-#include <kp/debug/DebugGeometry.h>
+#include <debug/DebugGeometry.h>
 
 #include <cstdio>
 #include <string>

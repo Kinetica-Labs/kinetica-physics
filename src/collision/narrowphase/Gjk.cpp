@@ -1,5 +1,5 @@
-#include <kp/collision/shapes/Cylinder.h>
-#include <kp/collision/narrowphase/Gjk.h>
+#include <collision/shapes/Cylinder.h>
+#include <collision/narrowphase/Gjk.h>
 
 #include <optional>
 
@@ -111,6 +111,39 @@ bool solve(Simplex& s) {
     return true;
 }
 
+// Спуск GJK: симплекс и ближайшая к началу координат точка v разности ядер. Ложь — ядра перекрылись.
+template <class Support>
+bool descend(Support&& support, Simplex& simplex, Vector3& v, int& iterations) {
+    // Квадрат длины, ниже которого v считается нулём: относительно размера самой разности.
+    Real scale = v.dot(v);
+    for (iterations = 1; iterations <= 64; ++iterations) {
+        if (v.dot(v) <= kEpsilon * kEpsilon * scale) return false;
+        const Vertex next = support(-v);
+        scale = std::max(scale, next.w.dot(next.w));
+        // v·v − v·w — насколько новая опорная точка ближе к началу вдоль v. Если продвижения
+        // нет, v уже ближайшая точка разности.
+        if (v.dot(v) - v.dot(next.w) <= 64 * kEpsilon * v.dot(v)) break;
+        // Опорная точка, которая уже есть в симплексе, ничего не добавит: дальше только цикл.
+        bool repeated = false;
+        for (int i = 0; i < simplex.count; ++i)
+            repeated = repeated || (next.w.x == simplex.vertex[i].w.x && next.w.y == simplex.vertex[i].w.y &&
+                                    next.w.z == simplex.vertex[i].w.z);
+        if (repeated) break;
+        const Simplex previous = simplex;
+        simplex.vertex[simplex.count++] = next;
+        if (!solve(simplex)) return false;
+        simplex.reduce();
+        const Vector3 closer = simplex.closest();
+        // Расстояние обязано убывать. Если из-за округления оно не убыло, лучший ответ — прежний.
+        if (closer.dot(closer) >= v.dot(v)) {
+            simplex = previous;
+            break;
+        }
+        v = closer;
+    }
+    return true;
+}
+
 } // namespace
 
 // Расстояние между ядрами как они есть.
@@ -134,33 +167,7 @@ static ClosestPoints betweenCores(const ConvexShape& a, const Transform& poseA, 
     Vector3 v = simplex.vertex[0].w;
 
     ClosestPoints result;
-    // Квадрат длины, ниже которого v считается нулём: относительно размера самой разности.
-    Real scale = v.dot(v);
-    for (result.iterations = 1; result.iterations <= 64; ++result.iterations) {
-        if (v.dot(v) <= kEpsilon * kEpsilon * scale) return result.coresOverlap = true, result;
-        const Vertex next = support(-v);
-        scale = std::max(scale, next.w.dot(next.w));
-        // v·v − v·w — насколько новая опорная точка ближе к началу вдоль v. Если продвижения
-        // нет, v уже ближайшая точка разности.
-        if (v.dot(v) - v.dot(next.w) <= 64 * kEpsilon * v.dot(v)) break;
-        // Опорная точка, которая уже есть в симплексе, ничего не добавит: дальше только цикл.
-        bool repeated = false;
-        for (int i = 0; i < simplex.count; ++i)
-            repeated = repeated || (next.w.x == simplex.vertex[i].w.x && next.w.y == simplex.vertex[i].w.y &&
-                                    next.w.z == simplex.vertex[i].w.z);
-        if (repeated) break;
-        const Simplex previous = simplex;
-        simplex.vertex[simplex.count++] = next;
-        if (!solve(simplex)) return result.coresOverlap = true, result;
-        simplex.reduce();
-        const Vector3 closer = simplex.closest();
-        // Расстояние обязано убывать. Если из-за округления оно не убыло, лучший ответ — прежний.
-        if (closer.dot(closer) >= v.dot(v)) {
-            simplex = previous;
-            break;
-        }
-        v = closer;
-    }
+    if (!descend(support, simplex, v, result.iterations)) return result.coresOverlap = true, result;
 
     const Real coreDistance = v.length();
     if (coreDistance == 0) return result.coresOverlap = true, result;

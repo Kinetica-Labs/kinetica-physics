@@ -1,4 +1,4 @@
-#include <kp/joints/FixedJoint.h>
+#include <joints/FixedJoint.h>
 
 namespace kp {
 

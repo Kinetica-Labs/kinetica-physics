@@ -2,8 +2,8 @@
 // через дерево, с перебором всех пар — они обязаны совпасть до последней пары — и печатает
 // качество дерева: высоту против log₂ n и сколько кандидатов на тело оно оставляет.
 
-#include <kp/collision/PairFinder.h>
-#include <kp/collision/ContactPair.h>
+#include <collision/PairFinder.h>
+#include <collision/ContactPair.h>
 
 #include <chrono>
 #include <cmath>

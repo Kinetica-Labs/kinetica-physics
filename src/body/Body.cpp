@@ -1,6 +1,6 @@
-#include <kp/body/Body.h>
+#include <body/Body.h>
 
-#include <kp/body/MassFrame.h>
+#include <body/MassFrame.h>
 
 #include <utility>
 

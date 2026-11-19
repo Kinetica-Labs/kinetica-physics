@@ -1,6 +1,7 @@
-#include <kp/dynamics/time_stepping/SoftContact.h>
+#include <dynamics/time_stepping/SoftContact.h>
 
-#include <kp/math/Complementarity.h>
+#include <collision/narrowphase/Gjk.h>
+#include <math/Complementarity.h>
 
 #include <algorithm>
 #include <cmath>
@@ -46,10 +47,12 @@ constexpr std::uint32_t kEdgePair = 0xC0000000u; // номер точки пар
 
 } // namespace
 
-SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const std::vector<SolverBody>& states, const Softness& soft, const ContactForces& memory, Real h, bool fourPoints)
+SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const std::vector<SolverBody>& states, const Softness& soft, const ContactForces& memory, Real h, bool fourPoints,
+                         bool tracked)
     : a_(pair.a), b_(pair.b), normal_(pair.manifold.normal), roundA_(pair.manifold.roundA), roundB_(pair.manifold.roundB), faceOnB_(pair.manifold.faceOnB), soft_(soft) {
     const Body &bodyA = bodies[size_t(pair.a)], &bodyB = bodies[size_t(pair.b)];
     const SolverBody &a = states[size_t(pair.a)], &b = states[size_t(pair.b)];
+    if (tracked && ((roundA_ > 0 && roundB_ > 0) || (roundA_ + roundB_ > 0 && pair.manifold.count == 1))) shapes_.track(bodyA.part(pair.partA), bodyB.part(pair.partB));
     const Vector3 n = normal_;
     const Vector3 aside = abs(n.x) < Real(0.57) ? Vector3{1, 0, 0} : Vector3{0, 1, 0};
     tangent1_ = n.cross(aside), tangent1_ = (1 / tangent1_.length()) * tangent1_, tangent2_ = n.cross(tangent1_);
@@ -67,7 +70,7 @@ SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodie
         const Vector3 at = Real(0.5) * (contact.onA + contact.onB);
         p.rA = at - bodyA.position, p.rB = at - bodyB.position;
         p.coreA = p.rA - roundA_ * n, p.coreB = p.rB + roundB_ * n;
-        p.base = contact.separation;
+        p.base = p.gap = p.found = contact.separation;
         const Real response = SolverBody::inverseMassAlong(a, b, p.rA, p.rB, n);
         p.normalMass = response > 0 ? 1 / response : 0;
         p.approach = n.dot(b.v + b.w.cross(p.rB) - a.v - a.w.cross(p.rA));
@@ -80,6 +83,7 @@ SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodie
     centreA_ = (1 / weights) * centreA_, centreB_ = (1 / weights) * centreB_;
     centreCoreA_ = centreA_ - roundA_ * n, centreCoreB_ = centreB_ + roundB_ * n;
     normal0_ = normal_, tangent10_ = tangent1_, tangent20_ = tangent2_, apart_ = bodyB.position - bodyA.position;
+    createdA_ = {a.moved, a.turned}, createdB_ = {b.moved, b.turned};
     edges_ = points_.size() == 1 && roundA_ == 0 && roundB_ == 0 && (points_[0].key.id & kEdgePair) == kEdgePair;
     for (Point& p : points_) p.lever = (p.rA - centreA_).length();
     rub_ = {rubbed.dot(tangent1_), rubbed.dot(tangent2_)};
@@ -91,24 +95,57 @@ SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodie
     tangentMass_ = Matrix2x2{k11, k12, k12, k22}.inverse();
     const Real around = n.dot(a.spinFrom(n) + b.spinFrom(n));
     twistMass_ = around > 0 ? 1 / around : 0;
-    const Vector3 turn1 = a.spinFrom(tangent1_) + b.spinFrom(tangent1_), turn2 = a.spinFrom(tangent2_) + b.spinFrom(tangent2_);
-    rollMass_ = Matrix2x2{tangent1_.dot(turn1), tangent1_.dot(turn2), tangent1_.dot(turn2), tangent2_.dot(turn2)}.inverse();
+    rolling_.prepare(a, b, tangent1_, tangent2_);
 }
 
-void SoftContact::follow(const std::vector<SolverBody>& states) {
-    const SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
+void SoftContact::aim(const BodyMotion& a, const BodyMotion& b, Vector3 apart, const ClosestPoints* found) {
     if (roundA_ > 0 && roundB_ > 0) {
-        const Vector3 between = apart_ + b.moved - a.moved + b.turned.rotate(points_[0].coreB) - a.turned.rotate(points_[0].coreA);
+        Vector3 between = apart + b.turned.rotate(points_[0].coreB) - a.turned.rotate(points_[0].coreA);
+        if (found) between = found->normal;
         if (between.length() > 0) normal_ = (1 / between.length()) * between;
-        tangent1_ = tangent10_ - tangent10_.dot(normal_) * normal_, tangent1_ = (1 / tangent1_.length()) * tangent1_, tangent2_ = normal_.cross(tangent1_);
+        tangent1_ = tangent10_;
     } else {
         const Real same = a.turned.w * b.turned.w + a.turned.x * b.turned.x + a.turned.y * b.turned.y + a.turned.z * b.turned.z < 0 ? Real(-1) : Real(1);
         const Quaternion mean = Quaternion{a.turned.w + same * b.turned.w, a.turned.x + same * b.turned.x, a.turned.y + same * b.turned.y, a.turned.z + same * b.turned.z}.unit();
         const Quaternion turn = edges_ ? mean : faceOnB_ ? b.turned : a.turned;
         normal_ = turn.rotate(normal0_), tangent1_ = turn.rotate(tangent10_), tangent2_ = turn.rotate(tangent20_);
+        if (!found) return;
+        normal_ = found->normal;
     }
-    centreA_ = a.turned.rotate(centreCoreA_) + roundA_ * normal_, centreB_ = b.turned.rotate(centreCoreB_) - roundB_ * normal_;
-    for (Point& p : points_) p.rA = a.turned.rotate(p.coreA) + roundA_ * normal_, p.rB = b.turned.rotate(p.coreB) - roundB_ * normal_;
+    tangent1_ = tangent1_ - tangent1_.dot(normal_) * normal_, tangent1_ = (1 / tangent1_.length()) * tangent1_, tangent2_ = normal_.cross(tangent1_);
+}
+
+void SoftContact::follow(const std::vector<SolverBody>& states) {
+    const SolverBody &stateA = states[size_t(a_)], &stateB = states[size_t(b_)];
+    const BodyMotion a{stateA.moved - createdA_.moved, stateA.turned * createdA_.turned.conjugate()}, b{stateB.moved - createdB_.moved, stateB.turned * createdB_.turned.conjugate()};
+    const Vector3 apart = apart_ + b.moved - a.moved;
+    // Нормаль круглого тела — по ближайшим точкам ядер. У шаров это линия центров. У капсулы и
+    // цилиндра ближайшая точка ядра уходит вдоль него вместе с соседом: по точкам, закреплённым в
+    // телах, нормаль наклонялась, а плечо отставало — шар, скользящий по торцу вращающегося цилиндра
+    // со скоростью 4,7 м/с, входил в него на 12 мм. То же у круглого тела на ребре или вершине
+    // многогранника, который вращается: нормаль, повёрнутая вместе с ним, уходит на 6–18° за
+    // обновление. Поэтому ближайшие точки ищутся заново (GJK, TrackedShapes); у площадки из одной точки
+    // по ним ставится и сама точка с её зазором.
+    const ClosestPoints closest = shapes_.tracking() ? shapes_.closest(a, b, apart_) : ClosestPoints{};
+    const bool found = shapes_.tracking() && !closest.coresOverlap;
+    aim(a, b, apart, found ? &closest : nullptr);
+    if (found && points_.size() == 1) {
+        const Vector3 middle = Real(0.5) * (closest.onA + closest.onB);
+        points_[0].rA = centreA_ = middle - a.moved, points_[0].rB = centreB_ = middle - (apart_ + b.moved);
+        points_[0].gap = closest.distance;
+        return;
+    }
+    // Плечи точек двух тел и расхождение этих точек d. Общая точка приложения — точка тела, которое
+    // лежит на грани другого (она и есть место касания); у пары рёбер и у двух круглых тел — посередине.
+    const Real toB = edges_ || (roundA_ > 0 && roundB_ > 0) ? Real(0.5) : faceOnB_ ? Real(0) : Real(1);
+    const auto meet = [&](Vector3 coreA, Vector3 coreB, Vector3& rA, Vector3& rB) {
+        rA = a.turned.rotate(coreA) + roundA_ * normal_, rB = b.turned.rotate(coreB) - roundB_ * normal_;
+        const Vector3 d = apart + rB - rA;
+        rA += toB * d, rB -= (1 - toB) * d;
+        return d;
+    };
+    meet(centreCoreA_, centreCoreB_, centreA_, centreB_);
+    for (Point& p : points_) p.gap = meet(p.coreA, p.coreB, p.rA, p.rB).dot(normal_) + p.base;
 }
 
 void SoftContact::warmStart(std::vector<SolverBody>& states) const {
@@ -116,7 +153,7 @@ void SoftContact::warmStart(std::vector<SolverBody>& states) const {
     for (const Point& p : points_) SolverBody::push(a, b, p.rA, p.rB, p.impulse * normal_);
     SolverBody::twist(a, b, twistImpulse_ * normal_);
     SolverBody::push(a, b, centreA_, centreB_, rub_.x * tangent1_ + rub_.y * tangent2_);
-    if (roll_.x != 0 || roll_.y != 0) SolverBody::twist(a, b, roll_.x * tangent1_ + roll_.y * tangent2_);
+    rolling_.warmStart(a, b, tangent1_, tangent2_);
 }
 
 // K — отклик нынешних тел: у вытянутого тела тензор инерции в мире меняется за кадр, и точное
@@ -137,13 +174,13 @@ void SoftContact::respond(const SolverBody& a, const SolverBody& b) const {
 
 void SoftContact::solveNormals(std::vector<SolverBody>& states, bool withBias, Real h, Real pushSpeed) {
     SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
-    const Vector3 n = normal_, shift = b.moved - a.moved;
+    const Vector3 n = normal_;
     const size_t count = points_.size();
     BlockWork& w = work;
     respond(a, b);
     for (size_t i = 0; i < count; ++i) {
         const Point& p = points_[i];
-        const Real gap = (shift + p.rB - p.rA + apart_).dot(n) + p.base;
+        const Real gap = p.gap;
         Real bias = 0;
         if (gap > 0) bias = gap / h; // до касания ещё далеко: сближаться можно не быстрее gap / h
         else if (withBias) w.scale[i] = soft_.massScale, bias = std::max(soft_.massScale * soft_.biasRate * gap, -pushSpeed) / soft_.massScale;
@@ -171,11 +208,30 @@ void SoftContact::solveNormals(std::vector<SolverBody>& states, bool withBias, R
         a.v -= (a.inverseMass * change) * n, a.w -= change * w.spinA[i];
         b.v += (b.inverseMass * change) * n, b.w += change * w.spinB[i];
         p.impulse = next;
-        if (!withBias) p.largest = std::max(p.largest, next);
     }
 }
 
-void SoftContact::solveFriction(std::vector<SolverBody>& states) {
+Real SoftContact::deepest() const {
+    Real depth = 0;
+    for (const Point& p : points_) depth = std::max(depth, -p.gap);
+    return depth;
+}
+
+void SoftContact::setNormalImpulse(std::vector<SolverBody>& states, size_t k, Real impulse) {
+    Point& p = points_[k];
+    SolverBody::push(states[size_t(a_)], states[size_t(b_)], p.rA, p.rB, (impulse - p.impulse) * normal_);
+    p.impulse = impulse;
+}
+
+void SoftContact::matchTrial(const std::vector<SolverBody>& states, Real h) {
+    const SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
+    for (Point& p : points_) {
+        const Real curved = p.found - (p.gap + h * normal_.dot(b.v + b.w.cross(p.rB) - a.v - a.w.cross(p.rA)));
+        p.base += curved, p.gap += curved;
+    }
+}
+
+void SoftContact::solveFriction(std::vector<SolverBody>& states, Real rollingArm) {
     SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
     Real load = 0, leverLoad = 0;
     for (const Point& p : points_) load += p.impulse, leverLoad += p.lever * p.impulse;
@@ -189,30 +245,21 @@ void SoftContact::solveFriction(std::vector<SolverBody>& states) {
     if (size > limit) rub = (limit / size) * rub;
     SolverBody::push(a, b, centreA_, centreB_, (rub.x - rub_.x) * tangent1_ + (rub.y - rub_.y) * tangent2_);
     rub_ = rub;
+    rolling_.solve(a, b, tangent1_, tangent2_, rollingArm, load);
 }
 
-void SoftContact::solveRolling(std::vector<SolverBody>& states, Real arm) {
-    if (arm == 0) return;
-    SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
-    Real load = 0;
-    for (const Point& p : points_) load += p.impulse;
-    const Vector3 spin = b.w - a.w;
-    Vector2 roll = roll_ - rollMass_ * Vector2{spin.dot(tangent1_), spin.dot(tangent2_)};
-    const Real size = roll.length(), limit = arm * load;
-    if (size > limit) roll = (limit / size) * roll;
-    SolverBody::twist(a, b, (roll.x - roll_.x) * tangent1_ + (roll.y - roll_.y) * tangent2_);
-    roll_ = roll;
-}
-
+// Удар становится свершившимся изменением скоростей: накопленный импульс точки обнуляется, иначе
+// следующее решение нормалей (оно ищет полный импульс точки) сняло бы отскок как лишний.
 void SoftContact::bounce(std::vector<SolverBody>& states, Real bounceSpeed) {
     if (restitution_ == 0) return;
+    constexpr Real kTouching = Real(1e-3); // м: ближе этого упреждающая точка считается коснувшейся
     SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
     for (Point& p : points_) {
-        if (p.approach > -bounceSpeed || p.largest == 0) continue;
+        if (p.approach > -bounceSpeed || p.impulse <= 0 || p.gap > kTouching) continue;
         const Real speed = normal_.dot(b.v + b.w.cross(p.rB) - a.v - a.w.cross(p.rA));
         const Real next = std::max(p.impulse - p.normalMass * (speed + restitution_ * p.approach), Real(0));
         SolverBody::push(a, b, p.rA, p.rB, (next - p.impulse) * normal_);
-        p.impulse = next;
+        p.impulse = 0, p.approach = 0;
     }
 }
 

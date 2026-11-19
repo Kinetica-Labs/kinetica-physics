@@ -1,4 +1,4 @@
-#include <kp/dynamics/time_stepping/SoftJoint.h>
+#include <dynamics/time_stepping/SoftJoint.h>
 
 #include <algorithm>
 
@@ -9,18 +9,9 @@ namespace {
 // вместе их не решить: они решаются по одной.
 constexpr Real kIndependent = Real(1e-9);
 
-bool locked(const Bond& bond) { return !bond.soft && !bond.driven && !bond.oneSided; }
-bool turning(const Bond& bond) { return bond.linear.lengthSquare() == 0; }
 Real component(Vector3 v, int k) { return k == 0 ? v.x : k == 1 ? v.y : v.z; }
 
 } // namespace
-
-int SoftJoint::blockSize(const Bond* bonds, int available) {
-    if (!locked(bonds[0])) return 1;
-    int count = 1;
-    while (count < 3 && count < available && locked(bonds[count]) && turning(bonds[count]) == turning(bonds[0])) ++count;
-    return count;
-}
 
 SoftJoint::SoftJoint(const Bond* bonds, int count, const std::vector<SolverBody>& states, Real* impulses) : count_(count), impulses_(impulses) {
     const SolverBody &a = states[size_t(bonds[0].a)], &b = states[size_t(bonds[0].b)];

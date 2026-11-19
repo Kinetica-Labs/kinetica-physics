@@ -1,8 +1,11 @@
-#include <kp/dynamics/time_stepping/SoftStep.h>
+#include <dynamics/time_stepping/SoftStep.h>
 
-#include <kp/dynamics/time_stepping/DirectJoints.h>
-#include <kp/dynamics/time_stepping/SoftContact.h>
-#include <kp/dynamics/time_stepping/SoftJoint.h>
+#include <dynamics/time_stepping/IslandNormals.h>
+#include <dynamics/time_stepping/DirectJoints.h>
+#include <dynamics/time_stepping/MissedContacts.h>
+#include <dynamics/time_stepping/PairReach.h>
+#include <dynamics/time_stepping/SoftContact.h>
+#include <dynamics/time_stepping/SoftJoint.h>
 
 #include <algorithm>
 #include <limits>
@@ -17,22 +20,34 @@ std::vector<SolverBody> solverBodiesOf(const std::vector<Body>& bodies) {
         const Body& body = bodies[i];
         if (body.isStatic()) continue;
         states[i].inverseMass = body.mass.inverseMass, states[i].v = body.linearVelocity(), states[i].w = body.angularVelocity();
-        states[i].inverseInertia = body.inverseInertiaInWorld();
+        states[i].inverseInertia = inverseInertiaInWorld(body);
     }
     return states;
 }
 
-// Контакты пар; у пары с неподвижным телом мягкость своя (staticSoft), как у Box3D.
-std::vector<SoftContact> contactsOf(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, const std::vector<SolverBody>& states, const Softness& soft,
-                                    const Softness& staticSoft, const ContactForces& memory, Real h, bool fourPoints) {
-    std::vector<SoftContact> contacts;
-    for (const ContactPair& pair : pairs) {
-        const Body &bodyA = bodies[size_t(pair.a)], &bodyB = bodies[size_t(pair.b)];
-        if (pair.manifold.count == 0 || (bodyA.isStatic() && bodyB.isStatic())) continue;
-        contacts.emplace_back(pair, bodies, states, bodyA.isStatic() || bodyB.isStatic() ? staticSoft : soft, memory, h, fourPoints);
+// Контакт пары; у пары с неподвижным телом мягкость своя (staticSoft), как у Box3D.
+struct ContactMaker {
+    const std::vector<Body>& bodies;
+    const std::vector<SolverBody>& states;
+    Softness soft, staticSoft;
+    Real h;
+    bool fourPoints;
+
+    // tracked — у круглых тел контакт заново ищет ближайшие точки внутри шага (SoftContact::follow).
+    SoftContact make(const ContactPair& pair, const ContactForces& memory, bool tracked) const {
+        const bool fixed = bodies[size_t(pair.a)].isStatic() || bodies[size_t(pair.b)].isStatic();
+        return SoftContact(pair, bodies, states, fixed ? staticSoft : soft, memory, h, fourPoints, tracked);
     }
-    return contacts;
-}
+    // Контакты пар, у которых есть точки; owner — номер пары каждого контакта.
+    std::vector<SoftContact> all(const std::vector<ContactPair>& pairs, const ContactForces& memory, std::vector<size_t>& owner) const {
+        std::vector<SoftContact> contacts;
+        for (size_t p = 0; p < pairs.size(); ++p) {
+            if (pairs[p].manifold.count == 0 || (bodies[size_t(pairs[p].a)].isStatic() && bodies[size_t(pairs[p].b)].isStatic())) continue;
+            contacts.push_back(make(pairs[p], memory, true)), owner.push_back(p);
+        }
+        return contacts;
+    }
+};
 
 // Момент импульса по угловой скорости: L = R I Rᵀ ω, I — главные моменты тела.
 Vector3 momentumOf(const Body& body, Vector3 w) {
@@ -40,29 +55,58 @@ Vector3 momentumOf(const Body& body, Vector3 w) {
     return body.orientation.rotate(inertia.scaled(body.orientation.rotateInverse(w)));
 }
 
-// Тела сдвигаются с найденными скоростями. Момент импульса при повороте сохраняется, а угловая
-// скорость пересчитывается по новой ориентации: это и есть гироскопический член. origin и facing —
-// позы начала кадра: от них считаются сдвиг и поворот, по которым контакт знает нынешний зазор.
-void moveBodies(std::vector<Body>& bodies, std::vector<SolverBody>& states, const std::vector<Vector3>& origin, const std::vector<Quaternion>& facing, Real h) {
-    for (size_t i = 0; i < bodies.size(); ++i) {
-        SolverBody& s = states[i];
-        if (s.inverseMass == 0) continue;
-        Body& body = bodies[i];
-        const Vector3 momentum = momentumOf(body, s.w);
-        body.position += h * s.v;
-        body.angularMomentum = momentum;
-        // У тела с неравными моментами инерции угловая скорость меняется вместе с ориентацией,
-        // поэтому поворот идёт со скоростью середины подшага. Со скоростью его начала вытянутое
-        // тело само раскручивалось вокруг длинной оси: на 2 % за кадр.
-        const Vector3 inverse = body.mass.inverseInertia;
-        const bool round = inverse.x == inverse.y && inverse.y == inverse.z;
-        const Vector3 turn = round ? h * s.w : h * body.angularVelocityAt((Quaternion::fromRotationVector((h / 2) * s.w) * body.orientation).unit());
-        body.orientation = (Quaternion::fromRotationVector(turn) * body.orientation).unit();
-        s.moved = body.position - origin[i], s.turned = body.orientation * facing[i].conjugate();
-        s.w = body.angularVelocity();
-        s.inverseInertia = body.inverseInertiaInWorld();
+// Тела в движении внутри шага. origin и facing — позы начала кадра: от них считаются сдвиг и поворот,
+// по которым контакт знает нынешний зазор. Позы и скорости перед последним сдвигом запоминаются:
+// к ним шаг возвращается, если сдвиг приходится повторить (MissedContacts).
+struct Moving {
+    struct Pose {
+        Vector3 position, angularMomentum;
+        Quaternion orientation;
+    };
+    std::vector<Body>& bodies;
+    std::vector<SolverBody>& states;
+    std::vector<Pose> origin, before;
+    std::vector<SolverBody> statesBefore;
+
+    Moving(std::vector<Body>& all, std::vector<SolverBody>& solved) : bodies(all), states(solved) { origin = poses(); }
+    std::vector<Pose> poses() const {
+        std::vector<Pose> now(bodies.size());
+        for (size_t i = 0; i < bodies.size(); ++i) now[i] = {bodies[i].position, bodies[i].angularMomentum, bodies[i].orientation};
+        return now;
     }
-}
+    // Тела сдвигаются с найденными скоростями. Момент импульса при повороте сохраняется, а угловая
+    // скорость пересчитывается по новой ориентации: это и есть гироскопический член.
+    void advance(Real h) {
+        before = poses(), statesBefore = states;
+        for (size_t i = 0; i < bodies.size(); ++i) {
+            SolverBody& s = states[i];
+            if (s.inverseMass == 0) continue;
+            Body& body = bodies[i];
+            const Vector3 momentum = momentumOf(body, s.w);
+            body.position += h * s.v;
+            body.angularMomentum = momentum;
+            // У тела с неравными моментами инерции угловая скорость меняется вместе с ориентацией,
+            // поэтому поворот идёт со скоростью середины подшага. Со скоростью его начала вытянутое
+            // тело само раскручивалось вокруг длинной оси: на 2 % за кадр.
+            const Vector3 inverse = body.mass.inverseInertia;
+            const bool round = inverse.x == inverse.y && inverse.y == inverse.z;
+            const Vector3 turn = round ? h * s.w : h * angularVelocityAt(body, (Quaternion::fromRotationVector((h / 2) * s.w) * body.orientation).unit());
+            body.orientation = (Quaternion::fromRotationVector(turn) * body.orientation).unit();
+            s.moved = body.position - origin[i].position, s.turned = body.orientation * origin[i].orientation.conjugate();
+            s.w = body.angularVelocity();
+            s.inverseInertia = inverseInertiaInWorld(body);
+        }
+    }
+    // Скорости решателя — в импульсы тел: по ним считают досягаемость PairReach и PairFinder.
+    void sync() {
+        for (size_t i = 0; i < bodies.size(); ++i)
+            if (states[i].inverseMass != 0) bodies[i].linearMomentum = (1 / states[i].inverseMass) * states[i].v, bodies[i].angularMomentum = momentumOf(bodies[i], states[i].w);
+    }
+    void undo() {
+        states = statesBefore;
+        for (size_t i = 0; i < bodies.size(); ++i) bodies[i].position = before[i].position, bodies[i].angularMomentum = before[i].angularMomentum, bodies[i].orientation = before[i].orientation;
+    }
+};
 
 // Связи сочленений по нынешним позам тел: запертые свободы — одной системой (DirectJoints),
 // остальные — мягкими связями по одной. Строятся заново после каждого сдвига тел: проход без
@@ -100,6 +144,75 @@ struct JointRows {
     }
 };
 
+// Начало подшага: сопротивление среды, v ← v / (1 + h c) (Body::linearDamping), и тяжесть.
+void applyForces(std::vector<SolverBody>& states, const std::vector<Body>& bodies, Vector3 gravity, Real h) {
+    for (size_t i = 0; i < states.size(); ++i) {
+        if (states[i].inverseMass <= 0) continue;
+        states[i].v = (1 / (1 + h * bodies[i].linearDamping)) * states[i].v + h * gravity;
+        states[i].w = (1 / (1 + h * bodies[i].angularDamping)) * states[i].w;
+    }
+}
+
+constexpr int kRechecks = 3; // сколько раз подшаг повторяет сдвиг, найдя пропущенные контакты
+
+// Контакты шага и то, что пополняет их по ходу: пропущенные точки пар списка (MissedContacts) и
+// пары, которых в списке не было (PairReach).
+struct LiveContacts {
+    std::vector<SoftContact>& contacts;
+    IslandNormals& normals;
+    MissedContacts& missed;
+    PairReach& reach;
+    const ContactMaker& maker;
+    const JointSet& joints;
+    Real pushSpeed, bounceSpeed, boundary;
+    // У контакта, найденного посреди шага, накопленных импульсов нет: тёплый старт их к телам не прикладывал.
+    ContactForces fresh;
+
+    // true — какое-то тело выходит за досягаемость списка пар, и нашлись новые пары с точками контакта.
+    bool discover(Moving& moving, Real h, Real remaining) {
+        moving.sync();
+        if (!reach.exceeded(moving.bodies, h)) return false;
+        bool added = false;
+        for (const ContactPair& pair : reach.discover(moving.bodies, joints, remaining, boundary)) {
+            missed.adopt(pair, moving.bodies, pair.manifold.count > 0);
+            if (pair.manifold.count > 0) contacts.push_back(maker.make(pair, fresh, true)), added = true;
+        }
+        return added;
+    }
+    // Нормали с поправкой положения и отскок точек, принявших удар.
+    void impact(Moving& moving, Real h) {
+        normals.solve(contacts, moving.bodies, moving.states, true, h, pushSpeed);
+        for (SoftContact& contact : contacts) contact.bounce(moving.states, bounceSpeed);
+    }
+    // Нормали с поправкой положения и сдвиг тел на h; remaining — время до конца обновления. Сдвиг
+    // пробный: если после него нашлись пропущенные контакты, тела возвращаются и нормали решаются
+    // снова, уже с ними.
+    void solveAndMove(Moving& moving, Real h, Real remaining) {
+        const MissedContacts::Maker untracked = [&](const ContactPair& pair) { return maker.make(pair, fresh, false); };
+        for (int round = 0;; ++round) {
+            impact(moving, h);
+            for (int k = 0; k < kRechecks && discover(moving, h, remaining); ++k) impact(moving, h);
+            missed.note(contacts);
+            moving.advance(h);
+            for (SoftContact& contact : contacts) contact.follow(moving.states);
+            const size_t known = contacts.size();
+            if (round == kRechecks || !missed.find(contacts, moving.bodies, moving.states, h, untracked)) break;
+            moving.undo();
+            for (SoftContact& contact : contacts) contact.follow(moving.states);
+            for (size_t c = known; c < contacts.size(); ++c) contacts[c].matchTrial(moving.states, h);
+        }
+        reach.spend();
+    }
+};
+
+// Конец шага: скорости решателя — в импульсы тел, накопленные импульсы контактов — в память.
+void finish(std::vector<Body>& bodies, const std::vector<SolverBody>& states, const std::vector<SoftContact>& contacts, ContactForces& memory, Real h) {
+    for (size_t i = 0; i < bodies.size(); ++i)
+        if (states[i].inverseMass != 0) bodies[i].linearMomentum = (1 / states[i].inverseMass) * states[i].v, bodies[i].angularMomentum = momentumOf(bodies[i], states[i].w);
+    memory.clear();
+    for (const SoftContact& contact : contacts) contact.remember(memory, h);
+}
+
 } // namespace
 
 void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& pairs, const JointSet& joints, Vector3 gravity, Real dt, ContactForces& contactMemory,
@@ -111,36 +224,31 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
 
     for (const Joint& joint : joints) joint.applyDrive(bodies, dt);
     std::vector<SolverBody> states = solverBodiesOf(bodies);
-    std::vector<SoftContact> contacts = contactsOf(pairs, bodies, states, soft, staticSoft, contactMemory, h, fourContactPoints);
-    std::vector<Vector3> origin(bodies.size());
-    std::vector<Quaternion> facing(bodies.size());
-    for (size_t i = 0; i < bodies.size(); ++i) origin[i] = bodies[i].position, facing[i] = bodies[i].orientation;
+    const ContactMaker maker{bodies, states, soft, staticSoft, h, fourContactPoints};
+    std::vector<size_t> owner;
+    std::vector<SoftContact> contacts = maker.all(pairs, contactMemory, owner);
+    MissedContacts missed(pairs, bodies, owner, recheckDepth, edgeSlop);
+    PairReach reach(bodies, pairs, gravity, dt, recheckDepth / 2);
+    Moving moving(bodies, states);
     jointMemory.resize(joints.size());
     JointRows rows;
     rows.build(joints, bodies, states, jointMemory, directJoints);
+    IslandNormals normals(directContactRows, soft.biasRate);
+    LiveContacts live{contacts, normals, missed, reach, maker, joints, pushSpeed, bounceSpeed, edgeSlop, {}};
 
     for (int substep = 0; substep < substeps; ++substep) {
-        for (SolverBody& s : states)
-            if (s.inverseMass > 0) s.v += h * gravity;
+        applyForces(states, bodies, gravity, h);
         // Тёплый старт: накопленные импульсы прикладываются к новым скоростям.
         rows.warmStart(states);
         for (const SoftContact& contact : contacts) contact.warmStart(states);
         rows.solve(states, true, jointCorrection, h, jointSoft, pushSpeed);
-        for (SoftContact& contact : contacts) contact.solveNormals(states, true, h, pushSpeed);
-        moveBodies(bodies, states, origin, facing, h);
-        for (SoftContact& contact : contacts) contact.follow(states);
+        live.solveAndMove(moving, h, (substeps - substep) * h);
         rows.build(joints, bodies, states, jointMemory, directJoints);
         rows.solve(states, false, jointCorrection, h, jointSoft, pushSpeed);
-        for (SoftContact& contact : contacts) contact.solveNormals(states, false, h, pushSpeed);
-        for (SoftContact& contact : contacts) contact.solveFriction(states);
-        for (SoftContact& contact : contacts) contact.solveRolling(states, rollingResistance);
+        normals.solve(contacts, bodies, states, false, h, pushSpeed);
+        for (SoftContact& contact : contacts) contact.solveFriction(states, rollingResistance);
     }
-
-    for (SoftContact& contact : contacts) contact.bounce(states, bounceSpeed);
-    for (size_t i = 0; i < bodies.size(); ++i)
-        if (states[i].inverseMass != 0) bodies[i].linearMomentum = (1 / states[i].inverseMass) * states[i].v, bodies[i].angularMomentum = momentumOf(bodies[i], states[i].w);
-    contactMemory.clear();
-    for (const SoftContact& contact : contacts) contact.remember(contactMemory, h);
+    finish(bodies, states, contacts, contactMemory, h);
 }
 
 } // namespace kp

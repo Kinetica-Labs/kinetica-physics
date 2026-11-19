@@ -1,14 +1,14 @@
 // Свободное движение против законов сохранения.
 
-#include <kp/collision/shapes/Meshes.h>
-#include <kp/body/CompoundBodyBuilder.h>
-#include <kp/collision/PairFinder.h>
+#include <collision/shapes/Meshes.h>
+#include <body/CompoundBodyBuilder.h>
+#include <collision/PairFinder.h>
 #include "Check.h"
 
-#include <kp/collision/shapes/Sphere.h>
-#include <kp/collision/shapes/ConvexHull.h>
-#include <kp/dynamics/Integrator.h>
-#include <kp/world/World.h>
+#include <collision/shapes/Sphere.h>
+#include <collision/shapes/ConvexHull.h>
+#include <dynamics/Integrator.h>
+#include <world/World.h>
 
 #include <cmath>
 
@@ -27,12 +27,12 @@ double worstEnergyError(int stepsPerSecond) {
     const Vector3 spin{0.01, 5, 0.01};
     body.angularMomentum = {spin.x / body.mass.inverseInertia.x, spin.y / body.mass.inverseInertia.y, spin.z / body.mass.inverseInertia.z};
     const BodyId id = world.addBody(body);
-    const Real energy = world.body(id).kineticEnergy();
+    const Real energy = kineticEnergyOf(world.body(id));
 
     double worst = 0;
     for (int step = 0; step < stepsPerSecond * 100; ++step) {
         world.step(1.0 / stepsPerSecond);
-        worst = std::fmax(worst, std::fabs(world.body(id).kineticEnergy() - energy) / energy);
+        worst = std::fmax(worst, std::fabs(kineticEnergyOf(world.body(id)) - energy) / energy);
     }
     const Vector3 linearMomentum = world.body(id).angularMomentum;
     CHECK(linearMomentum.x == body.angularMomentum.x && linearMomentum.y == body.angularMomentum.y && linearMomentum.z == body.angularMomentum.z,
@@ -181,7 +181,7 @@ void rollingOntoFaceGainsNoEnergy() {
     const BodyId id = world.addBody(cube);
     const auto energy = [&] {
         const Body& b = world.body(id);
-        return b.kineticEnergy() + Real(9.81) * b.position.y / b.mass.inverseMass;
+        return kineticEnergyOf(b) + Real(9.81) * b.position.y / b.mass.inverseMass;
     };
     Real previous = energy(), largestGain = 0;
     for (int frame = 0; frame < 180; ++frame) {
@@ -397,7 +397,7 @@ void cubeRestsOnWiderCylinder() {
 double mechanicalEnergy(const World& world) {
     double energy = 0;
     for (const Body& body : world.bodies())
-        if (!body.isStatic()) energy += double(body.kineticEnergy() - world.gravity.dot(body.position) / body.mass.inverseMass);
+        if (!body.isStatic()) energy += double(kineticEnergyOf(body) - world.gravity.dot(body.position) / body.mass.inverseMass);
     return energy;
 }
 
@@ -412,7 +412,7 @@ void pendulumKeepsPeriodAndEnergy() {
         World world;
         const BodyId pivot = world.addBody(Body::sphere(0.01, 0));
         const BodyId bob = world.addBody(Body::sphere(0.05, 1000, {Real(std::sin(0.5)), Real(-std::cos(0.5)), 0}));
-        world.addBallJoint(pivot, bob, {});
+        addBallJoint(world, pivot, bob, {});
         const double start = mechanicalEnergy(world);
         double last = double(world.bodies()[1].position.x), first = -1, latest = -1, armError = 0;
         int crossings = 0;
@@ -451,7 +451,7 @@ void jointsLeaveOnlyTheirFreedoms() {
         World world;
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
         const BodyId bar = world.addBody(Body::box({0.5, 0.05, 0.03}, 1000, {0.5, 0, 0}));
-        world.addHinge(base, bar, {}, {0, 0, 1});
+        addHinge(world, base, bar, {}, {0, 0, 1});
         double axisError = 0, anchorError = 0, lowest = 0;
         for (int step = 0; step < 300; ++step) {
             world.step(Real(1) / 60);
@@ -469,7 +469,7 @@ void jointsLeaveOnlyTheirFreedoms() {
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
         const BodyId block = world.addBody(Body::box({0.1, 0.07, 0.05}, 1000));
         const Vector3 axis{Real(0.5), Real(-0.86602540378443865), 0};
-        world.addSlider(base, block, {}, axis);
+        addSlider(world, base, block, {}, axis);
         for (int step = 0; step < 60; ++step) world.step(Real(1) / 60);
         const Body& b = world.bodies()[1];
         const double along = double(b.position.dot(axis));
@@ -482,7 +482,7 @@ void jointsLeaveOnlyTheirFreedoms() {
         World world;
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
         const BodyId beam = world.addBody(Body::box({0.5, 0.05, 0.03}, 1000, {0.55, 0, 0}));
-        world.addWeld(base, beam, {0.05, 0, 0});
+        addWeld(world, base, beam, {0.05, 0, 0});
         for (int step = 0; step < 120; ++step) world.step(Real(1) / 60);
         const Body& b = world.bodies()[1];
         CHECK(double((b.position - Vector3{0.55, 0, 0}).length()) < 1e-9 && double(b.linearVelocity().length()) < 1e-9, "приваренный брусок сдвинулся на %.2e м, скорость %.2e м/с",
@@ -498,7 +498,7 @@ void jointsLeaveOnlyTheirFreedoms() {
         shaft.linearMomentum = {0, 0, Real(0.4) / shaft.mass.inverseMass}; // толчок вбок
         shaft.angularMomentum = {Real(2) / shaft.mass.inverseInertia.x, 0, 0}; // и попытка закрутить вал
         const BodyId id = world.addBody(shaft);
-        world.addCardan(base, id, {}, {1, 0, 0}, {0, 1, 0});
+        addCardan(world, base, id, {}, {1, 0, 0}, {0, 1, 0});
         double crossError = 0, anchorError = 0, lowest = 0, sideways = 0;
         for (int step = 0; step < 240; ++step) {
             world.step(Real(1) / 60);
@@ -522,7 +522,7 @@ void chainsHold() {
         const int links = swinging ? 3 : 20;
         for (int k = 1; k <= links; ++k) {
             const BodyId bead = world.addBody(Body::sphere(0.02, 1000, Real(0.1 * k) * along));
-            world.addBallJoint(previous, bead, Real(0.1 * (k - 0.5)) * along);
+            addBallJoint(world, previous, bead, Real(0.1 * (k - 0.5)) * along);
             previous = bead;
         }
         double gap = 0, speed = 0;
@@ -544,15 +544,15 @@ void drivesMoveTheirFreedom() {
         world.gravity = {};
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
         const BodyId wheel = world.addBody(Body::cylinder(0.05, 0.3, 1000, {0, 0.2, 0}));
-        HingeJoint& axle = world.addHinge(base, wheel, {0, 0.2, 0}, {0, 1, 0});
+        HingeJoint& axle = addHinge(world, base, wheel, {0, 0.2, 0}, {0, 1, 0});
         axle.driveForce = Real(0.5);
         for (int step = 0; step < 60; ++step) world.step(Real(1) / 60);
         const Body& b = world.bodies()[1];
         const double rate = 0.5 * double(b.mass.inverseInertia.y); // M / I
         CHECK_NEAR(double(b.angularVelocity().y), rate, 1e-9 * rate);
         // Угол приводится к отрезку от −π до π.
-        const double turns = std::round((rate / 2 - double(world.coordinate(axle))) / 6.283185307179586);
-        CHECK_NEAR(double(world.coordinate(axle)) + 6.283185307179586 * turns, rate / 2, 1e-9 * rate);
+        const double turns = std::round((rate / 2 - double(coordinate(world, axle))) / 6.283185307179586);
+        CHECK_NEAR(double(coordinate(world, axle)) + 6.283185307179586 * turns, rate / 2, 1e-9 * rate);
         CHECK(double((b.position - Vector3{0, 0.2, 0}).length()) < 1e-9, "маховик ушёл с оси на %.2e м", double((b.position - Vector3{0, 0.2, 0}).length()));
     }
     {
@@ -560,7 +560,7 @@ void drivesMoveTheirFreedom() {
         World world;
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
         const BodyId bar = world.addBody(Body::box({0.3, 0.03, 0.03}, 1000, {0.3, 0, 0}));
-        HingeJoint& elbow = world.addHinge(base, bar, {}, {0, 0, 1});
+        HingeJoint& elbow = addHinge(world, base, bar, {}, {0, 0, 1});
         elbow.holdSpeed = true, elbow.driveSpeed = Real(2);
         double worst = 0;
         for (int step = 0; step < 45; ++step) {
@@ -568,7 +568,7 @@ void drivesMoveTheirFreedom() {
             worst = std::fmax(worst, std::fabs(double(world.bodies()[1].angularVelocity().z) - 2));
         }
         CHECK(worst < 1e-9, "привод скорости шарнира отклонился на %.2e рад/с", worst);
-        CHECK_NEAR(double(world.coordinate(elbow)), 1.5, 1e-6);
+        CHECK_NEAR(double(coordinate(world, elbow)), 1.5, 1e-6);
     }
     {
         // Ползун на вертикальной оси: сила привода, равная весу, держит груз; вдвое большая —
@@ -577,10 +577,10 @@ void drivesMoveTheirFreedom() {
             World world;
             const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
             const BodyId block = world.addBody(Body::box({0.1, 0.07, 0.05}, 1000));
-            SliderJoint& lift = world.addSlider(base, block, {}, {0, 1, 0});
+            SliderJoint& lift = addSlider(world, base, block, {}, {0, 1, 0});
             lift.driveForce = Real(load * 9.81) / world.bodies()[1].mass.inverseMass;
             for (int step = 0; step < 60; ++step) world.step(Real(1) / 60);
-            CHECK_NEAR(double(world.coordinate(lift)), (load - 1) * 9.81 / 2, 1e-9);
+            CHECK_NEAR(double(coordinate(world, lift)), (load - 1) * 9.81 / 2, 1e-9);
         }
     }
     {
@@ -588,13 +588,13 @@ void drivesMoveTheirFreedom() {
         World world;
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
         const BodyId bar = world.addBody(Body::box({0.3, 0.03, 0.03}, 1000, {0.3, 0, 0}));
-        HingeJoint& elbow = world.addHinge(base, bar, {}, {0, 0, 1});
+        HingeJoint& elbow = addHinge(world, base, bar, {}, {0, 0, 1});
         elbow.holdSpeed = true;
         for (int step = 0; step < 240; ++step) {
-            elbow.driveSpeed = 5 * (Real(1) - world.coordinate(elbow));
+            elbow.driveSpeed = 5 * (Real(1) - coordinate(world, elbow));
             world.step(Real(1) / 60);
         }
-        CHECK_NEAR(double(world.coordinate(elbow)), 1.0, 1e-6);
+        CHECK_NEAR(double(coordinate(world, elbow)), 1.0, 1e-6);
     }
 }
 
@@ -606,15 +606,15 @@ void limitsStopAndDrivesYield() {
         World world;
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
         const BodyId bar = world.addBody(Body::box({0.3, 0.03, 0.03}, 1000, {0.3, 0, 0}));
-        HingeJoint& elbow = world.addHinge(base, bar, {}, {0, 0, 1});
+        HingeJoint& elbow = addHinge(world, base, bar, {}, {0, 0, 1});
         elbow.lower = Real(-0.6);
         double lowest = 0;
         for (int step = 0; step < 120; ++step) {
             world.step(Real(1) / 60);
-            lowest = std::fmin(lowest, double(world.coordinate(elbow)));
+            lowest = std::fmin(lowest, double(coordinate(world, elbow)));
         }
         CHECK(lowest > -0.6 - 1e-6, "маятник прошёл предел на %.2e рад", -0.6 - lowest);
-        CHECK(std::fabs(double(world.coordinate(elbow)) + 0.6) < double(kLimitBand), "маятник остановился в %.2e рад от предела", std::fabs(double(world.coordinate(elbow)) + 0.6));
+        CHECK(std::fabs(double(coordinate(world, elbow)) + 0.6) < double(kLimitBand), "маятник остановился в %.2e рад от предела", std::fabs(double(coordinate(world, elbow)) + 0.6));
         CHECK(double(world.bodies()[1].angularVelocity().length()) < 1e-9, "маятник у предела движется: %.2e рад/с", double(world.bodies()[1].angularVelocity().length()));
     }
     {
@@ -626,10 +626,10 @@ void limitsStopAndDrivesYield() {
             const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
             Body wheel = Body::cylinder(0.05, 0.3, 1000, {0, 0.2, 0});
             wheel.angularMomentum = {0, Real(spin) / wheel.mass.inverseInertia.y, 0};
-            HingeJoint& axle = world.addHinge(base, world.addBody(wheel), {0, 0.2, 0}, {0, 1, 0});
+            HingeJoint& axle = addHinge(world, base, world.addBody(wheel), {0, 0.2, 0}, {0, 1, 0});
             axle.upper = 1;
             world.step(Real(1) / 60);
-            CHECK(std::fabs(double(world.coordinate(axle)) - 1) < double(kLimitBand), "маховик на %.0f рад/с остановился в %.2e рад от предела", spin, std::fabs(double(world.coordinate(axle)) - 1));
+            CHECK(std::fabs(double(coordinate(world, axle)) - 1) < double(kLimitBand), "маховик на %.0f рад/с остановился в %.2e рад от предела", spin, std::fabs(double(coordinate(world, axle)) - 1));
             CHECK(double(world.bodies()[1].angularVelocity().length()) < 1e-9 * spin, "маховик на %.0f рад/с после предела вращается: %.2e рад/с", spin, double(world.bodies()[1].angularVelocity().length()));
         }
     }
@@ -638,23 +638,23 @@ void limitsStopAndDrivesYield() {
         World world;
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
         const BodyId block = world.addBody(Body::box({0.1, 0.07, 0.05}, 1000));
-        SliderJoint& lift = world.addSlider(base, block, {}, {0, 1, 0});
+        SliderJoint& lift = addSlider(world, base, block, {}, {0, 1, 0});
         lift.lower = Real(-0.2), lift.upper = Real(0.3);
         double lowest = 0;
         for (int step = 0; step < 60; ++step) {
             world.step(Real(1) / 60);
-            lowest = std::fmin(lowest, double(world.coordinate(lift)));
+            lowest = std::fmin(lowest, double(coordinate(world, lift)));
         }
         CHECK(lowest > -0.2 - 1e-6, "ползун прошёл нижний предел на %.2e м", -0.2 - lowest);
-        CHECK(std::fabs(double(world.coordinate(lift)) + 0.2) < double(kLimitBand), "ползун остановился в %.2e м от нижнего предела", std::fabs(double(world.coordinate(lift)) + 0.2));
+        CHECK(std::fabs(double(coordinate(world, lift)) + 0.2) < double(kLimitBand), "ползун остановился в %.2e м от нижнего предела", std::fabs(double(coordinate(world, lift)) + 0.2));
         lift.driveForce = 3 * Real(9.81) / world.bodies()[1].mass.inverseMass;
         double highest = -1;
         for (int step = 0; step < 60; ++step) {
             world.step(Real(1) / 60);
-            highest = std::fmax(highest, double(world.coordinate(lift)));
+            highest = std::fmax(highest, double(coordinate(world, lift)));
         }
         CHECK(highest < 0.3 + 1e-6, "ползун прошёл верхний предел на %.2e м", highest - 0.3);
-        CHECK(std::fabs(double(world.coordinate(lift)) - 0.3) < double(kLimitBand), "ползун остановился в %.2e м от верхнего предела", std::fabs(double(world.coordinate(lift)) - 0.3));
+        CHECK(std::fabs(double(coordinate(world, lift)) - 0.3) < double(kLimitBand), "ползун остановился в %.2e м от верхнего предела", std::fabs(double(coordinate(world, lift)) - 0.3));
     }
     {
         // Привод скорости с пределом силы на горизонтальном бруске, который уже вращается с
@@ -668,7 +668,7 @@ void limitsStopAndDrivesYield() {
             const double mass = 1 / double(bar.mass.inverseMass), weight = mass * 9.81 * 0.3;
             const double inertia = 1 / double(bar.mass.inverseInertia.z) + mass * 0.09;
             bar.linearMomentum = {0, Real(mass * 0.5 * 0.3), 0}, bar.angularMomentum = {0, 0, Real(0.5) / bar.mass.inverseInertia.z};
-            HingeJoint& elbow = world.addHinge(base, world.addBody(bar), {}, {0, 0, 1});
+            HingeJoint& elbow = addHinge(world, base, world.addBody(bar), {}, {0, 0, 1});
             elbow.holdSpeed = true, elbow.driveSpeed = Real(0.5), elbow.driveStrength = Real(share * weight);
             world.step(Real(1) / 600);
             world.step(Real(1) / 600);
@@ -688,7 +688,7 @@ void limitsStopAndDrivesYield() {
         const BodyId crate = world.addBody(Body::box({0.1, 0.1, 0.1}, 1000, {0.5, 0.1, 0}));
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0, {-1, 2, 0}));
         const BodyId pusher = world.addBody(Body::box({0.05, 0.1, 0.1}, 1000, {0.2, 0.15, 0}));
-        SliderJoint& ram = world.addSlider(base, pusher, {0.2, 0.15, 0}, {1, 0, 0});
+        SliderJoint& ram = addSlider(world, base, pusher, {0.2, 0.15, 0}, {1, 0, 0});
         ram.holdSpeed = true, ram.driveSpeed = Real(0.5), ram.driveStrength = 200;
         double deepest = 0;
         bool stalled = false;
@@ -699,7 +699,7 @@ void limitsStopAndDrivesYield() {
         }
         CHECK(!stalled, "шаг с толкателем остановился раньше времени");
         CHECK(deepest < 2 * double(kOverlap), "толкатель вдавил ящик на %.2e м", deepest);
-        CHECK(std::fabs(double(world.coordinate(ram)) - 0.55) < 3e-4, "толкатель встал на %.5f м вместо 0,55", double(world.coordinate(ram)));
+        CHECK(std::fabs(double(coordinate(world, ram)) - 0.55) < 3e-4, "толкатель встал на %.5f м вместо 0,55", double(coordinate(world, ram)));
         CHECK(double(world.body(pusher).linearVelocity().length()) < 1e-6 && double(world.body(crate).linearVelocity().length()) < 1e-6, "толкатель или ящик у стены движутся: %.2e и %.2e м/с",
               double(world.body(pusher).linearVelocity().length()), double(world.body(crate).linearVelocity().length()));
     }
@@ -715,7 +715,7 @@ void compoundBodies() {
         CHECK(double((halves.position - whole.position).length()) < 1e-12, "центр масс составного бруска смещён на %.2e м", double((halves.position - whole.position).length()));
         // Главные оси составного тела могут быть переставлены; сравниваются моменты вокруг осей мира.
         for (Vector3 axis : {Vector3{1, 0, 0}, Vector3{0, 1, 0}, Vector3{0, 0, 1}}) {
-            const double expected = double(axis.dot(whole.inverseInertiaTimes(axis))), got = double(axis.dot(halves.inverseInertiaTimes(axis)));
+            const double expected = double(axis.dot(inverseInertiaTimes(whole, axis))), got = double(axis.dot(inverseInertiaTimes(halves, axis)));
             CHECK_NEAR(got, expected, 1e-10 * expected);
         }
         CHECK(halves.partCount() == 2, "у составного бруска частей %d", halves.partCount());
@@ -875,13 +875,13 @@ void islandsSleepAndWake() {
         world.sleeping = true;
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
         const BodyId bar = world.addBody(Body::box({0.3, 0.03, 0.03}, 1000, {0.3, 0, 0}));
-        HingeJoint& elbow = world.addHinge(base, bar, {}, {0, 0, 1});
+        HingeJoint& elbow = addHinge(world, base, bar, {}, {0, 0, 1});
         elbow.lower = Real(-0.6);
         for (int step = 0; step < 150; ++step) world.step(Real(1) / 60);
         CHECK(world.report().asleep == 1, "маятник у предела не уснул");
         elbow.holdSpeed = true, elbow.driveSpeed = 1;
         for (int step = 0; step < 30; ++step) world.step(Real(1) / 60);
-        CHECK(world.report().asleep == 0 && double(world.coordinate(elbow)) > -0.2, "привод не разбудил маятник: угол %.3f рад", double(world.coordinate(elbow)));
+        CHECK(world.report().asleep == 0 && double(coordinate(world, elbow)) > -0.2, "привод не разбудил маятник: угол %.3f рад", double(coordinate(world, elbow)));
     }
 }
 
@@ -894,23 +894,23 @@ void rayAndTether() {
         const BodyId ball = world.addBody(Body::sphere(0.5, 1000, {0, 1, 0}));
         const BodyId box = world.addBody(Body::box({0.5, 0.5, 0.5}, 1000, {2, 0.5, 0}));
         const BodyId ring = world.addBody(CompoundBodyBuilder::torus(0.5, 0.1, 1000, {0, 0, 4}));
-        const RayHit onBall = world.castRay({{0, 1, 5}, {0, 0, -3}, 100});
+        const RayHit onBall = castRay(world, {{0, 1, 5}, {0, 0, -3}, 100});
         CHECK(onBall.body == int(ball), "луч вдоль −z попал в тело %d, а не в шар", onBall.body);
         CHECK_NEAR(onBall.distance, 4.5, 1e-6); // тор лежит ниже луча
-        const RayHit onBox = world.castRay({{2, 5, 0}, {0, -1, 0}});
+        const RayHit onBox = castRay(world, {{2, 5, 0}, {0, -1, 0}});
         CHECK(onBox.body == int(box), "луч сверху попал в тело %d, а не в куб", onBox.body);
         CHECK_NEAR(onBox.distance, 4, 1e-6);
         CHECK_NEAR(onBox.normal.y, 1, 1e-6);
         CHECK_NEAR(onBox.point.y, 1, 1e-6);
-        const RayHit first = world.castRay({{-5, 1, 0}, {1, 0, 0}});
+        const RayHit first = castRay(world, {{-5, 1, 0}, {1, 0, 0}});
         CHECK(first.body == int(ball), "из двух тел на пути луч выбрал не ближнее");
         CHECK_NEAR(first.distance, 4.5, 1e-6);
         CHECK_NEAR(first.normal.x, -1, 1e-6);
-        CHECK(!world.castRay({{-5, 1, 0}, {-1, 0, 0}}), "луч, идущий от тел, во что-то попал");
-        CHECK(!world.castRay({{-5, 1, 0}, {1, 0, 0}, 4}), "луч короче расстояния до тела в него попал");
+        CHECK(!castRay(world, {{-5, 1, 0}, {-1, 0, 0}}), "луч, идущий от тел, во что-то попал");
+        CHECK(!castRay(world, {{-5, 1, 0}, {1, 0, 0}, 4}), "луч короче расстояния до тела в него попал");
         // Тор — составное тело: сквозь отверстие луч проходит, в трубку попадает.
-        CHECK(!world.castRay({{0, 5, 4}, {0, -1, 0}}), "луч прошёл не сквозь отверстие тора");
-        const RayHit onRing = world.castRay({{0.5, 5, 4}, {0, -1, 0}});
+        CHECK(!castRay(world, {{0, 5, 4}, {0, -1, 0}}), "луч прошёл не сквозь отверстие тора");
+        const RayHit onRing = castRay(world, {{0.5, 5, 4}, {0, -1, 0}});
         CHECK(onRing.body == int(ring), "луч над трубкой тора в него не попал");
         CHECK_NEAR(onRing.distance, 4.9, 0.02);
     }
@@ -921,7 +921,7 @@ void rayAndTether() {
         const BodyId hand = world.addBody(Body::box({0.1, 0.1, 0.1}, 0, {0, 3, 0}));
         const BodyId load = world.addBody(Body::box({0.1, 0.1, 0.1}, 1000, {0, 2, 0}));
         const double mass = 1 / double(world.body(load).mass.inverseMass), omega = 2 * 3.14159265358979323846 * 2;
-        TetherJoint& rope = world.addTether(hand, {0, 2.5, 0}, load, {0, 2.1, 0}, Real(mass * omega * omega), Real(2 * mass * omega));
+        TetherJoint& rope = addTether(world, hand, {0, 2.5, 0}, load, {0, 2.1, 0}, Real(mass * omega * omega), Real(2 * mass * omega));
         for (int step = 0; step < 180; ++step) world.step(Real(1) / 60);
         CHECK_NEAR(world.body(load).position.y + 0.1, 2.5 - 9.81 / (omega * omega), 1e-4);
         CHECK(world.body(load).linearVelocity().length() < 1e-4, "груз на привязи не успокоился: %.3g м/с", double(world.body(load).linearVelocity().length()));
@@ -938,7 +938,7 @@ void rayAndTether() {
         const BodyId floor = world.addBody(Body::box({5, 0.5, 5}, 0, {0, -0.5, 0}));
         const BodyId cube = world.addBody(Body::box({0.2, 0.2, 0.2}, 1000, {0, 0.2, 0}));
         const double mass = 1 / double(world.body(cube).mass.inverseMass), omega = 2 * 3.14159265358979323846 * 3;
-        TetherJoint& rope = world.addTether(floor, {0, -1, 0}, cube, {0, 0.2, 0}, Real(mass * omega * omega), Real(2 * mass * omega));
+        TetherJoint& rope = addTether(world, floor, {0, -1, 0}, cube, {0, 0.2, 0}, Real(mass * omega * omega), Real(2 * mass * omega));
         for (int step = 0; step < 120; ++step) world.step(Real(1) / 60);
         CHECK_NEAR(world.body(cube).position.y, 0.2, 1e-4);
         rope.stiffness = rope.damping = 0;
@@ -984,8 +984,8 @@ void realtimeStep() {
         BodyId previous = world.addBody(Body::box({0.05, 0.05, 0.05}, 0, {0, 3, 0}));
         for (int i = 0; i <= kind; ++i) {
             const BodyId link = world.addBody(Body::box({0.1, 0.03, 0.03}, 1000, {0.1 + 0.2 * i, 3, 0}));
-            if (kind == 0) world.addWeld(previous, link, {0.2 * i, 3, 0});
-            else world.addHinge(previous, link, {0.2 * i, 3, 0}, {0, 0, 1});
+            if (kind == 0) addWeld(world, previous, link, {0.2 * i, 3, 0});
+            else addHinge(world, previous, link, {0.2 * i, 3, 0}, {0, 0, 1});
             previous = link;
         }
         Real worst = 0;
@@ -1004,7 +1004,7 @@ void jointsResistMotion() {
         Body wheel = Body::cylinder(0.05, 0.3, 1000, {0, 0.2, 0});
         const double inertia = 1 / double(wheel.mass.inverseInertia.y);
         wheel.angularMomentum = {0, Real(10 * inertia), 0};
-        HingeJoint& axle = world.addHinge(base, world.addBody(wheel), {0, 0.2, 0}, {0, 1, 0});
+        HingeJoint& axle = addHinge(world, base, world.addBody(wheel), {0, 0.2, 0}, {0, 1, 0});
         axle.damping = Real(inertia);
         for (int step = 0; step < 60; ++step) world.step(Real(1) / 60);
         const double speed = double(world.bodies()[1].angularVelocity().y);
@@ -1019,17 +1019,17 @@ void jointsResistMotion() {
             world.gravity = {};
             const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
             const BodyId block = world.addBody(Body::box({0.1, 0.07, 0.05}, 1000));
-            SliderJoint& slide = world.addSlider(base, block, {}, {1, 0, 0});
+            SliderJoint& slide = addSlider(world, base, block, {}, {1, 0, 0});
             const double mass = 1 / double(world.bodies()[1].mass.inverseMass);
             slide.stiffness = Real(stiff * mass * 4 * 9.8696044010893586), slide.restPosition = Real(0.1);
             double farthest = 0;
             for (int step = 0; step < 30; ++step) {
                 world.step(Real(1) / 60);
-                farthest = std::fmax(farthest, std::fabs(double(world.coordinate(slide)) - 0.1));
+                farthest = std::fmax(farthest, std::fabs(double(coordinate(world, slide)) - 0.1));
             }
             CHECK(farthest < 0.1 + 1e-9, "пружина (жёсткость ×%.0e) раскачалась до %.3f м при начальном растяжении 0,1", stiff, farthest);
-            if (stiff == 1) CHECK(double(world.coordinate(slide)) > 0.17 && double(world.coordinate(slide)) < 0.2, "через полпериода груз в %.4f м", double(world.coordinate(slide)));
-            else CHECK_NEAR(double(world.coordinate(slide)), 0.1, 1e-3);
+            if (stiff == 1) CHECK(double(coordinate(world, slide)) > 0.17 && double(coordinate(world, slide)) < 0.2, "через полпериода груз в %.4f м", double(coordinate(world, slide)));
+            else CHECK_NEAR(double(coordinate(world, slide)), 0.1, 1e-3);
         }
     }
     {
@@ -1037,11 +1037,11 @@ void jointsResistMotion() {
         World world;
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
         const BodyId block = world.addBody(Body::box({0.1, 0.07, 0.05}, 1000));
-        SliderJoint& slide = world.addSlider(base, block, {}, {0, 1, 0});
+        SliderJoint& slide = addSlider(world, base, block, {}, {0, 1, 0});
         const double mass = 1 / double(world.bodies()[1].mass.inverseMass);
         slide.stiffness = Real(mass * 9.81 / 0.05), slide.damping = Real(2 * mass * std::sqrt(9.81 / 0.05));
         for (int step = 0; step < 180; ++step) world.step(Real(1) / 60);
-        CHECK_NEAR(double(world.coordinate(slide)), -0.05, 1e-6);
+        CHECK_NEAR(double(coordinate(world, slide)), -0.05, 1e-6);
     }
     {
         // Сухое трение на вертикальном ползуне: вдвое больше веса — груз стоит; вдвое меньше —
@@ -1050,17 +1050,50 @@ void jointsResistMotion() {
             World world;
             const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
             const BodyId block = world.addBody(Body::box({0.1, 0.07, 0.05}, 1000));
-            SliderJoint& slide = world.addSlider(base, block, {}, {0, 1, 0});
+            SliderJoint& slide = addSlider(world, base, block, {}, {0, 1, 0});
             slide.friction = Real(share * 9.81) / world.bodies()[1].mass.inverseMass;
             for (int step = 0; step < 60; ++step) world.step(Real(1) / 60);
-            CHECK_NEAR(double(world.coordinate(slide)), share > 1 ? 0.0 : -9.81 / 4, 1e-6);
+            CHECK_NEAR(double(coordinate(world, slide)), share > 1 ? 0.0 : -9.81 / 4, 1e-6);
         }
     }
 }
 
 } // namespace
 
+// Сопротивление среды (Body::linearDamping, angularDamping): скорость свободного тела убывает как
+// e^(−c t). Шаг считает v ← v / (1 + h c), поэтому показатель занижен на долю c h / 2 — допуск взят
+// из этой оценки, а не подобран. И главное свойство вязкого затухания: оно не создаёт покоя — куб на
+// ребре, отклонённый на 0,1°, падает (теория без затухания — 1,04 с), а не замирает.
+void dampingDecaysAndDoesNotHold() {
+    const Real c = Real(0.5), dt = Real(1) / 60, time = 2;
+    for (bool realtime : {false, true}) {
+        World world;
+        world.gravity = {};
+        world.realtime = realtime;
+        Body ball = Body::sphere(Real(0.2), 1000);
+        ball.linearDamping = ball.angularDamping = c;
+        ball.linearMomentum = {3 / ball.mass.inverseMass, 0, 0};
+        ball.angularMomentum = {0, 2 / ball.mass.inverseInertia.y, 0};
+        const BodyId id = world.addBody(ball);
+        for (int step = 0; step < 120; ++step) world.step(dt);
+        const Real h = realtime ? dt / world.soft.substeps : dt;
+        CHECK_NEAR(std::log(double(world.body(id).linearVelocity().x) / 3), -double(c * time), double(c * time * c * h / 2) * 1.01);
+        CHECK_NEAR(std::log(double(world.body(id).angularVelocity().y) / 2), -double(c * time), double(c * time * c * h / 2) * 1.01);
+    }
+    World world;
+    world.realtime = true;
+    world.addBody(Body::box({10, 0.5, 10}, 0, {0, -0.5, 0}));
+    const double reach = 0.2 * std::sqrt(2.0), tilt = 0.1 * 3.14159265358979 / 180;
+    Body cube = Body::box({0.2, 0.2, 0.2}, 1000, {Real(reach * std::sin(tilt)), Real(reach * std::cos(tilt)), 0});
+    cube.orientation = Quaternion::fromRotationVector({0, 0, Real(-(3.14159265358979 / 4 + tilt))});
+    cube.linearDamping = cube.angularDamping = c;
+    const BodyId id = world.addBody(cube);
+    for (int step = 0; step < 120; ++step) world.step(dt);
+    CHECK(world.body(id).position.y < Real(0.25), "куб на ребре не упал за 2 с: высота центра %.3f м", double(world.body(id).position.y));
+}
+
 void dynamicsTests() {
+    dampingDecaysAndDoesNotHold();
     freeRotationConserves();
     freeFall();
     bounceHeight();

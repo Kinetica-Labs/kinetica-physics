@@ -1,4 +1,4 @@
-#include <kp/dynamics/time_stepping/DirectJoints.h>
+#include <dynamics/time_stepping/DirectJoints.h>
 
 #include <algorithm>
 
