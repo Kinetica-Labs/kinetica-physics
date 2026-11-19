@@ -34,8 +34,19 @@ public:
     void solve(std::vector<SoftContact>& contacts, const std::vector<Body>& bodies, std::vector<SolverBody>& states, bool withBias, Real h, Real pushSpeed);
 
 private:
+    // Точка контакта в задаче островка; a и b — места её тел в островке.
     struct Row {
         size_t contact, point;
+        int a, b;
+    };
+    // Островок решается своей системой, со своей нумерацией тел: цена решения зависит от его размера,
+    // а не от размера мира, и островки идут в разных потоках. Одной системой на всех цена росла как
+    // куб числа тел: 400 кубов столбиками по четыре стоили 800 мс на кадр (замер study-scale).
+    struct Island {
+        std::vector<Row> rows;      // в порядке контактов
+        std::vector<int> members;   // номера тел мира
+        std::vector<Body> bodies;   // их масса, инерция и нынешняя ориентация — всё, что берёт решатель
+        std::vector<char> working;  // по rows: рабочий набор
     };
     struct Pass {
         bool withBias;
@@ -44,14 +55,14 @@ private:
     // Какие контакты идут в общую задачу: островки, уложившиеся в предел.
     void choose(const std::vector<SoftContact>& contacts, const std::vector<Body>& bodies);
     Real excess(const SoftContact::NormalRow& row, const std::vector<SolverBody>& states, const Pass& pass) const;
-    void solveWorking(std::vector<SoftContact>& contacts, const std::vector<Body>& bodies, std::vector<SolverBody>& states, const Pass& pass);
-    bool extend(const std::vector<SoftContact>& contacts, const std::vector<SolverBody>& states, const Pass& pass);
+    void solveIsland(Island& island, std::vector<SoftContact>& contacts, const std::vector<Body>& bodies, std::vector<SolverBody>& states, const Pass& pass) const;
+    void solveWorking(Island& island, std::vector<SoftContact>& contacts, std::vector<SolverBody>& states, const Pass& pass) const;
+    bool extend(Island& island, const std::vector<SoftContact>& contacts, const std::vector<SolverBody>& states, const Pass& pass) const;
 
     int rowLimit_;
     Real biasRate_;
-    std::vector<char> direct_;  // по контактам; пусто — ещё не выбрано
-    std::vector<Row> rows_;     // точки контактов общей задачи, в порядке контактов
-    std::vector<char> working_; // по rows_: рабочий набор
+    std::vector<char> direct_; // по контактам; пусто — ещё не выбрано
+    std::vector<Island> islands_;
 };
 
 } // namespace kp

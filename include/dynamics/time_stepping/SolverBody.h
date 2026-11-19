@@ -22,10 +22,11 @@ struct SolverBody {
     Quaternion turned; // поворот с начала кадра
 
     Vector3 spinFrom(Vector3 torque) const { return inverseInertia * torque; }
-    // Импульс P в точках с плечами rA и rB: телу b — плюс, телу a — минус.
+    // Импульс P в точках с плечами rA и rB: телу b — плюс, телу a — минус. Неподвижное тело не
+    // трогается: его скорости и так ноль, а общее на все островки тело не должны писать разные потоки.
     static void push(SolverBody& a, SolverBody& b, Vector3 rA, Vector3 rB, Vector3 impulse) {
-        a.v -= a.inverseMass * impulse, a.w -= a.spinFrom(rA.cross(impulse));
-        b.v += b.inverseMass * impulse, b.w += b.spinFrom(rB.cross(impulse));
+        if (a.inverseMass != 0) a.v -= a.inverseMass * impulse, a.w -= a.spinFrom(rA.cross(impulse));
+        if (b.inverseMass != 0) b.v += b.inverseMass * impulse, b.w += b.spinFrom(rB.cross(impulse));
     }
     static void twist(SolverBody& a, SolverBody& b, Vector3 torque) { a.w -= a.spinFrom(torque), b.w += b.spinFrom(torque); }
     static Real inverseMassAlong(const SolverBody& a, const SolverBody& b, Vector3 rA, Vector3 rB, Vector3 d) {
