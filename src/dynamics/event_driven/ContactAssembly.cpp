@@ -11,6 +11,26 @@ namespace {
 constexpr Real kIdle = ContactRows::kIdle;
 constexpr Real kSliding = ContactRows::kSliding;
 
+// Остров каждого тела: тела объединяются по парам и связям, неподвижное тело островов не связывает;
+// метка острова — наименьший номер его тела.
+StepArray<int> islandsOf(const ContactRows& state) {
+    StepArray<int> island(state.bodies.size());
+    for (size_t i = 0; i < island.size(); ++i) island[i] = int(i);
+    const auto root = [&](int body) {
+        while (island[size_t(body)] != body) body = island[size_t(body)] = island[size_t(island[size_t(body)])];
+        return body;
+    };
+    const auto join = [&](int x, int y) {
+        if (state.bodies[size_t(x)].isStatic() || state.bodies[size_t(y)].isStatic()) return;
+        const int a = root(x), b = root(y);
+        island[size_t(std::max(a, b))] = std::min(a, b);
+    };
+    for (const ContactRows::Pair& pair : state.pairs) join(pair.a, pair.b);
+    for (const Bond& bond : state.bonds) join(bond.a, bond.b);
+    for (size_t i = 0; i < island.size(); ++i) island[i] = root(int(i));
+    return island;
+}
+
 } // namespace
 
 // Порядок неизвестных для разложения: остров за островом, внутри острова пары снизу вверх, у
@@ -20,21 +40,8 @@ constexpr Real kSliding = ContactRows::kSliding;
 // узкой лентой в каждом блоке — и разложение, которое считает только внутри профиля
 // (math/ProfileMatrix.h), тратит время, пропорциональное числу неизвестных, а не его кубу.
 StepArray<size_t> ContactAssembly::eliminationOrder(const System& s) const {
-    // Острова: тела объединяются по парам; метка острова — наименьший номер его тела.
-    StepArray<int> island(state_.bodies.size());
-    for (size_t i = 0; i < island.size(); ++i) island[i] = int(i);
-    const auto root = [&](int body) {
-        while (island[size_t(body)] != body) body = island[size_t(body)] = island[size_t(island[size_t(body)])];
-        return body;
-    };
-    const auto join = [&](int x, int y) {
-        if (state_.bodies[size_t(x)].isStatic() || state_.bodies[size_t(y)].isStatic()) return;
-        const int a = root(x), b = root(y);
-        island[size_t(std::max(a, b))] = std::min(a, b);
-    };
-    for (const Pair& pair : state_.pairs) join(pair.a, pair.b);
-    for (const Bond& bond : state_.bonds) join(bond.a, bond.b);
-    const auto islandOf = [&](int a, int b) { return root(state_.bodies[size_t(a)].isStatic() ? b : a); };
+    const StepArray<int> island = islandsOf(state_);
+    const auto islandOf = [&](int a, int b) { return island[size_t(state_.bodies[size_t(a)].isStatic() ? b : a)]; };
 
     // Блоки неизвестных: пары (уже упорядочены снизу вверх), за ними связи в порядке создания.
     // Устойчивая сортировка по острову сохраняет этот порядок внутри острова.

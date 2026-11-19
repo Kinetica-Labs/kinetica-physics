@@ -159,3 +159,8 @@ if __name__ == "__main__":
         print(json.dumps(metrics, ensure_ascii=False))
     else:
         report(metrics, "--all" in sys.argv)
+    # Храповик: достигнутое нельзя потерять. С --check нарушение стандарта — ошибка сборки.
+    broken = sum(len(metrics[key]) for key in ("long_functions", "long_classes", "wide_classes", "upward_includes", "broken_links"))
+    if "--check" in sys.argv and broken:
+        print(f"стандарт кода нарушен: {broken}")
+        sys.exit(1)

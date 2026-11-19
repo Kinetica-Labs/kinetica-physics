@@ -2,7 +2,8 @@
 #   unit-tests  — модульные проверки и случайные проверки утверждений;
 #   no-libm     — в библиотеке нет функций libm (детерминизм);
 #   contact-patch-lemmas — леммы Z3 (proofs/check.sh);
-#   state-hash  — состояние сцен после 60 кадров бит в бит совпадает с эталоном.
+#   state-hash  — состояние сцен после 60 кадров бит в бит совпадает с эталоном;
+#   code_metrics --check — стандарт кода: нет длинных функций и классов, слои не нарушены.
 name: build
 
 on:
@@ -24,4 +25,4 @@ jobs:
       - name: Хэш состояния
         run: ./build/validation/studies/study-state-hash 60 | diff - docs/reports/data/state-hash.txt
       - name: Стандарт кода
-        run: python3 validation/code_metrics.py
+        run: python3 validation/code_metrics.py --check
