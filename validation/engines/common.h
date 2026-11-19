@@ -290,8 +290,32 @@ inline void printRow(const std::string& engine, const SceneSpec& s, const std::v
     std::fflush(stdout);
 }
 
+// Замер скорости: трёхмерная пирамида кубов с ребром 40 см, в основании side × side, каждый куб
+// лежит на четырёх нижних; всего side (side + 1) (2 side + 1) / 6 кубов. Сцена считается 60 кадров
+// по 1/60 с; печатается среднее и наибольшее время кадра. Постройка мира в замер не входит.
+inline void benchmark(const std::string& engine, const Simulate& simulate, int side) {
+    const double edge = 0.4, reach = std::fmax(5.0, edge * side / 2 + 1);
+    SceneSpec scene{"pyramid3d", "трёхмерная пирамида", {BoxSpec{{reach, 0.5, reach}, {0, -0.5, 0}, 0}}, {}, 1};
+    for (int level = 0; level < side; ++level)
+        for (int i = 0; i < side - level; ++i)
+            for (int k = 0; k < side - level; ++k)
+                scene.boxes.push_back({{edge / 2, edge / 2, edge / 2}, {edge * (i - (side - level - 1) / 2.0), edge / 2 + edge * level, edge * (k - (side - level - 1) / 2.0)}});
+    simulate(scene, [&](const Step& step, const Read&) {
+        double total = 0, worst = 0;
+        for (int frame = 0; frame < 60; ++frame) {
+            const auto start = std::chrono::steady_clock::now();
+            step(1.0 / 60);
+            const double spent = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+            total += spent, worst = std::fmax(worst, spent);
+        }
+        std::printf("%-22s пирамида %d × %d, тел %5zu: %9.2f мс на кадр, наибольший %9.2f\n", engine.c_str(), side, side, scene.boxes.size() - 1, total / 60, worst);
+    });
+}
+
 // SCENE=ключ в окружении — прогнать одну сцену (быстрая проверка; табло гоняет все).
+// BENCH=сторона — вместо табло замер скорости на трёхмерной пирамиде (benchmark).
 inline void compare(const std::string& engine, const Simulate& simulate) {
+    if (const char* side = std::getenv("BENCH")) return benchmark(engine, simulate, std::atoi(side));
     const char* only = std::getenv("SCENE");
     for (const SceneSpec& scene : scenes()) {
         if (only && std::strcmp(only, scene.key) != 0) continue;
