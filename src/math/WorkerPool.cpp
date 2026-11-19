@@ -28,7 +28,7 @@ void WorkerPool::resize(int threads) {
     for (int k = 1; k < threads; ++k) workers_.emplace_back([this] { work(); });
 }
 
-// Поток ждёт нового круга заданий, разбирает их вместе с остальными и сообщает, что закончил.
+// Поток ждёт нового круга заданий и входит в него, только если круг ещё открыт.
 void WorkerPool::work() {
     size_t seen = 0;
     for (;;) {
@@ -37,6 +37,8 @@ void WorkerPool::work() {
             wake_.wait(lock, [&] { return stopping_ || round_ != seen; });
             if (stopping_) return;
             seen = round_;
+            if (!open_) continue;
+            ++busy_;
         }
         drain();
         const std::lock_guard<std::mutex> lock(mutex_);
@@ -48,6 +50,7 @@ void WorkerPool::drain() {
     for (size_t i = next_.fetch_add(1); i < count_; i = next_.fetch_add(1)) (*job_)(i);
 }
 
+// Будится не больше потоков, чем заданий сверх одного: одно берёт вызывающий.
 void WorkerPool::run(size_t count, const std::function<void(size_t)>& job) {
     if (workers_.empty() || count < 2) {
         for (size_t i = 0; i < count; ++i) job(i);
@@ -55,11 +58,13 @@ void WorkerPool::run(size_t count, const std::function<void(size_t)>& job) {
     }
     {
         const std::lock_guard<std::mutex> lock(mutex_);
-        job_ = &job, count_ = count, next_ = 0, busy_ = workers_.size(), ++round_;
+        job_ = &job, count_ = count, next_ = 0, open_ = true, ++round_;
     }
-    wake_.notify_all();
+    if (count > workers_.size()) wake_.notify_all();
+    else for (size_t k = 1; k < count; ++k) wake_.notify_one();
     drain();
     std::unique_lock<std::mutex> lock(mutex_);
+    open_ = false;
     finished_.wait(lock, [&] { return busy_ == 0; });
 }
 
