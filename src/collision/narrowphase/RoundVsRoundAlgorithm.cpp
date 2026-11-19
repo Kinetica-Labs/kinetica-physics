@@ -62,7 +62,7 @@ ContactManifold RoundVsRoundAlgorithm::collide(const ConvexShape& a, const Trans
     // Если касаются оба конца общего участка, трубки лежат вдоль друг друга, и ближайшая точка —
     // случайная точка между концами: площадку задают концы.
     const bool along = found[1].separation <= touching && found[2].separation <= touching;
-    std::vector<ContactCandidate> candidates;
+    ContactCandidates candidates;
     // Ни одна точка контакта не бывает ближе ближайших точек тел. Цилиндр, упёртый кромкой под
     // 45°, считался трубкой, и концы «общего участка» получали зазор −7 см; выталкивание по ним
     // подбрасывало тело вверх на каждом отрезке, и оно никогда не долетало до второго.

@@ -7,6 +7,7 @@
 // Контакт скрещённых рёбер — одна точка.
 
 #include <collision/shapes/Flat.h> // kOnBoundary — допуск границы грани
+#include <math/SmallVector.h>
 #include <math/Vector3.h>
 
 #include <cstdint>
@@ -30,7 +31,7 @@ struct ContactManifold {
     // всех вершинах площадки, остановили его на всей площадке (proofs/vertices_bound_patch.smt2),
     // а любой набор из меньшего числа точек такой гарантии не даёт — пятая вершина пятиугольной
     // площадки может сближаться, когда четыре другие стоят.
-    std::vector<ContactPoint> points;
+    SmallVector<ContactPoint, 8> points;
     int count = 0; // число точек; меняется только через add
     // Грань, над которой лежат точки, принадлежит телу B; иначе — телу A. У многообразия из одной
     // точки (пара рёбер, скруглённая форма) значения не имеет.

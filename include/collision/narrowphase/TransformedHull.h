@@ -2,6 +2,7 @@
 // Многогранник, перенесённый в общую систему координат: вершины и нормали граней уже повёрнуты.
 // Им пользуются разделяющая ось (Sat.cpp) и построение точек контакта (HullVsHullAlgorithm.cpp).
 
+#include <math/SmallVector.h>
 #include <collision/shapes/ConvexHull.h>
 #include <math/Transform.h>
 
@@ -11,7 +12,7 @@ namespace kp {
 
 struct TransformedHull {
     const ConvexHull& shape;
-    std::vector<Vector3> vertices, normals;
+    SmallVector<Vector3, 32> vertices, normals; // у многогранника крупнее массив переезжает в кучу
     Vector3 centre;
 
     TransformedHull(const ConvexHull& hull, const Transform& pose) : shape(hull), centre(pose.position) {

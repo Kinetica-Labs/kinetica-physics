@@ -21,9 +21,10 @@ std::uint32_t crossingId(int referenceEdge, int tail, int head) {
 
 // Обрезает многоугольник полуплоскостью side · (x − onPlane) <= 0 (Сазерленд — Ходжман):
 // вершины внутри остаются, на каждом ребре, пересекающем границу, появляется новая вершина.
-std::vector<ContactCandidate> clip(const std::vector<ContactCandidate>& polygon, const std::vector<int>& vertexOf, Vector3 side, Vector3 onPlane, Real boundary,
-                            int referenceEdge, std::vector<int>& vertexOfClipped) {
-    std::vector<ContactCandidate> kept;
+using VertexNumbers = SmallVector<int, 16>;
+
+ContactCandidates clip(const ContactCandidates& polygon, const VertexNumbers& vertexOf, Vector3 side, Vector3 onPlane, Real boundary, int referenceEdge, VertexNumbers& vertexOfClipped) {
+    ContactCandidates kept;
     vertexOfClipped.clear();
     const Real sideLength = side.length();
     for (size_t i = 0; i < polygon.size(); ++i) {
@@ -62,12 +63,12 @@ int facingFace(const TransformedHull& body, Vector3 n) {
 }
 
 // Контакт по грани тела reference: обращённая к ней грань тела incident обрезается по её контуру.
-std::vector<ContactCandidate> clipAgainstFace(const TransformedHull& reference, int face, const TransformedHull& incident, Real margin, Real touching, Real boundary) {
+ContactCandidates clipAgainstFace(const TransformedHull& reference, int face, const TransformedHull& incident, Real margin, Real touching, Real boundary) {
     const Vector3 n = reference.normals[size_t(face)];
     const std::vector<int>& incidentLoop = incident.loop(facingFace(incident, n));
-    std::vector<ContactCandidate> polygon;
-    std::vector<int> vertexOf = incidentLoop, scratch;
-    for (int vertex : incidentLoop) polygon.push_back({incident.vertices[size_t(vertex)], 0, vertexId(vertex)});
+    ContactCandidates polygon;
+    VertexNumbers vertexOf, scratch;
+    for (int vertex : incidentLoop) polygon.push_back({incident.vertices[size_t(vertex)], 0, vertexId(vertex)}), vertexOf.push_back(vertex);
 
     const std::vector<int>& loop = reference.loop(face);
     // Запас на границе — не больше сотой доли самого короткого ребра опорной грани: миллиметр,
@@ -75,13 +76,13 @@ std::vector<ContactCandidate> clipAgainstFace(const TransformedHull& reference, 
     Real shortest = std::numeric_limits<Real>::infinity();
     for (size_t k = 0; k < loop.size(); ++k) shortest = std::min(shortest, (reference.vertices[size_t(loop[(k + 1) % loop.size()])] - reference.vertices[size_t(loop[k])]).length());
     boundary = std::min(boundary, shortest / 100);
-    for (size_t k = 0; k < loop.size() && !polygon.empty(); ++k) {
+    for (size_t k = 0; k < loop.size() && polygon.size() > 0; ++k) {
         const Vector3 tail = reference.vertices[size_t(loop[k])], head = reference.vertices[size_t(loop[(k + 1) % loop.size()])];
         // Обход грани идёт против часовой стрелки, поэтому наружу от ребра смотрит edge × n.
         polygon = clip(polygon, vertexOf, (head - tail).cross(n), tail, boundary, int(k), scratch);
-        vertexOf.swap(scratch);
+        std::swap(vertexOf, scratch);
     }
-    std::vector<ContactCandidate> near;
+    ContactCandidates near;
     for (ContactCandidate p : polygon) {
         p.separation = n.dot(p.point - reference.pointOnFace(face));
         if (p.separation <= margin) near.push_back(p);
@@ -139,7 +140,7 @@ ContactManifold HullVsHullAlgorithm::clipFaces(const ConvexHull& a, const Transf
         const SeparatingAxis face = findFaceAxis(a, Transform{}, b, toB, boundary);
         const bool onB = face.kind == SeparatingAxis::Kind::FaceB;
         if (axis.separation - face.separation <= touching &&
-            !clipAgainstFace(onB ? B : A, onB ? face.featureB : face.featureA, onB ? A : B, margin, touching, boundary).empty())
+            clipAgainstFace(onB ? B : A, onB ? face.featureB : face.featureA, onB ? A : B, margin, touching, boundary).size() > 0)
             axis = face;
     }
     manifold.normal = poseA.direction(axis.normal);

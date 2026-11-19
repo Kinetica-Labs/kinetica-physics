@@ -1,6 +1,7 @@
 #pragma once
 // Точка — кандидат в контакт, и порядок, в каком точки получает решатель.
 
+#include <math/SmallVector.h>
 #include <math/Vector3.h>
 
 #include <cstdint>
@@ -16,7 +17,10 @@ struct ContactCandidate {
 
     // Сначала опора — точки, которые уже касаются (зазор не больше touching или такой же, как у
     // самой глубокой), в порядке построения; за ними остальные по возрастанию зазора.
-    static std::vector<ContactCandidate> ordered(const std::vector<ContactCandidate>& points, Real touching);
+    static SmallVector<ContactCandidate, 16> ordered(const SmallVector<ContactCandidate, 16>& points, Real touching);
 };
+
+// Вершины обрезаемой грани и точки-кандидаты одной пары тел.
+using ContactCandidates = SmallVector<ContactCandidate, 16>;
 
 } // namespace kp

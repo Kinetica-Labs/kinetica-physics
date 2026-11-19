@@ -135,7 +135,7 @@ ContactManifold ContactPatch::manifold(bool onReferenceB, Real margin, Real touc
     manifold.faceOnB = onReferenceB;
     manifold.normal = (onReferenceB ? Real(-1) : Real(1)) * flat.normal;
     std::vector<ContactPoint> found;
-    std::vector<ContactCandidate> candidates;
+    ContactCandidates candidates;
     for (const Point& p : points) {
         const Real height = flat.height(p.core);
         const Vector3 onReference = p.core - (height - flat.rounding) * flat.normal, onOther = p.core - outline.rounding * flat.normal;
