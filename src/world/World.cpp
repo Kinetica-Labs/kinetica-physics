@@ -1,12 +1,14 @@
 #include <world/World.h>
 
 #include <collision/PairFinder.h>
+#include <math/StepMemory.h>
 
 #include <algorithm>
 
 namespace kp {
 
 void World::step(Real dt) {
+    const StepMemory memory; // рабочие массивы шага — из запаса потока (math/StepMemory.h)
     report_ = {};
     sleep_.track(bodies_.size());
     sleep_.wakeTouched(bodies_, joints_, gravity, dt, sleeping);

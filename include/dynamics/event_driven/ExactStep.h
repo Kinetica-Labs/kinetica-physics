@@ -2,6 +2,7 @@
 // Точный шаг. Делится на отрезки в моменты событий: удар решается тогда, когда он произошёл, и
 // остаток шага продолжается с новыми скоростями — время не теряется. Цена шага не ограничена.
 
+#include <math/StepMemory.h>
 #include <collision/ContactPair.h>
 #include <joints/JointSet.h>
 #include <dynamics/event_driven/ContactSolver.h>
@@ -48,9 +49,9 @@ public:
 private:
     // Силы на отрезке и момент, когда на нём остановится скольжение какой-нибудь точки.
     struct Forces {
-        std::vector<Rate> rates;
+        StepArray<Rate> rates;
         ContactSolver::SlidingStop slidingStop;
-        std::vector<Rate> bonds; // доля сочленений в rates
+        StepArray<Rate> bonds; // доля сочленений в rates
         bool resolved = true;    // связи сочленений в конце отрезка выполнены
     };
     enum class Cut { None, Impact, SlidingStop, Turn }; // чем оборван отрезок
@@ -65,11 +66,11 @@ private:
     Forces computeForces(const std::vector<ContactPair>& pairs, Real h);
     // Подбор сил связей сочленений по схеме SHAKE между проходами computeForces.
     struct BondShake {
-        std::vector<Real> bias, errors, previousErrors;
+        StepArray<Real> bias, errors, previousErrors;
         Real previousError = std::numeric_limits<Real>::infinity(), relaxation = 1;
     };
     static std::vector<Body> middleOf(const std::vector<Body>& before, const Forces& forces, Real h);
-    bool forcesPass(const std::vector<ContactPair>& pairs, Real h, int pass, const std::vector<Body>& before, const std::vector<Real>& bias, Forces& forces);
+    bool forcesPass(const std::vector<ContactPair>& pairs, Real h, int pass, const std::vector<Body>& before, const StepArray<Real>& bias, Forces& forces);
     bool shakeBonds(BondShake& shake, const std::vector<Body>& before, Forces& forces, int pass, Real h) const;
     Vector3 up() const;
     Real restBounceSpeed() const;
@@ -85,7 +86,7 @@ private:
     Report& report_;
     EventSearch events_;
     // Пары, у которых в этом шаге уже была остановка скольжения (ContactSolver::slidingStop).
-    std::vector<std::pair<int, int>> stoppedThisStep_;
+    StepArray<std::pair<int, int>> stoppedThisStep_;
 };
 
 } // namespace kp

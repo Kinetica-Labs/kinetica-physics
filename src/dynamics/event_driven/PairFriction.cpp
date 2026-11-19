@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/PairFriction.h>
 
 #include <algorithm>
@@ -42,7 +43,7 @@ PairFriction::Pair PairFriction::frictionOf(const ContactPair& contact, size_t f
     // касающихся точек нет — среднее всех точек пары.
     bool anyTouching = false;
     for (size_t i = first; i < last; ++i) anyTouching = anyTouching || state_.rows[i].touching;
-    std::vector<Real> weight(last - first, 0);
+    StepArray<Real> weight(last - first, 0);
     Real total = 0;
     for (size_t i = first; i < last; ++i) {
         if (!state_.rows[i].touching || !state_.pressure) continue;
@@ -112,7 +113,7 @@ void PairFriction::applyFriction(const Pair& pair, const Slip& impulse, bool toA
 
 // Импульс трения, который гасит скольжение пары, в пределах закона Кулона. response и inverse —
 // матрица отклика и обратная к ней; возвращает новый накопленный импульс.
-PairFriction::Slip PairFriction::frictionImpulse(const Pair& pair, const std::vector<Real>& goal, const Response& inverse) const {
+PairFriction::Slip PairFriction::frictionImpulse(const Pair& pair, const StepArray<Real>& goal, const Response& inverse) const {
     // Предел силы — μ Σ λn; предел момента — μ Σ λn rᵢ, где rᵢ — расстояние точки от центра.
     Real load = 0, leverLoad = 0;
     for (size_t i = pair.first; i < pair.last; ++i) {
@@ -143,7 +144,7 @@ PairFriction::Slip PairFriction::frictionImpulse(const Pair& pair, const std::ve
 }
 
 // Трение одной пары тел. Возвращает наибольшую поправку скорости.
-Real PairFriction::solveFriction(Pair& pair, const std::vector<Real>& goal) {
+Real PairFriction::solveFriction(Pair& pair, const StepArray<Real>& goal) {
     bool active = false;
     for (size_t i = pair.first; i < pair.last; ++i) active = active || goal[i] != kIdle;
     if (!active) return 0;

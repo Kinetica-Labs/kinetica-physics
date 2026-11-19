@@ -3,6 +3,7 @@
 // новой геометрии добавили бы кинетическую энергию, они уменьшаются в α раз, где α — наилучший масштаб
 // вдоль них.
 
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/PairFriction.h>
 
 namespace kp {
@@ -11,7 +12,7 @@ class WarmStart {
 public:
     WarmStart(ContactRows& state, PairFriction& friction) : state_(state), friction_(friction) {}
 
-    void apply(const std::vector<Real>& goal, const ContactForces& previous, Real h);
+    void apply(const StepArray<Real>& goal, const ContactForces& previous, Real h);
 
 private:
     using Row = ContactRows::Row;

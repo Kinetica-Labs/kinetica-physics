@@ -3,6 +3,7 @@
 // stacking», 2003): пары обходятся снизу вверх, каждая решается заново так, будто нижнее тело
 // неподвижно, поправка прикладывается только к верхнему. Импульс системы при этом не сохраняется.
 
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/PairFriction.h>
 
 namespace kp {
@@ -11,7 +12,7 @@ class ShockPropagation {
 public:
     ShockPropagation(ContactRows& state, PairFriction& friction) : state_(state), friction_(friction) {}
 
-    void pass(const std::vector<Real>& goal);
+    void pass(const StepArray<Real>& goal);
 
 private:
     using Row = ContactRows::Row;

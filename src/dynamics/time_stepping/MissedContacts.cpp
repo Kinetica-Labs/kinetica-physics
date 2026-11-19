@@ -1,10 +1,11 @@
+#include <math/StepMemory.h>
 #include <dynamics/time_stepping/MissedContacts.h>
 
 #include <algorithm>
 
 namespace kp {
 
-MissedContacts::MissedContacts(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, std::vector<size_t> owner, Real depth, Real boundary)
+MissedContacts::MissedContacts(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, StepArray<size_t> owner, Real depth, Real boundary)
     : owner_(std::move(owner)), depth_(depth), boundary_(boundary) {
     for (const ContactPair& pair : pairs) adopt(pair, bodies, false);
 }
@@ -16,7 +17,7 @@ void MissedContacts::adopt(const ContactPair& pair, const std::vector<Body>& bod
     radiusB_.push_back(bodies[size_t(pair.b)].part(pair.partB).boundingRadius());
 }
 
-void MissedContacts::note(const std::vector<SoftContact>& contacts) {
+void MissedContacts::note(const StepArray<SoftContact>& contacts) {
     known_.assign(pairs_.size(), 0);
     for (size_t c = 0; c < contacts.size(); ++c) known_[owner_[c]] = std::max(known_[owner_[c]], contacts[c].deepest());
 }
@@ -30,8 +31,8 @@ void MissedContacts::note(const std::vector<SoftContact>& contacts) {
 //   — зазор вдоль любого направления не больше расстояния со знаком
 //     (proofs/plane_gap_bounds_distance.smt2): если вдоль прежней нормали пары тела не вошли глубже
 //     известного, то и вообще не вошли.
-bool MissedContacts::find(std::vector<SoftContact>& contacts, const std::vector<Body>& bodies, const std::vector<SolverBody>& states, Real h, const Maker& make) {
-    std::vector<Real> speed(states.size()), spin(states.size()), shift(states.size()), chord(states.size());
+bool MissedContacts::find(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, Real h, const Maker& make) {
+    StepArray<Real> speed(states.size()), spin(states.size()), shift(states.size()), chord(states.size());
     for (size_t i = 0; i < states.size(); ++i) {
         const Quaternion& q = states[i].turned;
         speed[i] = states[i].v.length(), spin[i] = states[i].w.length(), shift[i] = states[i].moved.length(), chord[i] = 2 * Vector3{q.x, q.y, q.z}.length();

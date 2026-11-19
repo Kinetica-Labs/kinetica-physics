@@ -23,6 +23,7 @@
 // проходят вдоль цепочки контактов на конечное число звеньев. Трение везде решается обходом пар.
 // Точный шаг (World::step без realtime) остаётся эталоном, по которому меряется ошибка этого.
 
+#include <math/StepMemory.h>
 #include <collision/ContactPair.h>
 #include <dynamics/ContactForces.h>
 #include <joints/JointSet.h>

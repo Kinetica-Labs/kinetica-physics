@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/WarmStart.h>
 
 #include <algorithm>
@@ -14,7 +15,7 @@ constexpr Real kIdle = ContactRows::kIdle;
 // Прошлые силы, приложенные к нынешним скоростям. Изменение кинетической энергии от импульсов
 // α λ равно α c + α² q / 2, где c = λ · (J v), q = λ · A λ. Наименьшее оно при α = −c / q; больше
 // единицы масштаб не берётся — прошлые силы не преувеличиваются.
-void WarmStart::apply(const std::vector<Real>& goal, const ContactForces& previous, Real h) {
+void WarmStart::apply(const StepArray<Real>& goal, const ContactForces& previous, Real h) {
     Real c = 0;
     for (Pair& pair : state_.pairs) {
         for (size_t i = pair.first; i < pair.last; ++i) {

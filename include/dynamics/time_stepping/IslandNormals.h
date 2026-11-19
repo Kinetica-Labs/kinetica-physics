@@ -22,6 +22,7 @@
 // приближённый. Признак — по островку целиком: если часть его точек решать жёстко, а часть на
 // пружинах, он не успокаивается (шары в ведре).
 
+#include <math/StepMemory.h>
 #include <dynamics/time_stepping/SoftContact.h>
 
 #include <vector>
@@ -31,7 +32,7 @@ namespace kp {
 class IslandNormals {
 public:
     IslandNormals(int rowLimit, Real biasRate) : rowLimit_(rowLimit), biasRate_(biasRate) {}
-    void solve(std::vector<SoftContact>& contacts, const std::vector<Body>& bodies, std::vector<SolverBody>& states, bool withBias, Real h, Real pushSpeed);
+    void solve(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed);
 
 private:
     // Точка контакта в задаче островка; a и b — места её тел в островке.
@@ -43,26 +44,26 @@ private:
     // а не от размера мира, и островки идут в разных потоках. Одной системой на всех цена росла как
     // куб числа тел: 400 кубов столбиками по четыре стоили 800 мс на кадр (замер study-scale).
     struct Island {
-        std::vector<Row> rows;      // в порядке контактов
-        std::vector<int> members;   // номера тел мира
+        StepArray<Row> rows;      // в порядке контактов
+        StepArray<int> members;   // номера тел мира
         std::vector<Body> bodies;   // их масса, инерция и нынешняя ориентация — всё, что берёт решатель
-        std::vector<char> working;  // по rows: рабочий набор
+        StepArray<char> working;  // по rows: рабочий набор
     };
     struct Pass {
         bool withBias;
         Real h, pushSpeed;
     };
     // Какие контакты идут в общую задачу: островки, уложившиеся в предел.
-    void choose(const std::vector<SoftContact>& contacts, const std::vector<Body>& bodies);
-    Real excess(const SoftContact::NormalRow& row, const std::vector<SolverBody>& states, const Pass& pass) const;
-    void solveIsland(Island& island, std::vector<SoftContact>& contacts, const std::vector<Body>& bodies, std::vector<SolverBody>& states, const Pass& pass) const;
-    void solveWorking(Island& island, std::vector<SoftContact>& contacts, std::vector<SolverBody>& states, const Pass& pass) const;
-    bool extend(Island& island, const std::vector<SoftContact>& contacts, const std::vector<SolverBody>& states, const Pass& pass) const;
+    void choose(const StepArray<SoftContact>& contacts, const std::vector<Body>& bodies);
+    Real excess(const SoftContact::NormalRow& row, const StepArray<SolverBody>& states, const Pass& pass) const;
+    void solveIsland(Island& island, StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, const Pass& pass) const;
+    void solveWorking(Island& island, StepArray<SoftContact>& contacts, StepArray<SolverBody>& states, const Pass& pass) const;
+    bool extend(Island& island, const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states, const Pass& pass) const;
 
     int rowLimit_;
     Real biasRate_;
-    std::vector<char> direct_; // по контактам; пусто — ещё не выбрано
-    std::vector<Island> islands_;
+    StepArray<char> direct_; // по контактам; пусто — ещё не выбрано
+    StepArray<Island> islands_;
 };
 
 } // namespace kp

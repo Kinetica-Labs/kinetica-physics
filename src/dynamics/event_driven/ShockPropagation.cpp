@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ShockPropagation.h>
 
 #include <algorithm>
@@ -11,7 +12,7 @@ constexpr Real kIdle = ContactRows::kIdle;
 
 } // namespace
 
-void ShockPropagation::pass(const std::vector<Real>& goal) {
+void ShockPropagation::pass(const StepArray<Real>& goal) {
     const Body frozen; // неподвижное тело: обратные масса и инерция нулевые
     for (Pair& pair : state_.pairs) { // пары уже упорядочены снизу вверх
         Body& a = state_.bodies[size_t(pair.a)];

@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/OverlapSeparation.h>
 
 #include <dynamics/event_driven/ContactSolver.h>
@@ -43,7 +44,7 @@ bool OverlapSeparation::separate(const std::vector<ContactPair>& touching) {
     std::vector<Body> shadows = bodies_;
     for (Body& shadow : shadows) shadow.linearMomentum = shadow.angularMomentum = {};
     ContactSolver(shadows, pushed, up_, 0, nullptr, &joints_).solveOverlap();
-    std::vector<Vector3> shifts(bodies_.size());
+    StepArray<Vector3> shifts(bodies_.size());
     for (size_t i = 0; i < bodies_.size(); ++i) {
         integratePosition(shadows[i], 1);
         shifts[i] = shadows[i].position - bodies_[i].position;
@@ -54,8 +55,8 @@ bool OverlapSeparation::separate(const std::vector<ContactPair>& touching) {
     return true;
 }
 
-std::vector<int> OverlapSeparation::freeGroups(const std::vector<ContactPair>& pairs) const {
-    std::vector<int> group(bodies_.size());
+StepArray<int> OverlapSeparation::freeGroups(const std::vector<ContactPair>& pairs) const {
+    StepArray<int> group(bodies_.size());
     for (size_t i = 0; i < group.size(); ++i) group[i] = int(i);
     const auto root = [&](int i) {
         while (group[size_t(i)] != i) i = group[size_t(i)] = group[size_t(group[size_t(i)])];
@@ -65,16 +66,16 @@ std::vector<int> OverlapSeparation::freeGroups(const std::vector<ContactPair>& p
     for (const ContactPair& pair : pairs)
         if (pair.manifold.count > 0) link(pair.a, pair.b);
     for (const Joint& joint : joints_) link(joint.a, joint.b);
-    std::vector<char> grounded(bodies_.size(), 0);
+    StepArray<char> grounded(bodies_.size(), 0);
     for (size_t i = 0; i < bodies_.size(); ++i)
         if (bodies_[i].isStatic()) grounded[size_t(root(int(i)))] = 1;
-    std::vector<int> roots(bodies_.size());
+    StepArray<int> roots(bodies_.size());
     for (size_t i = 0; i < roots.size(); ++i) roots[i] = grounded[size_t(root(int(i)))] ? -1 : root(int(i));
     return roots;
 }
 
-void OverlapSeparation::keepMomenta(const std::vector<ContactPair>& pairs, const std::vector<Vector3>& shifts) {
-    const std::vector<int> group = freeGroups(pairs);
+void OverlapSeparation::keepMomenta(const std::vector<ContactPair>& pairs, const StepArray<Vector3>& shifts) {
+    const StepArray<int> group = freeGroups(pairs);
     const auto root = [&](int i) { return group[size_t(i)]; };
     for (int g = 0; g < int(bodies_.size()); ++g) {
         if (root(g) != g) continue;

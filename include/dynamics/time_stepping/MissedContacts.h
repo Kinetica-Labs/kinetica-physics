@@ -14,6 +14,7 @@
 // точек заново не ищет: иначе в начале подшага он совпал бы с прежним. Так же шаг без пересечений
 // (IPC) проверяет сдвиг до того, как его принять; здесь проверяется поза конца подшага, а не путь.
 
+#include <math/StepMemory.h>
 #include <dynamics/time_stepping/SoftContact.h>
 
 #include <functional>
@@ -25,20 +26,20 @@ class MissedContacts {
 public:
     using Maker = std::function<SoftContact(const ContactPair&)>;
     // owner — номер пары каждого контакта; depth — допуск глубины, м; boundary — PairFinder::boundary.
-    MissedContacts(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, std::vector<size_t> owner, Real depth, Real boundary);
+    MissedContacts(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, StepArray<size_t> owner, Real depth, Real boundary);
     // Пара, найденная посреди шага (PairReach); withContact — вызывающий дописывает в contacts её контакт.
     void adopt(const ContactPair& pair, const std::vector<Body>& bodies, bool withContact);
     // Глубина каждой пары до сдвига — по точкам её контактов.
-    void note(const std::vector<SoftContact>& contacts);
+    void note(const StepArray<SoftContact>& contacts);
     // Проверяет пары в позах после сдвига и дописывает недостающие контакты (их создаёт make);
     // h — подшаг. true — дописан хотя бы один.
-    bool find(std::vector<SoftContact>& contacts, const std::vector<Body>& bodies, const std::vector<SolverBody>& states, Real h, const Maker& make);
+    bool find(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, Real h, const Maker& make);
 
 private:
     std::vector<ContactPair> pairs_;
-    std::vector<size_t> owner_;
-    std::vector<Real> radiusA_, radiusB_; // охватывающие радиусы частей пары от центров масс тел
-    std::vector<Real> known_;             // глубина пары до сдвига
+    StepArray<size_t> owner_;
+    StepArray<Real> radiusA_, radiusB_; // охватывающие радиусы частей пары от центров масс тел
+    StepArray<Real> known_;             // глубина пары до сдвига
     Real depth_, boundary_;
 };
 

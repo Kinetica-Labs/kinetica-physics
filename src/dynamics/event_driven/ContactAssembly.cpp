@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ContactAssembly.h>
 
 #include <algorithm>
@@ -18,9 +19,9 @@ constexpr Real kSliding = ContactRows::kSliding;
 // стопки пара связана только с соседними, поэтому в таком порядке матрица блочно-диагональная с
 // узкой лентой в каждом блоке — и разложение, которое считает только внутри профиля
 // (math/ProfileMatrix.h), тратит время, пропорциональное числу неизвестных, а не его кубу.
-std::vector<size_t> ContactAssembly::eliminationOrder(const System& s) const {
+StepArray<size_t> ContactAssembly::eliminationOrder(const System& s) const {
     // Острова: тела объединяются по парам; метка острова — наименьший номер его тела.
-    std::vector<int> island(state_.bodies.size());
+    StepArray<int> island(state_.bodies.size());
     for (size_t i = 0; i < island.size(); ++i) island[i] = int(i);
     const auto root = [&](int body) {
         while (island[size_t(body)] != body) body = island[size_t(body)] = island[size_t(island[size_t(body)])];
@@ -42,13 +43,13 @@ std::vector<size_t> ContactAssembly::eliminationOrder(const System& s) const {
         bool bond;
         size_t index;
     };
-    std::vector<Block> blocks;
+    StepArray<Block> blocks;
     for (size_t p = 0; p < state_.pairs.size(); ++p) blocks.push_back({islandOf(state_.pairs[p].a, state_.pairs[p].b), false, p});
     for (size_t j = 0; j < state_.bonds.size(); ++j) blocks.push_back({islandOf(state_.bonds[j].a, state_.bonds[j].b), true, j});
     std::stable_sort(blocks.begin(), blocks.end(), [](const Block& x, const Block& y) { return x.island < y.island; });
 
     const size_t n = s.rows.size(), firstBond = n + 3 * s.pairs.size();
-    std::vector<size_t> order;
+    StepArray<size_t> order;
     for (const Block& block : blocks) {
         if (block.bond) {
             order.push_back(firstBond + block.index);
@@ -65,7 +66,7 @@ std::vector<size_t> ContactAssembly::eliminationOrder(const System& s) const {
 
 // Система задачи: нормали участвующих строк, трение пар, у которых такие строки есть, связи
 // сочленений; места строк и пар в ней, матрица отклика, её диагональ и порядок исключения.
-ContactAssembly::System ContactAssembly::assemble(const std::vector<Real>& goal) {
+ContactAssembly::System ContactAssembly::assemble(const StepArray<Real>& goal) {
     System s;
     for (size_t i = 0; i < state_.rows.size(); ++i)
         if (goal[i] != kIdle) s.rows.push_back(i), s.lines.push_back(state_.normalLine(state_.rows[i]));
@@ -92,7 +93,7 @@ ContactAssembly::System ContactAssembly::assemble(const std::vector<Real>& goal)
 
 // Три линии трения на пару с участвующими строками. Не скользит пара, которая покоилась в начале
 // отрезка; при ударе — любая, пока трения хватает.
-void ContactAssembly::addFriction(System& s, const std::vector<Real>& goal) {
+void ContactAssembly::addFriction(System& s, const StepArray<Real>& goal) {
     state_.stuck.assign(state_.pairs.size(), 0);
     for (size_t p = 0; p < state_.pairs.size(); ++p) {
         const Pair& pair = state_.pairs[p];

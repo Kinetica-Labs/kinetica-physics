@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ContactSolver.h>
 
 #include <algorithm>
@@ -21,7 +22,7 @@ ContactSolver::ContactSolver(std::vector<Body>& bodies, const std::vector<Contac
         Real height;
         const ContactPair* pair;
     };
-    std::vector<Ordered> ordered;
+    StepArray<Ordered> ordered;
     for (const ContactPair& pair : pairs) {
         if (pair.manifold.count == 0) continue;
         Real lowest = std::numeric_limits<Real>::infinity();
@@ -60,7 +61,7 @@ ContactSolver::ContactSolver(std::vector<Body>& bodies, const std::vector<Contac
     state_.setDrift(state_.bodies);
 }
 
-void ContactSolver::bondImpulses(std::vector<Vector3>& linear, std::vector<Vector3>& angular) const {
+void ContactSolver::bondImpulses(StepArray<Vector3>& linear, StepArray<Vector3>& angular) const {
     linear.assign(state_.bodies.size(), {}), angular.assign(state_.bodies.size(), {});
     for (size_t j = 0; j < state_.bonds.size(); ++j) {
         const Bond& bond = state_.bonds[j];
@@ -70,7 +71,7 @@ void ContactSolver::bondImpulses(std::vector<Vector3>& linear, std::vector<Vecto
     }
 }
 
-void ContactSolver::solve(const std::vector<Real>& goal) {
+void ContactSolver::solve(const StepArray<Real>& goal) {
     const System s = assembly_.assemble(goal);
     // Скользящие и сорвавшиеся пары обходятся по очереди после точного решения остальных. Круги
     // повторяются, пока условия задачи не выполнены с допуском (residual) — или пока поправки не
@@ -104,7 +105,7 @@ void ContactSolver::solve(const std::vector<Real>& goal) {
 
 void ContactSolver::solveImpacts() {
     // Отскок определяется скоростью, с которой тела пришли, поэтому цели считаются до решения.
-    std::vector<Real> goal(state_.rows.size(), kIdle);
+    StepArray<Real> goal(state_.rows.size(), kIdle);
     for (size_t i = 0; i < state_.rows.size(); ++i) {
         if (!state_.rows[i].touching) continue;
         // Отскок, который не вывел бы тело из полосы касания, — не отскок: иначе тело,
@@ -134,7 +135,7 @@ void ContactSolver::reset() {
 }
 
 void ContactSolver::solveOverlap() {
-    std::vector<Real> goal(state_.rows.size(), kIdle);
+    StepArray<Real> goal(state_.rows.size(), kIdle);
     for (size_t i = 0; i < state_.rows.size(); ++i)
         if (state_.rows[i].touching) goal[i] = state_.rows[i].separation < -kOverlap / 2 ? -state_.rows[i].separation : Real(0);
     reset();
@@ -146,7 +147,7 @@ void ContactSolver::solveOverlap() {
 }
 
 ContactForces ContactSolver::solveRestingContacts(Real h, const ContactForces& previous, bool shockPropagation) {
-    std::vector<Real> goal(state_.rows.size(), kIdle);
+    StepArray<Real> goal(state_.rows.size(), kIdle);
     for (size_t i = 0; i < state_.rows.size(); ++i) {
         if (state_.rows[i].touching) goal[i] = -state_.rows[i].startSpeed - h * state_.rows[i].drift;
     }

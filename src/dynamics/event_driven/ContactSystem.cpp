@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ContactSystem.h>
 
 #include <algorithm>
@@ -7,8 +8,8 @@ namespace kp {
 // Матрица откликов A = J M⁻¹ Jᵀ: A[i][j] — на сколько изменится скорость вдоль линии i от
 // единичного импульса вдоль линии j. Ненулевая, только если у линий есть общее подвижное тело,
 // поэтому матрица разреженная и строится по телам: каждое тело связывает лишь свои линии.
-ContactSystem::SparseMatrix ContactSystem::responseMatrix(const std::vector<Body>& bodies, const std::vector<Line>& lines) {
-    std::vector<std::vector<size_t>> onBody(bodies.size());
+ContactSystem::SparseMatrix ContactSystem::responseMatrix(const std::vector<Body>& bodies, const StepArray<Line>& lines) {
+    StepArray<StepArray<size_t>> onBody(bodies.size());
     for (size_t i = 0; i < lines.size(); ++i) onBody[size_t(lines[i].a)].push_back(i), onBody[size_t(lines[i].b)].push_back(i);
 
     SparseMatrix matrix(lines.size());
@@ -32,7 +33,7 @@ ContactSystem::SparseMatrix ContactSystem::responseMatrix(const std::vector<Body
         }
     }
     // Отклик через два общих тела складывается: одинаковые столбцы строки сливаются.
-    for (std::vector<Entry>& row : matrix) {
+    for (StepArray<Entry>& row : matrix) {
         std::stable_sort(row.begin(), row.end(), [](const Entry& x, const Entry& y) { return x.column < y.column; });
         size_t kept = 0;
         for (const Entry& entry : row) {

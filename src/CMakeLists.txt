@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 add_library(kinetica-physics STATIC
   math/Matrix3x3.cpp
   math/Quaternion.cpp
+  math/StepMemory.cpp
   math/WorkerPool.cpp
   world/World.cpp
   world/IslandSleep.cpp

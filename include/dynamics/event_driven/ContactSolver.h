@@ -20,6 +20,7 @@
 // точек по очереди и чередуется с точным решением нормалей, пока оба не перестанут меняться.
 // Пары тел упорядочены по высоте, обход трения идёт снизу вверх и обратно.
 
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ContactAssembly.h>
 #include <dynamics/event_driven/CoupledSolve.h>
 #include <dynamics/event_driven/ShockPropagation.h>
@@ -80,12 +81,12 @@ public:
     // Поправки к целям связей на отрезке опоры: на сколько скорость вдоль каждой связи в конце
     // отрезка должна отличаться от найденной по касательной оценке. Ими World доводит связи до
     // точного выполнения в конце отрезка (ExactStep::computeForces).
-    void biasBonds(const std::vector<Real>& bias) { state_.bondBias = bias; }
+    void biasBonds(const StepArray<Real>& bias) { state_.bondBias = bias; }
 
     // Доля связей сочленений в найденных импульсах: что они дали каждому телу. Приводы, трение,
     // пружины и демпферы не считаются: это силы, а не связи, и толкают тело весь отрезок (World,
     // advanced).
-    void bondImpulses(std::vector<Vector3>& linear, std::vector<Vector3>& angular) const;
+    void bondImpulses(StepArray<Vector3>& linear, StepArray<Vector3>& angular) const;
 
     int iterations() const { return state_.iterations; }
 
@@ -107,7 +108,7 @@ public:
 
     // Когда скольжение какой-нибудь точки остановится и что считать остановкой — SlidingStopSearch.h.
     using SlidingStop = kp::SlidingStop;
-    SlidingStop slidingStop(Real h, const std::vector<std::pair<int, int>>& already = {}) const { return slides_.slidingStop(h, already); }
+    SlidingStop slidingStop(Real h, const StepArray<std::pair<int, int>>& already = {}) const { return slides_.slidingStop(h, already); }
     void settle(SlidingStop stopped) { slides_.settle(stopped); }
 
 private:
@@ -117,7 +118,7 @@ private:
 
     // goal[i] — наименьшая допустимая нормальная скорость в точке i; минус бесконечность — точка
     // в этой фазе не участвует. Накопленные импульсы — в state_.sum.
-    void solve(const std::vector<Real>& goal);
+    void solve(const StepArray<Real>& goal);
     void reset();
 
     ContactRows state_;

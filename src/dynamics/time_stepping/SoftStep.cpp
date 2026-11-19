@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/time_stepping/SoftStep.h>
 
 #include <dynamics/time_stepping/IslandNormals.h>
@@ -14,8 +15,8 @@ namespace kp {
 namespace {
 
 // Состояния тел для решателя на начало кадра; у неподвижного тела — нули.
-std::vector<SolverBody> solverBodiesOf(const std::vector<Body>& bodies) {
-    std::vector<SolverBody> states(bodies.size());
+StepArray<SolverBody> solverBodiesOf(const std::vector<Body>& bodies) {
+    StepArray<SolverBody> states(bodies.size());
     for (size_t i = 0; i < bodies.size(); ++i) {
         const Body& body = bodies[i];
         if (body.isStatic()) continue;
@@ -28,7 +29,7 @@ std::vector<SolverBody> solverBodiesOf(const std::vector<Body>& bodies) {
 // Контакт пары; у пары с неподвижным телом мягкость своя (staticSoft), как у Box3D.
 struct ContactMaker {
     const std::vector<Body>& bodies;
-    const std::vector<SolverBody>& states;
+    const StepArray<SolverBody>& states;
     Softness soft, staticSoft;
     Real h;
     bool fourPoints;
@@ -39,8 +40,8 @@ struct ContactMaker {
         return SoftContact(pair, bodies, states, fixed ? staticSoft : soft, memory, h, fourPoints, tracked);
     }
     // Контакты пар, у которых есть точки; owner — номер пары каждого контакта.
-    std::vector<SoftContact> all(const std::vector<ContactPair>& pairs, const ContactForces& memory, std::vector<size_t>& owner) const {
-        std::vector<SoftContact> contacts;
+    StepArray<SoftContact> all(const std::vector<ContactPair>& pairs, const ContactForces& memory, StepArray<size_t>& owner) const {
+        StepArray<SoftContact> contacts;
         for (size_t p = 0; p < pairs.size(); ++p) {
             if (pairs[p].manifold.count == 0 || (bodies[size_t(pairs[p].a)].isStatic() && bodies[size_t(pairs[p].b)].isStatic())) continue;
             contacts.push_back(make(pairs[p], memory, true)), owner.push_back(p);
@@ -64,13 +65,13 @@ struct Moving {
         Quaternion orientation;
     };
     std::vector<Body>& bodies;
-    std::vector<SolverBody>& states;
-    std::vector<Pose> origin, before;
-    std::vector<SolverBody> statesBefore;
+    StepArray<SolverBody>& states;
+    StepArray<Pose> origin, before;
+    StepArray<SolverBody> statesBefore;
 
-    Moving(std::vector<Body>& all, std::vector<SolverBody>& solved) : bodies(all), states(solved) { origin = poses(); }
-    std::vector<Pose> poses() const {
-        std::vector<Pose> now(bodies.size());
+    Moving(std::vector<Body>& all, StepArray<SolverBody>& solved) : bodies(all), states(solved) { origin = poses(); }
+    StepArray<Pose> poses() const {
+        StepArray<Pose> now(bodies.size());
         for (size_t i = 0; i < bodies.size(); ++i) now[i] = {bodies[i].position, bodies[i].angularMomentum, bodies[i].orientation};
         return now;
     }
@@ -114,10 +115,10 @@ struct Moving {
 // импульса связи приходится на старое направление, половина — на новое; если оба прохода вести по
 // старому, скорость каждый подшаг срезается на косинус поворота, и маятник теряет 2,5 % энергии в секунду.
 struct JointRows {
-    std::vector<SoftJoint> links;
+    StepArray<SoftJoint> links;
     DirectJoints locked;
 
-    void build(const JointSet& joints, const std::vector<Body>& bodies, const std::vector<SolverBody>& states, std::vector<std::vector<Real>>& memory, bool direct) {
+    void build(const JointSet& joints, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, std::vector<std::vector<Real>>& memory, bool direct) {
         links.clear(), locked.clear();
         for (size_t j = 0; j < joints.size(); ++j) {
             const std::vector<Bond> bonds = joints[j].bonds(bodies, bodies);
@@ -134,18 +135,18 @@ struct JointRows {
         }
         locked.assemble(states);
     }
-    void warmStart(std::vector<SolverBody>& states) const {
+    void warmStart(StepArray<SolverBody>& states) const {
         locked.warmStart(states);
         for (const SoftJoint& link : links) link.warmStart(states);
     }
-    void solve(std::vector<SolverBody>& states, bool withBias, Real correction, Real h, const Softness& soft, Real pushSpeed) {
+    void solve(StepArray<SolverBody>& states, bool withBias, Real correction, Real h, const Softness& soft, Real pushSpeed) {
         locked.solve(states, withBias ? correction : 0, h);
         for (SoftJoint& link : links) link.solve(states, withBias, h, soft, pushSpeed);
     }
 };
 
 // Начало подшага: сопротивление среды, v ← v / (1 + h c) (Body::linearDamping), и тяжесть.
-void applyForces(std::vector<SolverBody>& states, const std::vector<Body>& bodies, Vector3 gravity, Real h) {
+void applyForces(StepArray<SolverBody>& states, const std::vector<Body>& bodies, Vector3 gravity, Real h) {
     for (size_t i = 0; i < states.size(); ++i) {
         if (states[i].inverseMass <= 0) continue;
         states[i].v = (1 / (1 + h * bodies[i].linearDamping)) * states[i].v + h * gravity;
@@ -158,7 +159,7 @@ constexpr int kRechecks = 3; // сколько раз подшаг повтор�
 // Контакты шага и то, что пополняет их по ходу: пропущенные точки пар списка (MissedContacts) и
 // пары, которых в списке не было (PairReach).
 struct LiveContacts {
-    std::vector<SoftContact>& contacts;
+    StepArray<SoftContact>& contacts;
     IslandNormals& normals;
     MissedContacts& missed;
     PairReach& reach;
@@ -206,7 +207,7 @@ struct LiveContacts {
 };
 
 // Конец шага: скорости решателя — в импульсы тел, накопленные импульсы контактов — в память.
-void finish(std::vector<Body>& bodies, const std::vector<SolverBody>& states, const std::vector<SoftContact>& contacts, ContactForces& memory, Real h) {
+void finish(std::vector<Body>& bodies, const StepArray<SolverBody>& states, const StepArray<SoftContact>& contacts, ContactForces& memory, Real h) {
     for (size_t i = 0; i < bodies.size(); ++i)
         if (states[i].inverseMass != 0) bodies[i].linearMomentum = (1 / states[i].inverseMass) * states[i].v, bodies[i].angularMomentum = momentumOf(bodies[i], states[i].w);
     memory.clear();
@@ -223,10 +224,10 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
     const Softness jointSoft = Softness::make(std::min(jointHertz, Real(0.25) / h), jointDamping, h);
 
     for (const Joint& joint : joints) joint.applyDrive(bodies, dt);
-    std::vector<SolverBody> states = solverBodiesOf(bodies);
+    StepArray<SolverBody> states = solverBodiesOf(bodies);
     const ContactMaker maker{bodies, states, soft, staticSoft, h, fourContactPoints};
-    std::vector<size_t> owner;
-    std::vector<SoftContact> contacts = maker.all(pairs, contactMemory, owner);
+    StepArray<size_t> owner;
+    StepArray<SoftContact> contacts = maker.all(pairs, contactMemory, owner);
     MissedContacts missed(pairs, bodies, owner, recheckDepth, edgeSlop);
     PairReach reach(bodies, pairs, gravity, dt, recheckDepth / 2);
     Moving moving(bodies, states);

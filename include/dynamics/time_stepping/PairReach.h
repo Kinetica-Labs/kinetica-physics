@@ -11,6 +11,7 @@
 // вывел бы тело за неё, пары ищутся заново — при нынешних скоростях, на оставшееся время обновления,
 // — и те, которых в списке не было, отдаются шагу до сдвига тел.
 
+#include <math/StepMemory.h>
 #include <collision/ContactPair.h>
 #include <joints/JointSet.h>
 
@@ -42,9 +43,9 @@ private:
 
     Vector3 gravity_;
     Real slack_;
-    std::vector<Real> least_, most_; // c частей тела: наименьшее и наибольшее
-    std::vector<Path> allowed_, spent_, next_;
-    std::vector<Key> listed_; // пары списка, по возрастанию
+    StepArray<Real> least_, most_; // c частей тела: наименьшее и наибольшее
+    StepArray<Path> allowed_, spent_, next_;
+    StepArray<Key> listed_; // пары списка, по возрастанию
 };
 
 } // namespace kp

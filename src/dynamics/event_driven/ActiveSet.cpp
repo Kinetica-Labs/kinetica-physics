@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ActiveSet.h>
 
 #include <math/ProfileMatrix.h>
@@ -23,7 +24,7 @@ namespace kp {
 // если решение на новом наборе делает чью-то силу отрицательной, шаг к нему укорачивается до
 // первой обнулившейся силы, и эта точка из набора выходит. Функция убывает на каждом шаге, поэтому
 // наборы не повторяются и перебор конечен.
-void ActiveSet::solve(const std::vector<char>& unknown, const std::vector<Real>& free, std::vector<Real>& force) {
+void ActiveSet::solve(const StepArray<char>& unknown, const StepArray<Real>& free, StepArray<Real>& force) {
     unknown_ = &unknown, free_ = &free;
     sided_.clear();
     for (size_t i = 0; i < system_.lines.size(); ++i)
@@ -45,23 +46,23 @@ char& ActiveSet::pressing(size_t i) {
 // Решение системы на нынешнем наборе: силы участвующих линий — в force, запас скорости недавящих
 // односторонних — в margin_. Сначала разложение в осях тел (BodySpaceSolve); если оно дороже
 // профиля — Холецкий по профилю.
-void ActiveSet::solveOn(std::vector<Real>& force) {
-    const std::vector<char>& unknown = *unknown_;
+void ActiveSet::solveOn(StepArray<Real>& force) {
+    const StepArray<char>& unknown = *unknown_;
     const size_t total = system_.lines.size();
-    std::vector<size_t> active;
+    StepArray<size_t> active;
     for (size_t i : system_.order)
         if (unknown[i] && (!oneSided(i) || pressing(i))) active.push_back(i);
     const size_t m = active.size();
-    std::vector<size_t> position(total, m); // место линии среди участвующих; m — не участвует
+    StepArray<size_t> position(total, m); // место линии среди участвующих; m — не участвует
     for (size_t p = 0; p < m; ++p) position[active[p]] = p;
-    std::vector<size_t> leftmost(m);
+    StepArray<size_t> leftmost(m);
     Real cost = 0; // цена разложения: сумма квадратов ширины профиля
     for (size_t p = 0; p < m; ++p) {
         leftmost[p] = p;
         for (const ContactSystem::Entry& entry : system_.matrix[active[p]]) leftmost[p] = std::min(leftmost[p], position[entry.column]);
         cost += Real(p - leftmost[p] + 1) * Real(p - leftmost[p] + 1);
     }
-    std::vector<Real> x(m);
+    StepArray<Real> x(m);
     for (size_t p = 0; p < m; ++p) x[p] = -(*free_)[active[p]];
     if (!BodySpaceSolve(bodies_, system_).solve(active, cost, x)) {
         ProfileMatrix a;
@@ -86,11 +87,11 @@ void ActiveSet::solveOn(std::vector<Real>& force) {
 
 // Быстрый путь: все нарушения переставляются разом, пока их число убывает (не дольше десяти
 // решений без убыли). true — набор найден.
-bool ActiveSet::permute(std::vector<Real>& force) {
+bool ActiveSet::permute(StepArray<Real>& force) {
     int fewest = int(sided_.size()) + 1, patience = 10;
     for (;;) {
         solveOn(force);
-        std::vector<size_t> violated;
+        StepArray<size_t> violated;
         for (size_t i : sided_) {
             // Допуск на силу — тот же допуск на скорость, переведённый в импульс: иначе точка с
             // силой −10⁻¹⁵ считалась бы нарушением, а после перестановки нарушением считалось бы
@@ -107,11 +108,11 @@ bool ActiveSet::permute(std::vector<Real>& force) {
 // Надёжный путь — спуск. held — нынешняя допустимая точка: силы односторонних линий в ней
 // неотрицательны. Начинается он с набора, на котором остановились перестановки: первый же шаг от
 // нуля выбрасывает из набора все точки с отрицательной силой.
-void ActiveSet::descend(std::vector<Real>& force) {
-    const std::vector<char>& unknown = *unknown_;
+void ActiveSet::descend(StepArray<Real>& force) {
+    const StepArray<char>& unknown = *unknown_;
     const size_t total = system_.lines.size();
-    std::vector<Real> held(total, 0);
-    std::vector<char> refused(total, 0); // точки, которые войти в набор не смогли
+    StepArray<Real> held(total, 0);
+    StepArray<char> refused(total, 0); // точки, которые войти в набор не смогли
     size_t entering = total;
     for (size_t round = 0; round < 3 * sided_.size() + 50; ++round) {
         for (;;) {

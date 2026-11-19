@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/time_stepping/DirectJoints.h>
 
 #include <algorithm>
@@ -11,10 +12,10 @@ void DirectJoints::clear() {
 
 void DirectJoints::add(const Bond& bond, Real* impulse) { bonds_.push_back(bond), impulses_.push_back(impulse); }
 
-void DirectJoints::assemble(const std::vector<SolverBody>& states) {
+void DirectJoints::assemble(const StepArray<SolverBody>& states) {
     // Связи одного тела: строка i матрицы начинается с самой ранней связи, с которой у неё есть
     // общее подвижное тело.
-    std::vector<std::vector<int>> onBody(states.size());
+    StepArray<StepArray<int>> onBody(states.size());
     for (size_t i = 0; i < bonds_.size(); ++i) {
         const Bond& bond = bonds_[i];
         int leftmost = int(i);
@@ -38,20 +39,20 @@ void DirectJoints::assemble(const std::vector<SolverBody>& states) {
     }
 }
 
-void DirectJoints::push(size_t row, std::vector<SolverBody>& states, Real impulse) const {
+void DirectJoints::push(size_t row, StepArray<SolverBody>& states, Real impulse) const {
     const Bond& bond = bonds_[row];
     SolverBody &a = states[size_t(bond.a)], &b = states[size_t(bond.b)];
     a.v -= (a.inverseMass * impulse) * bond.linear, a.w -= a.spinFrom(impulse * bond.angularA);
     b.v += (b.inverseMass * impulse) * bond.linear, b.w += b.spinFrom(impulse * bond.angularB);
 }
 
-void DirectJoints::warmStart(std::vector<SolverBody>& states) const {
+void DirectJoints::warmStart(StepArray<SolverBody>& states) const {
     for (size_t i = 0; i < bonds_.size(); ++i) push(i, states, *impulses_[i]);
 }
 
-void DirectJoints::solve(std::vector<SolverBody>& states, Real correction, Real h) {
+void DirectJoints::solve(StepArray<SolverBody>& states, Real correction, Real h) {
     if (bonds_.empty()) return;
-    std::vector<Real> change(bonds_.size());
+    StepArray<Real> change(bonds_.size());
     for (size_t i = 0; i < bonds_.size(); ++i) {
         const Bond& bond = bonds_[i];
         const SolverBody &a = states[size_t(bond.a)], &b = states[size_t(bond.b)];

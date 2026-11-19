@@ -2,6 +2,7 @@
 // Трение пары тел в решателе контактов: сила в касательной плоскости и момент вокруг нормали в центре
 // точек касания пары (ContactRows::Pair). Закон Кулона — конус: |λt| <= μ λn.
 
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ContactRows.h>
 
 namespace kp {
@@ -26,8 +27,8 @@ public:
     static Response inverted(const Response& m);
     Slip slip(const Pair& pair) const;
     void applyFriction(const Pair& pair, const Slip& impulse, bool toA, bool toB);
-    Slip frictionImpulse(const Pair& pair, const std::vector<Real>& goal, const Response& inverse) const;
-    Real solveFriction(Pair& pair, const std::vector<Real>& goal);
+    Slip frictionImpulse(const Pair& pair, const StepArray<Real>& goal, const Response& inverse) const;
+    Real solveFriction(Pair& pair, const StepArray<Real>& goal);
 
 private:
     ContactRows& state_;

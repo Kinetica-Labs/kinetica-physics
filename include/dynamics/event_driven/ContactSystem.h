@@ -1,6 +1,7 @@
 #pragma once
 // Линейная система одного решения сил контакта: линии ограничений и матрица их откликов.
 
+#include <math/StepMemory.h>
 #include <body/Body.h>
 
 #include <vector>
@@ -30,19 +31,19 @@ struct ContactSystem {
         size_t column;
         Real value;
     };
-    using SparseMatrix = std::vector<std::vector<Entry>>; // строка — её ненулевые элементы по возрастанию столбца
+    using SparseMatrix = StepArray<StepArray<Entry>>; // строка — её ненулевые элементы по возрастанию столбца
 
-    std::vector<size_t> rows, pairs; // номера строк и пар
-    std::vector<size_t> rowPlace;    // место строки среди неизвестных; rows.size() — строка не участвует
-    std::vector<size_t> pairPlace;   // то же для пар
-    std::vector<Line> lines;
+    StepArray<size_t> rows, pairs; // номера строк и пар
+    StepArray<size_t> rowPlace;    // место строки среди неизвестных; rows.size() — строка не участвует
+    StepArray<size_t> pairPlace;   // то же для пар
+    StepArray<Line> lines;
     SparseMatrix matrix;             // отклик: скорость вдоль линии i от единичного импульса вдоль j
-    std::vector<Real> diagonal;      // диагональ матрицы отклика
-    std::vector<Real> soft;          // податливость линии: скорость на единицу импульса; ноль у жёстких
-    std::vector<size_t> order;       // линии в том порядке, в каком их исключает разложение
+    StepArray<Real> diagonal;      // диагональ матрицы отклика
+    StepArray<Real> soft;          // податливость линии: скорость на единицу импульса; ноль у жёстких
+    StepArray<size_t> order;       // линии в том порядке, в каком их исключает разложение
 
     // Матрица откликов линий по телам.
-    static SparseMatrix responseMatrix(const std::vector<Body>& bodies, const std::vector<Line>& lines);
+    static SparseMatrix responseMatrix(const std::vector<Body>& bodies, const StepArray<Line>& lines);
 };
 
 } // namespace kp

@@ -1,6 +1,7 @@
 #pragma once
 // Событие «скольжение пары остановилось» в решателе контактов.
 
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/PairFriction.h>
 
 #include <utility>
@@ -37,7 +38,7 @@ public:
     // бы бесконечно много раз (ср. restBounceSpeed). Цена — направление трения такой пары до
     // конца шага может отставать от её скольжения; энергии оно при этом не добавляет
     // (frictionImpulse).
-    SlidingStop slidingStop(Real h, const std::vector<std::pair<int, int>>& already) const;
+    SlidingStop slidingStop(Real h, const StepArray<std::pair<int, int>>& already) const;
     // Пара, остановившаяся в конце прошлого отрезка, не скользит с начала этого — по определению
     // события, а не по измеренной скорости. Силы оборванного отрезка пересчитываются на его
     // длину и останавливают пару не точно; без этого правила остаток скольжения давал бы ту же

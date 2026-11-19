@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/time_stepping/SoftContact.h>
 
 #include <collision/narrowphase/Gjk.h>
@@ -16,7 +17,7 @@ constexpr Real kEquallyDeep = Real(1e-3); // м: точки, чьи глубин
 // Четыре точки, которых хватает опоре: самая глубокая, самая далёкая от неё, та, что даёт с ними
 // наибольший треугольник, и та, что добавляет наибольшую площадь по другую сторону. Так же отбирают
 // точки Box3D, Jolt и ReactPhysics3D.
-std::vector<int> fourOf(const ContactManifold& manifold) {
+StepArray<int> fourOf(const ContactManifold& manifold) {
     const auto at = [&](int k) { return manifold.points[size_t(k)].onA; };
     int first = 0;
     for (int k = 1; k < manifold.count; ++k)
@@ -30,7 +31,7 @@ std::vector<int> fourOf(const ContactManifold& manifold) {
         if (area(k) > area(third)) third = k;
         if (area(k) < area(fourth)) fourth = k;
     }
-    std::vector<int> kept;
+    StepArray<int> kept;
     for (int k : {first, second, third, fourth})
         if (std::find(kept.begin(), kept.end(), k) == kept.end()) kept.push_back(k);
     std::sort(kept.begin(), kept.end());
@@ -47,7 +48,7 @@ constexpr std::uint32_t kEdgePair = 0xC0000000u; // номер точки пар
 
 } // namespace
 
-SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const std::vector<SolverBody>& states, const Softness& soft, const ContactForces& memory, Real h, bool fourPoints,
+SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, const Softness& soft, const ContactForces& memory, Real h, bool fourPoints,
                          bool tracked)
     : a_(pair.a), b_(pair.b), normal_(pair.manifold.normal), roundA_(pair.manifold.roundA), roundB_(pair.manifold.roundB), faceOnB_(pair.manifold.faceOnB), soft_(soft) {
     const Body &bodyA = bodies[size_t(pair.a)], &bodyB = bodies[size_t(pair.b)];
@@ -59,7 +60,7 @@ SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodie
     friction_ = sqrt(bodyA.friction * bodyB.friction), restitution_ = std::max(bodyA.restitution, bodyB.restitution);
     Real weights = 0;
     Vector3 rubbed{};
-    std::vector<int> kept;
+    StepArray<int> kept;
     if (fourPoints && pair.manifold.count > 4) kept = fourOf(pair.manifold);
     else
         for (int k = 0; k < pair.manifold.count; ++k) kept.push_back(k);
@@ -115,7 +116,7 @@ void SoftContact::aim(const BodyMotion& a, const BodyMotion& b, Vector3 apart, c
     tangent1_ = tangent1_ - tangent1_.dot(normal_) * normal_, tangent1_ = (1 / tangent1_.length()) * tangent1_, tangent2_ = normal_.cross(tangent1_);
 }
 
-void SoftContact::follow(const std::vector<SolverBody>& states) {
+void SoftContact::follow(const StepArray<SolverBody>& states) {
     const SolverBody &stateA = states[size_t(a_)], &stateB = states[size_t(b_)];
     const BodyMotion a{stateA.moved - createdA_.moved, stateA.turned * createdA_.turned.conjugate()}, b{stateB.moved - createdB_.moved, stateB.turned * createdB_.turned.conjugate()};
     const Vector3 apart = apart_ + b.moved - a.moved;
@@ -148,7 +149,7 @@ void SoftContact::follow(const std::vector<SolverBody>& states) {
     for (Point& p : points_) p.gap = meet(p.coreA, p.coreB, p.rA, p.rB).dot(normal_) + p.base;
 }
 
-void SoftContact::warmStart(std::vector<SolverBody>& states) const {
+void SoftContact::warmStart(StepArray<SolverBody>& states) const {
     SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
     for (const Point& p : points_) SolverBody::push(a, b, p.rA, p.rB, p.impulse * normal_);
     SolverBody::twist(a, b, twistImpulse_ * normal_);
@@ -172,7 +173,7 @@ void SoftContact::respond(const SolverBody& a, const SolverBody& b) const {
             w.matrix[i * count + j] = w.matrix[j * count + i] = a.inverseMass + b.inverseMass + w.armA[i].dot(w.spinA[j]) + w.armB[i].dot(w.spinB[j]);
 }
 
-void SoftContact::solveNormals(std::vector<SolverBody>& states, bool withBias, Real h, Real pushSpeed) {
+void SoftContact::solveNormals(StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed) {
     SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
     const Vector3 n = normal_;
     const size_t count = points_.size();
@@ -217,13 +218,13 @@ Real SoftContact::deepest() const {
     return depth;
 }
 
-void SoftContact::setNormalImpulse(std::vector<SolverBody>& states, size_t k, Real impulse) {
+void SoftContact::setNormalImpulse(StepArray<SolverBody>& states, size_t k, Real impulse) {
     Point& p = points_[k];
     SolverBody::push(states[size_t(a_)], states[size_t(b_)], p.rA, p.rB, (impulse - p.impulse) * normal_);
     p.impulse = impulse;
 }
 
-void SoftContact::matchTrial(const std::vector<SolverBody>& states, Real h) {
+void SoftContact::matchTrial(const StepArray<SolverBody>& states, Real h) {
     const SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
     for (Point& p : points_) {
         const Real curved = p.found - (p.gap + h * normal_.dot(b.v + b.w.cross(p.rB) - a.v - a.w.cross(p.rA)));
@@ -231,7 +232,7 @@ void SoftContact::matchTrial(const std::vector<SolverBody>& states, Real h) {
     }
 }
 
-void SoftContact::solveFriction(std::vector<SolverBody>& states, Real rollingArm) {
+void SoftContact::solveFriction(StepArray<SolverBody>& states, Real rollingArm) {
     SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
     Real load = 0, leverLoad = 0;
     for (const Point& p : points_) load += p.impulse, leverLoad += p.lever * p.impulse;
@@ -250,7 +251,7 @@ void SoftContact::solveFriction(std::vector<SolverBody>& states, Real rollingArm
 
 // Удар становится свершившимся изменением скоростей: накопленный импульс точки обнуляется, иначе
 // следующее решение нормалей (оно ищет полный импульс точки) сняло бы отскок как лишний.
-void SoftContact::bounce(std::vector<SolverBody>& states, Real bounceSpeed) {
+void SoftContact::bounce(StepArray<SolverBody>& states, Real bounceSpeed) {
     if (restitution_ == 0) return;
     constexpr Real kTouching = Real(1e-3); // м: ближе этого упреждающая точка считается коснувшейся
     SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];

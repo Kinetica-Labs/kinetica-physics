@@ -2,6 +2,7 @@
 // Контакт пары тел в шаге с постоянной ценой кадра: нормали в точках с мягкой поправкой положения
 // и трение в центре точек — сила в касательной плоскости и момент вокруг нормали.
 
+#include <math/StepMemory.h>
 #include <collision/ContactPair.h>
 #include <collision/narrowphase/Gjk.h>
 #include <math/Matrix2x2.h>
@@ -20,7 +21,7 @@ public:
     // Плечи, массы и центр трения считаются один раз на кадр; накопленные импульсы — из memory.
     // Контакт может появиться и посреди шага (MissedContacts): смещения и повороты тел он отсчитывает
     // от момента своего создания. tracked — у круглых тел ближайшие точки ищутся заново внутри шага.
-    SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const std::vector<SolverBody>& states, const Softness& soft, const ContactForces& memory, Real h, bool fourPoints,
+    SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, const Softness& soft, const ContactForces& memory, Real h, bool fourPoints,
                 bool tracked);
     // Контакт идёт за телами внутри шага мира (вызывается после каждого перемещения тел). Нормаль и
     // касательные поворачиваются с телом, которому принадлежит грань контакта; у пары рёбер — со средним
@@ -31,8 +32,8 @@ public:
     // момент импульса системы уходил на 0,24 % за 5 с.
     // С контактом, замороженным на шаг мира, сила опоры качающегося тела шла по устаревшей нормали и
     // толкала его вдоль движения: цепь из торов, отведённая на 45°, за 30 с набирала 54 → 141 Дж.
-    void follow(const std::vector<SolverBody>& states);
-    void warmStart(std::vector<SolverBody>& states) const;
+    void follow(const StepArray<SolverBody>& states);
+    void warmStart(StepArray<SolverBody>& states) const;
     // Нормальные импульсы всех точек — одной задачей дополнительности (math/Complementarity.h), а не
     // по точке: проход по точкам оставляет ошибку в качании площадки, и тяжёлое тело на лёгком
     // раскачивается. Мягкость входит заменой μᵢ = λ'ᵢ / sᵢ (sᵢ — massScale точки, у упреждающей 1):
@@ -41,7 +42,7 @@ public:
     // Мягкость только на диагонали K была бы ошибкой: соседние точки толкали бы жёстко, со скоростью
     // pushSpeed / massScale.
     // Нынешний зазор точки — по смещению и повороту тел с начала кадра.
-    void solveNormals(std::vector<SolverBody>& states, bool withBias, Real h, Real pushSpeed);
+    void solveNormals(StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed);
     // То же, когда нормали всех контактов решаются одной задачей (IslandNormals): строка нормали
     // точки k и её новый импульс — разница прикладывается к телам.
     struct NormalRow {
@@ -53,21 +54,21 @@ public:
     // Наибольшая глубина, на которую вошли точки, м; ноль — ни одна не вошла.
     Real deepest() const;
     NormalRow normalRow(size_t k) const { return {a_, b_, normal_, points_[k].rA, points_[k].rB, points_[k].gap, points_[k].impulse}; }
-    void setNormalImpulse(std::vector<SolverBody>& states, size_t k, Real impulse);
+    void setNormalImpulse(StepArray<SolverBody>& states, size_t k, Real impulse);
     // Момент вокруг нормали в пределах μ Σ λ r, сила в пределах μ Σ λ; затем трение качения с
     // плечом rollingArm (RollingFriction).
-    void solveFriction(std::vector<SolverBody>& states, Real rollingArm);
+    void solveFriction(StepArray<SolverBody>& states, Real rollingArm);
     // Для контакта, созданного по позе после пробного сдвига, когда тела возвращены в начало подшага h
     // (MissedContacts). Строка решателя линейна по скорости, а путь точки вращающегося тела — дуга:
     // при 90 рад/с линейный прогноз зазора расходится с настоящим на 2–3 мм за подшаг. Настоящий
     // зазор после сдвига контакт знает — с ним он создан; разница с прогнозом g + h v_n при тех же
     // скоростях добавляется к зазору точки.
-    void matchTrial(const std::vector<SolverBody>& states, Real h);
+    void matchTrial(const StepArray<SolverBody>& states, Real h);
     // Отскок: точка, которая при создании контакта сближалась быстрее bounceSpeed, коснулась и приняла
     // удар, расходится со скоростью e · (скорость сближения). Вызывается сразу после решения
     // нормалей, один раз на точку: в цепочке шаров удары идут по очереди, и отскок, посчитанный
     // в конце шага для всех разом, давал не тот ответ (маятник Ньютона).
-    void bounce(std::vector<SolverBody>& states, Real bounceSpeed);
+    void bounce(StepArray<SolverBody>& states, Real bounceSpeed);
     void remember(ContactForces& memory, Real h) const;
 
 private:
@@ -88,7 +89,7 @@ private:
         Real impulse = 0;
     };
     int a_, b_;
-    std::vector<Point> points_;
+    StepArray<Point> points_;
     Vector3 normal_, tangent1_, tangent2_, centreA_, centreB_; // нынешние
     Vector3 normal0_, tangent10_, tangent20_, centreCoreA_, centreCoreB_; // начала кадра
     Vector3 apart_;  // от центра масс a к центру масс b в начале кадра

@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/BodySpaceSolve.h>
 
 #include <math/ProfileMatrix.h>
@@ -28,20 +29,20 @@ constexpr Real kBodySpaceGain = 32;     // во сколько раз решен
 // вырастает в миллион раз и даёт скоростям тел ошибку порядка 10⁻¹⁰ м/с — выше допуска решателя
 // (шары в ведре от неё дробили шаг на сотни ложных событий). Поэтому решение уточняется: невязка
 // b − (A + P) x считается в пространстве линий, где она точна, и та же система решается для неё.
-bool BodySpaceSolve::solve(const std::vector<size_t>& active, Real cost, std::vector<Real>& x) const {
+bool BodySpaceSolve::solve(const StepArray<size_t>& active, Real cost, StepArray<Real>& x) const {
     Layout layout;
     if (!lay(active, cost, layout)) return false;
-    const std::vector<Real> b = x;
+    const StepArray<Real> b = x;
     solveFor(active, layout, x);
-    std::vector<Real> residual = residualOf(active, b, x);
+    StepArray<Real> residual = residualOf(active, b, x);
     solveFor(active, layout, residual);
     for (size_t p = 0; p < active.size(); ++p) x[p] += residual[p];
     return true;
 }
 
 // Тела линий в порядке появления и профиль K; false — в пространстве линий дешевле.
-bool BodySpaceSolve::lay(const std::vector<size_t>& active, Real cost, Layout& layout) const {
-    std::vector<int>& place = layout.place;
+bool BodySpaceSolve::lay(const StepArray<size_t>& active, Real cost, Layout& layout) const {
+    StepArray<int>& place = layout.place;
     place.assign(bodies_.size(), -1);
     for (size_t p = 0; p < active.size(); ++p) {
         const ContactSystem::Line& line = system_.lines[active[p]];
@@ -88,9 +89,9 @@ void BodySpaceSolve::rowOf(const ContactSystem::Line& line, int body, Real j[6])
 }
 
 // K y = Jᵀ P⁻¹ b, затем x = P⁻¹ (b − J y); x на входе — b.
-void BodySpaceSolve::solveFor(const std::vector<size_t>& active, const Layout& layout, std::vector<Real>& x) const {
+void BodySpaceSolve::solveFor(const StepArray<size_t>& active, const Layout& layout, StepArray<Real>& x) const {
     ProfileMatrix k = massMatrix(layout);
-    std::vector<Real> y(6 * layout.listed.size(), 0);
+    StepArray<Real> y(6 * layout.listed.size(), 0);
     for (size_t p = 0; p < active.size(); ++p) {
         const ContactSystem::Line& line = system_.lines[active[p]];
         const Real stiffness = 1 / (kProximal * system_.diagonal[active[p]] + system_.soft[active[p]]);
@@ -125,11 +126,11 @@ void BodySpaceSolve::solveFor(const std::vector<size_t>& active, const Layout& l
 }
 
 // Невязка b − (A + P) x в пространстве линий, где она точна.
-std::vector<Real> BodySpaceSolve::residualOf(const std::vector<size_t>& active, const std::vector<Real>& b, const std::vector<Real>& x) const {
+StepArray<Real> BodySpaceSolve::residualOf(const StepArray<size_t>& active, const StepArray<Real>& b, const StepArray<Real>& x) const {
     const size_t m = active.size();
-    std::vector<size_t> position(system_.lines.size(), m);
+    StepArray<size_t> position(system_.lines.size(), m);
     for (size_t p = 0; p < m; ++p) position[active[p]] = p;
-    std::vector<Real> residual(m);
+    StepArray<Real> residual(m);
     for (size_t p = 0; p < m; ++p) {
         residual[p] = b[p] - (kProximal * system_.diagonal[active[p]] + system_.soft[active[p]]) * x[p];
         for (const ContactSystem::Entry& entry : system_.matrix[active[p]])

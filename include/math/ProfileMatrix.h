@@ -2,6 +2,7 @@
 // Решение линейной системы с симметричной положительно определённой матрицей разложением
 // Холецкого: A = L Lᵀ, затем две подстановки. Только сложение, умножение, деление и корень.
 
+#include <math/StepMemory.h>
 #include <math/math_functions.h>
 
 #include <algorithm>
@@ -15,9 +16,9 @@ namespace kp {
 // за островом и пара за парой вдоль стопки, профиль узкий: и память, и время растут как
 // n · (ширина ленты)², а не как n² и n³.
 struct ProfileMatrix {
-    std::vector<int> first;    // первый хранимый столбец каждой строки
-    std::vector<size_t> start; // где в values начинается строка
-    std::vector<Real> values;
+    StepArray<int> first;    // первый хранимый столбец каждой строки
+    StepArray<size_t> start; // где в values начинается строка
+    StepArray<Real> values;
 
     int size() const { return int(first.size()); }
     // Добавляет следующую строку с профилем от столбца firstColumn; её элементы нулевые.
@@ -38,7 +39,7 @@ struct ProfileMatrix {
 // точками можно распределить по-разному при тех же скоростях, и здесь выбирается распределение
 // без лишней точки. Ведущий элемент считается нулевым, если он меньше dependent от исходного
 // диагонального.
-inline void solveCholesky(ProfileMatrix& a, std::vector<Real>& b, Real dependent = Real(1e-14)) {
+template <class Vector> void solveCholesky(ProfileMatrix& a, Vector& b, Real dependent = Real(1e-14)) {
     const int n = a.size();
     thread_local std::vector<char> skipped; // рабочий массив потока: решение не выделяет память
     skipped.assign(size_t(n), 0);

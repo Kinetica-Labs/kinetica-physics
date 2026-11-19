@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/EventSearch.h>
 
 #include <collision/narrowphase/Gjk.h>
@@ -263,7 +264,7 @@ Real crossingStart(const Body& a, const Body& b, BodiesAt&& bodiesAt, const Moti
 
 // Наибольший поворот касающихся тел за время t под действием найденных сил. Момент импульса на
 // отрезке линеен по времени, поэтому угловая скорость не больше, чем в его начале или в конце.
-Real EventSearch::contactTurn(const std::vector<ContactPair>& pairs, const std::vector<Rate>& rates, Real t) const {
+Real EventSearch::contactTurn(const std::vector<ContactPair>& pairs, const StepArray<Rate>& rates, Real t) const {
     Real turn = 0;
     const auto consider = [&](int id) {
         Body later = bodies_[size_t(id)];
@@ -279,7 +280,7 @@ Real EventSearch::contactTurn(const std::vector<ContactPair>& pairs, const std::
 
 // Ближайший момент, когда появится новая точка касания: пара ещё не касающихся тел войдёт в
 // полосу касания или у касающейся пары коснётся ещё одна точка.
-Real EventSearch::earliestImpact(const std::vector<ContactPair>& pairs, const std::vector<Rate>& rates, Real h) const {
+Real EventSearch::earliestImpact(const std::vector<ContactPair>& pairs, const StepArray<Rate>& rates, Real h) const {
     Real earliest = h;
     for (const ContactPair& pair : pairs) {
         const Body a = bodies_[size_t(pair.a)].part(pair.partA);
@@ -335,7 +336,7 @@ Real EventSearch::earliestImpact(const std::vector<ContactPair>& pairs, const st
 // Шарнир: g = ±(угол − предел), dg/dt = ±e·(ω_b − ω_a) (proofs/hinge_angle_rate.smt2), а
 // d²g/dt² = ±((ω_a × e)·ω_b + e·(α_b − α_a)). Ползун: g = ±(e·d − предел), d — от точки
 // сочленения тела a до точки тела b; ось e вращается с телом a.
-Real EventSearch::earliestLimit(const std::vector<Rate>& rates, Real h) const {
+Real EventSearch::earliestLimit(const StepArray<Rate>& rates, Real h) const {
     constexpr Real level = kLimitBand / 2, allowance = kLimitBand / 4;
     Real earliest = h;
     for (const Joint& any : joints_) {

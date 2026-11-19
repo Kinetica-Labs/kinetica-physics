@@ -2,6 +2,7 @@
 // Раздвигание тел, вошедших друг в друга, и возврат разошедшихся сочленений: сдвигом поз, без
 // изменения скоростей.
 
+#include <math/StepMemory.h>
 #include <collision/ContactPair.h>
 #include <joints/JointSet.h>
 
@@ -24,10 +25,10 @@ private:
     // (proofs/separation_keeps_momenta.smt2). Разведение увеличивает I, и энергия
     // L² / 2I убывает — как у фигуриста, разводящего руки. Группа с неподвижным телом не трогается: её
     // импульсы уходят в опору.
-    void keepMomenta(const std::vector<ContactPair>& pairs, const std::vector<Vector3>& shifts);
+    void keepMomenta(const std::vector<ContactPair>& pairs, const StepArray<Vector3>& shifts);
     // Корень группы каждого тела: тела, связанные парами с точками контакта и сочленениями; корень —
     // младший номер. Группа с неподвижным телом помечена корнем −1.
-    std::vector<int> freeGroups(const std::vector<ContactPair>& pairs) const;
+    StepArray<int> freeGroups(const std::vector<ContactPair>& pairs) const;
     // Глубина пар по истинной нормали там, где точки контакта её занижают; ложь — перекрытий нет.
     bool deepen(std::vector<ContactPair>& pushed) const;
 

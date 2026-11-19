@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/SlidingStopSearch.h>
 
 #include <algorithm>
@@ -18,7 +19,7 @@ void SlidingStopSearch::settle(SlidingStop stopped) {
         if (pair.a == stopped.a && pair.b == stopped.b) pair.startSlip = {};
 }
 
-SlidingStop SlidingStopSearch::slidingStop(Real h, const std::vector<std::pair<int, int>>& already) const {
+SlidingStop SlidingStopSearch::slidingStop(Real h, const StepArray<std::pair<int, int>>& already) const {
     SlidingStop earliest{h};
     for (const Pair& pair : state_.pairs) {
         if (std::find(already.begin(), already.end(), std::make_pair(pair.a, pair.b)) != already.end()) continue;
