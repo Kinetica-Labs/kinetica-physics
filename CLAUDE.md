@@ -40,6 +40,7 @@ KP_REALTIME=1 ./build/validation/studies/study-standard-scenes [rows.jsonl] [б�
 ./build/validation/studies/study-overlap-spread [ключ_сцены] [секунды] [вариантов]
 ./build/validation/studies/study-scale [тел ...]        # цена кадра от числа тел: порознь, столбики, кладка
 ./build/validation/studies/study-frame-times [ключ_сцены] [секунды]   # рывки: медиана, 99 %, наибольший кадр
+./build/validation/studies/study-allocations [ключ_сцены] [секунды]   # обращений к куче на кадр; KP_SITES=1 — откуда
 ```
 
 `state-hash` — главный критерий: правка, которая не должна менять физику, обязана дать тот же хэш
