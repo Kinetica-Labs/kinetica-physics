@@ -129,7 +129,7 @@ void closestOnEdges(Vector3 p1, Vector3 d1, Vector3 p2, Vector3 d2, Vector3& on1
 }
 
 // Окончательная ось контакта; false — тела дальше запаса.
-bool settleAxis(SeparatingAxis& axis, const ConvexHull& a, const ConvexHull& b, const Transform& toB, const TransformedHull& A, const TransformedHull& B, Real margin, Real touching, Real boundary) {
+bool settleAxis(SeparatingAxis& axis, const TransformedHull& A, const TransformedHull& B, Real margin, Real touching, Real boundary) {
     // С телом, у которого наружу обращена одна грань, контакт идёт только через неё.
     if (SeparatingAxis outer; outerFaceAxis(A, B, outer)) {
         if (outer.separation > margin) return false;
@@ -141,7 +141,7 @@ bool settleAxis(SeparatingAxis& axis, const ConvexHull& a, const ConvexHull& b, 
     // два бруска на 100 м/с входили друг в друга на 36 см. Зазор каждой точки площадки меряется
     // от плоскости грани в самой точке, поэтому точность касания от замены оси не страдает.
     if (axis.kind == SeparatingAxis::Kind::EdgePair) {
-        const SeparatingAxis face = findFaceAxis(a, Transform{}, b, toB, boundary);
+        const SeparatingAxis face = findFaceAxis(A, B, boundary);
         const bool onB = face.kind == SeparatingAxis::Kind::FaceB;
         if (axis.separation - face.separation <= touching &&
             clipAgainstFace(onB ? B : A, onB ? face.featureB : face.featureA, onB ? A : B, margin, touching, boundary).size() > 0)
@@ -156,10 +156,10 @@ ContactManifold HullVsHullAlgorithm::clipFaces(const ConvexHull& a, const Transf
     ContactManifold manifold;
     // Как и разделяющая ось, работа идёт в осях тела A; в мир переводится ответ.
     const Transform toB = poseA.relative(poseB);
-    SeparatingAxis axis = findSeparatingAxis(a, Transform{}, b, toB, boundary);
-    if (axis.separation > margin) return manifold;
     const TransformedHull A(a, Transform{}), B(b, toB);
-    if (!settleAxis(axis, a, b, toB, A, B, margin, touching, boundary)) return manifold;
+    SeparatingAxis axis = findSeparatingAxis(A, B, boundary);
+    if (axis.separation > margin) return manifold;
+    if (!settleAxis(axis, A, B, margin, touching, boundary)) return manifold;
     manifold.normal = poseA.direction(axis.normal);
 
     const auto add = [&](Vector3 onA, Vector3 onB, Real separation, std::uint32_t id) {

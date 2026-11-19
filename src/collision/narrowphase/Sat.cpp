@@ -1,6 +1,7 @@
 #include <collision/narrowphase/Sat.h>
 
 #include <collision/narrowphase/TransformedHull.h>
+#include <math/StepMemory.h>
 
 namespace kp {
 namespace {
@@ -24,8 +25,9 @@ void faceAxis(const TransformedHull& of, const TransformedHull& other, Real& sep
 // произведения решает округление, и проверка полушария за ним ошибается. Так вертикальное ребро
 // коробки «образовывало грань» с горизонтальным ребром дальней стороны тонкой пластины, и зазор
 // выходил больше истинного на её толщину. Ось такой пары совпадает с нормалью грани и ею покрыта.
-bool formsMinkowskiFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d) {
-    const Vector3 bxa = b.cross(a), dxc = d.cross(c);
+// bxa и dxc — b × a и d × c: они зависят только от своего ребра и считаются раз на ребро, а не на
+// каждую пару рёбер.
+bool formsMinkowskiFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 bxa, Vector3 dxc) {
     const Real cba = c.dot(bxa), dba = d.dot(bxa), adc = a.dot(dxc), bdc = b.dot(dxc);
     const Real onArc = Real(1e-10);
     for (Real side : {cba, dba, adc, bdc})
@@ -33,57 +35,25 @@ bool formsMinkowskiFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d) {
     return cba * dba < 0 && adc * bdc < 0 && cba * bdc > 0;
 }
 
+// Векторное произведение нормалей двух граней каждого ребра: правая × левая.
+StepArray<Vector3> edgeArcs(const TransformedHull& hull) {
+    StepArray<Vector3> arcs;
+    for (const ConvexHull::Edge& edge : hull.shape.edges()) arcs.push_back(hull.normals[size_t(edge.right)].cross(hull.normals[size_t(edge.left)]));
+    return arcs;
+}
+
 } // namespace
 
-// Работа идёт в осях тела A (см. Transform::relative); в мир переводится только нормаль.
-static SeparatingAxis leastPenetrationInA(const ConvexHull& a, const ConvexHull& b, const Transform& toB, Real preference);
-
-SeparatingAxis findSeparatingAxis(const ConvexHull& a, const Transform& poseA, const ConvexHull& b, const Transform& poseB, Real preference) {
-    SeparatingAxis axis = leastPenetrationInA(a, b, poseA.relative(poseB), preference);
-    axis.normal = poseA.direction(axis.normal);
-    return axis;
-}
-
-static SeparatingAxis bestFaceInA(const TransformedHull& A, const TransformedHull& B, Real preference) {
-    Real separationA, separationB;
-    int faceA = 0, faceB = 0;
-    faceAxis(A, B, separationA, faceA);
-    faceAxis(B, A, separationB, faceB);
-    if (separationB > separationA + preference) return {SeparatingAxis::Kind::FaceB, separationB, -B.normals[size_t(faceB)], 0, faceB};
-    return {SeparatingAxis::Kind::FaceA, separationA, A.normals[size_t(faceA)], faceA, 0};
-}
-
-bool outerFaceAxis(const TransformedHull& A, const TransformedHull& B, SeparatingAxis& axis) {
-    if (A.shape.outerFace >= 0) {
-        const Vector3 n = A.normals[size_t(A.shape.outerFace)];
-        axis = {SeparatingAxis::Kind::FaceA, n.dot(B.support(-1 * n) - A.pointOnFace(A.shape.outerFace)), n, A.shape.outerFace, 0};
-        return true;
-    }
-    if (B.shape.outerFace >= 0) {
-        const Vector3 n = B.normals[size_t(B.shape.outerFace)];
-        axis = {SeparatingAxis::Kind::FaceB, n.dot(A.support(-1 * n) - B.pointOnFace(B.shape.outerFace)), -1 * n, 0, B.shape.outerFace};
-        return true;
-    }
-    return false;
-}
-
-SeparatingAxis findFaceAxis(const ConvexHull& a, const Transform& poseA, const ConvexHull& b, const Transform& poseB, Real preference) {
-    SeparatingAxis axis = bestFaceInA(TransformedHull(a, Transform{}), TransformedHull(b, poseA.relative(poseB)), preference);
-    axis.normal = poseA.direction(axis.normal);
-    return axis;
-}
-
-static SeparatingAxis leastPenetrationInA(const ConvexHull& a, const ConvexHull& b, const Transform& toB, Real preference) {
-    const TransformedHull A(a, Transform{}), B(b, toB);
-    SeparatingAxis best = bestFaceInA(A, B, preference);
-
-    for (int i = 0; i < int(a.edges().size()); ++i) {
-        const ConvexHull::Edge& ea = a.edges()[size_t(i)];
+// Оси пар рёбер: лучше оси best — заменяют её.
+static SeparatingAxis bestEdgePair(const TransformedHull& A, const TransformedHull& B, SeparatingAxis best, Real preference) {
+    const StepArray<Vector3> arcsA = edgeArcs(A), arcsB = edgeArcs(B);
+    for (int i = 0; i < int(A.shape.edges().size()); ++i) {
+        const ConvexHull::Edge& ea = A.shape.edges()[size_t(i)];
         const Vector3 tailA = A.vertices[size_t(ea.tail)], directionA = A.vertices[size_t(ea.head)] - tailA;
-        for (int j = 0; j < int(b.edges().size()); ++j) {
-            const ConvexHull::Edge& eb = b.edges()[size_t(j)];
-            if (!formsMinkowskiFace(A.normals[size_t(ea.left)], A.normals[size_t(ea.right)],
-                                    -B.normals[size_t(eb.left)], -B.normals[size_t(eb.right)]))
+        for (int j = 0; j < int(B.shape.edges().size()); ++j) {
+            const ConvexHull::Edge& eb = B.shape.edges()[size_t(j)];
+            // (−d) × (−c) = d × c: произведение нормалей ребра B годится без смены знака.
+            if (!formsMinkowskiFace(A.normals[size_t(ea.left)], A.normals[size_t(ea.right)], -B.normals[size_t(eb.left)], -B.normals[size_t(eb.right)], arcsA[size_t(i)], arcsB[size_t(j)]))
                 continue;
             const Vector3 tailB = B.vertices[size_t(eb.tail)], directionB = B.vertices[size_t(eb.head)] - tailB;
             const Vector3 axis = directionA.cross(directionB);
@@ -98,6 +68,40 @@ static SeparatingAxis leastPenetrationInA(const ConvexHull& a, const ConvexHull&
         }
     }
     return best;
+}
+
+static SeparatingAxis bestFaceInA(const TransformedHull& A, const TransformedHull& B, Real preference) {
+    Real separationA, separationB;
+    int faceA = 0, faceB = 0;
+    faceAxis(A, B, separationA, faceA);
+    faceAxis(B, A, separationB, faceB);
+    if (separationB > separationA + preference) return {SeparatingAxis::Kind::FaceB, separationB, -B.normals[size_t(faceB)], 0, faceB};
+    return {SeparatingAxis::Kind::FaceA, separationA, A.normals[size_t(faceA)], faceA, 0};
+}
+
+// Оболочки уже в общих осях: ось — в них же. Так отсечение граней строит оболочки один раз на пару.
+SeparatingAxis findSeparatingAxis(const TransformedHull& A, const TransformedHull& B, Real preference) { return bestEdgePair(A, B, bestFaceInA(A, B, preference), preference); }
+SeparatingAxis findFaceAxis(const TransformedHull& A, const TransformedHull& B, Real preference) { return bestFaceInA(A, B, preference); }
+
+// Работа идёт в осях тела A (см. Transform::relative); в мир переводится только нормаль.
+SeparatingAxis findSeparatingAxis(const ConvexHull& a, const Transform& poseA, const ConvexHull& b, const Transform& poseB, Real preference) {
+    SeparatingAxis axis = findSeparatingAxis(TransformedHull(a, Transform{}), TransformedHull(b, poseA.relative(poseB)), preference);
+    axis.normal = poseA.direction(axis.normal);
+    return axis;
+}
+
+bool outerFaceAxis(const TransformedHull& A, const TransformedHull& B, SeparatingAxis& axis) {
+    if (A.shape.outerFace >= 0) {
+        const Vector3 n = A.normals[size_t(A.shape.outerFace)];
+        axis = {SeparatingAxis::Kind::FaceA, n.dot(B.support(-1 * n) - A.pointOnFace(A.shape.outerFace)), n, A.shape.outerFace, 0};
+        return true;
+    }
+    if (B.shape.outerFace >= 0) {
+        const Vector3 n = B.normals[size_t(B.shape.outerFace)];
+        axis = {SeparatingAxis::Kind::FaceB, n.dot(A.support(-1 * n) - B.pointOnFace(B.shape.outerFace)), -1 * n, 0, B.shape.outerFace};
+        return true;
+    }
+    return false;
 }
 
 } // namespace kp
