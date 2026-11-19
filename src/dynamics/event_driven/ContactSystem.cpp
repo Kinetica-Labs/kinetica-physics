@@ -32,15 +32,20 @@ ContactSystem::SparseMatrix ContactSystem::responseMatrix(const std::vector<Body
             }
         }
     }
-    // Отклик через два общих тела складывается: одинаковые столбцы строки сливаются.
+    // Отклик через два общих тела складывается: одинаковые столбцы строки сливаются. Строка — два
+    // куска, каждый уже по возрастанию столбца (линии первого тела, затем второго); они сливаются
+    // устойчиво, как при std::stable_sort, но без обращения к куче.
+    StepArray<Entry> merged;
     for (StepArray<Entry>& row : matrix) {
-        std::stable_sort(row.begin(), row.end(), [](const Entry& x, const Entry& y) { return x.column < y.column; });
-        size_t kept = 0;
-        for (const Entry& entry : row) {
-            if (kept > 0 && row[kept - 1].column == entry.column) row[kept - 1].value += entry.value;
-            else row[kept++] = entry;
+        size_t second = 1;
+        while (second < row.size() && !(row[second].column < row[second - 1].column)) ++second;
+        merged.clear();
+        for (size_t x = 0, y = second; x < second || y < row.size();) {
+            const Entry& entry = y == row.size() || (x < second && !(row[y].column < row[x].column)) ? row[x++] : row[y++];
+            if (!merged.empty() && merged.back().column == entry.column) merged.back().value += entry.value;
+            else merged.push_back(entry);
         }
-        row.resize(kept);
+        row.assign(merged.begin(), merged.end());
     }
     return matrix;
 }
