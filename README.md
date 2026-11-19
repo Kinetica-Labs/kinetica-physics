@@ -33,7 +33,7 @@
 sudo apt install build-essential cmake       # компилятор и сборка
 git clone <адрес репозитория> && cd kinetica-physics
 cmake -B build && cmake --build build -j     # библиотека, проверки, примеры
-ctest --test-dir build                       # 15 104 проверки и 25 лемм
+ctest --test-dir build                       # 15 136 проверок и 30 лемм
 ```
 
 Окну просмотра дополнительно нужны OpenGL и две библиотеки. Ставить руками можно только первую:
