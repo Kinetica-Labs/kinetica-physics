@@ -5,21 +5,30 @@
 
 namespace kp {
 
+namespace {
+
+// Охватывающий радиус части тела от его центра масс; простое тело ради этого не копируется.
+Real radiusOf(const Body& body, int part) { return body.parts ? body.part(part).boundingRadius() : body.boundingRadius(); }
+
+} // namespace
+
 MissedContacts::MissedContacts(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, StepArray<size_t> owner, Real depth, Real boundary)
-    : owner_(std::move(owner)), depth_(depth), boundary_(boundary) {
-    pairs_.reserve(pairs.size()), radiusA_.reserve(pairs.size()), radiusB_.reserve(pairs.size());
-    for (const ContactPair& pair : pairs) adopt(pair, bodies, false);
+    : listed_(pairs), owner_(std::move(owner)), depth_(depth), boundary_(boundary) {
+    radiusA_.reserve(pairs.size()), radiusB_.reserve(pairs.size());
+    for (const ContactPair& pair : pairs) measure(pair, bodies);
+}
+
+void MissedContacts::measure(const ContactPair& pair, const std::vector<Body>& bodies) {
+    radiusA_.push_back(radiusOf(bodies[size_t(pair.a)], pair.partA)), radiusB_.push_back(radiusOf(bodies[size_t(pair.b)], pair.partB));
 }
 
 void MissedContacts::adopt(const ContactPair& pair, const std::vector<Body>& bodies, bool withContact) {
-    if (withContact) owner_.push_back(pairs_.size());
-    pairs_.push_back(pair);
-    radiusA_.push_back(bodies[size_t(pair.a)].part(pair.partA).boundingRadius());
-    radiusB_.push_back(bodies[size_t(pair.b)].part(pair.partB).boundingRadius());
+    if (withContact) owner_.push_back(pairCount());
+    adopted_.push_back(pair), measure(pair, bodies);
 }
 
 void MissedContacts::note(const StepArray<SoftContact>& contacts) {
-    known_.assign(pairs_.size(), 0);
+    known_.assign(pairCount(), 0);
     for (size_t c = 0; c < contacts.size(); ++c) known_[owner_[c]] = std::max(known_[owner_[c]], contacts[c].deepest());
 }
 
@@ -39,8 +48,8 @@ bool MissedContacts::find(StepArray<SoftContact>& contacts, const std::vector<Bo
         speed[i] = states[i].v.length(), spin[i] = states[i].w.length(), shift[i] = states[i].moved.length(), chord[i] = 2 * Vector3{q.x, q.y, q.z}.length();
     }
     bool found = false;
-    for (size_t p = 0; p < pairs_.size(); ++p) {
-        const ContactPair& pair = pairs_[p];
+    for (size_t p = 0; p < pairCount(); ++p) {
+        const ContactPair& pair = this->pair(p);
         const size_t a = size_t(pair.a), b = size_t(pair.b);
         if ((speed[a] + spin[a] * radiusA_[p] + speed[b] + spin[b] * radiusB_[p]) * h <= depth_) continue;
         if (pair.distance - (shift[a] + chord[a] * radiusA_[p] + shift[b] + chord[b] * radiusB_[p]) >= -depth_) continue;

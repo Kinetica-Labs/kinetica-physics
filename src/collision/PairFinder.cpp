@@ -96,13 +96,12 @@ StepArray<std::pair<int, int>> partPairs(const Body& a, const Body& b, Vector3 g
 PairFinder::Found PairFinder::simplePair(int i, int j, Real reach) const {
     Found found;
     const Body &a = bodies_[size_t(i)], &b = bodies_[size_t(j)];
-    const ManifoldMemory::Entry* known = memory ? memory->valid(i, j, a, b, reach) : nullptr;
-    std::optional<ContactPair> pair = known ? std::optional<ContactPair>(ManifoldMemory::carried(*known, a, b, reach)) : examinePairWithin(a, b, reach, boundary);
-    if (!pair) return found;
-    pair->a = i, pair->b = j;
-    if (known) found.kept = *known;
-    else if (memory) found.kept = ManifoldMemory::entryOf(*pair, a, b);
-    found.pairs.push_back(*pair);
+    found.carried = memory ? memory->valid(i, j, a, b, reach) : nullptr;
+    if (found.carried) found.pairs.push_back(ManifoldMemory::carried(*found.carried, a, b, reach));
+    else if (const std::optional<ContactPair> pair = examinePairWithin(a, b, reach, boundary)) found.pairs.push_back(*pair);
+    if (found.pairs.empty()) return found;
+    found.pairs[0].a = i, found.pairs[0].b = j;
+    if (memory && !found.carried) found.fresh = ManifoldMemory::entryOf(found.pairs[0], a, b);
     return found;
 }
 
@@ -138,11 +137,11 @@ std::vector<ContactPair> PairFinder::pairs(Real h) const {
     if (parts < kParallelParts) for (size_t k = 0; k < candidates.size(); ++k) examine(k);
     else WorkerPool::shared().run(candidates.size(), examine);
     size_t total = 0;
-    StepArray<ManifoldMemory::Entry> kept;
+    StepArray<const ManifoldMemory::Entry*> kept;
     kept.reserve(memory ? found.size() : 0);
     for (const Found& some : found) {
         total += some.pairs.size();
-        if (some.kept) kept.push_back(*some.kept);
+        if (some.carried || some.fresh) kept.push_back(some.carried ? some.carried : &*some.fresh);
     }
     if (memory) memory->replace(kept);
     std::vector<ContactPair> pairs; // ответ уходит наружу и живёт дольше шага: он в куче, одним куском

@@ -26,6 +26,7 @@ class MissedContacts {
 public:
     using Maker = std::function<SoftContact(const ContactPair&)>;
     // owner — номер пары каждого контакта; depth — допуск глубины, м; boundary — PairFinder::boundary.
+    // Список pairs не копируется: он обязан пережить этот объект.
     MissedContacts(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, StepArray<size_t> owner, Real depth, Real boundary);
     // Пара, найденная посреди шага (PairReach); withContact — вызывающий дописывает в contacts её контакт.
     void adopt(const ContactPair& pair, const std::vector<Body>& bodies, bool withContact);
@@ -36,7 +37,12 @@ public:
     bool find(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, Real h, const Maker& make);
 
 private:
-    StepArray<ContactPair> pairs_;
+    size_t pairCount() const { return listed_.size() + adopted_.size(); }
+    const ContactPair& pair(size_t p) const { return p < listed_.size() ? listed_[p] : adopted_[p - listed_.size()]; }
+    void measure(const ContactPair& pair, const std::vector<Body>& bodies);
+
+    const std::vector<ContactPair>& listed_; // пары шага
+    StepArray<ContactPair> adopted_;         // пары, найденные посреди шага: их номера идут следом
     StepArray<size_t> owner_;
     StepArray<Real> radiusA_, radiusB_; // охватывающие радиусы частей пары от центров масс тел
     StepArray<Real> known_;             // глубина пары до сдвига

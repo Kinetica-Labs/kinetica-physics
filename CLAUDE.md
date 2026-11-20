@@ -55,6 +55,7 @@ KP_REALTIME=1 ./build/validation/studies/study-standard-scenes [rows.jsonl] [б�
 ./build/validation/studies/study-overlap-spread [ключ_сцены] [секунды] [вариантов]
 ./build/validation/studies/study-scale [тел ...]        # цена кадра от числа тел: порознь, столбики, кладка
 ./build/validation/studies/study-frame-times [ключ_сцены] [секунды]   # рывки: медиана, 99 %, наибольший кадр
+KP_THREADS=1 ./build/validation/studies/study-frame-stages pyramid3d  # кадр по стадиям шага: куда уходит время
 ./build/validation/studies/study-allocations [ключ_сцены] [секунды]   # обращений к куче на кадр; KP_SITES=1 — откуда
 ```
 
@@ -115,7 +116,8 @@ v ← v / (1 + h c), как в ReactPhysics3D и Box3D. Вязкое затух�
 граней — касание многогранников; скруглённые формы (шар, капсула) — ядро плюс радиус. Цилиндр
 особый: нет конечного SAT и это не «ядро плюс радиус».
 
-Наблюдение — только снаружи шага: `StepObserver` (таймеры, энергия), `debugGeometry(world)` /
+Наблюдение — только снаружи шага: `StepObserver` (таймеры, энергия; оба шага сообщают ему о стадиях
+из `dynamics/StepStage.h`), `debugGeometry(world)` /
 `debugText(world)` — точки, отрезки и текст для любого рендера. Внутри физики строк приборов нет.
 
 Сцены живут в `examples/scenes/` (библиотека `kinetica-scenes`) и общие для окна и приборов —

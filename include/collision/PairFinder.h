@@ -36,7 +36,9 @@ private:
     // Пары частей двух тел и запись памяти площадок для следующего обновления.
     struct Found {
         StepArray<ContactPair> pairs;
-        std::optional<ManifoldMemory::Entry> kept;
+        // Запись памяти площадок пары простых тел: carried — прежняя, по ней пара перенесена; fresh — новая.
+        const ManifoldMemory::Entry* carried = nullptr;
+        std::optional<ManifoldMemory::Entry> fresh;
     };
     StepArray<std::pair<int, int>> candidates(Real h, const StepArray<Real>& fastest) const;
     Found between(int i, int j, Real h, Real reach) const;

@@ -57,4 +57,15 @@ ContactPair ManifoldMemory::carried(const Entry& entry, const Body& a, const Bod
     return pair;
 }
 
+// Записи, оставшиеся на своих местах, не копируются: в покое состав памяти не меняется вовсе. Иначе
+// новый состав собирается в стороне — указатели смотрят в нынешний — и занимает его место.
+void ManifoldMemory::replace(const StepArray<const Entry*>& entries) {
+    size_t same = 0;
+    while (same < entries.size() && same < entries_.size() && entries[same] == &entries_[same]) ++same;
+    if (same == entries.size() && same == entries_.size()) return;
+    next_.clear(), next_.reserve(entries.size());
+    for (const Entry* entry : entries) next_.push_back(*entry);
+    entries_.swap(next_);
+}
+
 } // namespace kp

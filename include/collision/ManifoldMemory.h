@@ -49,10 +49,11 @@ public:
     // Площадка записи в нынешних позах тел.
     static ContactPair carried(const Entry& entry, const Body& a, const Body& b, Real reach);
     // Записи следующего обновления, по возрастанию (a, b).
-    void replace(const StepArray<Entry>& entries) { entries_.assign(entries.begin(), entries.end()); }
+    void replace(const StepArray<const Entry*>& entries);
 
 private:
     std::vector<Entry> entries_;
+    std::vector<Entry> next_; // место под новый состав: между шагами не освобождается
 };
 
 } // namespace kp
