@@ -10,7 +10,7 @@ slope     точный   d2f117b338e08ff1
 slope     быстрый  b990e76682eb7dd4
 dominoes  точный   fde12a0aa277f1d1
 dominoes  быстрый  c3b8a0b3f867cb29
-wall      быстрый  d8398e89bbf7ba38
+wall      быстрый  d20c16d27cb6e0de
 bullet    точный   8554240f0e3f7f5a
 bullet    быстрый  227330ab9302e82e
 cradle    точный   4f914266183b004e
@@ -18,7 +18,7 @@ cradle    быстрый  cce3690665a9c3d9
 chain     точный   d611590b1387cd69
 chain     быстрый  426ccd616b67e481
 buckets   точный   4d992759a641c075
-buckets   быстрый  4af7889e95ab0705
+buckets   быстрый  c5c6c90366ccdb97
 balls     точный   f38a5e91cf02f7ae
 balls     быстрый  2e38ec251ed0ac93
 pile      точный   95ea4541451f353b

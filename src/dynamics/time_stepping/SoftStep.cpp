@@ -284,7 +284,7 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
     jointMemory.resize(joints.size());
     JointRows rows;
     rows.build(joints, bodies, states, jointMemory, directJoints);
-    IslandNormals normals(directContactRows, soft.biasRate);
+    IslandNormals normals(directContactRows, soft.biasRate, directFactorizations);
     LiveContacts live{contacts, normals, missed, reach, maker, joints, pushSpeed, bounceSpeed, edgeSlop, observer,
                       std::any_of(bodies.begin(), bodies.end(), [](const Body& body) { return body.restitution != 0; })};
     notify(observer, StepStage::Contacts);

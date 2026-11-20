@@ -29,7 +29,7 @@ void ActiveSet::solve(const StepArray<char>& unknown, const StepArray<Real>& fre
     sided_.clear();
     for (size_t i = 0; i < system_.lines.size(); ++i)
         if (unknown[i] && oneSided(i)) sided_.push_back(i);
-    margin_.assign(system_.lines.size(), 0);
+    margin_.assign(system_.lines.size(), 0), spent_ = 0;
     if (!permute(force)) descend(force);
 }
 
@@ -47,6 +47,7 @@ char& ActiveSet::pressing(size_t i) {
 // односторонних — в margin_. Сначала разложение в осях тел (BodySpaceSolve); если оно дороже
 // профиля — Холецкий по профилю.
 void ActiveSet::solveOn(StepArray<Real>& force) {
+    ++spent_;
     const StepMemory::Scope scope; // force и margin_ созданы раньше и здесь не растут
     const StepArray<char>& unknown = *unknown_;
     const size_t total = system_.lines.size();
@@ -101,10 +102,21 @@ bool ActiveSet::permute(StepArray<Real>& force) {
             if (pressing(i) ? force[i] < -kSolved / system_.diagonal[i] : margin_[i] < -kSolved) violated.push_back(i);
         }
         if (violated.empty()) return true;
+        if (factorizations > 0 && spent_ >= factorizations) return false;
         if (int(violated.size()) < fewest) fewest = int(violated.size()), patience = 10;
         else if (patience-- == 0) return false;
         for (size_t i : violated) pressing(i) = !pressing(i);
     }
+}
+
+// Точка, с которой начинается спуск: ноль или заданная допустимая точка start; набор — её давящие линии
+// (набор, на котором остановились перестановки, к ней отношения не имеет).
+StepArray<Real> ActiveSet::descentStart() {
+    StepArray<Real> held(system_.lines.size(), 0);
+    if (!start) return held;
+    held = *start;
+    for (size_t i : sided_) pressing(i) = held[i] > 0;
+    return held;
 }
 
 // Надёжный путь — спуск. held — нынешняя допустимая точка: силы односторонних линий в ней
@@ -113,11 +125,12 @@ bool ActiveSet::permute(StepArray<Real>& force) {
 void ActiveSet::descend(StepArray<Real>& force) {
     const StepArray<char>& unknown = *unknown_;
     const size_t total = system_.lines.size();
-    StepArray<Real> held(total, 0);
+    StepArray<Real> held = descentStart();
     StepArray<char> refused(total, 0); // точки, которые войти в набор не смогли
     size_t entering = total;
     for (size_t round = 0; round < 3 * sided_.size() + 50; ++round) {
         for (;;) {
+            if (factorizations > 0 && spent_ >= 3 * factorizations) return void(force = held); // предел работы: допустимая точка
             solveOn(force);
             Real step = 1;
             bool blocked = false;

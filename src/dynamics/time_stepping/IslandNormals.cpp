@@ -89,14 +89,16 @@ void IslandNormals::solve(StepArray<SoftContact>& contacts, const std::vector<Bo
 void IslandNormals::solveIsland(Island& island, StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, const Pass& pass) const {
     for (size_t k = 0; k < island.members.size(); ++k) island.bodies[k].orientation = bodies[size_t(island.members[k])].orientation;
     for (size_t r = 0; r < island.rows.size(); ++r) island.working[r] = contacts[island.rows[r].contact].normalRow(island.rows[r].point).impulse > 0 ? kWorking : kOutside;
-    do solveWorking(island, contacts, states, pass);
-    while (extend(island, contacts, states, pass));
+    // Решению даётся треть остатка предела: перебор тратит до трёх своих пределов (ActiveSet::factorizations).
+    int spent = 0;
+    do spent += solveWorking(island, contacts, states, pass, std::max(1, (factorizations_ - spent) / 3));
+    while (spent < factorizations_ && extend(island, contacts, states, pass));
 }
 
 // Неизвестные — полные импульсы точек набора: из скорости вычитается вклад уже накопленных, A λ_прежн.
 // Добавка kProximal (ActiveSet) держит ответ у прежнего: у четырёх точек на грани матрица
 // вырожденная, и без неё силу между ними можно распределить как угодно.
-void IslandNormals::solveWorking(Island& island, StepArray<SoftContact>& contacts, StepArray<SolverBody>& states, const Pass& pass) const {
+int IslandNormals::solveWorking(Island& island, StepArray<SoftContact>& contacts, StepArray<SolverBody>& states, const Pass& pass, int allowed) const {
     ContactSystem system;
     StepArray<size_t> listed;
     StepArray<Real> impulse, free;
@@ -110,7 +112,7 @@ void IslandNormals::solveWorking(Island& island, StepArray<SoftContact>& contact
         pressing.push_back(row.impulse > 0 || island.working[r] == kEntered), island.working[r] = kWorking;
     }
     const size_t total = listed.size();
-    if (total == 0) return;
+    if (total == 0) return 0;
     system.matrix = ContactSystem::responseMatrix(island.bodies, system.lines);
     system.diagonal.assign(total, 0), system.soft.assign(total, 0);
     for (size_t i = 0; i < total; ++i) {
@@ -124,8 +126,11 @@ void IslandNormals::solveWorking(Island& island, StepArray<SoftContact>& contact
     const std::vector<Bond> noBonds;
     StepArray<char> noBondSet;
     StepArray<Real> force(total);
-    ActiveSet(island.bodies, system, noBonds, pressing, noBondSet).solve(StepArray<char>(total, 1), free, force);
+    ActiveSet set(island.bodies, system, noBonds, pressing, noBondSet);
+    set.factorizations = allowed, set.start = &impulse;
+    set.solve(StepArray<char>(total, 1), free, force);
     for (size_t i = 0; i < total; ++i) contacts[island.rows[listed[i]].contact].setNormalImpulse(states, island.rows[listed[i]].point, std::max(Real(0), force[i]));
+    return set.spent();
 }
 
 // В набор входят самые нарушенные точки вне его — не больше kEntering на пару тел: у составных тел

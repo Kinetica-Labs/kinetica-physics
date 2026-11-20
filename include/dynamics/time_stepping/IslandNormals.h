@@ -32,7 +32,8 @@ namespace kp {
 
 class IslandNormals {
 public:
-    IslandNormals(int rowLimit, Real biasRate) : rowLimit_(rowLimit), biasRate_(biasRate) {}
+    // factorizations — SoftStep::directFactorizations: разложений системы на островок за одно решение, не больше.
+    IslandNormals(int rowLimit, Real biasRate, int factorizations) : rowLimit_(rowLimit), factorizations_(factorizations), biasRate_(biasRate) {}
     // moving — по телам: решаются только контакты и островки, где движется хоть одно тело; nullptr — все.
     void solve(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed,
                const StepArray<char>* moving = nullptr);
@@ -62,10 +63,11 @@ private:
     void choose(const StepArray<SoftContact>& contacts, const std::vector<Body>& bodies);
     Real excess(const SoftContact::NormalRow& row, const StepArray<SolverBody>& states, const Pass& pass) const;
     void solveIsland(Island& island, StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, const Pass& pass) const;
-    void solveWorking(Island& island, StepArray<SoftContact>& contacts, StepArray<SolverBody>& states, const Pass& pass) const;
+    // allowed — предел ActiveSet::factorizations этого решения; возвращает, сколько разложений ушло.
+    int solveWorking(Island& island, StepArray<SoftContact>& contacts, StepArray<SolverBody>& states, const Pass& pass, int allowed) const;
     bool extend(Island& island, const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states, const Pass& pass) const;
 
-    int rowLimit_;
+    int rowLimit_, factorizations_;
     Real biasRate_;
     StepArray<char> direct_; // по контактам; пусто — ещё не выбрано
     StepArray<Island> islands_;

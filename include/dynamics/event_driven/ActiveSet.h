@@ -18,11 +18,21 @@ public:
         : bodies_(bodies), system_(system), bonds_(bonds), pressing_(pressing), bondPressing_(bondPressing) {}
     // unknown — какие линии участвуют; free — скорость вдоль линии без искомых сил; force — ответ.
     void solve(const StepArray<char>& unknown, const StepArray<Real>& free, StepArray<Real>& force);
+    // Предел работы для шага с постоянной ценой кадра; ноль — без предела (точный шаг). Перестановкам
+    // даётся factorizations разложений; не сошлись — спуск идёт от допустимой точки start (прежние силы,
+    // у односторонних линий неотрицательные) и получает ещё вдвое больше. Спуск на каждом шаге остаётся в
+    // допустимых силах и уменьшает функцию задачи, поэтому оборванный спуск даёт ответ не хуже прежнего —
+    // в отличие от оборванных перестановок, чей промежуточный набор сил может быть каким угодно.
+    int factorizations = 0;
+    const StepArray<Real>* start = nullptr;
+    int spent() const { return spent_; } // разложений в последнем решении
 
 private:
     bool oneSided(size_t i) const;
     char& pressing(size_t i);
     void solveOn(StepArray<Real>& force);
+    int spent_ = 0; // разложений в нынешнем решении
+    StepArray<Real> descentStart();
     bool permute(StepArray<Real>& force);
     void descend(StepArray<Real>& force);
 
