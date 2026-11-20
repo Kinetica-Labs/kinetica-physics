@@ -52,21 +52,14 @@ python3 validation/case_table.py [--check]              # полная табл�
                                                         # нарушений против эталона; --check — ошибка, если стало хуже
 KP_REALTIME=1 ./build/validation/studies/study-standard-scenes [rows.jsonl] [бюджет_с] [ключ_сцены]
 ./build/validation/studies/study-exact-scenes [секунды]
-./build/validation/studies/study-overlap-spread [ключ_сцены] [секунды] [вариантов]
-./build/validation/studies/study-scale [тел ...]        # цена кадра от числа тел: порознь, столбики, кладка
-./build/validation/studies/study-frame-times [ключ_сцены] [секунды]   # рывки: медиана, 99 %, наибольший кадр
-KP_THREADS=1 ./build/validation/studies/study-frame-stages pyramid3d  # кадр по стадиям шага: куда уходит время
-KP_THREADS=1 BENCH=14 perf stat -e cycles:u,instructions:u,LLC-load-misses:u build/validation/engines/compare-ours realtime 8
-                                                        # счётчики вместо времени: такты шумят на 2–3 %, время — на 20 %;
-                                                        # perf работает при kernel.perf_event_paranoid ≤ 1 (сбрасывается перезагрузкой)
-./build/validation/studies/study-allocations [ключ_сцены] [секунды]   # обращений к куче на кадр; KP_SITES=1 — откуда
 ```
 
 `state-hash` — главный критерий: правка, которая не должна менять физику, обязана дать тот же хэш
 бит в бит. Он смотрит 60 кадров стандартных сцен и не заменяет таблицу случаев: правку точного шага,
 геометрии контакта или решателя проверять и `case_table.py --check` (регрессия `b27472a` прошла хэш). Строки «точный» совпадают всегда; «быстрый» — если правка не касалась `time_stepping`.
 Если физика меняется намеренно, эталон перезаписывается этой же командой, и это видно в diff.
-Ключи приборов `KP_*`, требования к новому прибору и правила замера — `validation/CLAUDE.md`.
+Приборы скорости (стадии кадра, счётчики `perf`, разброс перекрытия, обращения к куче), ключи `KP_*`,
+требования к новому прибору и правила замера — `validation/CLAUDE.md`: прочитать перед правкой ради скорости.
 
 ## Архитектура
 

@@ -13,6 +13,24 @@
 Перекрытие сцены с ударами (куча, чаша) с одного прогона — случайное число: сцена хаотична. Мерить
 его `study-overlap-spread` — медианой и наибольшим по 16 вариантам с возмущением скоростей 1 мм/с.
 
+## Приборы скорости
+
+```
+./build/validation/studies/study-overlap-spread [ключ_сцены] [секунды] [вариантов]
+./build/validation/studies/study-scale [тел ...]        # цена кадра от числа тел: порознь, столбики, кладка
+./build/validation/studies/study-frame-times [ключ_сцены] [секунды]   # рывки: медиана, 99 %, наибольший кадр
+KP_THREADS=1 ./build/validation/studies/study-frame-stages pyramid3d  # кадр по стадиям шага: куда уходит время
+KP_THREADS=1 BENCH=14 perf stat -e cycles:u,instructions:u,LLC-load-misses:u build/validation/engines/compare-ours realtime 8
+                                                        # счётчики вместо времени: такты шумят на 2–3 %, время — на 20 %;
+                                                        # perf работает при kernel.perf_event_paranoid ≤ 1 (сбрасывается перезагрузкой)
+./build/validation/studies/study-allocations [ключ_сцены] [секунды]   # обращений к куче на кадр; KP_SITES=1 — откуда
+```
+
+Скорость мерить тактами (`cycles:u`), а не временем и не числом инструкций: замер `BENCH` идёт 60 кадров,
+время шумит на 20 %, такты — на 2–3 %; инструкций можно убрать 11 % и не выиграть ни такта (H77).
+Правке ради скорости предшествует замер, где теряются такты: 2026-11-20 шесть правок по догадке
+(H70, H73, H74, H76, H77) были сделаны и откатаны. Отклонённое — в `validation/attempts.jsonl`.
+
 ## Сравнение с Box3D и RP3D (`validation/engines/`)
 
 `validation/engines/` — общие сцены (покой, осыпь, тело в теле, сон, высокий столбик, сочленения) для нашего движка (`compare-ours`, в сборке), Box3D и RP3D
