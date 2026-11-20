@@ -7,6 +7,14 @@
 
 namespace kp {
 
+// Тихий кадр: наибольший путь точки любого тела за dt при нынешних скоростях не больше допуска
+// soft.contactDrift, с которым площадка пары и так идёт за телами (ManifoldMemory).
+bool World::quiet(Real dt) const {
+    for (const Body& body : bodies_)
+        if (!body.isStatic() && (body.linearVelocity().length() + body.angularVelocity().length() * body.boundingRadius()) * dt > soft.contactDrift) return false;
+    return true;
+}
+
 void World::step(Real dt) {
     const StepMemory memory; // рабочие массивы шага — из запаса потока (math/StepMemory.h)
     report_ = {};
@@ -17,15 +25,18 @@ void World::step(Real dt) {
         SoftStep part = soft;
         part.observer = watch;
         manifolds_.tolerance = soft.contactDrift;
-        part.substeps = std::max(1, soft.substeps / soft.contactUpdates);
-        for (int update = 0; update < soft.contactUpdates; ++update) {
+        // В тихом кадре контакты ищутся один раз: четыре поиска нужны при ударах, а в покое не меняют ни
+        // осадку, ни перекрытие и стоят трети кадра (замер H69).
+        const int updates = quiet(dt) ? 1 : soft.contactUpdates;
+        part.substeps = std::max(1, soft.substeps / updates);
+        for (int update = 0; update < updates; ++update) {
             PairFinder finder(bodies_, gravity);
             finder.boundary = soft.edgeSlop, finder.memory = &manifolds_;
-            const std::vector<ContactPair> pairs = finder.pairs(dt / soft.contactUpdates, joints_);
+            const std::vector<ContactPair> pairs = finder.pairs(dt / updates, joints_);
             notify(watch, StepStage::Pairs);
-            part.step(bodies_, pairs, joints_, gravity, dt / soft.contactUpdates, contactForces_, jointImpulses_);
+            part.step(bodies_, pairs, joints_, gravity, dt / updates, contactForces_, jointImpulses_);
         }
-        report_.segments = part.substeps * soft.contactUpdates;
+        report_.segments = part.substeps * updates;
     } else {
         ExactStep exact(bodies_, joints_, gravity, contactForces_, stopped_, report_);
         exact.shockPropagation = shockPropagation, exact.maxSegments = maxSegments;

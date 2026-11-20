@@ -93,6 +93,7 @@ public:
     const Report& report() const { return report_; }
 
 private:
+    bool quiet(Real dt) const;
     std::vector<Body> bodies_;
     JointSet joints_;
     ContactForces contactForces_; // силы в точках контакта с прошлого отрезка — для тёплого старта
