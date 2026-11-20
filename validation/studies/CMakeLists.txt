@@ -1,5 +1,5 @@
 # Приборы: не проверки «да/нет», а замеры, из которых выводятся решения .
-foreach(study GeometryErrors Stack RotationMap CubeOnCorner DropStatistics TreeStatistics CcdStatistics CaseTable)
+foreach(study GeometryErrors Stack RotationMap DropStatistics TreeStatistics CcdStatistics CaseTable)
   string(REGEX REPLACE "([a-z])([A-Z])" "\\1-\\2" name ${study})
   string(TOLOWER study-${name} name)
   add_executable(${name} ${study}.cpp)

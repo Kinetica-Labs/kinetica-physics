@@ -18,4 +18,3 @@ option(KP_VIEWER "Окно просмотра на OpenGL (GLFW)" OFF)
 if(KP_VIEWER)
   add_subdirectory(viewer)
 endif()
-# Сравнение со старым ядром (validation/) собирает validation/run.py: ему нужна библиотека phys_realflow.
