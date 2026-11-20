@@ -71,9 +71,6 @@ Vector3 momentumOf(const Body& body, Vector3 w) {
     return body.orientation.rotate(inertia.scaled(body.orientation.rotateInverse(w)));
 }
 
-// Тела в движении внутри шага. origin и facing — позы начала кадра: от них считаются сдвиг и поворот,
-// по которым контакт знает нынешний зазор. Позы и скорости перед последним сдвигом запоминаются:
-// к ним шаг возвращается, если сдвиг приходится повторить (MissedContacts).
 // job(i) для count независимых заданий: каждое пишет только в своё место, поэтому ответ от числа потоков
 // не зависит. Раздаются пулу кусками — поток читает память подряд; малое число дешевле сделать на месте.
 template <class Job> void eachOf(size_t count, const Job& job) {
@@ -88,6 +85,9 @@ template <class Job> void eachOf(size_t count, const Job& job) {
     });
 }
 
+// Тела в движении внутри шага. origin и facing — позы начала кадра: от них считаются сдвиг и поворот,
+// по которым контакт знает нынешний зазор. Позы и скорости перед последним сдвигом запоминаются:
+// к ним шаг возвращается, если сдвиг приходится повторить (MissedContacts).
 struct Moving {
     struct Pose {
         Vector3 position, angularMomentum;
