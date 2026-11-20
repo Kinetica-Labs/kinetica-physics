@@ -48,6 +48,7 @@ private:
     const std::vector<ContactPair>& listed_; // пары шага
     StepArray<ContactPair> adopted_;         // пары, найденные посреди шага: их номера идут следом
     StepArray<size_t> owner_;
+    StepArray<int> bodyA_, bodyB_;      // тела пары: первый отсев идёт по плотным массивам, запись пары (624 байта) не читается
     StepArray<Real> radiusA_, radiusB_; // охватывающие радиусы частей пары от центров масс тел
     StepArray<Real> known_;             // глубина пары до сдвига
     Real depth_, boundary_;

@@ -97,8 +97,23 @@ struct Moving {
     StepArray<SolverBody>& states;
     StepArray<Pose> origin, before;
     StepArray<SolverBody> statesBefore;
+    // Охватывающие радиусы подвижных тел — один раз за шаг: радиус лежит в форме, за указателем, и читать
+    // его у каждого тела каждый подшаг значило ждать память. У неподвижного тела формы может не быть.
+    StepArray<Real> radius;
 
-    Moving(std::vector<Body>& all, StepArray<SolverBody>& solved) : bodies(all), states(solved) { origin = poses(); }
+    Moving(std::vector<Body>& all, StepArray<SolverBody>& solved) : bodies(all), states(solved), radius(all.size(), 0) {
+        origin = poses();
+        for (size_t i = 0; i < bodies.size(); ++i)
+            if (states[i].inverseMass != 0) radius[i] = bodies[i].boundingRadius();
+    }
+    // Какие тела движутся: скорость точки тела больше speed. Выталкивание вдавленных тел разгоняет их и в
+    // покое: тогда второе решение нормалей нужно, чтобы снять эту скорость (без него тела, вдавленные на
+    // 10 см, разлетались на 1,7 м/с).
+    StepArray<char> stirred(Real speed) const {
+        StepArray<char> fast(states.size(), 0);
+        for (size_t i = 0; i < states.size(); ++i) fast[i] = states[i].inverseMass != 0 && states[i].v.length() + states[i].w.length() * radius[i] > speed;
+        return fast;
+    }
     StepArray<Pose> poses() const {
         StepArray<Pose> now(bodies.size());
         for (size_t i = 0; i < bodies.size(); ++i) now[i] = {bodies[i].position, bodies[i].angularMomentum, bodies[i].orientation};
@@ -241,15 +256,6 @@ struct LiveContacts {
     }
 };
 
-// Какие тела движутся: скорость точки тела больше speed. Выталкивание вдавленных тел разгоняет их и в
-// покое: тогда второе решение нормалей нужно, чтобы снять эту скорость (без него тела, вдавленные на
-// 10 см, разлетались на 1,7 м/с).
-StepArray<char> stirred(const std::vector<Body>& bodies, const StepArray<SolverBody>& states, Real speed) {
-    StepArray<char> moving(bodies.size(), 0);
-    for (size_t i = 0; i < bodies.size(); ++i) moving[i] = states[i].inverseMass != 0 && states[i].v.length() + states[i].w.length() * bodies[i].boundingRadius() > speed;
-    return moving;
-}
-
 // Конец шага: скорости решателя — в импульсы тел, накопленные импульсы контактов — в память.
 void finish(std::vector<Body>& bodies, const StepArray<SolverBody>& states, const StepArray<SoftContact>& contacts, ContactForces& memory, Real h) {
     for (size_t i = 0; i < bodies.size(); ++i)
@@ -292,8 +298,8 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
         live.solveAndMove(moving, h, (substeps - substep) * h);
         rows.build(joints, bodies, states, jointMemory, directJoints);
         rows.solve(states, false, jointCorrection, h, jointSoft, pushSpeed), notify(observer, StepStage::Joints);
-        const StepArray<char> moving = stirred(bodies, states, restSpeed);
-        if (restSpeed == 0 || std::find(moving.begin(), moving.end(), 1) != moving.end()) normals.solve(contacts, bodies, states, false, h, pushSpeed, restSpeed > 0 ? &moving : nullptr);
+        const StepArray<char> stirred = moving.stirred(restSpeed);
+        if (restSpeed == 0 || std::find(stirred.begin(), stirred.end(), 1) != stirred.end()) normals.solve(contacts, bodies, states, false, h, pushSpeed, restSpeed > 0 ? &stirred : nullptr);
         notify(observer, StepStage::Normals);
         for (size_t c = 0; c < contacts.size(); ++c) SoftContact::prefetchAhead(contacts, states, c), contacts[c].solveFriction(states, rollingResistance);
         notify(observer, StepStage::Friction);
