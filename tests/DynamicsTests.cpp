@@ -1116,7 +1116,24 @@ static void stepMemoryReturnsPerThread() {
     other.join();
 }
 
+// Часть запаса возвращается раньше конца шага: рабочие массивы одного решения системы отдаются
+// сразу, иначе шаг с сотнями тысяч решений держит память каждого (рывок за куб пирамиды в точном
+// шаге занимал 2,7 ГБ за две минуты). Массив, созданный до отметки, остаётся цел.
+static void stepMemoryScopeReturnsEarly() {
+    const StepMemory step;
+    StepArray<int> kept(100, 7);
+    const size_t before = StepMemory::held();
+    for (int round = 0; round < 1000; ++round) {
+        const StepMemory::Scope scope;
+        const StepArray<double> work(10000, 1.0);
+        CHECK(StepMemory::held() > before, "внутри отметки занято %zu байт, до неё %zu", StepMemory::held(), before);
+    }
+    CHECK(StepMemory::held() == before, "после тысячи отметок занято %zu байт, до них %zu", StepMemory::held(), before);
+    CHECK(kept.front() == 7 && kept.back() == 7, "массив до отметки: %d … %d", kept.front(), kept.back());
+}
+
 void dynamicsTests() {
+    stepMemoryScopeReturnsEarly();
     dampingDecaysAndDoesNotHold();
     freeRotationConserves();
     freeFall();

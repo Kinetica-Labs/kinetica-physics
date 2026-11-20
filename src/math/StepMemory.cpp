@@ -37,6 +37,14 @@ struct Reserve {
         for (size_t k = 0; wipe && k < blocks.size(); ++k) std::memset(blocks[k], 0xFF, sizes[k]);
         block = 0, used = 0;
     }
+    // Отдать всё, что взято после отметки (toBlock, toUsed).
+    void release(size_t toBlock, size_t toUsed, bool wipe) {
+        for (size_t k = toBlock; wipe && k < blocks.size() && k <= block; ++k) {
+            const size_t from = k == toBlock ? toUsed : 0, to = k == block ? used : sizes[k];
+            if (to > from) std::memset(blocks[k] + from, 0xFF, to - from);
+        }
+        block = toBlock, used = toUsed;
+    }
     size_t held() const {
         size_t bytes = used;
         for (size_t k = 0; k < block; ++k) bytes += sizes[k];
@@ -100,6 +108,10 @@ void* StepMemory::take(size_t bytes) {
     memory[0] = stepped ? kFromStep : kFromHeap;
     return memory + kHeader;
 }
+
+StepMemory::Scope::Scope() : block_(reserve.block), used_(reserve.used) {}
+
+StepMemory::Scope::~Scope() { reserve.release(block_, used_, registry().wipe); }
 
 size_t StepMemory::held() { return reserve.held(); }
 

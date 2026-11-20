@@ -47,6 +47,7 @@ char& ActiveSet::pressing(size_t i) {
 // односторонних — в margin_. Сначала разложение в осях тел (BodySpaceSolve); если оно дороже
 // профиля — Холецкий по профилю.
 void ActiveSet::solveOn(StepArray<Real>& force) {
+    const StepMemory::Scope scope; // force и margin_ созданы раньше и здесь не растут
     const StepArray<char>& unknown = *unknown_;
     const size_t total = system_.lines.size();
     StepArray<size_t> active;
@@ -90,6 +91,7 @@ void ActiveSet::solveOn(StepArray<Real>& force) {
 bool ActiveSet::permute(StepArray<Real>& force) {
     int fewest = int(sided_.size()) + 1, patience = 10;
     for (;;) {
+        const StepMemory::Scope scope;
         solveOn(force);
         StepArray<size_t> violated;
         for (size_t i : sided_) {
