@@ -47,6 +47,12 @@ struct BlockWork {
 thread_local BlockWork work;
 constexpr std::uint32_t kEdgePair = 0xC0000000u; // номер точки пары рёбер (HullVsHullAlgorithm::clipFaces)
 
+// Средний поворот двух тел: кватернионы складываются в одном полушарии. Нужен только паре рёбер.
+Quaternion meanTurn(const Quaternion& p, const Quaternion& q) {
+    const Real same = p.w * q.w + p.x * q.x + p.y * q.y + p.z * q.z < 0 ? Real(-1) : Real(1);
+    return Quaternion{p.w + same * q.w, p.x + same * q.x, p.y + same * q.y, p.z + same * q.z}.unit();
+}
+
 // Отклик трения в центре площадки: обратная матрица 2 × 2 в касательной плоскости и обратный отклик
 // вращения вокруг нормали.
 struct FrictionMass {
@@ -128,9 +134,7 @@ void SoftContact::aim(const BodyMotion& a, const BodyMotion& b, Vector3 apart, c
         if (between.length() > 0) normal_ = (1 / between.length()) * between;
         tangent1_ = tangent10_;
     } else {
-        const Real same = a.turned.w * b.turned.w + a.turned.x * b.turned.x + a.turned.y * b.turned.y + a.turned.z * b.turned.z < 0 ? Real(-1) : Real(1);
-        const Quaternion mean = Quaternion{a.turned.w + same * b.turned.w, a.turned.x + same * b.turned.x, a.turned.y + same * b.turned.y, a.turned.z + same * b.turned.z}.unit();
-        const Quaternion turn = edges_ ? mean : faceOnB_ ? b.turned : a.turned;
+        const Quaternion turn = edges_ ? meanTurn(a.turned, b.turned) : faceOnB_ ? b.turned : a.turned;
         normal_ = turn.rotate(normal0_), tangent1_ = turn.rotate(tangent10_), tangent2_ = turn.rotate(tangent20_);
         if (!found) return;
         normal_ = found->normal;
