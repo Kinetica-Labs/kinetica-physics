@@ -5,7 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 kinetica-physics — движок твёрдых тел на C++17 (только стандартная библиотека), библиотека
 `libkinetica-physics.a`, пространство имён `kp`, общий заголовок `<physics.h>`. Обзор для людей —
 `README.md`; цель, стандарт кода и обоснование каждого решения — `docs/DEVELOPMENT.md`; как движок
-делался, по датам — `docs/JOURNAL.md` (запись добавляется в конце шага, вместе с коммитом).
+делался, по датам — `docs/JOURNAL.md` (запись добавляется в конце шага, вместе с коммитом); сверхцели с порогами и очередь
+оптимизаций — `docs/ROADMAP.md` (следующую правку скорости брать оттуда).
 
 Родительский `~/GIT/CLAUDE.md` описывает istereolab-sdk: его сборка (`sdk_master.sh`, `bin/ctx`,
 `ISTEREOLAB_LIBS_DIR`) сюда не относится, действуют только общие правила стиля.
@@ -15,12 +16,15 @@ kinetica-physics — движок твёрдых тел на C++17 (только
 ```
 cmake -B build && cmake --build build -j                # библиотека, проверки, примеры, приборы (Release)
 ctest --test-dir build                                  # unit-tests, no-libm, contact-patch-lemmas (если есть z3), why3-models (если есть why3)
-ctest --test-dir build -R no-libm                       # один из трёх тестов ctest
+ctest --test-dir build -R no-libm                       # один тест ctest по имени (всего их до четырёх)
 ./build/tests/unit-tests                                # все модульные проверки; отказ печатает файл:строку и числа
 z3 proofs/<лемма>.smt2                                  # одна лемма: доказана, если ответ unsat
 ./proofs/check.sh                                       # все леммы и дыры (counterexamples/ обязаны быть sat)
 ./proofs/why3/check.sh                                  # модели Why3: каждое условие проверки доказано Z3 или Alt-Ergo
-cmake -B build -DKP_VIEWER=ON && ./build/viewer/viewer --scene N   # окно; тянет GLFW и ImGui через FetchContent
+cmake -B build -DKP_VIEWER=ON && cmake --build build -j # окно; тянет GLFW и ImGui через FetchContent
+./build/viewer/viewer --scene N [--exact 1]             # быстрый шаг по умолчанию, --exact 1 — точный
+./build/viewer/viewer --scene N --frames 150 --screenshot кадр.ppm   # закрывается само, пишет последний кадр;
+                                                        # --record префикс — каждый кадр (нужен графический экран)
 python3 validation/code_metrics.py [--all|--json|--check]  # стандарт кода: длинные функции, классы, слои, битые ссылки;
                                                         # --check — ошибка при любом нарушении (так в CI): сейчас нарушений 0
 python3 validation/run.py run|box3d|report              # табло против Box3D → docs/reports/engine-comparison.md
@@ -34,6 +38,13 @@ BENCH=14 build/box3d/compare-box3d 8                    # то же у Box3D —
 `tests/PropertyTests.cpp` — случайные проверки утверждений, намеченных к доказательству (10⁵ входов
 на утверждение, свой генератор с постоянным зерном); там же «дыры» — утверждения, про которые
 известно, что они неверны (`expectSome`).
+
+Лемма `proofs/*.smt2` — посылки и отрицание вывода **последним** `assert`: `check.sh` требует `unsat`
+целиком и `sat` без последнего утверждения (иначе посылки противоречат сами себе и доказательство
+пусто). Дыра в `proofs/counterexamples/` обязана быть `sat` и лежит там, пока алгоритм её не закрыл.
+
+CI (`.github/workflows/build.yml`) на каждый пуш в `main` и запрос на слияние: сборка, `ctest`,
+`diff` хэша состояния с эталоном, `code_metrics.py --check`. Перед коммитом — те же четыре команды.
 
 Регрессия после правки (порядок из практики):
 
@@ -51,6 +62,9 @@ KP_REALTIME=1 ./build/validation/studies/study-standard-scenes [rows.jsonl] [б�
 бит в бит. Строки «точный» совпадают всегда; «быстрый» — если правка не касалась `time_stepping`.
 Если физика меняется намеренно, эталон перезаписывается этой же командой, и это видно в diff.
 `KP_SLEEP=1` включает сон островов в `study-standard-scenes`.
+Ключи приборов — переменные окружения `KP_*`, перечислены в шапке каждого `validation/studies/*.cpp`.
+Библиотека читает из окружения только `KP_STEP_MEMORY`; `KP_THREADS` разбирает сам прибор
+(`WorkerPool::shared().resize(n)`) — новый прибор обязан делать то же, иначе хэш по потокам не проверить.
 Время кадра в окне меряется `KP_PACED=1 study-frame-times`: в темпе окна ядра между кадрами сбрасывают
 частоту (профиль питания `balanced`), и шаг стоит в 2–3 раза дороже, чем при счёте подряд.
 Перекрытие сцены с ударами (куча, чаша) с одного прогона — случайное число: сцена хаотична. Мерить
@@ -150,6 +164,10 @@ H16–H27 в журнале попыток; не начинать его зан�
   `docs/DEVELOPMENT.md`. Идентификаторы по-английски, комментарии по-русски: над методом — формула
   в обозначениях кода, источник, единицы; внутри — только неочевидная причина.
 - Сильные типы (`BodyId` — `enum class`, не `int`).
+- Вещественное число — только `Real` (`math/math_functions.h`, сейчас `double`); слов `double` и
+  `float` в `src/` и `include/` больше нигде нет, допуски выражаются через `kEpsilon`. Замена на
+  `float` целиком отклонена замером (H54 в журнале попыток): ломаются `IslandNormals`, `QuickHull`
+  и тысячи модульных проверок.
 
 **Процесс:**
 - Тест или прибор с эталоном раньше кода; где эталон аналитический, допуск записывается до прогона.
@@ -160,5 +178,5 @@ H16–H27 в журнале попыток; не начинать его зан�
 ## Что ещё не перенесено
 
 Репозиторий переехал из `~/GIT/REAL_FLLOW_RB`. Ещё там: серии табло A–I и их журнал
-`results.jsonl`; `validation/README.md` здесь — их отчёт от 2026-11-14, до переноса не обновляется. `research/refs` (клоны чужих движков, вне git) — символическая ссылка в старую
+`results.jsonl` (здешний `validation/results.jsonl` — другой журнал: сравнение движков, его пишет `run.py`); `validation/README.md` здесь — их отчёт от 2026-11-14, до переноса не обновляется. `research/refs` (клоны чужих движков, вне git) — символическая ссылка в старую
 папку; восстановить без неё: `python3 research/facts.py restore`.
