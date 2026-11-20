@@ -250,6 +250,7 @@ flowchart LR
 | Документ | О чём |
 |---|---|
 | [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) | цель, стандарт кода, имена, решения по подсистемам, этапы |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | сверхцели с порогами и командами замера, очередь оптимизаций от памяти до сборки |
 | [`docs/JOURNAL.md`](docs/JOURNAL.md) | журнал разработки: как движок делался, по датам — что хотели, что вышло, что нет |
 | [`docs/reports/engine-comparison.md`](docs/reports/engine-comparison.md) | табло против Box3D: 16 вариантов каждой сцены, критерий знаков, дрожь |
 | [`docs/VALIDATION.md`](docs/VALIDATION.md) | испытания точности и их допуски |

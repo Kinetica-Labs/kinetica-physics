@@ -26,6 +26,7 @@ PairReach::PairReach(const std::vector<Body>& bodies, const std::vector<ContactP
             least_[i] = k ? std::min(least_[i], c) : c, most_[i] = std::max(most_[i], c);
         }
     }
+    listed_.reserve(pairs.size());
     for (const ContactPair& pair : pairs) listed_.push_back({pair.a, pair.b, pair.partA, pair.partB});
     std::sort(listed_.begin(), listed_.end());
     allow(bodies, time);

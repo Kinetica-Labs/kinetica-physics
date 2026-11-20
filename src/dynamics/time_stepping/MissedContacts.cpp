@@ -7,6 +7,7 @@ namespace kp {
 
 MissedContacts::MissedContacts(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, StepArray<size_t> owner, Real depth, Real boundary)
     : owner_(std::move(owner)), depth_(depth), boundary_(boundary) {
+    pairs_.reserve(pairs.size()), radiusA_.reserve(pairs.size()), radiusB_.reserve(pairs.size());
     for (const ContactPair& pair : pairs) adopt(pair, bodies, false);
 }
 

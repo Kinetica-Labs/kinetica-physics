@@ -18,10 +18,11 @@ namespace kp {
 
 class SoftContact {
 public:
-    // Плечи, массы и центр трения считаются один раз на кадр; накопленные импульсы — из memory.
+    // Плечи, массы и центр трения считаются один раз на кадр; накопленные импульсы — из known, записей
+    // сил этой пары с прошлого шага (ContactForces::of); у контакта, найденного посреди шага, их нет.
     // Контакт может появиться и посреди шага (MissedContacts): смещения и повороты тел он отсчитывает
     // от момента своего создания. tracked — у круглых тел ближайшие точки ищутся заново внутри шага.
-    SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, const Softness& soft, const ContactForces& memory, Real h, bool fourPoints,
+    SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, const Softness& soft, Span<ContactForces::Entry> known, Real h, bool fourPoints,
                 bool tracked);
     // Контакт идёт за телами внутри шага мира (вызывается после каждого перемещения тел). Нормаль и
     // касательные поворачиваются с телом, которому принадлежит грань контакта; у пары рёбер — со средним
@@ -72,7 +73,7 @@ public:
     void remember(ContactForces& memory, Real h) const;
 
 private:
-    Vector3 takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, const ContactForces& memory, Real h, bool fourPoints);
+    Vector3 takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, Span<ContactForces::Entry> known, Real h, bool fourPoints);
     // Нынешние нормаль и касательные; found — ближайшие точки форм, найденные заново, или nullptr.
     void aim(const BodyMotion& a, const BodyMotion& b, Vector3 apart, const ClosestPoints* found);
 
@@ -85,7 +86,7 @@ private:
         Vector3 coreA, coreB; // плечи ядер в начале кадра: точка за вычетом радиуса скругления вдоль нормали
         Real base, gap;     // зазор при создании контакта и нынешний: base + n · (расхождение точек тел с тех пор)
         Real found;         // зазор, с которым точка найдена
-        Real normalMass, lever;
+        Real normalMass, lever; // normalMass и approach считаются только у пары с отскоком: их читает один bounce
         Real approach;      // нормальная скорость до шага: по ней считается отскок
         Real impulse = 0;
     };

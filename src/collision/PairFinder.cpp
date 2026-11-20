@@ -139,6 +139,7 @@ std::vector<ContactPair> PairFinder::pairs(Real h) const {
     else WorkerPool::shared().run(candidates.size(), examine);
     size_t total = 0;
     StepArray<ManifoldMemory::Entry> kept;
+    kept.reserve(memory ? found.size() : 0);
     for (const Found& some : found) {
         total += some.pairs.size();
         if (some.kept) kept.push_back(*some.kept);

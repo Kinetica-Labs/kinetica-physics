@@ -35,16 +35,23 @@ struct ContactMaker {
     bool fourPoints;
 
     // tracked — у круглых тел контакт заново ищет ближайшие точки внутри шага (SoftContact::follow).
-    SoftContact make(const ContactPair& pair, const ContactForces& memory, bool tracked) const {
+    // known — силы пары с прошлого шага; у контакта, найденного посреди шага, их нет: тёплый старт
+    // его импульсов к телам не прикладывал.
+    SoftContact make(const ContactPair& pair, bool tracked, Span<ContactForces::Entry> known = {}) const {
         const bool fixed = bodies[size_t(pair.a)].isStatic() || bodies[size_t(pair.b)].isStatic();
-        return SoftContact(pair, bodies, states, fixed ? staticSoft : soft, memory, h, fourPoints, tracked);
+        return SoftContact(pair, bodies, states, fixed ? staticSoft : soft, known, h, fourPoints, tracked);
     }
     // Контакты пар, у которых есть точки; owner — номер пары каждого контакта.
     StepArray<SoftContact> all(const std::vector<ContactPair>& pairs, const ContactForces& memory, StepArray<size_t>& owner) const {
         StepArray<SoftContact> contacts;
+        contacts.reserve(pairs.size()), owner.reserve(pairs.size());
+        const ContactForces::Entry* next = memory.begin();
         for (size_t p = 0; p < pairs.size(); ++p) {
-            if (pairs[p].manifold.count == 0 || (bodies[size_t(pairs[p].a)].isStatic() && bodies[size_t(pairs[p].b)].isStatic())) continue;
-            contacts.push_back(make(pairs[p], memory, true)), owner.push_back(p);
+            const ContactPair& pair = pairs[p];
+            if (pair.manifold.count == 0 || (bodies[size_t(pair.a)].isStatic() && bodies[size_t(pair.b)].isStatic())) continue;
+            const Span<ContactForces::Entry> known = memory.of({pair.a, pair.b, 0, pair.partA, pair.partB}, next);
+            next = known.end();
+            contacts.push_back(make(pair, true, known)), owner.push_back(p);
         }
         return contacts;
     }
@@ -166,8 +173,6 @@ struct LiveContacts {
     const ContactMaker& maker;
     const JointSet& joints;
     Real pushSpeed, bounceSpeed, boundary;
-    // У контакта, найденного посреди шага, накопленных импульсов нет: тёплый старт их к телам не прикладывал.
-    ContactForces fresh;
 
     // true — какое-то тело выходит за досягаемость списка пар, и нашлись новые пары с точками контакта.
     bool discover(Moving& moving, Real h, Real remaining) {
@@ -176,7 +181,7 @@ struct LiveContacts {
         bool added = false;
         for (const ContactPair& pair : reach.discover(moving.bodies, joints, remaining, boundary)) {
             missed.adopt(pair, moving.bodies, pair.manifold.count > 0);
-            if (pair.manifold.count > 0) contacts.push_back(maker.make(pair, fresh, true)), added = true;
+            if (pair.manifold.count > 0) contacts.push_back(maker.make(pair, true)), added = true;
         }
         return added;
     }
@@ -189,7 +194,7 @@ struct LiveContacts {
     // пробный: если после него нашлись пропущенные контакты, тела возвращаются и нормали решаются
     // снова, уже с ними.
     void solveAndMove(Moving& moving, Real h, Real remaining) {
-        const MissedContacts::Maker untracked = [&](const ContactPair& pair) { return maker.make(pair, fresh, false); };
+        const MissedContacts::Maker untracked = [&](const ContactPair& pair) { return maker.make(pair, false); };
         for (int round = 0;; ++round) {
             impact(moving, h);
             for (int k = 0; k < kRechecks && discover(moving, h, remaining); ++k) impact(moving, h);
@@ -235,7 +240,7 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
     JointRows rows;
     rows.build(joints, bodies, states, jointMemory, directJoints);
     IslandNormals normals(directContactRows, soft.biasRate);
-    LiveContacts live{contacts, normals, missed, reach, maker, joints, pushSpeed, bounceSpeed, edgeSlop, {}};
+    LiveContacts live{contacts, normals, missed, reach, maker, joints, pushSpeed, bounceSpeed, edgeSlop};
 
     for (int substep = 0; substep < substeps; ++substep) {
         applyForces(states, bodies, gravity, h);

@@ -1,6 +1,7 @@
 #pragma once
 // Силы в точках контакта, запомненные между отрезками шага: тёплый старт решателя.
 
+#include <math/Span.h>
 #include <math/Vector3.h>
 
 #include <algorithm>
@@ -16,9 +17,10 @@ struct ContactId {
     int a, b;
     std::uint32_t id;
     int partA = 0, partB = 0;
-    bool operator<(const ContactId& o) const {
-        return a != o.a ? a < o.a : b != o.b ? b < o.b : partA != o.partA ? partA < o.partA : partB != o.partB ? partB < o.partB : id < o.id;
-    }
+    // Порядок: тела, части, номер точки — точки одной пары тел и частей стоят в массиве подряд.
+    bool samePair(const ContactId& o) const { return a == o.a && b == o.b && partA == o.partA && partB == o.partB; }
+    bool pairBefore(const ContactId& o) const { return a != o.a ? a < o.a : b != o.b ? b < o.b : partA != o.partA ? partA < o.partA : partB < o.partB; }
+    bool operator<(const ContactId& o) const { return samePair(o) ? id < o.id : pairBefore(o); }
 };
 
 // Сила в точке контакта: импульс за единицу времени. Хранится сила, а не импульс, потому что
@@ -48,6 +50,17 @@ public:
     const Entry* find(const ContactId& key) const {
         const auto after = std::upper_bound(entries_.begin(), entries_.end(), key, [](const ContactId& k, const Entry& e) { return k < e.first; });
         return after != entries_.begin() && !((after - 1)->first < key) ? &*(after - 1) : end();
+    }
+    // Записи всех точек пары тел и частей pair (номер точки в pair не читается), по порядку ключей.
+    // Пары спрашивают по порядку, поэтому поиск начинается с hint — конца отрезка прошлой пары (в первый
+    // раз begin()); двоичный поиск нужен, только когда следующая по порядку пара записей не оставила.
+    Span<Entry> of(const ContactId& pair, const Entry* hint) const {
+        const Entry* first = hint;
+        if (first == end() || !first->first.samePair(pair))
+            first = std::lower_bound(begin(), end(), pair, [](const Entry& e, const ContactId& k) { return e.first.pairBefore(k); });
+        const Entry* last = first;
+        while (last != end() && last->first.samePair(pair)) ++last;
+        return {first, size_t(last - first)};
     }
     const Entry* begin() const { return entries_.data(); }
     const Entry* end() const { return entries_.data() + entries_.size(); }
