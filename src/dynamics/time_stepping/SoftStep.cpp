@@ -57,6 +57,13 @@ struct ContactMaker {
     }
 };
 
+// Наибольшая глубина, на которую вошли точки контакта, м; ноль — ни одна не вошла.
+Real deepestOf(const SoftContact& contact) {
+    Real depth = 0;
+    for (size_t k = 0; k < contact.pointCount(); ++k) depth = std::max(depth, -contact.normalRow(k).gap);
+    return depth;
+}
+
 // Момент импульса по угловой скорости: L = R I Rᵀ ω, I — главные моменты тела.
 Vector3 momentumOf(const Body& body, Vector3 w) {
     const Vector3 inertia{1 / body.mass.inverseInertia.x, 1 / body.mass.inverseInertia.y, 1 / body.mass.inverseInertia.z};
@@ -203,7 +210,7 @@ struct LiveContacts {
             for (int k = 0; k < kRechecks && discover(moving, h, remaining); ++k) impact(moving, h);
             notify(observer, StepStage::Recheck);
             missed.forget(), moving.advance(h);
-            for (size_t c = 0; c < contacts.size(); ++c) missed.note(c, contacts[c].deepest()), contacts[c].follow(moving.states);
+            for (size_t c = 0; c < contacts.size(); ++c) missed.note(c, deepestOf(contacts[c])), contacts[c].follow(moving.states);
             notify(observer, StepStage::Motion);
             const size_t known = contacts.size();
             const bool found = round != kRechecks && missed.find(contacts, moving.bodies, moving.states, h, untracked);

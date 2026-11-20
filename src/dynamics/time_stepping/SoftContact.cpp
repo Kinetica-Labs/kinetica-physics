@@ -53,21 +53,6 @@ Quaternion meanTurn(const Quaternion& p, const Quaternion& q) {
     return Quaternion{p.w + same * q.w, p.x + same * q.x, p.y + same * q.y, p.z + same * q.z}.unit();
 }
 
-// Отклик трения в центре площадки: обратная матрица 2 × 2 в касательной плоскости и обратный отклик
-// вращения вокруг нормали.
-struct FrictionMass {
-    Matrix2x2 tangent;
-    Real twist;
-};
-FrictionMass frictionMassOf(const SolverBody& a, const SolverBody& b, Vector3 centreA, Vector3 centreB, Vector3 t1, Vector3 t2, Vector3 n) {
-    const Vector3 a1 = centreA.cross(t1), a2 = centreA.cross(t2), b1 = centreB.cross(t1), b2 = centreB.cross(t2);
-    const Real k11 = a.inverseMass + b.inverseMass + a1.dot(a.spinFrom(a1)) + b1.dot(b.spinFrom(b1));
-    const Real k22 = a.inverseMass + b.inverseMass + a2.dot(a.spinFrom(a2)) + b2.dot(b.spinFrom(b2));
-    const Real k12 = a1.dot(a.spinFrom(a2)) + b1.dot(b.spinFrom(b2));
-    const Real around = n.dot(a.spinFrom(n) + b.spinFrom(n));
-    return {Matrix2x2{k11, k12, k12, k22}.inverse(), around > 0 ? 1 / around : 0};
-}
-
 } // namespace
 
 SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, const Softness& soft, Span<ContactForces::Entry> known, Real h, bool fourPoints,
@@ -78,24 +63,21 @@ SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodie
     if (tracked && ((roundA_ > 0 && roundB_ > 0) || (roundA_ + roundB_ > 0 && pair.manifold.count == 1))) shapes_.track(bodyA.part(pair.partA), bodyB.part(pair.partB));
     const Vector3 aside = abs(normal_.x) < Real(0.57) ? Vector3{1, 0, 0} : Vector3{0, 1, 0};
     tangent1_ = normal_.cross(aside), tangent1_ = (1 / tangent1_.length()) * tangent1_, tangent2_ = normal_.cross(tangent1_);
-    friction_ = sqrt(bodyA.friction * bodyB.friction), restitution_ = std::max(bodyA.restitution, bodyB.restitution);
-    const Vector3 rubbed = takePoints(pair, bodyA.position, bodyB.position, a, b, known, h, fourPoints);
+    friction_.coefficient = sqrt(bodyA.friction * bodyB.friction), restitution_ = std::max(bodyA.restitution, bodyB.restitution);
+    const CentreFriction::Carried rubbed = takePoints(pair, bodyA.position, bodyB.position, a, b, known, h, fourPoints);
     normal0_ = normal_, tangent10_ = tangent1_, tangent20_ = tangent2_, apart_ = bodyB.position - bodyA.position;
     createdA_ = {a.moved, a.turned}, createdB_ = {b.moved, b.turned};
     edges_ = points_.size() == 1 && roundA_ == 0 && roundB_ == 0 && (points_[0].key.id & kEdgePair) == kEdgePair;
-    rub_ = {rubbed.dot(tangent1_), rubbed.dot(tangent2_)};
-    const FrictionMass mass = frictionMassOf(a, b, centreA_, centreB_, tangent1_, tangent2_, normal_);
-    tangentMass_ = mass.tangent, twistMass_ = mass.twist;
-    rolling_.prepare(a, b, tangent1_, tangent2_);
+    friction_.prepare(a, b, frame(), rubbed);
 }
 
 // Точки площадки с плечами от центров масс xA и xB, их массы и накопленные импульсы из known (берётся
 // последняя запись с номером точки); центр трения — среднее точек с весом по зазору. Возвращает
 // накопленный импульс трения пары, мир.
-Vector3 SoftContact::takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, Span<ContactForces::Entry> known, Real h, bool fourPoints) {
+CentreFriction::Carried SoftContact::takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, Span<ContactForces::Entry> known, Real h, bool fourPoints) {
     const Vector3 n = normal_;
     Real weights = 0;
-    Vector3 rubbed{};
+    CentreFriction::Carried rubbed;
     StepArray<int> kept(size_t(pair.manifold.count));
     if (fourPoints && pair.manifold.count > 4) kept = fourOf(pair.manifold);
     else std::iota(kept.begin(), kept.end(), 0);
@@ -115,7 +97,7 @@ Vector3 SoftContact::takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB,
         }
         size_t last = known.size();
         while (last > 0 && known[last - 1].first.id != contact.id) --last;
-        if (last > 0) p.impulse = h * known[last - 1].second.normal, rubbed += h * known[last - 1].second.tangent, twistImpulse_ += h * known[last - 1].second.twist;
+        if (last > 0) p.impulse = h * known[last - 1].second.normal, rubbed.rubbed += h * known[last - 1].second.tangent, rubbed.twist += h * known[last - 1].second.twist;
         const Real weight = std::max(kLeastWeight, std::min(Real(1), 2 - contact.separation / kSpeculative));
         centreA_ += weight * p.rA, centreB_ += weight * p.rB, weights += weight;
         points_.push_back(p);
@@ -178,9 +160,7 @@ void SoftContact::follow(const StepArray<SolverBody>& states) {
 void SoftContact::warmStart(StepArray<SolverBody>& states) const {
     SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
     for (const Point& p : points_) SolverBody::push(a, b, p.rA, p.rB, p.impulse * normal_);
-    SolverBody::twist(a, b, twistImpulse_ * normal_);
-    SolverBody::push(a, b, centreA_, centreB_, rub_.x * tangent1_ + rub_.y * tangent2_);
-    rolling_.warmStart(a, b, tangent1_, tangent2_);
+    friction_.warmStart(a, b, frame());
 }
 
 // K — отклик нынешних тел: у вытянутого тела тензор инерции в мире меняется за кадр, и точное
@@ -238,12 +218,6 @@ void SoftContact::solveNormals(StepArray<SolverBody>& states, bool withBias, Rea
     }
 }
 
-Real SoftContact::deepest() const {
-    Real depth = 0;
-    for (const Point& p : points_) depth = std::max(depth, -p.gap);
-    return depth;
-}
-
 void SoftContact::setNormalImpulse(StepArray<SolverBody>& states, size_t k, Real impulse) {
     Point& p = points_[k];
     SolverBody::push(states[size_t(a_)], states[size_t(b_)], p.rA, p.rB, (impulse - p.impulse) * normal_);
@@ -259,20 +233,9 @@ void SoftContact::matchTrial(const StepArray<SolverBody>& states, Real h) {
 }
 
 void SoftContact::solveFriction(StepArray<SolverBody>& states, Real rollingArm) {
-    SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
     Real load = 0, leverLoad = 0;
     for (const Point& p : points_) load += p.impulse, leverLoad += p.lever * p.impulse;
-    const Real turning = std::max(-friction_ * leverLoad, std::min(friction_ * leverLoad, twistImpulse_ - twistMass_ * normal_.dot(b.w - a.w)));
-    SolverBody::twist(a, b, (turning - twistImpulse_) * normal_);
-    twistImpulse_ = turning;
-    const Vector3 slip = b.v + b.w.cross(centreB_) - a.v - a.w.cross(centreA_);
-    const Real s1 = slip.dot(tangent1_), s2 = slip.dot(tangent2_);
-    Vector2 rub = rub_ - tangentMass_ * Vector2{s1, s2};
-    const Real size = rub.length(), limit = friction_ * load;
-    if (size > limit) rub = (limit / size) * rub;
-    SolverBody::push(a, b, centreA_, centreB_, (rub.x - rub_.x) * tangent1_ + (rub.y - rub_.y) * tangent2_);
-    rub_ = rub;
-    rolling_.solve(a, b, tangent1_, tangent2_, rollingArm, load);
+    friction_.solve(states[size_t(a_)], states[size_t(b_)], frame(), load, leverLoad, rollingArm);
 }
 
 // Удар становится свершившимся изменением скоростей: накопленный импульс точки обнуляется, иначе
@@ -292,7 +255,8 @@ void SoftContact::bounce(StepArray<SolverBody>& states, Real bounceSpeed) {
 
 void SoftContact::remember(ContactForces& memory, Real h) const {
     const Real share = 1 / (h * Real(points_.size()));
-    for (const Point& p : points_) memory[p.key] = {p.impulse / h, share * (rub_.x * tangent1_ + rub_.y * tangent2_), share * twistImpulse_};
+    const CentreFriction::Carried kept = friction_.carried(frame());
+    for (const Point& p : points_) memory[p.key] = {p.impulse / h, share * kept.rubbed, share * kept.twist};
 }
 
 } // namespace kp

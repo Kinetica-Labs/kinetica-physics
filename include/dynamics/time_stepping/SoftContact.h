@@ -8,7 +8,7 @@
 #include <math/Matrix2x2.h>
 #include <dynamics/ContactForces.h>
 #include <dynamics/time_stepping/Softness.h>
-#include <dynamics/time_stepping/RollingFriction.h>
+#include <dynamics/time_stepping/CentreFriction.h>
 #include <dynamics/time_stepping/SolverBody.h>
 #include <dynamics/time_stepping/TrackedShapes.h>
 
@@ -52,8 +52,6 @@ public:
         Real gap, impulse;
     };
     size_t pointCount() const { return points_.size(); }
-    // Наибольшая глубина, на которую вошли точки, м; ноль — ни одна не вошла.
-    Real deepest() const;
     NormalRow normalRow(size_t k) const { return {a_, b_, normal_, points_[k].rA, points_[k].rB, points_[k].gap, points_[k].impulse}; }
     void setNormalImpulse(StepArray<SolverBody>& states, size_t k, Real impulse);
     // Момент вокруг нормали в пределах μ Σ λ r, сила в пределах μ Σ λ; затем трение качения с
@@ -73,7 +71,7 @@ public:
     void remember(ContactForces& memory, Real h) const;
 
 private:
-    Vector3 takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, Span<ContactForces::Entry> known, Real h, bool fourPoints);
+    CentreFriction::Carried takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, Span<ContactForces::Entry> known, Real h, bool fourPoints);
     // Нынешние нормаль и касательные; found — ближайшие точки форм, найденные заново, или nullptr.
     void aim(const BodyMotion& a, const BodyMotion& b, Vector3 apart, const ClosestPoints* found);
 
@@ -100,13 +98,10 @@ private:
     // Слежение за формами: у двух круглых тел и у круглого тела с многогранником при одной точке.
     TrackedShapes shapes_;
     bool faceOnB_ = false, edges_ = false;
-    Real friction_ = 0, restitution_ = 0;
+    CentreFriction::Frame frame() const { return {normal_, tangent1_, tangent2_, centreA_, centreB_}; }
+    Real restitution_ = 0;
     Softness soft_;
-    Matrix2x2 tangentMass_; // обратная матрица отклика трения в центре
-    Real twistMass_ = 0;
-    Vector2 rub_; // накопленный импульс трения вдоль двух касательных
-    Real twistImpulse_ = 0;
-    RollingFriction rolling_;
+    CentreFriction friction_; // трение в центре точек — сила в касательной плоскости и момент вокруг нормали
 };
 
 } // namespace kp

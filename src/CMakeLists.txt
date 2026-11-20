@@ -38,6 +38,7 @@ add_library(kinetica-physics STATIC
   dynamics/time_stepping/MissedContacts.cpp
   dynamics/time_stepping/PairReach.cpp
   dynamics/time_stepping/RollingFriction.cpp
+  dynamics/time_stepping/CentreFriction.cpp
   dynamics/time_stepping/TrackedShapes.cpp
   dynamics/time_stepping/SoftJoint.cpp
   dynamics/time_stepping/DirectJoints.cpp
