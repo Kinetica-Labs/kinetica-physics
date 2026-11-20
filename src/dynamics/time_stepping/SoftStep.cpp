@@ -174,6 +174,7 @@ struct LiveContacts {
     const JointSet& joints;
     Real pushSpeed, bounceSpeed, boundary;
     const StageObserver& observer;
+    bool bounces; // есть ли тело с отскоком: без него проход отскока по контактам не нужен
 
     // true — какое-то тело выходит за досягаемость списка пар, и нашлись новые пары с точками контакта.
     bool discover(Moving& moving, Real h, Real remaining) {
@@ -189,6 +190,7 @@ struct LiveContacts {
     // Нормали с поправкой положения и отскок точек, принявших удар.
     void impact(Moving& moving, Real h) {
         normals.solve(contacts, moving.bodies, moving.states, true, h, pushSpeed);
+        if (!bounces) return;
         for (SoftContact& contact : contacts) contact.bounce(moving.states, bounceSpeed);
     }
     // Нормали с поправкой положения и сдвиг тел на h; remaining — время до конца обновления. Сдвиг
@@ -199,9 +201,9 @@ struct LiveContacts {
         for (int round = 0;; ++round) {
             impact(moving, h), notify(observer, StepStage::Normals);
             for (int k = 0; k < kRechecks && discover(moving, h, remaining); ++k) impact(moving, h);
-            missed.note(contacts), notify(observer, StepStage::Recheck);
-            moving.advance(h);
-            for (SoftContact& contact : contacts) contact.follow(moving.states);
+            notify(observer, StepStage::Recheck);
+            missed.forget(), moving.advance(h);
+            for (size_t c = 0; c < contacts.size(); ++c) missed.note(c, contacts[c].deepest()), contacts[c].follow(moving.states);
             notify(observer, StepStage::Motion);
             const size_t known = contacts.size();
             const bool found = round != kRechecks && missed.find(contacts, moving.bodies, moving.states, h, untracked);
@@ -244,7 +246,8 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
     JointRows rows;
     rows.build(joints, bodies, states, jointMemory, directJoints);
     IslandNormals normals(directContactRows, soft.biasRate);
-    LiveContacts live{contacts, normals, missed, reach, maker, joints, pushSpeed, bounceSpeed, edgeSlop, observer};
+    LiveContacts live{contacts, normals, missed, reach, maker, joints, pushSpeed, bounceSpeed, edgeSlop, observer,
+                      std::any_of(bodies.begin(), bodies.end(), [](const Body& body) { return body.restitution != 0; })};
     notify(observer, StepStage::Contacts);
     for (int substep = 0; substep < substeps; ++substep) {
         applyForces(states, bodies, gravity, h);

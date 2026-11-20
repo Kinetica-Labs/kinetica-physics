@@ -17,6 +17,7 @@
 #include <math/StepMemory.h>
 #include <dynamics/time_stepping/SoftContact.h>
 
+#include <algorithm>
 #include <functional>
 #include <vector>
 
@@ -30,8 +31,11 @@ public:
     MissedContacts(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, StepArray<size_t> owner, Real depth, Real boundary);
     // Пара, найденная посреди шага (PairReach); withContact — вызывающий дописывает в contacts её контакт.
     void adopt(const ContactPair& pair, const std::vector<Body>& bodies, bool withContact);
-    // Глубина каждой пары до сдвига — по точкам её контактов.
-    void note(const StepArray<SoftContact>& contacts);
+    // Глубина каждой пары до сдвига — наибольшая по её контактам: forget перед сдвигом, затем note на
+    // каждый контакт. Глубину контакт отдаёт в том же проходе, в котором идёт за телами (follow):
+    // отдельный проход по всем точкам ради неё стоил восьмой части обращений шага в память.
+    void forget() { known_.assign(pairCount(), 0); }
+    void note(size_t contact, Real depth) { known_[owner_[contact]] = std::max(known_[owner_[contact]], depth); }
     // Проверяет пары в позах после сдвига и дописывает недостающие контакты (их создаёт make);
     // h — подшаг. true — дописан хотя бы один.
     bool find(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, Real h, const Maker& make);

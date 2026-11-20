@@ -56,6 +56,9 @@ KP_REALTIME=1 ./build/validation/studies/study-standard-scenes [rows.jsonl] [б�
 ./build/validation/studies/study-scale [тел ...]        # цена кадра от числа тел: порознь, столбики, кладка
 ./build/validation/studies/study-frame-times [ключ_сцены] [секунды]   # рывки: медиана, 99 %, наибольший кадр
 KP_THREADS=1 ./build/validation/studies/study-frame-stages pyramid3d  # кадр по стадиям шага: куда уходит время
+KP_THREADS=1 BENCH=14 perf stat -e cycles:u,instructions:u,LLC-load-misses:u build/validation/engines/compare-ours realtime 8
+                                                        # счётчики вместо времени: такты шумят на 2–3 %, время — на 20 %;
+                                                        # perf работает при kernel.perf_event_paranoid ≤ 1 (сбрасывается перезагрузкой)
 ./build/validation/studies/study-allocations [ключ_сцены] [секунды]   # обращений к куче на кадр; KP_SITES=1 — откуда
 ```
 

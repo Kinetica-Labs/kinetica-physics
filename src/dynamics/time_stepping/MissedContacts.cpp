@@ -27,11 +27,6 @@ void MissedContacts::adopt(const ContactPair& pair, const std::vector<Body>& bod
     adopted_.push_back(pair), measure(pair, bodies);
 }
 
-void MissedContacts::note(const StepArray<SoftContact>& contacts) {
-    known_.assign(pairCount(), 0);
-    for (size_t c = 0; c < contacts.size(); ++c) known_[owner_[c]] = std::max(known_[owner_[c]], contacts[c].deepest());
-}
-
 // Полная проверка пары дорога, поэтому до неё три дешёвых отсева — каждый доказывает, что глубина
 // вырасти на допуск не могла:
 //   — точка тела движется не быстрее |v| + |ω| R, и за подшаг точки пары сближаются не больше чем на
