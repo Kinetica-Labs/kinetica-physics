@@ -2,3 +2,7 @@
 add_executable(compare-ours ours.cpp)
 target_link_libraries(compare-ours PRIVATE kinetica-physics)
 target_compile_options(compare-ours PRIVATE -Wall -Wextra -Wno-missing-field-initializers) # сцены — короткие списки полей
+# Опыт Л2: решатель AVBD на тех же сценах и на наших площадках (docs/ROADMAP.md, research/papers.md).
+add_executable(compare-avbd avbd.cpp)
+target_link_libraries(compare-avbd PRIVATE kinetica-physics)
+target_compile_options(compare-avbd PRIVATE -Wall -Wextra -Wno-missing-field-initializers)
