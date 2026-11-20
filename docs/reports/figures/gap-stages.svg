@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="346" font-family="sans-serif" font-size="13">
+<rect width="100%" height="100%" fill="white"/>
+<line x1="300" y1="24" x2="300" y2="306" stroke="#ddd"/>
+<text x="300" y="16" text-anchor="middle" fill="#555">0.1 мс</text>
+<line x1="463" y1="24" x2="463" y2="306" stroke="#ddd"/>
+<text x="463" y="16" text-anchor="middle" fill="#555">1 мс</text>
+<line x1="627" y1="24" x2="627" y2="306" stroke="#ddd"/>
+<text x="627" y="16" text-anchor="middle" fill="#555">10 мс</text>
+<line x1="790" y1="24" x2="790" y2="306" stroke="#ddd"/>
+<text x="790" y="16" text-anchor="middle" fill="#555">100 мс</text>
+<text x="290" y="52" text-anchor="end">поиск пар и точек контакта</text>
+<rect x="300" y="34" width="361" height="15" fill="#c0504d"/><text x="667" y="46">16.14 мс — мы</text>
+<rect x="300" y="51" width="136" height="15" fill="#4f81bd"/><text x="442" y="63">0.68 мс — Box3D (в 24 раз меньше)</text>
+<text x="290" y="98" text-anchor="end">постройка контактов для решателя</text>
+<rect x="300" y="80" width="321" height="15" fill="#c0504d"/><text x="627" y="92">9.21 мс — мы</text>
+<rect x="300" y="97" width="80" height="15" fill="#4f81bd"/><text x="386" y="109">0.31 мс — Box3D (в 30 раз меньше)</text>
+<text x="290" y="144" text-anchor="end">тёплый старт</text>
+<rect x="300" y="126" width="263" height="15" fill="#c0504d"/><text x="569" y="138">4.07 мс — мы</text>
+<rect x="300" y="143" width="118" height="15" fill="#4f81bd"/><text x="424" y="155">0.53 мс — Box3D (в 8 раз меньше)</text>
+<text x="290" y="190" text-anchor="end">нормали и трение</text>
+<rect x="300" y="172" width="403" height="15" fill="#c0504d"/><text x="709" y="184">29.25 мс — мы</text>
+<rect x="300" y="189" width="202" height="15" fill="#4f81bd"/><text x="508" y="201">1.73 мс — Box3D (в 17 раз меньше)</text>
+<text x="290" y="236" text-anchor="end">сдвиг тел и точек контакта</text>
+<rect x="300" y="218" width="300" height="15" fill="#c0504d"/><text x="606" y="230">6.83 мс — мы</text>
+<rect x="300" y="235" width="53" height="15" fill="#4f81bd"/><text x="359" y="247">0.21 мс — Box3D (в 33 раз меньше)</text>
+<text x="290" y="282" text-anchor="end">запись импульсов</text>
+<rect x="300" y="264" width="212" height="15" fill="#c0504d"/><text x="518" y="276">1.98 мс — мы</text>
+<rect x="300" y="281" width="33" height="15" fill="#4f81bd"/><text x="339" y="293">0.16 мс — Box3D (в 12 раз меньше)</text>
+<text x="300" y="332" fill="#555">Пирамида из 1 015 кубов, один поток, 8 подшагов; шкала логарифмическая</text></svg>

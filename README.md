@@ -254,6 +254,7 @@ flowchart LR
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | сверхцели с порогами и командами замера, очередь оптимизаций от памяти до сборки |
 | [`docs/JOURNAL.md`](docs/JOURNAL.md) | журнал разработки: как движок делался, по датам — что хотели, что вышло, что нет |
 | [`docs/reports/engine-comparison.md`](docs/reports/engine-comparison.md) | табло против Box3D: 16 вариантов каждой сцены, критерий знаков, дрожь |
+| [`docs/reports/gap-analysis.md`](docs/reports/gap-analysis.md) | что мы упускаем: кадр по стадиям против Box3D и порядок работ по скорости |
 | [`docs/reports/case-table.md`](docs/reports/case-table.md) | полная таблица случаев контакта: где движок ошибается, с рисунками |
 | [`docs/reports/standard-scenes.md`](docs/reports/standard-scenes.md) | стандартный набор сцен: пирамида, домино, цепь из торов, ведро в ведре и другие — чем кончаются и чего стоят |
 | [`proofs/`](proofs) | леммы площадки касания, проверяемые решателем Z3 (`proofs/check.sh`) |
