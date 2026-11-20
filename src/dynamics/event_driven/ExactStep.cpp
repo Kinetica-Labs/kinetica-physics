@@ -246,6 +246,23 @@ bool ExactStep::forcesPass(const std::vector<ContactPair>& pairs, Real h, int pa
     return pass == 0 && solver.setDrift(middleOf(before, forces, h)) * h >= kDriftResolved;
 }
 
+// Поправка связей — малая добавка к движению без неё: нарушение C в конце отрезка второго порядка
+// по повороту тел. Если она меняет поворот тела за отрезок больше чем на kMaxTurn, подбор разошёлся
+// (тяжёлый груз на лёгкой цепи): касательная поправка «−2 C / h» отклик уже не описывает, а честно
+// интегрировать такое пробное состояние — миллионы частей поворота (integratePosition). true —
+// отрезок слишком длинен; проход 0 идёт без поправки и запоминается как точка отсчёта.
+bool ExactStep::shakeDiverged(BondShake& shake, const std::vector<Body>& before, const Forces& forces, int pass, Real h) {
+    const std::vector<Body> middle = middleOf(before, forces, h);
+    if (pass == 0) shake.spin.clear();
+    bool diverged = false;
+    for (size_t i = 0; i < middle.size(); ++i) {
+        const Vector3 spin = middle[i].angularVelocity();
+        if (pass == 0) shake.spin.push_back(spin);
+        else diverged = diverged || (spin - shake.spin[i]).length() * h > kMaxTurn;
+    }
+    return diverged;
+}
+
 // Сила связи постоянна на отрезке и направлена как в его начале, а тела за отрезок
 // поворачиваются, и связь, выполненная «по касательной», в конце отрезка расходится. Поэтому
 // нарушение C в конце отрезка гасится поправкой −2 C / h к конечной скорости вдоль связи
@@ -255,6 +272,10 @@ bool ExactStep::forcesPass(const std::vector<ContactPair>& pairs, Real h, int pa
 // system with constraints», J. Comput. Phys. 23, 1977. false — подбор не сходится, отрезок
 // слишком длинен (его укоротит forcesWithin).
 bool ExactStep::shakeBonds(BondShake& shake, const std::vector<Body>& before, Forces& forces, int pass, Real h) const {
+    if (shakeDiverged(shake, before, forces, pass, h)) {
+        forces.resolved = false;
+        return false;
+    }
     std::vector<Body> end = before;
     for (size_t i = 0; i < end.size(); ++i) end[i] = advanced(before[i], forces.rates[i].force, forces.rates[i].torque, h);
     shake.errors.clear();

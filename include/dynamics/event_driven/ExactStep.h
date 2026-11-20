@@ -65,8 +65,10 @@ private:
     // Подбор сил связей сочленений по схеме SHAKE между проходами computeForces.
     struct BondShake {
         StepArray<Real> bias, errors, previousErrors;
+        StepArray<Vector3> spin; // угловые скорости тел в середине отрезка на проходе 0, без поправки связей
         Real previousError = std::numeric_limits<Real>::infinity(), relaxation = 1;
     };
+    static bool shakeDiverged(BondShake& shake, const std::vector<Body>& before, const Forces& forces, int pass, Real h);
     static std::vector<Body> middleOf(const std::vector<Body>& before, const Forces& forces, Real h);
     bool forcesPass(const std::vector<ContactPair>& pairs, Real h, int pass, const std::vector<Body>& before, const StepArray<Real>& bias, Forces& forces);
     bool shakeBonds(BondShake& shake, const std::vector<Body>& before, Forces& forces, int pass, Real h) const;
