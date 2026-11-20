@@ -7,6 +7,7 @@
 #include <dynamics/time_stepping/PairReach.h>
 #include <dynamics/time_stepping/SoftContact.h>
 #include <dynamics/time_stepping/SoftJoint.h>
+#include <math/WorkerPool.h>
 
 #include <algorithm>
 #include <limits>
@@ -73,6 +74,20 @@ Vector3 momentumOf(const Body& body, Vector3 w) {
 // Тела в движении внутри шага. origin и facing — позы начала кадра: от них считаются сдвиг и поворот,
 // по которым контакт знает нынешний зазор. Позы и скорости перед последним сдвигом запоминаются:
 // к ним шаг возвращается, если сдвиг приходится повторить (MissedContacts).
+// job(i) для count независимых заданий: каждое пишет только в своё место, поэтому ответ от числа потоков
+// не зависит. Раздаются пулу кусками — поток читает память подряд; малое число дешевле сделать на месте.
+template <class Job> void eachOf(size_t count, const Job& job) {
+    constexpr size_t kChunk = 32, kParallelChunks = 8;
+    const size_t chunks = (count + kChunk - 1) / kChunk;
+    if (chunks < kParallelChunks) {
+        for (size_t i = 0; i < count; ++i) job(i);
+        return;
+    }
+    WorkerPool::shared().run(chunks, [&](size_t k) {
+        for (size_t i = k * kChunk; i < std::min(count, (k + 1) * kChunk); ++i) job(i);
+    });
+}
+
 struct Moving {
     struct Pose {
         Vector3 position, angularMomentum;
@@ -93,9 +108,9 @@ struct Moving {
     // скорость пересчитывается по новой ориентации: это и есть гироскопический член.
     void advance(Real h) {
         before = poses(), statesBefore = states;
-        for (size_t i = 0; i < bodies.size(); ++i) {
+        eachOf(bodies.size(), [&](size_t i) {
             SolverBody& s = states[i];
-            if (s.inverseMass == 0) continue;
+            if (s.inverseMass == 0) return;
             Body& body = bodies[i];
             const Vector3 momentum = momentumOf(body, s.w);
             body.position += h * s.v;
@@ -110,7 +125,7 @@ struct Moving {
             s.moved = body.position - origin[i].position, s.turned = body.orientation * origin[i].orientation.conjugate();
             s.w = body.angularVelocity();
             s.inverseInertia = inverseInertiaInWorld(body);
-        }
+        });
     }
     // Скорости решателя — в импульсы тел: по ним считают досягаемость PairReach и PairFinder.
     void sync() {
@@ -210,14 +225,16 @@ struct LiveContacts {
             for (int k = 0; k < kRechecks && discover(moving, h, remaining); ++k) impact(moving, h);
             notify(observer, StepStage::Recheck);
             missed.forget(), moving.advance(h);
-            for (size_t c = 0; c < contacts.size(); ++c) missed.note(c, deepestOf(contacts[c])), contacts[c].follow(moving.states);
+            StepArray<Real> depth(contacts.size()); // глубина до пересчёта: её записывает общий проход ниже
+            eachOf(contacts.size(), [&](size_t c) { depth[c] = deepestOf(contacts[c]), contacts[c].follow(moving.states); });
+            for (size_t c = 0; c < contacts.size(); ++c) missed.note(c, depth[c]);
             notify(observer, StepStage::Motion);
             const size_t known = contacts.size();
             const bool found = round != kRechecks && missed.find(contacts, moving.bodies, moving.states, h, untracked);
             notify(observer, StepStage::Recheck);
             if (!found) break;
             moving.undo();
-            for (SoftContact& contact : contacts) contact.follow(moving.states);
+            eachOf(contacts.size(), [&](size_t c) { contacts[c].follow(moving.states); });
             for (size_t c = known; c < contacts.size(); ++c) contacts[c].matchTrial(moving.states, h);
         }
         reach.spend();
