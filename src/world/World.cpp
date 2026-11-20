@@ -14,10 +14,11 @@ void World::step(Real dt) {
     sleep_.wakeTouched(bodies_, joints_, gravity, dt, sleeping);
     if (realtime) {
         SoftStep part = soft;
+        manifolds_.tolerance = soft.contactDrift;
         part.substeps = std::max(1, soft.substeps / soft.contactUpdates);
         for (int update = 0; update < soft.contactUpdates; ++update) {
             PairFinder finder(bodies_, gravity);
-            finder.boundary = soft.edgeSlop;
+            finder.boundary = soft.edgeSlop, finder.memory = &manifolds_;
             part.step(bodies_, finder.pairs(dt / soft.contactUpdates, joints_), joints_, gravity, dt / soft.contactUpdates, contactForces_, jointImpulses_);
         }
         report_.segments = part.substeps * soft.contactUpdates;

@@ -3,6 +3,7 @@
 
 #include <math/StepMemory.h>
 #include <collision/ContactPair.h>
+#include <collision/ManifoldMemory.h>
 #include <collision/broadphase/DynamicTree.h>
 #include <joints/JointSet.h>
 
@@ -17,6 +18,9 @@ public:
     // внутри. У кубов в стопке рёбра совпадают, и без запаса шире дрожи тел вершина то остаётся,
     // то заменяется точкой пересечения почти параллельных рёбер — а та прыгает вдоль ребра.
     Real boundary = kOnBoundary;
+    // Память площадок (ManifoldMemory): пара простых тел, чья запись ещё годится, получает площадку
+    // из неё, без поиска; записи обновляются каждым вызовом pairs. Без памяти ищется каждая пара.
+    ManifoldMemory* memory = nullptr;
     // Дерево брусков всех тел; брусок охватывает всё, чего тело может достичь за время h.
     DynamicTree tree(Real h) const;
     // Пары по возрастанию номеров тел. Дерево отбирает кандидатов — тела с пересекающимися
@@ -29,8 +33,14 @@ public:
     std::vector<ContactPair> pairs(Real h, const JointSet& joints) const;
 
 private:
+    // Пары частей двух тел и запись памяти площадок для следующего обновления.
+    struct Found {
+        StepArray<ContactPair> pairs;
+        std::optional<ManifoldMemory::Entry> kept;
+    };
     StepArray<std::pair<int, int>> candidates(Real h, const StepArray<Real>& fastest) const;
-    StepArray<ContactPair> between(int i, int j, Real h, Real reach) const;
+    Found between(int i, int j, Real h, Real reach) const;
+    Found simplePair(int i, int j, Real reach) const;
 
     const std::vector<Body>& bodies_;
     Vector3 gravity_;

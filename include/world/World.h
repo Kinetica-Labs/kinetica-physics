@@ -10,6 +10,7 @@
 #include <joints/SliderJoint.h>
 #include <joints/TetherJoint.h>
 #include <collision/ContactPair.h>
+#include <collision/ManifoldMemory.h>
 #include <collision/RayCast.h>
 #include <body/Body.h>
 #include <world/IslandSleep.h>
@@ -95,6 +96,7 @@ private:
     std::vector<Body> bodies_;
     JointSet joints_;
     ContactForces contactForces_; // силы в точках контакта с прошлого отрезка — для тёплого старта
+    ManifoldMemory manifolds_;    // площадки пар с прошлого обновления быстрого шага
     std::vector<std::vector<Real>> jointImpulses_; // импульсы связей сочленений с прошлого кадра (SoftStep)
     Report report_;
     // Пара, остановкой скольжения которой закончился прошлый отрезок: на следующем она не скользит.

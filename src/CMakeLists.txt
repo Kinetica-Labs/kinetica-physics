@@ -10,6 +10,7 @@ add_library(kinetica-physics STATIC
   world/World.cpp
   world/IslandSleep.cpp
   collision/ContactPair.cpp
+  collision/ManifoldMemory.cpp
   collision/PairFinder.cpp
   collision/RayCast.cpp
   collision/broadphase/DynamicTree.cpp

@@ -92,21 +92,32 @@ StepArray<std::pair<int, int>> partPairs(const Body& a, const Body& b, Vector3 g
 
 } // namespace
 
-// Пары частей тел i и j — в порядке partPairs. reach — путь сближения простых тел (approachReach).
-StepArray<ContactPair> PairFinder::between(int i, int j, Real h, Real reach) const {
-    StepArray<ContactPair> pairs;
+// Пара простых тел: площадка из памяти, если запись пары ещё годится, иначе поиск.
+PairFinder::Found PairFinder::simplePair(int i, int j, Real reach) const {
+    Found found;
     const Body &a = bodies_[size_t(i)], &b = bodies_[size_t(j)];
-    if (!a.parts && !b.parts) {
-        if (std::optional<ContactPair> pair = examinePairWithin(a, b, reach, boundary)) pair->a = i, pair->b = j, pairs.push_back(*pair);
-        return pairs;
-    }
+    const ManifoldMemory::Entry* known = memory ? memory->valid(i, j, a, b, reach) : nullptr;
+    std::optional<ContactPair> pair = known ? std::optional<ContactPair>(ManifoldMemory::carried(*known, a, b, reach)) : examinePairWithin(a, b, reach, boundary);
+    if (!pair) return found;
+    pair->a = i, pair->b = j;
+    if (known) found.kept = *known;
+    else if (memory) found.kept = ManifoldMemory::entryOf(*pair, a, b);
+    found.pairs.push_back(*pair);
+    return found;
+}
+
+// Пары частей тел i и j — в порядке partPairs. reach — путь сближения простых тел (approachReach).
+PairFinder::Found PairFinder::between(int i, int j, Real h, Real reach) const {
+    const Body &a = bodies_[size_t(i)], &b = bodies_[size_t(j)];
+    if (!a.parts && !b.parts) return simplePair(i, j, reach);
+    Found found;
     for (const auto& [p, q] : partPairs(a, b, gravity_, h)) {
         std::optional<ContactPair> pair = examinePair(a.part(p), b.part(q), gravity_, h, boundary);
         if (!pair) continue;
         pair->a = i, pair->b = j, pair->partA = p, pair->partB = q;
-        pairs.push_back(*pair);
+        found.pairs.push_back(*pair);
     }
-    return pairs;
+    return found;
 }
 
 // Наибольшая скорость точки считается раз на тело, а не на каждую его пару. Кандидатов отбирает
@@ -119,7 +130,7 @@ std::vector<ContactPair> PairFinder::pairs(Real h) const {
     int parts = 0;
     for (const Body& body : bodies_) parts += body.shape ? body.partCount() : 0;
     const StepArray<std::pair<int, int>> candidates = this->candidates(h, fastest);
-    StepArray<StepArray<ContactPair>> found(candidates.size());
+    StepArray<Found> found(candidates.size());
     const auto examine = [&](size_t k) {
         const auto [i, j] = candidates[k];
         found[k] = between(i, j, h, approachReach(fastest[size_t(i)], fastest[size_t(j)], gravity_, h));
@@ -127,10 +138,15 @@ std::vector<ContactPair> PairFinder::pairs(Real h) const {
     if (parts < kParallelParts) for (size_t k = 0; k < candidates.size(); ++k) examine(k);
     else WorkerPool::shared().run(candidates.size(), examine);
     size_t total = 0;
-    for (const StepArray<ContactPair>& some : found) total += some.size();
+    StepArray<ManifoldMemory::Entry> kept;
+    for (const Found& some : found) {
+        total += some.pairs.size();
+        if (some.kept) kept.push_back(*some.kept);
+    }
+    if (memory) memory->replace(kept);
     std::vector<ContactPair> pairs; // ответ уходит наружу и живёт дольше шага: он в куче, одним куском
     pairs.reserve(total);
-    for (const StepArray<ContactPair>& some : found) pairs.insert(pairs.end(), some.begin(), some.end());
+    for (const Found& some : found) pairs.insert(pairs.end(), some.pairs.begin(), some.pairs.end());
     return pairs;
 }
 
