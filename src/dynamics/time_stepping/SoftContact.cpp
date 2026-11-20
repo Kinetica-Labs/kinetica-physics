@@ -157,6 +157,20 @@ void SoftContact::follow(const StepArray<SolverBody>& states) {
     for (Point& p : points_) p.gap = meet(p.coreA, p.coreB, p.rA, p.rB).dot(normal_) + p.base;
 }
 
+// Сам контакт подкачивается на kFar вперёд: его адрес известен заранее. Точки и тела — на kNear: их
+// адреса лежат в контакте, который к этому времени уже в кэше. Дистанции 2/4, 4/8 и 8/16 дают одно и то же.
+void SoftContact::prefetchAhead(const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states, size_t c) {
+    constexpr size_t kNear = 4, kFar = 8, kLine = 64;
+    const auto fetch = [](const void* memory, size_t bytes) {
+        for (size_t offset = 0; offset < bytes; offset += kLine) __builtin_prefetch(static_cast<const char*>(memory) + offset);
+    };
+    if (c + kFar < contacts.size()) fetch(&contacts[c + kFar], sizeof(SoftContact));
+    if (c + kNear >= contacts.size()) return;
+    const SoftContact& near = contacts[c + kNear];
+    fetch(near.points_.data(), near.points_.size() * sizeof(Point));
+    fetch(&states[size_t(near.a_)], sizeof(SolverBody)), fetch(&states[size_t(near.b_)], sizeof(SolverBody));
+}
+
 void SoftContact::warmStart(StepArray<SolverBody>& states) const {
     SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
     for (const Point& p : points_) SolverBody::push(a, b, p.rA, p.rB, p.impulse * normal_);

@@ -226,7 +226,7 @@ struct LiveContacts {
             notify(observer, StepStage::Recheck);
             missed.forget(), moving.advance(h);
             StepArray<Real> depth(contacts.size()); // глубина до пересчёта: её записывает общий проход ниже
-            eachOf(contacts.size(), [&](size_t c) { depth[c] = deepestOf(contacts[c]), contacts[c].follow(moving.states); });
+            eachOf(contacts.size(), [&](size_t c) { SoftContact::prefetchAhead(contacts, moving.states, c), depth[c] = deepestOf(contacts[c]), contacts[c].follow(moving.states); });
             for (size_t c = 0; c < contacts.size(); ++c) missed.note(c, depth[c]);
             notify(observer, StepStage::Motion);
             const size_t known = contacts.size();
@@ -286,7 +286,7 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
         applyForces(states, bodies, gravity, h);
         // Тёплый старт: накопленные импульсы прикладываются к новым скоростям.
         rows.warmStart(states);
-        for (const SoftContact& contact : contacts) contact.warmStart(states);
+        for (size_t c = 0; c < contacts.size(); ++c) SoftContact::prefetchAhead(contacts, states, c), contacts[c].warmStart(states);
         notify(observer, StepStage::WarmStart);
         rows.solve(states, true, jointCorrection, h, jointSoft, pushSpeed), notify(observer, StepStage::Joints);
         live.solveAndMove(moving, h, (substeps - substep) * h);
@@ -295,7 +295,7 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
         const StepArray<char> moving = stirred(bodies, states, restSpeed);
         if (restSpeed == 0 || std::find(moving.begin(), moving.end(), 1) != moving.end()) normals.solve(contacts, bodies, states, false, h, pushSpeed, restSpeed > 0 ? &moving : nullptr);
         notify(observer, StepStage::Normals);
-        for (SoftContact& contact : contacts) contact.solveFriction(states, rollingResistance);
+        for (size_t c = 0; c < contacts.size(); ++c) SoftContact::prefetchAhead(contacts, states, c), contacts[c].solveFriction(states, rollingResistance);
         notify(observer, StepStage::Friction);
     }
     finish(bodies, states, contacts, contactMemory, h), notify(observer, StepStage::Memory);
