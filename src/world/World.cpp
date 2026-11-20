@@ -26,8 +26,10 @@ void World::step(Real dt) {
         part.observer = watch;
         manifolds_.tolerance = soft.contactDrift;
         // В тихом кадре контакты ищутся один раз: четыре поиска нужны при ударах, а в покое не меняют ни
-        // осадку, ни перекрытие и стоят трети кадра (замер H69).
-        const int updates = quiet(dt) ? 1 : soft.contactUpdates;
+        // осадку, ни перекрытие и стоят трети кадра (замер H69). Второго решения нормалей в нём тоже нет.
+        const bool calm = quiet(dt);
+        const int updates = calm ? 1 : soft.contactUpdates;
+        part.relaxNormals = !calm;
         part.substeps = std::max(1, soft.substeps / updates);
         for (int update = 0; update < updates; ++update) {
             PairFinder finder(bodies_, gravity);
