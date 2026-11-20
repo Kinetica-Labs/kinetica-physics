@@ -90,8 +90,8 @@ xychart-beta
 
 | № | Цель | Сейчас | Порог | Команда |
 |---|---|---|---|---|
-| С1 | Быстрее ReactPhysics3D на одном потоке | медленнее в 5,1 раза | отношение ≤ 1 | `KP_THREADS=1 BENCH=14 build/validation/engines/compare-ours realtime 8` против `BENCH=14 build/rp3d/compare-rp3d` |
-| С2 | Быстрее Box3D на одном потоке | медленнее в 21 раз | вехи 10 → 5 → 2 → ≤ 1 | то же против `BENCH=14 build/box3d/compare-box3d 8` |
+| С1 | Быстрее ReactPhysics3D на одном потоке | медленнее в 1,27 раза (33,5 против 26,4 мс); на всех ядрах — 23,3 мс | отношение ≤ 1 | `KP_THREADS=1 BENCH=14 build/validation/engines/compare-ours realtime 8` против `BENCH=14 build/rp3d/compare-rp3d` |
+| С2 | Быстрее Box3D на одном потоке | медленнее в 9,2 раза (33,5 против 3,65 мс) | вехи 10 → 5 → 2 → ≤ 1 | то же против `BENCH=14 build/box3d/compare-box3d 8` |
 | С3 | Точнее Box3D | хуже в 2 строках из 102 | хуже в 0 строках | `python3 validation/run.py run && python3 validation/run.py report` |
 | С4 | Повторяемость | бит в бит при 1, 4, 12 потоках | то же плюс скалярная и векторная сборки, второй компилятор | `KP_THREADS=N build/validation/studies/study-state-hash 60 \| diff - docs/reports/data/state-hash.txt` |
 | С5 | Память | 13–24 обращения к куче на кадр; контакт из 4 точек — 1 416 Б | 0 обращений в установившемся кадре; контакт ≤ 512 Б | `build/validation/studies/study-allocations pyramid 2` |

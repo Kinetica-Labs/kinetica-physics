@@ -157,18 +157,16 @@ void SoftContact::follow(const StepArray<SolverBody>& states) {
     for (Point& p : points_) p.gap = meet(p.coreA, p.coreB, p.rA, p.rB).dot(normal_) + p.base;
 }
 
-// Сам контакт подкачивается на kFar вперёд: его адрес известен заранее. Точки и тела — на kNear: их
-// адреса лежат в контакте, который к этому времени уже в кэше. Дистанции 2/4, 4/8 и 8/16 дают одно и то же.
-void SoftContact::prefetchAhead(const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states, size_t c) {
-    constexpr size_t kNear = 4, kFar = 8, kLine = 64;
+void SoftContact::prefetch(const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states, size_t near, size_t far) {
+    constexpr size_t kLine = 64;
     const auto fetch = [](const void* memory, size_t bytes) {
         for (size_t offset = 0; offset < bytes; offset += kLine) __builtin_prefetch(static_cast<const char*>(memory) + offset);
     };
-    if (c + kFar < contacts.size()) fetch(&contacts[c + kFar], sizeof(SoftContact));
-    if (c + kNear >= contacts.size()) return;
-    const SoftContact& near = contacts[c + kNear];
-    fetch(near.points_.data(), near.points_.size() * sizeof(Point));
-    fetch(&states[size_t(near.a_)], sizeof(SolverBody)), fetch(&states[size_t(near.b_)], sizeof(SolverBody));
+    if (far < contacts.size()) fetch(&contacts[far], sizeof(SoftContact));
+    if (near >= contacts.size()) return;
+    const SoftContact& next = contacts[near];
+    fetch(next.points_.data(), next.points_.size() * sizeof(Point));
+    fetch(&states[size_t(next.a_)], sizeof(SolverBody)), fetch(&states[size_t(next.b_)], sizeof(SolverBody));
 }
 
 void SoftContact::warmStart(StepArray<SolverBody>& states) const {
@@ -226,8 +224,8 @@ void SoftContact::solveNormals(StepArray<SolverBody>& states, bool withBias, Rea
     for (size_t i = 0; i < count; ++i) {
         Point& p = points_[i];
         const Real next = w.scale[i] * w.unscaled[i], change = next - p.impulse;
-        a.v -= (a.inverseMass * change) * n, a.w -= change * w.spinA[i];
-        b.v += (b.inverseMass * change) * n, b.w += change * w.spinB[i];
+        if (a.inverseMass != 0) a.v -= (a.inverseMass * change) * n, a.w -= change * w.spinA[i]; // в неподвижное тело не пишут:
+        if (b.inverseMass != 0) b.v += (b.inverseMass * change) * n, b.w += change * w.spinB[i]; // оно общее у контактов разных потоков
         p.impulse = next;
     }
 }

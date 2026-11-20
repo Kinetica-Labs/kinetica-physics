@@ -28,7 +28,10 @@ struct SolverBody {
         if (a.inverseMass != 0) a.v -= a.inverseMass * impulse, a.w -= a.spinFrom(rA.cross(impulse));
         if (b.inverseMass != 0) b.v += b.inverseMass * impulse, b.w += b.spinFrom(rB.cross(impulse));
     }
-    static void twist(SolverBody& a, SolverBody& b, Vector3 torque) { a.w -= a.spinFrom(torque), b.w += b.spinFrom(torque); }
+    static void twist(SolverBody& a, SolverBody& b, Vector3 torque) {
+        if (a.inverseMass != 0) a.w -= a.spinFrom(torque);
+        if (b.inverseMass != 0) b.w += b.spinFrom(torque);
+    }
     static Real inverseMassAlong(const SolverBody& a, const SolverBody& b, Vector3 rA, Vector3 rB, Vector3 d) {
         const Vector3 armA = rA.cross(d), armB = rB.cross(d);
         return a.inverseMass + b.inverseMass + armA.dot(a.spinFrom(armA)) + armB.dot(b.spinFrom(armB));

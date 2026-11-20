@@ -23,6 +23,7 @@
 // пружинах, он не успокаивается (шары в ведре).
 
 #include <math/StepMemory.h>
+#include <dynamics/time_stepping/ContactLevels.h>
 #include <dynamics/time_stepping/SoftContact.h>
 
 #include <vector>
@@ -35,6 +36,8 @@ public:
     // moving — по телам: решаются только контакты и островки, где движется хоть одно тело; nullptr — все.
     void solve(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed,
                const StepArray<char>* moving = nullptr);
+    // Уровни зависимости контактов шага: ими же идут проходы тёплого старта и трения (SoftStep).
+    ContactLevels levels;
 
 private:
     // Точка контакта в задаче островка; a и b — места её тел в островке.

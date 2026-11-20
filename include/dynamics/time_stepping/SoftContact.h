@@ -69,10 +69,13 @@ public:
     // в конце шага для всех разом, давал не тот ответ (маятник Ньютона).
     void bounce(StepArray<SolverBody>& states, Real bounceSpeed);
     void remember(ContactForces& memory, Real h) const;
-    // Подкачка памяти впереди прохода по контактам, зовётся перед работой с контактом c. Аппаратная
-    // подкачка останавливается на границе страницы, и первый доступ на каждой странице ждал основную
-    // память: 13,5 % тактов кадра на пирамиде из 1 015 кубов. Ответ от подкачки не зависит.
-    static void prefetchAhead(const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states, size_t c);
+    // Подкачка памяти впереди прохода по контактам: сам контакт far (его адрес известен заранее) и точки
+    // и тела контакта near (их адреса лежат в контакте, к этому времени уже подкачанном); проход зовёт
+    // её перед контактом, до которого от near kNear шагов, а от far — kFar. Номер за концом списка
+    // пропускается. Аппаратная подкачка останавливается на границе страницы, и первый доступ на каждой
+    // странице ждал основную память: 13,5 % тактов кадра пирамиды из 1 015 кубов. Ответ от неё не зависит.
+    static constexpr size_t kNear = 4, kFar = 8; // 2 и 4, 8 и 16 дают то же
+    static void prefetch(const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states, size_t near, size_t far);
 
 private:
     CentreFriction::Carried takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, Span<ContactForces::Entry> known, Real h, bool fourPoints);

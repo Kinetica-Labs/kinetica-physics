@@ -35,6 +35,7 @@ add_library(kinetica-physics STATIC
   dynamics/time_stepping/SoftStep.cpp
   dynamics/time_stepping/SoftContact.cpp
   dynamics/time_stepping/IslandNormals.cpp
+  dynamics/time_stepping/ContactLevels.cpp
   dynamics/time_stepping/MissedContacts.cpp
   dynamics/time_stepping/PairReach.cpp
   dynamics/time_stepping/RollingFriction.cpp

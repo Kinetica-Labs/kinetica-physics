@@ -5,6 +5,7 @@
 #include <collision/PairFinder.h>
 #include "Check.h"
 #include <math/StepMemory.h>
+#include <math/WorkerPool.h>
 
 #include <collision/shapes/Sphere.h>
 #include <collision/shapes/ConvexHull.h>
@@ -13,6 +14,7 @@
 
 #include <atomic>
 #include <cmath>
+#include <cstring>
 #include <thread>
 
 using namespace kp;
@@ -1132,7 +1134,45 @@ static void stepMemoryScopeReturnsEarly() {
     CHECK(kept.front() == 7 && kept.back() == 7, "массив до отметки: %d … %d", kept.front(), kept.back());
 }
 
+// Быстрый шаг считает проходы решателя всеми потоками по уровням зависимости (ContactLevels). Пирамида
+// из 385 кубов даёт около 1 900 контактов — достаточно, чтобы потоки включились; куб, брошенный ей в бок,
+// даёт удары и контакты, найденные посреди шага. Ответ обязан совпасть с одним потоком бит в бит:
+// контакты одного уровня независимы, порядок зависимых прежний.
+void contactLevelsKeepAnswer() {
+    const auto run = [](int threads) {
+        WorkerPool::shared().resize(threads);
+        World world;
+        world.realtime = true;
+        std::vector<BodyId> ids{world.addBody(Body::box({5, 0.5, 5}, 0, {0, -0.5, 0}))};
+        const int side = 10;
+        const Real edge = 0.4;
+        for (int level = 0; level < side; ++level)
+            for (int i = 0; i < side - level; ++i)
+                for (int k = 0; k < side - level; ++k)
+                    ids.push_back(world.addBody(Body::box({edge / 2, edge / 2, edge / 2}, 1000, {edge * (i - (side - level - 1) / Real(2)), edge / 2 + edge * level, edge * (k - (side - level - 1) / Real(2))})));
+        Body thrown = Body::box({0.3, 0.3, 0.3}, 4000, {-3.5, 1.2, 0.1});
+        thrown.linearMomentum = (1 / thrown.mass.inverseMass) * Vector3{6, 0, 0};
+        ids.push_back(world.addBody(thrown));
+        for (int frame = 0; frame < 30; ++frame) world.step(Real(1) / 60);
+        std::vector<Real> state;
+        for (BodyId id : ids) {
+            const Body& body = world.body(id);
+            for (Real value : {body.position.x, body.position.y, body.position.z, body.orientation.w, body.orientation.x, body.orientation.y, body.orientation.z,
+                               body.linearMomentum.x, body.linearMomentum.y, body.linearMomentum.z, body.angularMomentum.x, body.angularMomentum.y, body.angularMomentum.z})
+                state.push_back(value);
+        }
+        return state;
+    };
+    const int before = WorkerPool::shared().threads();
+    const std::vector<Real> one = run(1), many = run(4);
+    WorkerPool::shared().resize(before);
+    size_t differing = 0;
+    for (size_t k = 0; k < one.size(); ++k) differing += std::memcmp(&one[k], &many[k], sizeof(Real)) != 0;
+    CHECK(differing == 0, "при четырёх потоках расходятся %zu чисел состояния из %zu", differing, one.size());
+}
+
 void dynamicsTests() {
+    contactLevelsKeepAnswer();
     stepMemoryScopeReturnsEarly();
     dampingDecaysAndDoesNotHold();
     freeRotationConserves();

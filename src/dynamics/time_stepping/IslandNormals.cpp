@@ -71,10 +71,9 @@ void IslandNormals::solve(StepArray<SoftContact>& contacts, const std::vector<Bo
                           const StepArray<char>* moving) {
     if (direct_.size() != contacts.size()) choose(contacts, bodies);
     const auto stirs = [&](int body) { return !moving || (*moving)[size_t(body)]; };
-    for (size_t c = 0; c < contacts.size(); ++c) {
-        SoftContact::prefetchAhead(contacts, states, c);
+    levels.each(contacts, states, [&](size_t c) {
         if (!direct_[c] && (stirs(contacts[c].normalRow(0).a) || stirs(contacts[c].normalRow(0).b))) contacts[c].solveNormals(states, withBias, h, pushSpeed);
-    }
+    });
     const Pass pass{withBias, h, pushSpeed};
     size_t rows = 0;
     for (const Island& island : islands_) rows += island.rows.size();
