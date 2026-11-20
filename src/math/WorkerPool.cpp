@@ -1,5 +1,7 @@
 #include <math/WorkerPool.h>
 
+#include <math/StepMemory.h>
+
 #include <algorithm>
 
 namespace kp {
@@ -30,6 +32,7 @@ void WorkerPool::resize(int threads) {
 
 // Поток ждёт нового круга заданий и входит в него, только если круг ещё открыт.
 void WorkerPool::work() {
+    StepMemory::serve();
     size_t seen = 0;
     for (;;) {
         {

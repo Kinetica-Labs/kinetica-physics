@@ -18,6 +18,7 @@ struct Reserve {
     std::vector<char*> blocks;
     std::vector<size_t> sizes;
     size_t block = 0, used = 0;
+    bool serving = false; // запас потока пула
 
     Reserve();
     ~Reserve();
@@ -36,13 +37,18 @@ struct Reserve {
         for (size_t k = 0; wipe && k < blocks.size(); ++k) std::memset(blocks[k], 0xFF, sizes[k]);
         block = 0, used = 0;
     }
+    size_t held() const {
+        size_t bytes = used;
+        for (size_t k = 0; k < block; ++k) bytes += sizes[k];
+        return bytes;
+    }
 };
 
-// Все запасы процесса: самый внешний StepMemory возвращает их разом, пока потоки пула стоят.
+// Все запасы процесса: когда закрыт последний StepMemory, возвращаются запасы потоков пула — они стоят.
 struct Registry {
     std::mutex mutex;
     std::vector<Reserve*> reserves;
-    std::atomic<int> open{0}; // сколько StepMemory открыто
+    std::atomic<int> open{0}; // сколько StepMemory открыто во всех потоках; меняется под mutex
     bool wipe = false;
 };
 Registry& registry() {
@@ -63,31 +69,41 @@ Reserve::~Reserve() {
 }
 
 thread_local Reserve reserve;
+thread_local int depth = 0; // сколько StepMemory открыто этим потоком
 
 } // namespace
 
 StepMemory::StepMemory() {
     Registry& all = registry();
+    const std::lock_guard<std::mutex> lock(all.mutex); // новый шаг не начнётся, пока возвращаются запасы пула
     if (all.open.fetch_add(1) == 0) {
         const char* mode = std::getenv("KP_STEP_MEMORY");
         all.wipe = mode && std::strcmp(mode, "check") == 0;
     }
+    ++depth;
 }
 
 StepMemory::~StepMemory() {
     Registry& all = registry();
-    if (all.open.fetch_sub(1) != 1) return;
+    // Свой запас: в нём данные одного этого шага, другим потокам он не виден.
+    if (--depth == 0 && !reserve.serving) reserve.rewind(all.wipe);
     const std::lock_guard<std::mutex> lock(all.mutex);
-    for (Reserve* each : all.reserves) each->rewind(all.wipe);
+    if (all.open.fetch_sub(1) != 1) return;
+    for (Reserve* each : all.reserves)
+        if (each->serving) each->rewind(all.wipe);
 }
 
 void* StepMemory::take(size_t bytes) {
     const size_t size = (bytes + kHeader + 15) & ~size_t(15);
-    const bool stepped = registry().open.load(std::memory_order_relaxed) > 0;
+    const bool stepped = depth > 0 || (reserve.serving && registry().open.load(std::memory_order_relaxed) > 0);
     char* memory = stepped ? static_cast<char*>(reserve.take(size)) : static_cast<char*>(::operator new(size));
     memory[0] = stepped ? kFromStep : kFromHeap;
     return memory + kHeader;
 }
+
+size_t StepMemory::held() { return reserve.held(); }
+
+void StepMemory::serve() { reserve.serving = true; }
 
 void StepMemory::give(void* memory) noexcept {
     char* start = static_cast<char*>(memory) - kHeader;

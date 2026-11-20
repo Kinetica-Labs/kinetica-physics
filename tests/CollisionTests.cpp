@@ -101,7 +101,7 @@ void carriedManifoldMatchesSearch() {
         if (!entry) continue;
         ManifoldMemory memory;
         memory.tolerance = tolerance;
-        memory.replace(StepArray<ManifoldMemory::Entry>(1, *entry));
+        memory.replace(StepArray<const ManifoldMemory::Entry*>(1, &*entry));
         const Vector3 turn = within(4e-5);
         bodies[1].position += within(4e-5), bodies[1].orientation = (Quaternion{1, turn.x, turn.y, turn.z} * bodies[1].orientation).unit();
         const ManifoldMemory::Entry* known = memory.valid(0, 1, bodies[0], bodies[1], found->reach);

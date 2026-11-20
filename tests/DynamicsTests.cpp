@@ -4,13 +4,16 @@
 #include <body/CompoundBodyBuilder.h>
 #include <collision/PairFinder.h>
 #include "Check.h"
+#include <math/StepMemory.h>
 
 #include <collision/shapes/Sphere.h>
 #include <collision/shapes/ConvexHull.h>
 #include <dynamics/Integrator.h>
 #include <world/World.h>
 
+#include <atomic>
 #include <cmath>
+#include <thread>
 
 using namespace kp;
 
@@ -1092,6 +1095,27 @@ void dampingDecaysAndDoesNotHold() {
     CHECK(world.body(id).position.y < Real(0.25), "куб на ребре не упал за 2 с: высота центра %.3f м", double(world.body(id).position.y));
 }
 
+// Память шага возвращается потоку в конце его шага, даже когда в это время шагает другой поток:
+// иначе программа с несколькими мирами в потоках не возвращает её никогда (таблица случаев,
+// 12 миров в 12 потоках, занимала 13 ГБ и была убита системой).
+static void stepMemoryReturnsPerThread() {
+    std::atomic<bool> opened{false}, release{false};
+    std::thread other([&] {
+        const StepMemory longStep;
+        opened = true;
+        while (!release) std::this_thread::yield();
+    });
+    while (!opened) std::this_thread::yield();
+    {
+        const StepMemory mine;
+        const StepArray<int> work(1000);
+        CHECK(StepMemory::held() >= 1000 * sizeof(int), "внутри шага занято %zu байт", StepMemory::held());
+    }
+    CHECK(StepMemory::held() == 0, "после шага занято %zu байт", StepMemory::held());
+    release = true;
+    other.join();
+}
+
 void dynamicsTests() {
     dampingDecaysAndDoesNotHold();
     freeRotationConserves();
@@ -1121,4 +1145,5 @@ void dynamicsTests() {
     jointsResistMotion();
     realtimeStep();
     rayAndTether();
+    stepMemoryReturnsPerThread();
 }
