@@ -8,6 +8,7 @@
 #include <dynamics/event_driven/ContactSolver.h>
 #include <dynamics/event_driven/EventSearch.h>
 #include <dynamics/event_driven/Rate.h>
+#include <dynamics/StepStage.h>
 
 #include <functional>
 #include <utility>
@@ -15,9 +16,6 @@
 #include <vector>
 
 namespace kp {
-
-// Стадии отрезка шага в порядке выполнения. Наблюдатель получает управление после каждой.
-enum class StepStage { Separation, Impact, Forces, Motion };
 
 class ExactStep {
 public:

@@ -26,6 +26,7 @@
 #include <math/StepMemory.h>
 #include <collision/ContactPair.h>
 #include <dynamics/ContactForces.h>
+#include <dynamics/StepStage.h>
 #include <joints/JointSet.h>
 
 #include <vector>
@@ -72,6 +73,8 @@ public:
     // Ноль — потерь на качение нет, и качнувшаяся цепь или катящийся шар не останавливаются никогда; у
     // стали по стали δ — сотые доли миллиметра, у мягкого колеса — миллиметры.
     Real rollingResistance = 0;
+    // Наблюдатель стадий шага (StepStage) — для приборов времени; пустой никого не зовёт.
+    StageObserver observer;
 
     // Продвигает тела на dt. contactMemory и jointMemory — накопленные импульсы прошлого кадра для
     // тёплого старта; на выходе в них импульсы этого.

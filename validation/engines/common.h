@@ -290,16 +290,22 @@ inline void printRow(const std::string& engine, const SceneSpec& s, const std::v
     std::fflush(stdout);
 }
 
-// Замер скорости: трёхмерная пирамида кубов с ребром 40 см, в основании side × side, каждый куб
-// лежит на четырёх нижних; всего side (side + 1) (2 side + 1) / 6 кубов. Сцена считается 60 кадров
-// по 1/60 с; печатается среднее и наибольшее время кадра. Постройка мира в замер не входит.
-inline void benchmark(const std::string& engine, const Simulate& simulate, int side) {
+// Трёхмерная пирамида кубов с ребром 40 см, в основании side × side, каждый куб лежит на четырёх
+// нижних; всего side (side + 1) (2 side + 1) / 6 кубов.
+inline SceneSpec pyramid3d(int side) {
     const double edge = 0.4, reach = std::fmax(5.0, edge * side / 2 + 1);
     SceneSpec scene{"pyramid3d", "трёхмерная пирамида", {BoxSpec{{reach, 0.5, reach}, {0, -0.5, 0}, 0}}, {}, 1};
     for (int level = 0; level < side; ++level)
         for (int i = 0; i < side - level; ++i)
             for (int k = 0; k < side - level; ++k)
                 scene.boxes.push_back({{edge / 2, edge / 2, edge / 2}, {edge * (i - (side - level - 1) / 2.0), edge / 2 + edge * level, edge * (k - (side - level - 1) / 2.0)}});
+    return scene;
+}
+
+// Замер скорости на трёхмерной пирамиде: 60 кадров по 1/60 с; печатается среднее и наибольшее время
+// кадра. Постройка мира в замер не входит.
+inline void benchmark(const std::string& engine, const Simulate& simulate, int side) {
+    const SceneSpec scene = pyramid3d(side);
     simulate(scene, [&](const Step& step, const Read&) {
         double total = 0, worst = 0;
         for (int frame = 0; frame < 60; ++frame) {

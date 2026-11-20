@@ -14,6 +14,9 @@ target_link_libraries(study-allocations PRIVATE kinetica-scenes ${CMAKE_DL_LIBS}
 target_link_options(study-allocations PRIVATE -rdynamic) # имена функций в цепочках вызовов
 add_executable(study-frame-times FrameTimes.cpp)
 target_link_libraries(study-frame-times PRIVATE kinetica-scenes)
+add_executable(study-frame-stages FrameStages.cpp)
+target_link_libraries(study-frame-stages PRIVATE kinetica-scenes)
+target_include_directories(study-frame-stages PRIVATE ${PROJECT_SOURCE_DIR}/validation/engines) # трёхмерная пирамида замера скорости
 add_executable(study-scale Scale.cpp)
 target_link_libraries(study-scale PRIVATE kinetica-physics)
 add_executable(study-overlap-spread OverlapSpread.cpp)

@@ -173,6 +173,7 @@ struct LiveContacts {
     const ContactMaker& maker;
     const JointSet& joints;
     Real pushSpeed, bounceSpeed, boundary;
+    const StageObserver& observer;
 
     // true — какое-то тело выходит за досягаемость списка пар, и нашлись новые пары с точками контакта.
     bool discover(Moving& moving, Real h, Real remaining) {
@@ -196,13 +197,16 @@ struct LiveContacts {
     void solveAndMove(Moving& moving, Real h, Real remaining) {
         const MissedContacts::Maker untracked = [&](const ContactPair& pair) { return maker.make(pair, false); };
         for (int round = 0;; ++round) {
-            impact(moving, h);
+            impact(moving, h), notify(observer, StepStage::Normals);
             for (int k = 0; k < kRechecks && discover(moving, h, remaining); ++k) impact(moving, h);
-            missed.note(contacts);
+            missed.note(contacts), notify(observer, StepStage::Recheck);
             moving.advance(h);
             for (SoftContact& contact : contacts) contact.follow(moving.states);
+            notify(observer, StepStage::Motion);
             const size_t known = contacts.size();
-            if (round == kRechecks || !missed.find(contacts, moving.bodies, moving.states, h, untracked)) break;
+            const bool found = round != kRechecks && missed.find(contacts, moving.bodies, moving.states, h, untracked);
+            notify(observer, StepStage::Recheck);
+            if (!found) break;
             moving.undo();
             for (SoftContact& contact : contacts) contact.follow(moving.states);
             for (size_t c = known; c < contacts.size(); ++c) contacts[c].matchTrial(moving.states, h);
@@ -240,21 +244,23 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
     JointRows rows;
     rows.build(joints, bodies, states, jointMemory, directJoints);
     IslandNormals normals(directContactRows, soft.biasRate);
-    LiveContacts live{contacts, normals, missed, reach, maker, joints, pushSpeed, bounceSpeed, edgeSlop};
-
+    LiveContacts live{contacts, normals, missed, reach, maker, joints, pushSpeed, bounceSpeed, edgeSlop, observer};
+    notify(observer, StepStage::Contacts);
     for (int substep = 0; substep < substeps; ++substep) {
         applyForces(states, bodies, gravity, h);
         // Тёплый старт: накопленные импульсы прикладываются к новым скоростям.
         rows.warmStart(states);
         for (const SoftContact& contact : contacts) contact.warmStart(states);
-        rows.solve(states, true, jointCorrection, h, jointSoft, pushSpeed);
+        notify(observer, StepStage::WarmStart);
+        rows.solve(states, true, jointCorrection, h, jointSoft, pushSpeed), notify(observer, StepStage::Joints);
         live.solveAndMove(moving, h, (substeps - substep) * h);
         rows.build(joints, bodies, states, jointMemory, directJoints);
-        rows.solve(states, false, jointCorrection, h, jointSoft, pushSpeed);
-        normals.solve(contacts, bodies, states, false, h, pushSpeed);
+        rows.solve(states, false, jointCorrection, h, jointSoft, pushSpeed), notify(observer, StepStage::Joints);
+        normals.solve(contacts, bodies, states, false, h, pushSpeed), notify(observer, StepStage::Normals);
         for (SoftContact& contact : contacts) contact.solveFriction(states, rollingResistance);
+        notify(observer, StepStage::Friction);
     }
-    finish(bodies, states, contacts, contactMemory, h);
+    finish(bodies, states, contacts, contactMemory, h), notify(observer, StepStage::Memory);
 }
 
 } // namespace kp
