@@ -22,8 +22,9 @@ struct TransformedHull {
     // Самая далёкая вершина в направлении d.
     Vector3 support(Vector3 d) const {
         size_t best = 0;
+        Real most = vertices[0].dot(d);
         for (size_t i = 1; i < vertices.size(); ++i)
-            if (vertices[i].dot(d) > vertices[best].dot(d)) best = i;
+            if (const Real along = vertices[i].dot(d); along > most) most = along, best = i;
         return vertices[best];
     }
     // Любая точка грани: её первая вершина.

@@ -29,7 +29,8 @@ public:
     std::vector<ContactPair> pairs(Real h, const JointSet& joints) const;
 
 private:
-    StepArray<ContactPair> between(int i, int j, Real h) const;
+    StepArray<std::pair<int, int>> candidates(Real h, const StepArray<Real>& fastest) const;
+    StepArray<ContactPair> between(int i, int j, Real h, Real reach) const;
 
     const std::vector<Body>& bodies_;
     Vector3 gravity_;

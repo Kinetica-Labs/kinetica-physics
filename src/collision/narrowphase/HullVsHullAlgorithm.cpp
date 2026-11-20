@@ -51,8 +51,9 @@ ContactCandidates clip(const ContactCandidates& polygon, const VertexNumbers& ve
 // оба выбора совпадают.
 int facingFace(const TransformedHull& body, Vector3 n) {
     int deepest = 0;
+    Real least = body.vertices[0].dot(n);
     for (int i = 1; i < int(body.vertices.size()); ++i)
-        if (body.vertices[size_t(i)].dot(n) < body.vertices[size_t(deepest)].dot(n)) deepest = i;
+        if (const Real along = body.vertices[size_t(i)].dot(n); along < least) least = along, deepest = i;
     int best = -1;
     for (int face = 0; face < int(body.normals.size()); ++face) {
         const std::vector<int>& loop = body.loop(face);

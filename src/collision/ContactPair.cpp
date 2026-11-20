@@ -73,8 +73,11 @@ Real gapAlong(const Body& a, const Body& b, Vector3 n) {
 
 std::optional<ContactPair> examinePair(const Body& a, const Body& b, Vector3 gravity, Real h, Real boundary) {
     if (!a.shape || !b.shape || (a.isStatic() && b.isStatic())) return std::nullopt;
-    // За время h сила тяжести добавляет к скорости не больше g h.
-    const Real reach = (maxPointSpeed(a) + maxPointSpeed(b) + gravity.length() * h) * h;
+    return examinePairWithin(a, b, approachReach(maxPointSpeed(a), maxPointSpeed(b), gravity, h), boundary);
+}
+
+std::optional<ContactPair> examinePairWithin(const Body& a, const Body& b, Real reach, Real boundary) {
+    if (!a.shape || !b.shape || (a.isStatic() && b.isStatic())) return std::nullopt;
     if ((b.pose().position - a.pose().position).length() - a.shape->boundingRadius() - b.shape->boundingRadius() > reach + kContactDistance) return std::nullopt;
     const ClosestPoints gap = closestPoints(*a.shape, a.pose(), *b.shape, b.pose());
     const Real distance = gap.coresOverlap ? 0 : gap.distance;

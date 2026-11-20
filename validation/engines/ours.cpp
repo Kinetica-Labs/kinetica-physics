@@ -1,8 +1,10 @@
 // Наш движок на общих сценах (common.h).
 //
 //   compare-ours [realtime ПОДШАГОВ [sleep] | exact]     по умолчанию realtime 8; sleep — со сном островов, как в окне
+//   KP_THREADS=1 — число потоков пула: Box3D в сравнении считает одним потоком
 #include "common.h"
 #include <physics.h>
+#include <math/WorkerPool.h>
 
 #include <cstdlib>
 
@@ -12,6 +14,7 @@ int main(int argc, char** argv) {
     const std::string mode = argc > 1 ? argv[1] : "realtime";
     const int substeps = argc > 2 ? std::atoi(argv[2]) : 8;
     const bool sleep = argc > 3 && std::string(argv[3]) == "sleep";
+    if (const char* threads = std::getenv("KP_THREADS")) WorkerPool::shared().resize(std::atoi(threads));
     const std::string engine = mode == "exact" ? "kinetica exact" : "kinetica realtime " + std::to_string(substeps) + (sleep ? " sleep" : "");
     compare(engine, [&](const SceneSpec& s, const Play& play) {
         World world;

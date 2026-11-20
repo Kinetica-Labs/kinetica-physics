@@ -19,42 +19,48 @@ void faceAxis(const TransformedHull& of, const TransformedHull& other, Real& sep
 
 // Образуют ли два ребра грань разности Минковского. На единичной сфере ребру A соответствует
 // дуга между нормалями его граней a и b, ребру B — дуга между −c и −d; пара даёт грань разности,
-// если дуги пересекаются. Сюда c и d передаются уже со знаком минус.
+// если дуги пересекаются. Признак — знаки четырёх смешанных произведений: c · (b × a), d · (b × a),
+// a · (d × c), b · (d × c), где c и d уже со знаком минус (arcSides).
 //
 // Конец одной дуги, лежащий на большом круге другой, — не пересечение: знак нулевого смешанного
 // произведения решает округление, и проверка полушария за ним ошибается. Так вертикальное ребро
 // коробки «образовывало грань» с горизонтальным ребром дальней стороны тонкой пластины, и зазор
 // выходил больше истинного на её толщину. Ось такой пары совпадает с нормалью грани и ею покрыта.
-// bxa и dxc — b × a и d × c: они зависят только от своего ребра и считаются раз на ребро, а не на
-// каждую пару рёбер.
-bool formsMinkowskiFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 bxa, Vector3 dxc) {
-    const Real cba = c.dot(bxa), dba = d.dot(bxa), adc = a.dot(dxc), bdc = b.dot(dxc);
+bool formsMinkowskiFace(Real cba, Real dba, Real adc, Real bdc) {
     const Real onArc = Real(1e-10);
     for (Real side : {cba, dba, adc, bdc})
         if (abs(side) < onArc) return false;
     return cba * dba < 0 && adc * bdc < 0 && cba * bdc > 0;
 }
 
-// Векторное произведение нормалей двух граней каждого ребра: правая × левая.
-StepArray<Vector3> edgeArcs(const TransformedHull& hull) {
-    StepArray<Vector3> arcs;
-    for (const ConvexHull::Edge& edge : hull.shape.edges()) arcs.push_back(hull.normals[size_t(edge.right)].cross(hull.normals[size_t(edge.left)]));
-    return arcs;
+// Смешанные произведения для проверки грани разности: строка — ребро тела `of`, столбец — грань
+// тела `other`, значение — (sign · нормаль грани) · (правая нормаль ребра × левая). Произведение
+// зависит от ребра одного тела и грани другого, а не от пары рёбер: у двух кубов это 2 · 12 · 6
+// скалярных произведений вместо 4 на каждую из 144 пар рёбер.
+StepArray<Real> arcSides(const TransformedHull& of, const TransformedHull& other, Real sign) {
+    StepArray<Real> sides;
+    sides.reserve(of.shape.edges().size() * other.normals.size());
+    for (const ConvexHull::Edge& edge : of.shape.edges()) {
+        const Vector3 arc = of.normals[size_t(edge.right)].cross(of.normals[size_t(edge.left)]);
+        for (Vector3 normal : other.normals) sides.push_back((sign * normal).dot(arc));
+    }
+    return sides;
 }
 
 } // namespace
 
 // Оси пар рёбер: лучше оси best — заменяют её.
 static SeparatingAxis bestEdgePair(const TransformedHull& A, const TransformedHull& B, SeparatingAxis best, Real preference) {
-    const StepArray<Vector3> arcsA = edgeArcs(A), arcsB = edgeArcs(B);
+    const size_t facesA = A.normals.size(), facesB = B.normals.size();
+    const StepArray<Real> sidesA = arcSides(A, B, -1), sidesB = arcSides(B, A, 1);
     for (int i = 0; i < int(A.shape.edges().size()); ++i) {
         const ConvexHull::Edge& ea = A.shape.edges()[size_t(i)];
         const Vector3 tailA = A.vertices[size_t(ea.tail)], directionA = A.vertices[size_t(ea.head)] - tailA;
+        const Real* ofA = &sidesA[size_t(i) * facesB];
         for (int j = 0; j < int(B.shape.edges().size()); ++j) {
             const ConvexHull::Edge& eb = B.shape.edges()[size_t(j)];
-            // (−d) × (−c) = d × c: произведение нормалей ребра B годится без смены знака.
-            if (!formsMinkowskiFace(A.normals[size_t(ea.left)], A.normals[size_t(ea.right)], -B.normals[size_t(eb.left)], -B.normals[size_t(eb.right)], arcsA[size_t(i)], arcsB[size_t(j)]))
-                continue;
+            const Real* ofB = &sidesB[size_t(j) * facesA];
+            if (!formsMinkowskiFace(ofA[eb.left], ofA[eb.right], ofB[ea.left], ofB[ea.right])) continue;
             const Vector3 tailB = B.vertices[size_t(eb.tail)], directionB = B.vertices[size_t(eb.head)] - tailB;
             const Vector3 axis = directionA.cross(directionB);
             const Real axisLength = axis.length();

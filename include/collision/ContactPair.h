@@ -70,6 +70,12 @@ Real gapAlong(const Body& a, const Body& b, Vector3 n);
 // проверка по охватывающим шарам, затем точное расстояние и точки контакта. Номера тел и частей
 // вписывает вызывающий.
 std::optional<ContactPair> examinePair(const Body& a, const Body& b, Vector3 gravity, Real h, Real boundary = kOnBoundary);
+// Путь сближения пары за время h при наибольших скоростях точек тел speedA и speedB (maxPointSpeed):
+// (speedA + speedB + g h) h — за время h сила тяжести добавляет к скорости не больше g h.
+inline Real approachReach(Real speedA, Real speedB, Vector3 gravity, Real h) { return (speedA + speedB + gravity.length() * h) * h; }
+// То же, что examinePair, когда путь сближения reach уже посчитан: поиск пар считает наибольшую
+// скорость точки раз на тело, а не на каждую его пару.
+std::optional<ContactPair> examinePairWithin(const Body& a, const Body& b, Real reach, Real boundary = kOnBoundary);
 // То же для простых тел i и j.
 std::optional<ContactPair> examinePair(const std::vector<Body>& bodies, int i, int j, Vector3 gravity, Real h, Real boundary = kOnBoundary);
 

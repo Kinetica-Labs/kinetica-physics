@@ -25,7 +25,8 @@ python3 validation/code_metrics.py [--all|--json|--check]  # стандарт к
                                                         # --check — ошибка при любом нарушении (так в CI): сейчас нарушений 0
 python3 validation/run.py run|box3d|report              # табло против Box3D → docs/reports/engine-comparison.md
 BENCH=14 build/validation/engines/compare-ours realtime 8   # скорость: трёхмерная пирамида 14 × 14 (1 015 кубов);
-BENCH=14 build/box3d/compare-box3d 8                    # то же у Box3D — сравнивать мс на кадр
+BENCH=14 build/box3d/compare-box3d 8                    # то же у Box3D — сравнивать мс на кадр; Box3D считает одним
+                                                        # потоком, поэтому честное отношение — при KP_THREADS=1
 ```
 
 Отбора отдельной проверки в `unit-tests` нет: `tests/main.cpp` вызывает пять групп подряд,
