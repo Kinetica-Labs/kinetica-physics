@@ -25,7 +25,7 @@ std::string text(const char* format, ...) {
 // libm» касается ядра.
 Quaternion about(Vector3 axis, double degrees) {
     const double half = degrees * 3.14159265358979323846 / 360;
-    return {Real(std::cos(half)), Real(std::sin(half)) * axis.x, Real(std::sin(half)) * axis.y, Real(std::sin(half)) * axis.z};
+    return {Real(sinCos(half).cos), Real(sinCos(half).sin) * axis.x, Real(sinCos(half).sin) * axis.y, Real(sinCos(half).sin) * axis.z};
 }
 
 World withFloor() {
@@ -89,7 +89,7 @@ World arch() {
         for (int end = 0; end < 2; ++end) {
             const double angle = (k + end) * 3.14159265358979323846 / 9;
             for (double radius : {inner, outer})
-                for (double z : {-depth, depth}) wedge.push_back({Real(radius * std::cos(angle)), Real(radius * std::sin(angle)), Real(z)});
+                for (double z : {-depth, depth}) wedge.push_back({Real(radius * sinCos(angle).cos), Real(radius * sinCos(angle).sin), Real(z)});
         }
         world.addBody(Body::hull(wedge, 2000));
     }
@@ -120,7 +120,7 @@ World slope() {
 std::string slopeVerdict(const World& start, const World& now) {
     const double friction[3] = {0.2, 0.5, 0.8}, time = 1;
     for (int k = 0; k < 3; ++k) {
-        const double expected = std::max(0.0, 9.81 * (std::sin(kSlope) - friction[k] * std::cos(kSlope))) * time * time / 2;
+        const double expected = std::max(0.0, 9.81 * (sinCos(kSlope).sin - friction[k] * sinCos(kSlope).cos)) * time * time / 2;
         const double travelled = double((now.bodies()[size_t(k + 1)].position - start.bodies()[size_t(k + 1)].position).length());
         if (std::fabs(travelled - expected) > 1e-3 + 1e-3 * expected) return text("брусок с трением %.1f прошёл %.4f м вместо %.4f", friction[k], travelled, expected);
     }
@@ -195,7 +195,7 @@ std::string cradleVerdict(const World&, const World& now) {
     // Через 0,65 с первый шар уже ударил: стоять должны все, кроме последнего.
     for (size_t i = 1; i <= 4; ++i)
         if (double(now.bodies()[i].linearVelocity().length()) > 0.1) return text("шар %zu после удара движется: %.2f м/с", i, double(now.bodies()[i].linearVelocity().length()));
-    const double last = double(now.bodies()[5].linearVelocity().length()), expected = std::sqrt(2 * 9.81 * (1 - std::cos(30 * 3.14159265358979323846 / 180)));
+    const double last = double(now.bodies()[5].linearVelocity().length()), expected = std::sqrt(2 * 9.81 * (1 - sinCos(30 * 3.14159265358979323846 / 180).cos));
     return last > 0.8 * expected ? "" : text("последний шар получил %.2f м/с из %.2f", last, expected);
 }
 
@@ -236,7 +236,7 @@ std::string bucketsVerdict(const World&, const World& now) {
     const double base = double(now.bodies()[1].position.y);
     for (int k = 1; k < 3; ++k) {
         const Body& bucket = now.bodies()[size_t(k + 1)];
-        const double lift = double(bucket.position.y) - base, aside = std::hypot(double(bucket.position.x), double(bucket.position.z));
+        const double lift = double(bucket.position.y) - base, aside = std::sqrt(double(bucket.position.x) * double(bucket.position.x) + double(bucket.position.z) * double(bucket.position.z));
         if (std::fabs(lift - 0.06 * k) > 0.01) return text("ведро %d стоит на %.3f м выше нижнего вместо %.3f", k + 1, lift, 0.06 * k);
         if (aside > 0.01) return text("ведро %d смещено вбок на %.3f м", k + 1, aside);
         if (speedOf(bucket) > 0.02) return text("ведро %d движется: %.3f м/с", k + 1, speedOf(bucket));
@@ -255,7 +255,7 @@ std::string ballsVerdict(const World&, const World& now) {
     const Body& bucket = now.bodies()[1];
     for (size_t i = 2; i < now.bodies().size(); ++i) {
         const Vector3 p = now.bodies()[i].position - bucket.position;
-        if (std::hypot(double(p.x), double(p.z)) > 0.25 || double(now.bodies()[i].position.y) < 0.04) return text("шар %zu выпал из ведра", i - 1);
+        if (std::sqrt(double(p.x) * double(p.x) + double(p.z) * double(p.z)) > 0.25 || double(now.bodies()[i].position.y) < 0.04) return text("шар %zu выпал из ведра", i - 1);
         // Покой — по скорости центра. Вращение шара на месте вокруг нормали контакта модель не гасит:
         // у точечного контакта нет момента трения вокруг нормали, и без сопротивления среды шар
         // крутится вечно (1,3 рад/с на замере) — это не движение по ведру.
@@ -354,7 +354,7 @@ const double kBowlInner = 0.80, kBowlOuter = 0.85, kBowlRim = 0.84;
 Body bowlShell() {
     const auto on = [](double radius, double degrees) {
         const double angle = degrees * 3.14159265358979323846 / 180;
-        return std::pair<Real, Real>{Real(radius * std::sin(angle)), Real(kBowlOuter - radius * std::cos(angle))};
+        return std::pair<Real, Real>{Real(radius * sinCos(angle).sin), Real(kBowlOuter - radius * sinCos(angle).cos)};
     };
     std::vector<std::vector<std::pair<Real, Real>>> profiles;
     for (int k = 0; k < 5; ++k) profiles.push_back({on(kBowlOuter, 16 * k), on(kBowlOuter, 16 * k + 16), on(kBowlInner, 16 * k + 16), on(kBowlInner, 16 * k)});
@@ -397,7 +397,7 @@ World bowl() {
         default: body = k % 12 == 5 ? dice.hull(0.2) : Body::cylinder(0.06, 0.07, 1000, {}, Real(0.005));
         }
         body.orientation = (dice.turn() * body.orientation).unit();
-        body.position = {Real(0.3 * std::cos(2.4 * k)), Real(0.9 + 0.25 * k), Real(0.3 * std::sin(2.4 * k))};
+        body.position = {Real(0.3 * sinCos(2.4 * k).cos), Real(0.9 + 0.25 * k), Real(0.3 * sinCos(2.4 * k).sin)};
         world.addBody(body);
     }
     return world;
@@ -405,7 +405,7 @@ World bowl() {
 std::string bowlVerdict(const World&, const World& now) {
     for (size_t i = 2; i < now.bodies().size(); ++i) {
         const Body& body = now.bodies()[i];
-        if (std::hypot(double(body.position.x), double(body.position.z)) > kBowlRim || double(body.position.y) < 0.02) return text("тело %zu вне чаши: (%.2f, %.2f, %.2f)", i - 1, double(body.position.x), double(body.position.y), double(body.position.z));
+        if (std::sqrt(double(body.position.x) * double(body.position.x) + double(body.position.z) * double(body.position.z)) > kBowlRim || double(body.position.y) < 0.02) return text("тело %zu вне чаши: (%.2f, %.2f, %.2f)", i - 1, double(body.position.x), double(body.position.y), double(body.position.z));
         if (speedOf(body) > 0.05) return text("тело %zu движется: %.3f м/с", i - 1, speedOf(body));
     }
     return "";
@@ -416,7 +416,7 @@ std::string bowlVerdict(const World&, const World& now) {
 // 0,25 м: 8 × 8 м, 2048 треугольников (heightfieldMesh → CompoundBodyBuilder::ground). Плоского пола нет.
 const int kHillSide = 33;
 const double kHillCell = 0.25;
-double hillHeight(double x, double z) { return 0.2 + 0.03 * (x * x + z * z) + 0.12 * std::sin(1.7 * x) * std::cos(1.3 * z); }
+double hillHeight(double x, double z) { return 0.2 + 0.03 * (x * x + z * z) + 0.12 * sinCos(1.7 * x).sin * sinCos(1.3 * z).cos; }
 World hills() {
     World world;
     std::vector<Real> heights;

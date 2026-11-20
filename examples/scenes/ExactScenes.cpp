@@ -38,7 +38,7 @@ constexpr double kRodHalf = 0.4, kRelease = 2 * kPiD / 3;
 Body rodAt(double angle, Vector3 pivot) {
     Body rod = Body::box({Real(kRodHalf), Real(0.03), Real(0.03)}, 1000);
     rod.orientation = Quaternion::fromRotationVector({0, 0, Real(angle - kPiD / 2)});
-    rod.position = pivot + Real(kRodHalf) * Vector3{Real(std::sin(angle)), Real(-std::cos(angle)), 0};
+    rod.position = pivot + Real(kRodHalf) * Vector3{Real(sinCos(angle).sin), Real(-sinCos(angle).cos), 0};
     return rod;
 }
 
@@ -51,7 +51,7 @@ World pendulum() {
 
 double pendulumAngle(const World& world) {
     const Vector3 r = world.bodies()[1].position - kPivot;
-    return std::atan2(double(r.x), double(-r.y));
+    return double(kp::atan2(r.x, -r.y));
 }
 
 double pendulumExact(double time) {
@@ -60,8 +60,8 @@ double pendulumExact(double time) {
     // I / (m d) = (hx² + hy²) / (3 d) + d для бруска с полуразмерами hx, hy.
     const double k = kG / ((kRodHalf * kRodHalf + 0.03 * 0.03) / (3 * kRodHalf) + kRodHalf), dt = 1e-5;
     for (; at < time - dt / 2; at += dt) {
-        const double a1 = -k * std::sin(angle), v2 = speed + dt / 2 * a1, a2 = -k * std::sin(angle + dt / 2 * speed);
-        const double v3 = speed + dt / 2 * a2, a3 = -k * std::sin(angle + dt / 2 * v2), v4 = speed + dt * a3, a4 = -k * std::sin(angle + dt * v3);
+        const double a1 = -k * sinCos(angle).sin, v2 = speed + dt / 2 * a1, a2 = -k * sinCos(angle + dt / 2 * speed).sin;
+        const double v3 = speed + dt / 2 * a2, a3 = -k * sinCos(angle + dt / 2 * v2).sin, v4 = speed + dt * a3, a4 = -k * sinCos(angle + dt * v3).sin;
         angle += dt / 6 * (speed + 2 * v2 + 2 * v3 + v4), speed += dt / 6 * (a1 + 2 * a2 + 2 * a3 + a4);
     }
     return angle;
@@ -102,7 +102,7 @@ World gyroscope() {
 }
 
 double offsetX(const World& world) { return double(world.bodies()[1].position.x - kPivot.x); }
-double gyroscopeExact(double time) { return kGyroArm * std::cos(kGyroTurn * time); }
+double gyroscopeExact(double time) { return kGyroArm * sinCos(kGyroTurn * time).cos; }
 
 // --- Конический маятник: брусок на шаровой опоре описывает конус --------------------------------
 // Брусок отклонён на β и вращается как целое вокруг вертикали: Ω² = m g d / ((I₁ − I₃) cos β),
@@ -110,7 +110,7 @@ double gyroscopeExact(double time) { return kGyroArm * std::cos(kGyroTurn * time
 constexpr double kConeTilt = kPiD / 4;
 double coneTurn() {
     const double across = (kRodHalf * kRodHalf + 0.03 * 0.03) / 3 + kRodHalf * kRodHalf, along = 2 * 0.03 * 0.03 / 3;
-    return std::sqrt(kG * kRodHalf / ((across - along) * std::cos(kConeTilt)));
+    return std::sqrt(kG * kRodHalf / ((across - along) * sinCos(kConeTilt).cos));
 }
 
 World conicalPendulum() {
@@ -122,7 +122,7 @@ World conicalPendulum() {
     return world;
 }
 
-double coneExact(double time) { return kRodHalf * std::sin(kConeTilt) * std::cos(coneTurn() * time); }
+double coneExact(double time) { return kRodHalf * sinCos(kConeTilt).sin * sinCos(coneTurn() * time).cos; }
 
 // --- Кривошип, шатун и поршень: замкнутый механизм с приводом -----------------------------------
 // Кривошип длиной r вращается приводом со скоростью ω; поршень на ползуне ходит по закону
@@ -149,8 +149,8 @@ World sliderCrank() {
 
 double pistonX(const World& world) { return double(world.bodies()[3].position.x - kPivot.x); }
 double pistonExact(double time) {
-    const double s = kCrank * std::sin(kCrankSpeed * time);
-    return kCrank * std::cos(kCrankSpeed * time) + std::sqrt(kRod * kRod - s * s);
+    const double s = kCrank * sinCos(kCrankSpeed * time).sin;
+    return kCrank * sinCos(kCrankSpeed * time).cos + std::sqrt(kRod * kRod - s * s);
 }
 
 // --- Балка: шесть брусков, приваренных друг к другу и к опоре ------------------------------------

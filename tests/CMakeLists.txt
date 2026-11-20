@@ -5,6 +5,9 @@ target_compile_options(unit-tests PRIVATE -Wall -Wextra)
 add_test(NAME unit-tests COMMAND unit-tests)
 # Правило детерминизма: в библиотеке нет вызовов sin, cos, exp и прочих функций libm.
 add_test(NAME no-libm COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/check_no_libm.sh $<TARGET_FILE:kinetica-physics>)
+# То же для сцен: синус, вычисленный компилятором при сборке, и синус библиотеки расходятся в последнем
+# бите, и сцена с ним строилась по-разному у g++ и clang++ (чаша, 2026-11-20).
+add_test(NAME no-libm-scenes COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/check_no_libm.sh $<TARGET_FILE:kinetica-scenes>)
 
 # Леммы площадки касания проверяет решатель Z3, если он есть в системе (proofs/).
 find_program(Z3_SOLVER z3)

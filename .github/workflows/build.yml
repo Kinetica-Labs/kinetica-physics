@@ -3,7 +3,9 @@
 #   no-libm     — в библиотеке нет функций libm (детерминизм);
 #   contact-patch-lemmas — леммы Z3 (proofs/check.sh);
 #   state-hash  — состояние сцен после 60 кадров бит в бит совпадает с эталоном;
-#   code_metrics --check — стандарт кода: нет длинных функций и классов, слои не нарушены.
+#   code_metrics --check — стандарт кода: нет длинных функций и классов, слои не нарушены;
+#   тот же хэш у clang++ — повторяемость не зависит от компилятора;
+#   case_table --check — счёт нарушений в полной таблице случаев контакта не вырос.
 name: build
 
 on:
@@ -17,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Средства
-        run: sudo apt-get update && sudo apt-get install -y z3
+        run: sudo apt-get update && sudo apt-get install -y z3 clang
       - name: Сборка
         run: cmake -B build && cmake --build build -j
       - name: Проверки
@@ -26,3 +28,9 @@ jobs:
         run: ./build/validation/studies/study-state-hash 60 | diff - docs/reports/data/state-hash.txt
       - name: Стандарт кода
         run: python3 validation/code_metrics.py --check
+      - name: Хэш состояния другим компилятором
+        run: |
+          cmake -B build-clang -DCMAKE_CXX_COMPILER=clang++ && cmake --build build-clang -j --target study-state-hash
+          ./build-clang/validation/studies/study-state-hash 60 | diff - docs/reports/data/state-hash.txt
+      - name: Таблица случаев контакта
+        run: python3 validation/case_table.py --check
