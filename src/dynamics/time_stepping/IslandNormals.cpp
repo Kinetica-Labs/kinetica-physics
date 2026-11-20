@@ -67,14 +67,18 @@ Real IslandNormals::excess(const SoftContact::NormalRow& row, const StepArray<So
 
 // Островки не связаны: каждый пишет только в свои контакты и свои подвижные тела, поэтому решаются
 // заданиями пула потоков, и ответ от числа потоков не зависит.
-void IslandNormals::solve(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed) {
+void IslandNormals::solve(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed,
+                          const StepArray<char>* moving) {
     if (direct_.size() != contacts.size()) choose(contacts, bodies);
+    const auto stirs = [&](int body) { return !moving || (*moving)[size_t(body)]; };
     for (size_t c = 0; c < contacts.size(); ++c)
-        if (!direct_[c]) contacts[c].solveNormals(states, withBias, h, pushSpeed);
+        if (!direct_[c] && (stirs(contacts[c].normalRow(0).a) || stirs(contacts[c].normalRow(0).b))) contacts[c].solveNormals(states, withBias, h, pushSpeed);
     const Pass pass{withBias, h, pushSpeed};
     size_t rows = 0;
     for (const Island& island : islands_) rows += island.rows.size();
-    const auto one = [&](size_t k) { solveIsland(islands_[k], contacts, bodies, states, pass); };
+    const auto one = [&](size_t k) {
+        if (std::any_of(islands_[k].members.begin(), islands_[k].members.end(), stirs)) solveIsland(islands_[k], contacts, bodies, states, pass);
+    };
     if (rows < kParallelRows) for (size_t k = 0; k < islands_.size(); ++k) one(k);
     else WorkerPool::shared().run(islands_.size(), one);
 }

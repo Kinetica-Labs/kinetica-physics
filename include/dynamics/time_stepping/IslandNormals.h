@@ -32,7 +32,9 @@ namespace kp {
 class IslandNormals {
 public:
     IslandNormals(int rowLimit, Real biasRate) : rowLimit_(rowLimit), biasRate_(biasRate) {}
-    void solve(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed);
+    // moving — по телам: решаются только контакты и островки, где движется хоть одно тело; nullptr — все.
+    void solve(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed,
+               const StepArray<char>* moving = nullptr);
 
 private:
     // Точка контакта в задаче островка; a и b — места её тел в островке.

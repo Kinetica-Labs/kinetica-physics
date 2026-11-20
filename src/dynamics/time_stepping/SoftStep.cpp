@@ -217,13 +217,13 @@ struct LiveContacts {
     }
 };
 
-// Есть ли тело, точка которого при нынешней скорости пройдёт за time больше reach. Выталкивание
-// вдавленных тел разгоняет их и в тихом кадре: тогда второе решение нормалей нужно, чтобы снять эту
-// скорость (без него тела, вдавленные на 10 см, разлетались на 1,7 м/с).
-bool stirred(const std::vector<Body>& bodies, const StepArray<SolverBody>& states, Real time, Real reach) {
-    for (size_t i = 0; i < bodies.size(); ++i)
-        if (states[i].inverseMass != 0 && (states[i].v.length() + states[i].w.length() * bodies[i].boundingRadius()) * time > reach) return true;
-    return false;
+// Какие тела движутся: скорость точки тела больше speed. Выталкивание вдавленных тел разгоняет их и в
+// покое: тогда второе решение нормалей нужно, чтобы снять эту скорость (без него тела, вдавленные на
+// 10 см, разлетались на 1,7 м/с).
+StepArray<char> stirred(const std::vector<Body>& bodies, const StepArray<SolverBody>& states, Real speed) {
+    StepArray<char> moving(bodies.size(), 0);
+    for (size_t i = 0; i < bodies.size(); ++i) moving[i] = states[i].inverseMass != 0 && states[i].v.length() + states[i].w.length() * bodies[i].boundingRadius() > speed;
+    return moving;
 }
 
 // Конец шага: скорости решателя — в импульсы тел, накопленные импульсы контактов — в память.
@@ -268,7 +268,8 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
         live.solveAndMove(moving, h, (substeps - substep) * h);
         rows.build(joints, bodies, states, jointMemory, directJoints);
         rows.solve(states, false, jointCorrection, h, jointSoft, pushSpeed), notify(observer, StepStage::Joints);
-        if (relaxNormals || stirred(bodies, states, dt, contactDrift)) normals.solve(contacts, bodies, states, false, h, pushSpeed);
+        const StepArray<char> moving = stirred(bodies, states, restSpeed);
+        if (restSpeed == 0 || std::find(moving.begin(), moving.end(), 1) != moving.end()) normals.solve(contacts, bodies, states, false, h, pushSpeed, restSpeed > 0 ? &moving : nullptr);
         notify(observer, StepStage::Normals);
         for (SoftContact& contact : contacts) contact.solveFriction(states, rollingResistance);
         notify(observer, StepStage::Friction);
