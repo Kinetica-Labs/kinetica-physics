@@ -64,12 +64,11 @@ python3 validation/frame_covariance.py --cached    # собрать отчёт �
 
 ```
 python3 validation/report_page.py docs/reports/отчёт.md build/site/index.html   # одна страница, рисунки внутри
-python3 -m http.server 8765 --bind 0.0.0.0 --directory build/site               # открыть с телефона в той же сети
 ```
 
-Пользователь читает отчёты с телефона и рисунков из локального Markdown в чате не видит: отчёт с рисунками
-отдавать ещё и страницей. Рисунки отчёта строит свой сценарий в `validation/studies/` (`status_figures.py`,
-`day_figures.py`) — из чисел замеров, не руками.
+Страница открывается с диска, двойным щелчком. **Сервер ради неё не поднимать** — ни здесь, ни на свободной
+машине: пользователь 2026-11-21 назвал это идиотизмом. Рисунки отчёта строит свой сценарий в
+`validation/studies/` (`status_figures.py`, `day_figures.py`) — из чисел замеров, не руками.
 
 ## Приборы (`validation/studies/`)
 
