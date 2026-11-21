@@ -8,7 +8,8 @@
 //   study-frame-covariance bench [сторона]                                            — пирамида замера скорости, 60 кадров
 // Время каждой стадии каждого кадра — наименьшее по KP_REPEATS прогонам (3): счёт повторяется бит в бит,
 // помеха время только прибавляет. KP_THREADS — потоков пула; KP_SUBSTEPS, KP_UPDATES, KP_ITERATIONS —
-// настройки быстрого шага (PullScenario.h). Вывод: строка-шапка и по строке JSON на кадр.
+// настройки быстрого шага (PullScenario.h); KP_NO_COUNTERS — не снимать счётчики кадра: они зовут поиск пар
+// вне времени кадра, но попадают в профиль и в счёт исполнений. Вывод: строка-шапка и по строке JSON на кадр.
 
 #include <collision/PairFinder.h>
 #include <math/WorkerPool.h>
@@ -126,7 +127,7 @@ int main(int argc, char** argv) {
     if (const char* threads = std::getenv("KP_THREADS")) WorkerPool::shared().resize(std::atoi(threads));
     const Experiment experiment = experimentOf(argc, argv);
     const int repeats = std::getenv("KP_REPEATS") ? std::max(1, std::atoi(std::getenv("KP_REPEATS"))) : 3;
-    std::vector<Frame> frames = play(experiment, true);
+    std::vector<Frame> frames = play(experiment, std::getenv("KP_NO_COUNTERS") == nullptr);
     for (int r = 1; r < repeats; ++r) {
         const std::vector<Frame> again = play(experiment, false);
         for (size_t f = 0; f < frames.size(); ++f)
