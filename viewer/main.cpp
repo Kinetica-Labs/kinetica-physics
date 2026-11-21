@@ -1,6 +1,6 @@
 // Окно просмотра: сцены движка в реальном времени на OpenGL.
 //
-//   viewer [--scene N] [--exact 1] [--frames N] [--screenshot файл.ppm] [--record префикс]
+//   viewer [--scene N] [--exact 1] [--frames N] [--screenshot файл.ppm] [--record префикс] [--blast кадр]
 //
 // Управление — на панели в окне и клавишами: 1–9 — сцена, пробел — пауза, → — один шаг,
 // R — сцена заново, T — состояние мира в консоль, левая кнопка мыши на теле — взять и тянуть его,
@@ -8,6 +8,8 @@
 // колесо — приближение, Esc — выход.
 // С ключом --frames окно само закрывается после N кадров; --screenshot сохраняет последний,
 // --record — каждый (префикс-0001.ppm, …): из них собираются анимации для документации.
+// --blast ставит взрыв в точку, на которую смотрит камера, и пускает его на заданном кадре: проверка
+// источников импульсов без мыши. E — пуск всех источников импульсов с панели.
 
 #include "GlRenderer.h"
 #include "Panel.h"
@@ -35,6 +37,7 @@ void onKey(GLFWwindow* window, int key, int, int action, int) {
     if (key == GLFW_KEY_R) viewer.load(viewer.scene);
     if (key == GLFW_KEY_SPACE) viewer.paused = !viewer.paused;
     if (key == GLFW_KEY_RIGHT) viewer.stepOnce = true;
+    if (key == GLFW_KEY_E) viewer.fireAll();
     if (key == GLFW_KEY_T) std::fputs(debugText(viewer.world).c_str(), stdout);
     if (key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
@@ -56,7 +59,7 @@ void pointer(GLFWwindow* window, Viewer& viewer, int width, int height) {
     const bool down = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && (wasDown || !ImGui::GetIO().WantCaptureMouse);
     const bool turning = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !ImGui::GetIO().WantCaptureMouse;
     const Vector3 direction = viewer.camera.ray(x, y, width, height);
-    if (down && !wasDown) viewer.grabAt(direction);
+    if (down && !wasDown && !viewer.placeAt(direction)) viewer.grabAt(direction);
     if (!down) viewer.release();
     viewer.dragTo(direction);
     if (turning || (down && viewer.grab.body < 0)) {
@@ -106,7 +109,7 @@ void stopPanel() {
 
 int main(int argc, char** argv) {
     size_t firstScene = 0;
-    int frameLimit = 0;
+    int frameLimit = 0, blastFrame = -1;
     bool exact = false;
     std::string screenshot, record;
     for (int i = 1; i + 1 < argc; i += 2) {
@@ -116,6 +119,7 @@ int main(int argc, char** argv) {
         if (key == "--exact") exact = std::atoi(argv[i + 1]) != 0;
         if (key == "--screenshot") screenshot = argv[i + 1];
         if (key == "--record") record = argv[i + 1];
+        if (key == "--blast") blastFrame = std::atoi(argv[i + 1]);
     }
 
     if (!glfwInit()) return (std::fprintf(stderr, "не удалось запустить GLFW: нет графического экрана?\n"), 1);
@@ -127,6 +131,7 @@ int main(int argc, char** argv) {
     Viewer viewer;
     viewer.realtime = !exact;
     viewer.load(firstScene);
+    if (blastFrame >= 0) viewer.impulses.push_back({}), viewer.impulses.back().center = viewer.camera.target;
     glfwSetWindowUserPointer(window, &viewer);
     glfwSetKeyCallback(window, onKey);
     glfwSetScrollCallback(window, onScroll);
@@ -141,6 +146,7 @@ int main(int argc, char** argv) {
         int width = 0, height = 0, pixelsWide = 0, pixelsHigh = 0;
         glfwGetWindowSize(window, &width, &height);
         pointer(window, viewer, width, height);
+        if (viewer.frame == blastFrame) viewer.fireAll();
         if (!viewer.paused || viewer.stepOnce) viewer.step();
         viewer.stepOnce = false;
 

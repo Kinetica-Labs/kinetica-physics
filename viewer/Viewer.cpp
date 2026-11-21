@@ -11,6 +11,7 @@ void Viewer::load(size_t index) {
     world = scenes()[index].build();
     world.sleeping = sleeping;
     grab = {};
+    placing = -1;
     camera.target = scenes()[index].lookAt;
     camera.distance = scenes()[index].distance;
     frame = mostSegments = 0;
@@ -34,6 +35,8 @@ void Viewer::step() {
     for (size_t i = 0; i < world.bodies().size(); ++i) world.body(BodyId(int(i))).linearDamping = world.body(BodyId(int(i))).angularDamping = drag;
     if (scenes()[scene].control) scenes()[scene].control(world, frame * double(kFrame));
     world.soft.contactUpdates = contactUpdates, world.soft.substeps = substeps;
+    for (const ImpulseTool& tool : impulses)
+        if (tool.everyFrame) tool.fire(world, kFrame); // постоянная сила: импульс «сила × время кадра»
     const auto start = std::chrono::steady_clock::now();
     world.step(kFrame);
     lastStep = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
@@ -44,6 +47,18 @@ void Viewer::step() {
     worstGap = std::max(worstGap, double(world.joints().largestError(world.bodies())));
     if (const ExactScene* exact = scenes()[scene].exact)
         worstError = std::max(worstError, std::abs(exact->measured(world) - exact->exact((frame * double(kFrame)) - lag)));
+}
+
+bool Viewer::placeAt(Vector3 direction) {
+    if (placing < 0) return false;
+    if (const RayHit hit = castRay(world, {camera.eye(), direction})) impulses[size_t(placing)].center = hit.point;
+    placing = -1;
+    return true;
+}
+
+void Viewer::fireAll() {
+    for (ImpulseTool& tool : impulses)
+        if (!tool.everyFrame) tool.touched = tool.fire(world);
 }
 
 bool Viewer::grabAt(Vector3 direction) {
@@ -84,6 +99,7 @@ DebugGeometry Viewer::visible(const DebugGeometry& all) const {
         if (show[int(line.kind)]) shown.lines.push_back(line);
     for (const DebugPoint& point : all.points)
         if (show[int(point.kind)]) shown.points.push_back(point);
+    for (const ImpulseTool& tool : impulses) tool.draw(shown);
     if (grab.body >= 0) {
         const TetherJoint& tether = *grab.tether;
         const Vector3 from = world.bodies()[size_t(tether.b)].pose().point(tether.anchorB), to = world.bodies()[size_t(tether.a)].pose().point(tether.anchorA);

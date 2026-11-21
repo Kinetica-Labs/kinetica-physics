@@ -10,6 +10,7 @@ add_library(kinetica-physics STATIC
   math/WorkerPool.cpp
   world/World.cpp
   world/IslandSleep.cpp
+  world/AreaImpulse.cpp
   collision/ContactPair.cpp
   collision/ManifoldMemory.cpp
   collision/CandidateMemory.cpp

@@ -2,6 +2,7 @@
 // Состояние окна просмотра: какая сцена идёт, её мир, камера и что показывать.
 
 #include "Camera.h"
+#include "ImpulseTool.h"
 #include "Scenes.h"
 #include <debug/DebugGeometry.h>
 
@@ -44,6 +45,12 @@ struct Viewer {
     bool grabAt(kp::Vector3 direction);
     void dragTo(kp::Vector3 direction);
     void release();
+    // Источники импульсов: взрывы и толчки. Принадлежат окну и смену сцены переживают. placing — номер
+    // источника, центр которого поставит следующий щелчок по сцене; −1 — никакой.
+    std::vector<ImpulseTool> impulses;
+    int placing = -1;
+    bool placeAt(kp::Vector3 direction); // ставит центр под курсор; true — щелчок потрачен на это
+    void fireAll();                      // пуск всех разовых источников
     int frame = 0;
     double worstError = 0, worstGap = 0; // наибольшие ошибка величины с точным решением и разрыв сочленений, м
     double lastStep = 0, slowestStep = 0; // время счёта шага, мс

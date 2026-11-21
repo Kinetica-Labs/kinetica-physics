@@ -22,6 +22,7 @@ cmake -B build -DKP_VIEWER=ON && cmake --build build -j # окно; тянет G
 ./build/viewer/viewer --scene N [--exact 1]             # быстрый шаг по умолчанию, --exact 1 — точный
 ./build/viewer/viewer --scene N --frames 150 --screenshot кадр.ppm   # закрывается само, пишет последний кадр;
                                                         # --record префикс — каждый кадр (нужен графический экран)
+                                                        # --blast кадр — взрыв в точке взгляда на этом кадре: проверка окна «Импульсы» без мыши
 python3 validation/code_metrics.py [--all|--json|--check]  # стандарт кода: длинные функции, классы, слои, битые ссылки;
                                                         # --check — ошибка при любом нарушении (так в CI): сейчас нарушений 0
 python3 validation/run.py run|box3d|report              # табло против Box3D → docs/reports/engine-comparison.md

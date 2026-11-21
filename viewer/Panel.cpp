@@ -20,6 +20,55 @@ void drawBodyNumbers(const Viewer& viewer, int width, int height) {
     }
 }
 
+// Один источник импульса: ползунки, пуск, постановка центра мышью. true — источник просят удалить.
+bool drawImpulse(Viewer& viewer, size_t index) {
+    ImpulseTool& tool = viewer.impulses[index];
+    float center[3] = {float(tool.center.x), float(tool.center.y), float(tool.center.z)};
+    if (ImGui::DragFloat3("центр, м", center, 0.02f)) tool.center = {Real(center[0]), Real(center[1]), Real(center[2])};
+    ImGui::SliderFloat("радиус действия, м", &tool.radius, 0.1f, 10, "%.2f");
+    ImGui::SliderFloat(tool.everyFrame ? "сила, Н" : "импульс, Н·с", &tool.impulse, 1, 20000, "%.0f", ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderInt("спад с расстоянием, степень (0 - без спада)", &tool.falloff, 0, 3);
+    if (!tool.radial) {
+        ImGui::SliderAngle("направление: поворот", &tool.yaw, -180, 180);
+        ImGui::SliderAngle("направление: подъём", &tool.pitch, -90, 90);
+    }
+    ImGui::Checkbox("действует постоянно (сила каждый кадр)", &tool.everyFrame);
+    if (ImGui::Button("Пуск")) tool.touched = tool.fire(viewer.world);
+    ImGui::SameLine();
+    if (ImGui::Button(viewer.placing == int(index) ? "щёлкните по сцене" : "Поставить мышью")) viewer.placing = int(index);
+    ImGui::SameLine();
+    const bool remove = ImGui::Button("Удалить");
+    ImGui::Text("последний пуск задел тел: %d", tool.touched);
+    return remove;
+}
+
+// Источники импульсов — своё окно у правого края, раскрывающимся списком: взрывы и толчки в направлении.
+void drawImpulses(Viewer& viewer, int width) {
+    ImGui::SetNextWindowPos({float(width) - 10, 10}, ImGuiCond_FirstUseEver, {1, 0});
+    ImGui::Begin("Импульсы: взрывы и толчки", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    for (bool radial : {true, false}) {
+        if (ImGui::Button(radial ? "+ взрыв" : "+ толчок в направлении")) {
+            viewer.impulses.push_back({});
+            viewer.impulses.back().radial = radial, viewer.impulses.back().center = viewer.camera.target;
+        }
+        ImGui::SameLine();
+    }
+    if (ImGui::Button("Пуск всех (E)")) viewer.fireAll();
+    for (size_t k = 0; k < viewer.impulses.size(); ++k) {
+        ImGui::PushID(int(k));
+        const bool open = ImGui::TreeNodeEx("source", ImGuiTreeNodeFlags_DefaultOpen, "%zu. %s", k + 1, viewer.impulses[k].radial ? "взрыв" : "толчок в направлении");
+        const bool remove = open && drawImpulse(viewer, k);
+        if (open) ImGui::TreePop();
+        ImGui::PopID();
+        if (remove) {
+            viewer.impulses.erase(viewer.impulses.begin() + std::ptrdiff_t(k));
+            viewer.placing = -1;
+            break;
+        }
+    }
+    ImGui::End();
+}
+
 } // namespace
 
 void drawPanel(Viewer& viewer, const DebugGeometry& all, int width, int height) {
@@ -84,8 +133,9 @@ void drawPanel(Viewer& viewer, const DebugGeometry& all, int width, int height) 
     }
 
     ImGui::SeparatorText("Управление");
-    ImGui::TextUnformatted("левая кнопка на теле — взять и тянуть\nмимо тел или правая кнопка — камера\nсредняя кнопка — сдвинуть сцену\nколесо — ближе и дальше\n1–9 — сцена, пробел — пауза, → — шаг\nR — заново, T — мир в консоль, Esc — выход");
+    ImGui::TextUnformatted("левая кнопка на теле — взять и тянуть\nмимо тел или правая кнопка — камера\nсредняя кнопка — сдвинуть сцену\nколесо — ближе и дальше\n1–9 — сцена, пробел — пауза, → — шаг\nR — заново, T — мир в консоль, Esc — выход\nE — пуск всех импульсов");
     ImGui::End();
 
+    drawImpulses(viewer, width);
     if (viewer.showBodyNumbers) drawBodyNumbers(viewer, width, height);
 }

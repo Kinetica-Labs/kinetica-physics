@@ -1,5 +1,6 @@
 // Свободное движение против законов сохранения.
 
+#include <world/AreaImpulse.h>
 #include <collision/shapes/Meshes.h>
 #include <body/CompoundBodyBuilder.h>
 #include <collision/PairFinder.h>
@@ -593,6 +594,32 @@ void jointsLeaveOnlyTheirFreedoms() {
         if (wavy) continue;
         CHECK_NEAR(double(coordinate(world, rail)) - start, 2.0, 5e-3);
         CHECK_NEAR(spin, 1.0, 0.03);
+    }
+    {
+        // Взрыв: шар на оси получает импульс вдоль неё с линейным спадом (ближайшая точка в 0,9 м от центра,
+        // доля 1 − 0,9/2); тело за радиусом действия и неподвижное тело не меняются.
+        World world;
+        const BodyId near = world.addBody(Body::sphere(0.1, 1000, {1, 0, 0})), far = world.addBody(Body::sphere(0.1, 1000, {3, 0, 0}));
+        world.addBody(Body::box({0.1, 0.1, 0.1}, 0, {0, 1, 0}));
+        CHECK(applyRadialImpulse(world, {}, 2, 10) == 1, "взрыв задел не одно тело");
+        CHECK_NEAR(double(world.body(near).linearMomentum.x), 5.5, 1e-9);
+        CHECK(double((world.body(near).linearMomentum - Vector3{Real(world.body(near).linearMomentum.x), 0, 0}).length()) < 1e-9, "импульс шара не вдоль оси");
+        CHECK(double(world.body(near).angularMomentum.length()) < 1e-12, "взрыв закрутил шар на оси");
+        CHECK(double(world.body(far).linearMomentum.length()) == 0, "взрыв задел тело за радиусом действия");
+        // Толчок в направлении со спадом степени 2: доля (1 − 0,9/2)², в центре масс, без закрутки.
+        world.body(near).linearMomentum = {};
+        CHECK(applyDirectedImpulse(world, {}, 2, {0, 3, 0}, 2) == 1, "толчок задел не одно тело");
+        CHECK_NEAR(double(world.body(near).linearMomentum.y), 0.9075, 1e-9);
+        CHECK(double(world.body(near).angularMomentum.length()) == 0, "толчок в центр масс закрутил тело");
+    }
+    {
+        // Взрыв сбоку от куба со стороной 1 м: импульс приложен в ближайшей точке (0,5; 0,3; 0) — момент
+        // импульса (p − c) × J = (0; 0; 0,6) при J = (−2; 0; 0).
+        World world;
+        const BodyId cube = world.addBody(Body::box({0.5, 0.5, 0.5}, 1000));
+        applyRadialImpulse(world, {2, Real(0.3), 0}, 3, 4);
+        CHECK(double((world.body(cube).linearMomentum - Vector3{-2, 0, 0}).length()) < 1e-9, "импульс куба (%.9f, %.9f, %.9f)", double(world.body(cube).linearMomentum.x), double(world.body(cube).linearMomentum.y), double(world.body(cube).linearMomentum.z));
+        CHECK(double((world.body(cube).angularMomentum - Vector3{0, 0, Real(0.6)}).length()) < 1e-9, "момент импульса куба (%.9f, %.9f, %.9f)", double(world.body(cube).angularMomentum.x), double(world.body(cube).angularMomentum.y), double(world.body(cube).angularMomentum.z));
     }
     {
         // Координата пути за концами открытой кривой: длина дуги плюс смещение по касательной в конце.
