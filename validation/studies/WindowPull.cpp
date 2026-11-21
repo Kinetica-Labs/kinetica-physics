@@ -8,61 +8,35 @@
 //   study-window-pull [exact|realtime] [сцена] [тело] [скорость, м/с] [dx dy dz]
 // Время каждого кадра — наименьшее по KP_REPEATS прогонам (по умолчанию 3): счёт повторяется бит в бит,
 // а помеха соседних программ время только прибавляет. KP_THREADS — число потоков пула; KP_SEGMENTS —
-// предел отрезков точного шага (в окне 8). Последняя строка — те же числа в JSON для validation/gate.py.
+// предел отрезков точного шага (в окне 8); KP_SUBSTEPS, KP_UPDATES, KP_ITERATIONS — настройки быстрого шага
+// (PullScenario.h). Последняя строка — те же числа в JSON для validation/gate.py.
 
 #include <collision/PairFinder.h>
 #include <math/WorkerPool.h>
-#include "../../examples/scenes/StandardScenes.h"
 #include "OverlapDepth.h"
+#include "PullScenario.h"
 
 #include <algorithm>
 #include <chrono>
-#include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <string>
 #include <vector>
 
 using namespace kp;
 
 namespace {
 
-struct Pull {
-    std::string mode = "realtime", key = "pyramid";
-    int held = 12;
-    double speed = 2;
-    Vector3 along{1, 0, 0};
-};
-
 struct Sanity {
     double peakSpeed = 0, overlap = 0; // м/с и м за все кадры рывка
 };
 
-World settled(const Pull& pull) {
-    World world;
-    for (const StandardScene& scene : standardScenes())
-        if (pull.key == scene.key) world = scene.build();
-    const bool exact = pull.mode == "exact";
-    world.sleeping = true, world.realtime = !exact;
-    world.sleepSpeed = exact ? Real(1e-4) : Real(0.05), world.sleepTime = 2;
-    if (const char* cap = std::getenv("KP_SEGMENTS")) world.maxSegments = std::atoi(cap);
-    for (size_t i = 0; i < world.bodies().size(); ++i) world.body(BodyId(int(i))).linearDamping = world.body(BodyId(int(i))).angularDamping = Real(0.1);
-    for (int f = 0; f < 180; ++f) world.step(Real(1) / 60);
-    return world;
-}
-
 // Время каждого из 240 кадров рывка, мс; sanity — если задан, меряется после каждого кадра вне времени.
-std::vector<double> pullOnce(const Pull& pull, Sanity* sanity) {
-    World world = settled(pull);
-    const BodyId held{pull.held};
-    world.wake(held);
-    const Vector3 start = world.body(held).position;
-    const double mass = 1 / double(world.body(held).mass.inverseMass), omega = 2 * M_PI * 8;
-    TetherJoint& tether = addTether(world, BodyId(0), start, held, start, Real(mass * omega * omega), Real(2 * mass * omega));
+std::vector<double> pullOnce(const PullScenario& pull, Sanity* sanity) {
+    World world = pull.settled();
+    const PullScenario::Grip grip = pull.grab(world);
     std::vector<double> times;
     for (int f = 0; f < 240; ++f) {
-        const Vector3 hand = start + Real(pull.speed * std::min((f + 1) / 60.0, 0.5)) * pull.along;
-        tether.anchorA = world.body(BodyId(0)).pose().localPoint(hand);
+        pull.drag(world, grip, f);
         const auto t0 = std::chrono::steady_clock::now();
         world.step(Real(1) / 60);
         times.push_back(1e3 * std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count());
@@ -79,12 +53,7 @@ std::vector<double> pullOnce(const Pull& pull, Sanity* sanity) {
 
 int main(int argc, char** argv) {
     if (const char* threads = std::getenv("KP_THREADS")) WorkerPool::shared().resize(std::atoi(threads));
-    Pull pull;
-    if (argc > 1) pull.mode = argv[1];
-    if (argc > 2) pull.key = argv[2];
-    if (argc > 3) pull.held = std::atoi(argv[3]);
-    if (argc > 4) pull.speed = std::atof(argv[4]);
-    if (argc > 7) pull.along = {Real(std::atof(argv[5])), Real(std::atof(argv[6])), Real(std::atof(argv[7]))};
+    const PullScenario pull = PullScenario::parse(argc, argv, 1);
     const int repeats = std::getenv("KP_REPEATS") ? std::max(1, std::atoi(std::getenv("KP_REPEATS"))) : 3;
     Sanity sanity;
     std::vector<double> times = pullOnce(pull, &sanity);

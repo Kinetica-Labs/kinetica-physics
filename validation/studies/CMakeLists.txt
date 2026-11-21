@@ -25,6 +25,9 @@ add_executable(study-overlap-spread OverlapSpread.cpp)
 target_link_libraries(study-overlap-spread PRIVATE kinetica-scenes)
 add_executable(study-window-pull WindowPull.cpp)
 target_link_libraries(study-window-pull PRIVATE kinetica-scenes)
+add_executable(study-frame-covariance FrameCovariance.cpp)
+target_link_libraries(study-frame-covariance PRIVATE kinetica-scenes)
+target_include_directories(study-frame-covariance PRIVATE ${PROJECT_SOURCE_DIR}/validation/engines) # трёхмерная пирамида замера скорости
 find_package(Threads REQUIRED)
 target_link_libraries(study-case-table PRIVATE Threads::Threads) # клетки таблицы считаются параллельно
 add_executable(study-exact-scenes ExactScenes.cpp)
