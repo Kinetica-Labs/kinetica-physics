@@ -9,9 +9,11 @@ add_executable(study-standard-scenes StandardScenes.cpp)
 target_link_libraries(study-standard-scenes PRIVATE kinetica-scenes)
 add_executable(study-state-hash StateHash.cpp)
 target_link_libraries(study-state-hash PRIVATE kinetica-scenes)
-add_executable(study-allocations Allocations.cpp)
-target_link_libraries(study-allocations PRIVATE kinetica-scenes ${CMAKE_DL_LIBS})
-target_link_options(study-allocations PRIVATE -rdynamic) # имена функций в цепочках вызовов
+if(NOT WIN32) # подмена malloc и цепочки вызовов — средствами Linux
+  add_executable(study-allocations Allocations.cpp)
+  target_link_libraries(study-allocations PRIVATE kinetica-scenes ${CMAKE_DL_LIBS})
+  target_link_options(study-allocations PRIVATE -rdynamic) # имена функций в цепочках вызовов
+endif()
 add_executable(study-frame-times FrameTimes.cpp)
 target_link_libraries(study-frame-times PRIVATE kinetica-scenes)
 add_executable(study-frame-stages FrameStages.cpp)
@@ -21,6 +23,8 @@ add_executable(study-scale Scale.cpp)
 target_link_libraries(study-scale PRIVATE kinetica-physics)
 add_executable(study-overlap-spread OverlapSpread.cpp)
 target_link_libraries(study-overlap-spread PRIVATE kinetica-scenes)
+add_executable(study-window-pull WindowPull.cpp)
+target_link_libraries(study-window-pull PRIVATE kinetica-scenes)
 find_package(Threads REQUIRED)
 target_link_libraries(study-case-table PRIVATE Threads::Threads) # клетки таблицы считаются параллельно
 add_executable(study-exact-scenes ExactScenes.cpp)

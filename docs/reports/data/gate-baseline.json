@@ -1,0 +1,146 @@
+{
+ "remote": {
+  "bench_all_ms": 34.66,
+  "bench_single": 60.97,
+  "pull": {
+   "pyramid 1": {
+    "body": 1,
+    "median_ms": 1.5082,
+    "mode": "realtime",
+    "overlap_m": 0.000238788,
+    "p99_ms": 15.5292,
+    "peak_speed": 2.48326,
+    "scene": "pyramid",
+    "slow_frames": 1,
+    "worst_ms": 17.5481
+   },
+   "pyramid 12": {
+    "body": 12,
+    "median_ms": 4.0879,
+    "mode": "realtime",
+    "overlap_m": 0.000182494,
+    "p99_ms": 17.7769,
+    "peak_speed": 5.4058,
+    "scene": "pyramid",
+    "slow_frames": 4,
+    "worst_ms": 22.0265
+   },
+   "pyramid 9": {
+    "body": 9,
+    "median_ms": 3.5232,
+    "mode": "realtime",
+    "overlap_m": 0.000495588,
+    "p99_ms": 15.0126,
+    "peak_speed": 6.385,
+    "scene": "pyramid",
+    "slow_frames": 1,
+    "worst_ms": 22.8149
+   }
+  },
+  "scene": {
+   "beam6": 0.174361333,
+   "chain100": 0.486844333,
+   "column100": 2.59572533,
+   "cube100": 0.0562546667,
+   "gap1mm": 0.0519122222,
+   "overlap": 0.0858622222,
+   "pendulum120": 0.0541015,
+   "pyramid55": 1.31516867,
+   "rubble36": 1.79465167,
+   "stack10": 0.259079
+  }
+ },
+ "standard": {
+  "arch": {
+   "energy_gain": 0.0002103,
+   "ok": true,
+   "overlap_m": 9.568e-10
+  },
+  "balls": {
+   "energy_gain": 4.304e-07,
+   "ok": true,
+   "overlap_m": 2.24e-07
+  },
+  "bowl": {
+   "energy_gain": 3.179e-06,
+   "ok": true,
+   "overlap_m": 0.002272
+  },
+  "buckets": {
+   "energy_gain": 5.403e-05,
+   "ok": true,
+   "overlap_m": 0.0008229
+  },
+  "bullet": {
+   "energy_gain": 3.789e-19,
+   "ok": true,
+   "overlap_m": 4.868e-15
+  },
+  "chain": {
+   "energy_gain": 0.0001148,
+   "ok": true,
+   "overlap_m": 3.665e-05
+  },
+  "cradle": {
+   "energy_gain": 0.0008247,
+   "ok": true,
+   "overlap_m": 4.387e-08
+  },
+  "dominoes": {
+   "energy_gain": 6.906e-07,
+   "ok": true,
+   "overlap_m": 0.001568
+  },
+  "drift": {
+   "energy_gain": 1.237e-10,
+   "ok": true,
+   "overlap_m": 0.0005644
+  },
+  "gripper": {
+   "energy_gain": 1.186,
+   "ok": true,
+   "overlap_m": 8.518e-09
+  },
+  "heavy": {
+   "energy_gain": 9.363e-07,
+   "ok": true,
+   "overlap_m": 6.503e-08
+  },
+  "hills": {
+   "energy_gain": 0.0,
+   "ok": true,
+   "overlap_m": 0.001716
+  },
+  "pile": {
+   "energy_gain": 0.05161,
+   "ok": true,
+   "overlap_m": 0.004703
+  },
+  "pyramid": {
+   "energy_gain": 6.978e-11,
+   "ok": true,
+   "overlap_m": 6.122e-11
+  },
+  "slope": {
+   "energy_gain": 0.0,
+   "ok": false,
+   "overlap_m": 5.216e-11
+  },
+  "stack": {
+   "energy_gain": 9.387e-10,
+   "ok": true,
+   "overlap_m": 6.504e-11
+  },
+  "swing": {
+   "energy_gain": 0.000868,
+   "ok": true,
+   "overlap_m": 0.0009905
+  },
+  "wall": {
+   "energy_gain": 3.133e-07,
+   "ok": true,
+   "overlap_m": 0.0007515
+  }
+ },
+ "wall_overlap_median_mm": 0.76
+}
