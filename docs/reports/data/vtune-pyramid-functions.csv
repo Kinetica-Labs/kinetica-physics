@@ -1,0 +1,345 @@
+Function;CPU Time;CPU Time:Effective Time;CPU Time:Spin Time;CPU Time:Overhead Time;Module;Function (Full);Source File;Start Address
+kp::solveDenseBlock;2.479102;2.479102;0.0;0.0;compare-ours.exe;kp::solveDenseBlock(std::__1::vector<double, std::__1::allocator<double>> const&, unsigned long long, std::__1::vector<unsigned long long, std::__1::allocator<unsigned long long>> const&, std::__1::vector<double, std::__1::allocator<double>>&, std::__1::vector<double, std::__1::allocator<double>>&);Complementarity.h;0x140048d10
+kp::SoftContact::prefetch::<lambda0>::operator();1.535058;1.535058;0.0;0.0;compare-ours.exe;kp::SoftContact::prefetch::<lambda0>::operator();SoftContact.cpp;0x1400457bd
+kp::SoftContact::solveNormals;1.341859;1.341859;0.0;0.0;compare-ours.exe;kp::SoftContact::solveNormals(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double);SoftContact.cpp;0x140046a80
+const;1.174981;1.174981;0.0;0.0;compare-ours.exe;const;SoftContact.cpp;0x1400459b0
+kp::SoftContact::takePoints;1.152360;1.152360;0.0;0.0;compare-ours.exe;kp::SoftContact::takePoints(kp::ContactPair const&, kp::Vector3, kp::Vector3, kp::SolverBody const&, kp::SolverBody const&, kp::Span<std::__1::pair<kp::ContactId, kp::ContactForce>>, double, bool);SoftContact.cpp;0x140042fd0
+kp::SoftContact::prefetch::<lambda0>::operator();0.807749;0.807749;0.0;0.0;compare-ours.exe;kp::SoftContact::prefetch::<lambda0>::operator();SoftContact.cpp;0x14004573e
+kp::solveComplementarity;0.729676;0.729676;0.0;0.0;compare-ours.exe;kp::solveComplementarity(std::__1::vector<double, std::__1::allocator<double>> const&, std::__1::vector<double, std::__1::allocator<double>> const&, std::__1::vector<double, std::__1::allocator<double>>&);Complementarity.h;0x140048190
+kp::CentreFriction::solve;0.726128;0.726128;0.0;0.0;compare-ours.exe;kp::CentreFriction::solve(kp::SolverBody&, kp::SolverBody&, kp::CentreFriction::Frame const&, double, double, double);CentreFriction.cpp;0x140062090
+kp::SoftContact::SoftContact;0.612967;0.612967;0.0;0.0;compare-ours.exe;kp::SoftContact::SoftContact(kp::ContactPair const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, kp::Softness const&, kp::Span<std::__1::pair<kp::ContactId, kp::ContactForce>>, double, bool, bool);SoftContact.cpp;0x140042770
+kp::SoftContact::follow;0.520887;0.520887;0.0;0.0;compare-ours.exe;kp::SoftContact::follow(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&);SoftContact.cpp;0x140044c40
+std::__1::vector<kp::Vector3,std::__1::allocator<kp::Vector3> >::resize;0.458229;0.458229;0.0;0.0;compare-ours.exe;std::__1::vector<kp::Vector3,std::__1::allocator<kp::Vector3> >::resize(unsigned __int64);vector.h;0x140047ef0
+kp::Vector3::cross;0.407136;0.407136;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x140045490
+func@0x180048b50;0.369291;0.369291;0.0;0.0;ucrtbase.dll;func@0x180048b50;[Unknown];0x180048b50
+kp::SoftContact::follow::<lambda0>::operator();0.308874;0.308874;0.0;0.0;compare-ours.exe;kp::SoftContact::follow::<lambda0>::operator()(struct kp::Vector3, struct kp::Vector3, struct kp::Vector3 & const, struct kp::Vector3 & const);SoftContact.cpp;0x140045430
+std::__1::vector<kp::PairFinder::Found::Pair,kp::StepAllocator<kp::PairFinder::Found::Pair> >::operator=;0.306121;0.306121;0.0;0.0;compare-ours.exe;std::__1::vector<kp::PairFinder::Found::Pair,kp::StepAllocator<kp::PairFinder::Found::Pair> >::operator=;vector.h;0x140021352
+kp::SolverBody::push;0.290050;0.290050;0.0;0.0;compare-ours.exe;kp::SolverBody::push(kp::SolverBody&, kp::SolverBody&, kp::Vector3, kp::Vector3, kp::Vector3);SolverBody.h;0x140047ca0
+std::__1::vector<double,std::__1::allocator<double> >::assign;0.274207;0.274207;0.0;0.0;compare-ours.exe;std::__1::vector<double,std::__1::allocator<double> >::assign(unsigned __int64, const double & const);vector.h;0x14002ac60
+std::__1::vector<kp::Vector3,std::__1::allocator<kp::Vector3> >::operator[];0.244630;0.244630;0.0;0.0;compare-ours.exe;std::__1::vector<kp::Vector3,std::__1::allocator<kp::Vector3> >::operator[];vector.h;0x140046c5a
+std::__1::vector<kp::PairFinder::Found::Pair,kp::StepAllocator<kp::PairFinder::Found::Pair> >::push_back;0.243506;0.243506;0.0;0.0;compare-ours.exe;std::__1::vector<kp::PairFinder::Found::Pair,kp::StepAllocator<kp::PairFinder::Found::Pair> >::push_back;vector.h;0x14001f84b
+kp::Quaternion::rotate;0.231654;0.231654;0.0;0.0;compare-ours.exe;kp::Quaternion::rotate;Quaternion.h;0x140045467
+kp::SoftContact::prefetch;0.228414;0.228414;0.0;0.0;compare-ours.exe;kp::SoftContact::prefetch(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, unsigned long long, unsigned long long);SoftContact.cpp;0x140045710
+std::__1::vector<kp::ManifoldMemory::Entry,std::__1::allocator<kp::ManifoldMemory::Entry> >::push_back;0.214937;0.214937;0.0;0.0;compare-ours.exe;std::__1::vector<kp::ManifoldMemory::Entry,std::__1::allocator<kp::ManifoldMemory::Entry> >::push_back;vector.h;0x140041783
+kp::Vector3::dot;0.213389;0.213389;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140047e60
+kp::Vector3::cross;0.212031;0.212031;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x1400460f0
+const;0.211043;0.211043;0.0;0.0;compare-ours.exe;const;ManifoldMemory.cpp;0x140040c40
+std::__1::vector<double,std::__1::allocator<double> >::resize;0.199573;0.199573;0.0;0.0;compare-ours.exe;std::__1::vector<double,std::__1::allocator<double> >::resize(unsigned __int64);vector.h;0x140048060
+memcpy;0.199517;0.199517;0.0;0.0;ucrtbase.dll;memcpy;[Unknown];0x180048b70
+kp::SoftContact::solveFriction;0.199388;0.199388;0.0;0.0;compare-ours.exe;kp::SoftContact::solveFriction(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, double);SoftContact.cpp;0x1400476e0
+kp::Vector3::dot;0.199232;0.199232;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140047d52
+kp::SoftContact::prefetch::<lambda0>::operator();0.196514;0.196514;0.0;0.0;compare-ours.exe;kp::SoftContact::prefetch::<lambda0>::operator();SoftContact.cpp;0x1400457eb
+kp::Vector3::dot;0.185682;0.185682;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140045370
+std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::push_back;0.183860;0.183860;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::push_back;vector.h;0x1400441c2
+const;0.179458;0.179458;0.0;0.0;compare-ours.exe;const;CentreFriction.cpp;0x140061f30
+kp::RollingFriction::solve;0.173885;0.173885;0.0;0.0;compare-ours.exe;kp::RollingFriction::solve(kp::SolverBody&, kp::SolverBody&, kp::Vector3, kp::Vector3, double, double);RollingFriction.cpp;0x14006b340
+kp::SoftContact::aim;0.170458;0.170458;0.0;0.0;compare-ours.exe;kp::SoftContact::aim(kp::BodyMotion const&, kp::BodyMotion const&, kp::Vector3, kp::ClosestPoints const*);SoftContact.cpp;0x1400445b0
+kp::Vector3::cross;0.167239;0.167239;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x140047d0d
+kp::SoftContact::prefetch::<lambda0>::operator();0.152847;0.152847;0.0;0.0;compare-ours.exe;kp::SoftContact::prefetch::<lambda0>::operator();SoftContact.cpp;0x140045807
+kp::operator+;0.152747;0.152747;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x1400454cd
+std::__1::vector<kp::Body,std::__1::allocator<kp::Body> >::operator[];0.152720;0.152720;0.0;0.0;compare-ours.exe;std::__1::vector<kp::Body,std::__1::allocator<kp::Body> >::operator[];vector.h;0x1400497db
+const;0.152496;0.152496;0.0;0.0;compare-ours.exe;const;SoftContact.cpp;0x140045820
+const;0.152387;0.152387;0.0;0.0;compare-ours.exe;const;SoftContact.cpp;0x140047b50
+kp::Vector3::cross;0.152374;0.152374;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x1400455dd
+kp::Vector3::dot;0.152369;0.152369;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140045ff1
+kp::sinCos;0.138280;0.138280;0.0;0.0;compare-ours.exe;kp::sinCos;math_functions.h;0x14003a4cd
+kp::Vector3::dot;0.138264;0.138264;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x1400467a2
+kp::Vector3::dot;0.136355;0.136355;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140046068
+kp::SolverBody::twist;0.134999;0.134999;0.0;0.0;compare-ours.exe;kp::SolverBody::twist(kp::SolverBody&, kp::SolverBody&, kp::Vector3);SolverBody.h;0x140062530
+kp::operator-=;0.122931;0.122931;0.0;0.0;compare-ours.exe;kp::operator-=;Vector3.h;0x140047cd9
+kp::sqrt;0.122241;0.122241;0.0;0.0;compare-ours.exe;kp::sqrt;math_functions.h;0x140062373
+kp::ManifoldMemory::carried;0.122017;0.122017;0.0;0.0;compare-ours.exe;kp::ManifoldMemory::carried(kp::ManifoldMemory::Entry const&, kp::Body const&, kp::Body const&, double);ManifoldMemory.cpp;0x140040eb0
+kp::SoftContact::frame;0.121429;0.121429;0.0;0.0;compare-ours.exe;kp::SoftContact::frame;SoftContact.h;0x140045902
+kp::ContactForces::operator[];0.121253;0.121253;0.0;0.0;compare-ours.exe;kp::ContactForces::operator[](kp::ContactId const&);ContactForces.h;0x140031950
+kp::Vector3::cross;0.120591;0.120591;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x140045584
+kp::operator*;0.109915;0.109915;0.0;0.0;compare-ours.exe;kp::operator*;Quaternion.h;0x140044d56
+std::__1::vector<std::__1::pair<kp::ContactId,kp::ContactForce>,std::__1::allocator<std::__1::pair<kp::ContactId,kp::ContactForce> > >::push_back;0.108995;0.108995;0.0;0.0;compare-ours.exe;std::__1::vector<std::__1::pair<kp::ContactId,kp::ContactForce>,std::__1::allocator<std::__1::pair<kp::ContactId,kp::ContactForce> > >::push_back;vector.h;0x140031988
+kp::operator-=;0.108318;0.108318;0.0;0.0;compare-ours.exe;kp::operator-=;Vector3.h;0x140047daa
+kp::ContactPair::ContactPair;0.108171;0.108171;0.0;0.0;compare-ours.exe;kp::ContactPair::ContactPair;ContactPair.h;0x140020fba
+std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::push_back;0.107650;0.107650;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::push_back;vector.h;0x140024dd9
+kp::Quaternion::unit;0.107086;0.107086;0.0;0.0;compare-ours.exe;kp::Quaternion::unit;Quaternion.h;0x14002934e
+kp::Vector3::cross;0.106499;0.106499;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x14004619e
+o_memset;0.106339;0.106339;0.0;0.0;ucrtbase.dll;o_memset;[Unknown];0x180048830
+kp::operator+;0.106151;0.106151;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x14004568d
+kp::operator+=;0.093694;0.093694;0.0;0.0;compare-ours.exe;kp::operator+=;Vector3.h;0x140046f68
+kp::IslandNormals::solve::<lambda0>::operator();0.093665;0.093665;0.0;0.0;compare-ours.exe;kp::IslandNormals::solve::<lambda0>::operator();IslandNormals.cpp;0x14005320b
+kp::`anonymous namespace'::applyForces;0.093319;0.093319;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::applyForces;SoftStep.cpp;0x1400258a3
+std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator[];0.093054;0.093054;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator[];vector.h;0x1400457e1
+kp::operator+;0.092662;0.092662;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x140047eb8
+kp::Vector3::cross;0.092290;0.092290;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x140047e1e
+std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::size;0.092264;0.092264;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::size;vector.h;0x140045710
+kp::operator*;0.092227;0.092227;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x1400454be
+kp::`anonymous namespace'::momentumOf;0.091675;0.091675;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::momentumOf;SoftStep.cpp;0x140025e59
+kp::Vector3::dot;0.091435;0.091435;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14006261c
+const;0.091424;0.091424;0.0;0.0;compare-ours.exe;const;ContactLevels.cpp;0x140041e10
+kp::operator-=;0.091382;0.091382;0.0;0.0;compare-ours.exe;kp::operator-=;Vector3.h;0x140062571
+kp::StepMemory::take;0.091094;0.091094;0.0;0.0;compare-ours.exe;kp::StepMemory::take(unsigned long long);StepMemory.cpp;0x1400155c0
+kp::`anonymous namespace'::deepestOf;0.090959;0.090959;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::deepestOf;SoftStep.cpp;0x140029852
+kp::Vector3::dot;0.090659;0.090659;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14006257b
+kp::Vector3::dot;0.090583;0.090583;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140047ea1
+kp::Vector3::cross;0.090140;0.090140;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x1400454ee
+const;0.078656;0.078656;0.0;0.0;compare-ours.exe;const;PairFinder.cpp;0x14001fc20
+const;0.078656;0.078656;0.0;0.0;compare-ours.exe;const;Body.h;0x1400126b0
+std::__1::pair<kp::ContactId,kp::ContactForce>::pair;0.077539;0.077539;0.0;0.0;compare-ours.exe;std::__1::pair<kp::ContactId,kp::ContactForce>::pair;pair.h;0x140031963
+free_base;0.077480;0.077480;0.0;0.0;ucrtbase.dll;free_base;[Unknown];0x18000f040
+kp::operator-=;0.076790;0.076790;0.0;0.0;compare-ours.exe;kp::operator-=;Vector3.h;0x1400456c6
+std::__1::vector<kp::Body,std::__1::allocator<kp::Body> >::operator[];0.076754;0.076754;0.0;0.0;compare-ours.exe;std::__1::vector<kp::Body,std::__1::allocator<kp::Body> >::operator[];vector.h;0x140024d44
+kp::operator*;0.076642;0.076642;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140062196
+const;0.076100;0.076100;0.0;0.0;compare-ours.exe;const;ConvexHull.cpp;0x14000d740
+kp::operator*;0.076079;0.076079;0.0;0.0;compare-ours.exe;kp::operator*;Quaternion.h;0x140044eb8
+std::__1::fill;0.075890;0.075890;0.0;0.0;compare-ours.exe;std::__1::fill;fill.h;0x140048749
+const;0.075593;0.075593;0.0;0.0;compare-ours.exe;const;PairFinder.cpp;0x1400209d0
+kp::Vector3::dot;0.075335;0.075335;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14004603b
+func@0x180048810;0.074934;0.074934;0.0;0.0;ucrtbase.dll;func@0x180048810;[Unknown];0x180048810
+std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::size;0.074305;0.074305;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::size;vector.h;0x140050feb
+kp::Vector3::dot;0.063222;0.063222;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x1400467b2
+kp::operator-;0.062635;0.062635;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x140045613
+kp::operator*;0.062615;0.062615;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x1400458bc
+kp::Vector3::dot;0.062569;0.062569;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140062143
+kp::Quaternion::rotate;0.062434;0.062434;0.0;0.0;compare-ours.exe;kp::Quaternion::rotate;Quaternion.h;0x140045554
+kp::CentreFriction::carried;0.062391;0.062391;0.0;0.0;compare-ours.exe;kp::CentreFriction::carried;CentreFriction.h;0x140047b89
+kp::ContactId::samePair;0.062270;0.062270;0.0;0.0;compare-ours.exe;kp::ContactId::samePair;ContactForces.h;0x14002a680
+std::__1::function<void (unsigned long long)>::operator();0.062252;0.062252;0.0;0.0;compare-ours.exe;std::__1::function<void (unsigned long long)>::operator();function.h;0x140041ec8
+kp::SmallVector<kp::ContactPoint,8>::operator[];0.061838;0.061838;0.0;0.0;compare-ours.exe;kp::SmallVector<kp::ContactPoint,8>::operator[];SmallVector.h;0x140043ae4
+kp::operator-;0.061700;0.061700;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x140047daf
+kp::operator-;0.061691;0.061691;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x140045658
+kp::operator*;0.061554;0.061554;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140047de5
+kp::`anonymous namespace'::Moving::advance::<lambda1>::operator();0.061451;0.061451;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::Moving::advance::<lambda1>::operator()(unsigned __int64);SoftStep.cpp;0x140028b20
+kp::operator*;0.061255;0.061255;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x1400410fb
+kp::operator-=;0.060983;0.060983;0.0;0.0;compare-ours.exe;kp::operator-=;Vector3.h;0x140046f06
+kp::`anonymous namespace'::Moving::sync;0.060736;0.060736;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::Moving::sync;SoftStep.cpp;0x140025df5
+kp::operator-=;0.060703;0.060703;0.0;0.0;compare-ours.exe;kp::operator-=;Vector3.h;0x140046eda
+const;0.060647;0.060647;0.0;0.0;compare-ours.exe;const;RollingFriction.cpp;0x14006b2b0
+kp::Vector3::cross;0.060647;0.060647;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x140044713
+kp::operator*;0.060627;0.060627;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140045671
+std::__1::vector<double,std::__1::allocator<double> >::push_back;0.060408;0.060408;0.0;0.0;compare-ours.exe;std::__1::vector<double,std::__1::allocator<double> >::push_back;vector.h;0x140048510
+kp::ManifoldMemory::valid::<lambda0>::operator();0.060293;0.060293;0.0;0.0;compare-ours.exe;kp::ManifoldMemory::valid::<lambda0>::operator();ManifoldMemory.cpp;0x140040cd6
+std::__1::vector<char,std::__1::allocator<char> >::resize;0.059707;0.059707;0.0;0.0;compare-ours.exe;std::__1::vector<char,std::__1::allocator<char> >::resize;vector.h;0x140048286
+kp::Vector3::dot;0.058759;0.058759;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140046c78
+kp::Vector3::dot;0.047619;0.047619;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140047d8f
+kp::`anonymous namespace'::Reserve::take;0.047471;0.047471;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::Reserve::take;StepMemory.cpp;0x14001564f
+kp::bestEdgePair;0.047464;0.047464;0.0;0.0;compare-ours.exe;kp::bestEdgePair;Sat.cpp;0x14005fd1f
+std::__1::lower_bound;0.047290;0.047290;0.0;0.0;compare-ours.exe;std::__1::lower_bound;lower_bound.h;0x140040c80
+kp::PairFinder::collect::<lambda0>::operator();0.046947;0.046947;0.0;0.0;compare-ours.exe;kp::PairFinder::collect::<lambda0>::operator()(unsigned __int64);PairFinder.cpp;0x1400212b0
+kp::MissedContacts::note;0.046812;0.046812;0.0;0.0;compare-ours.exe;kp::MissedContacts::note;MissedContacts.h;0x140027046
+const;0.046809;0.046809;0.0;0.0;compare-ours.exe;const;ConvexHull.h;0x14000e520
+std::__1::min;0.046766;0.046766;0.0;0.0;compare-ours.exe;std::__1::min;min.h;0x140062183
+std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator=;0.046746;0.046746;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator=;vector.h;0x140026ab1
+kp::operator-;0.046734;0.046734;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x140046f0b
+kp::operator*;0.046677;0.046677;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140045569
+kp::StepMemory::give;0.046639;0.046639;0.0;0.0;compare-ours.exe;kp::StepMemory::give(void*);StepMemory.cpp;0x140015cb0
+kp::Vector3::dot;0.046535;0.046535;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140047e83
+kp::Body::isStatic;0.046498;0.046498;0.0;0.0;compare-ours.exe;kp::Body::isStatic;Body.h;0x140024d4e
+std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::size;0.046451;0.046451;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::size;vector.h;0x1400457b8
+kp::Vector3::dot;0.046332;0.046332;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14000d7b0
+std::__1::function<void (unsigned long long)>::operator();0.046091;0.046091;0.0;0.0;compare-ours.exe;std::__1::function<void (unsigned long long)>::operator();function.h;0x14000f360
+kp::SoftContact::frame;0.045885;0.045885;0.0;0.0;compare-ours.exe;kp::SoftContact::frame;SoftContact.h;0x140047752
+kp::Vector3::cross;0.045868;0.045868;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x14006183a
+std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator[];0.045814;0.045814;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator[];vector.h;0x140045800
+kp::`anonymous namespace'::momentumOf;0.045733;0.045733;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::momentumOf;SoftStep.cpp;0x140027a27
+NtWaitForSingleObject;0.045676;0.0;0.045676;0.0;ntdll.dll;NtWaitForSingleObject;[Unknown];0x18009d610
+kp::Quaternion::conjugate;0.045639;0.045639;0.0;0.0;compare-ours.exe;kp::Quaternion::conjugate;Quaternion.h;0x140025ea2
+kp::operator*;0.045538;0.045538;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140043b7b
+kp::operator*;0.045525;0.045525;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140045679
+kp::Vector3::dot;0.045513;0.045513;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140047d75
+kp::operator*;0.045435;0.045435;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140046ed1
+kp::operator+=;0.045387;0.045387;0.0;0.0;compare-ours.exe;kp::operator+=;Vector3.h;0x140047eb8
+kp::Vector3::dot;0.045208;0.045208;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140046c7d
+kp::operator*;0.044935;0.044935;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x14006240c
+std::__1::vector<kp::ManifoldMemory::Entry,kp::StepAllocator<kp::ManifoldMemory::Entry> >::operator=;0.044764;0.044764;0.0;0.0;compare-ours.exe;std::__1::vector<kp::ManifoldMemory::Entry,kp::StepAllocator<kp::ManifoldMemory::Entry> >::operator=;vector.h;0x1400213d1
+kp::operator*;0.044762;0.044762;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x1400455b3
+std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::size;0.044746;0.044746;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::size;vector.h;0x140045a2b
+kp::`anonymous namespace'::Moving::Moving;0.044743;0.044743;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::Moving::Moving;SoftStep.cpp;0x14002508d
+kp::IslandNormals::choose;0.044687;0.044687;0.0;0.0;compare-ours.exe;kp::IslandNormals::choose(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&);IslandNormals.cpp;0x140050b00
+kp::operator*;0.044588;0.044588;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140046f02
+std::__1::vector<kp::Span<std::__1::pair<kp::ContactId,kp::ContactForce> >,kp::StepAllocator<kp::Span<std::__1::pair<kp::ContactId,kp::ContactForce> > > >::push_back;0.044336;0.044336;0.0;0.0;compare-ours.exe;std::__1::vector<kp::Span<std::__1::pair<kp::ContactId,kp::ContactForce> >,kp::StepAllocator<kp::Span<std::__1::pair<kp::ContactId,kp::ContactForce> > > >::push_back;vector.h;0x140024a68
+kp::Vector3::cross;0.031803;0.031803;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x14006225c
+kp::operator+=;0.031023;0.031023;0.0;0.0;compare-ours.exe;kp::operator+=;Vector3.h;0x140047dee
+kp::operator*;0.030953;0.030953;0.0;0.0;compare-ours.exe;kp::operator*;Matrix2x2.h;0x140062321
+kp::ContactManifold::ContactManifold;0.030951;0.030951;0.0;0.0;compare-ours.exe;kp::ContactManifold::ContactManifold;ContactManifold.h;0x140040f58
+std::__1::vector<kp::Vector3,std::__1::allocator<kp::Vector3> >::operator[];0.030933;0.030933;0.0;0.0;compare-ours.exe;std::__1::vector<kp::Vector3,std::__1::allocator<kp::Vector3> >::operator[];vector.h;0x14000d740
+kp::Vector3::dot;0.030895;0.030895;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14006af2d
+kp::Vector3::cross;0.030893;0.030893;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x140044826
+kp::operator*;0.030893;0.030893;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140044165
+std::__1::vector<kp::PairFinder::Found::Pair,kp::StepAllocator<kp::PairFinder::Found::Pair> >::vector;0.030881;0.030881;0.0;0.0;compare-ours.exe;std::__1::vector<kp::PairFinder::Found::Pair,kp::StepAllocator<kp::PairFinder::Found::Pair> >::vector;vector.h;0x140021868
+std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator[];0.030877;0.030877;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator[];vector.h;0x140044cb0
+kp::Vector3::cross;0.030874;0.030874;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x14002a1b4
+kp::SmallVector<kp::ContactPoint,8>::operator=;0.030858;0.030858;0.0;0.0;compare-ours.exe;kp::SmallVector<kp::ContactPoint,8>::operator=;SmallVector.h;0x1400234c2
+std::__1::vector<kp::ContactPair,std::__1::allocator<kp::ContactPair> >::push_back;0.030856;0.030856;0.0;0.0;compare-ours.exe;std::__1::vector<kp::ContactPair,std::__1::allocator<kp::ContactPair> >::push_back;vector.h;0x140020fab
+kp::Vector3::dot;0.030843;0.030843;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14000d77f
+kp::operator*;0.030817;0.030817;0.0;0.0;compare-ours.exe;kp::operator*(kp::Quaternion, kp::Quaternion);Quaternion.h;0x140041820
+kp::`anonymous namespace'::ContactMaker::all;0.030797;0.030797;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::ContactMaker::all;SoftStep.cpp;0x1400248da
+kp::SmallVector<kp::Vector3,32>::operator[];0.030794;0.030794;0.0;0.0;compare-ours.exe;kp::SmallVector<kp::Vector3,32>::operator[];SmallVector.h;0x140060ece
+kp::ContactManifold::ContactManifold;0.030771;0.030771;0.0;0.0;compare-ours.exe;kp::ContactManifold::ContactManifold;ContactManifold.h;0x1400222a6
+kp::Vector3::dot;0.030759;0.030759;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14006260e
+kp::Vector3::cross;0.030735;0.030735;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x140041392
+kp::operator+;0.030710;0.030710;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x1400447b8
+kp::`anonymous namespace'::clip;0.030700;0.030700;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::clip;HullVsHullAlgorithm.cpp;0x140067666
+kp::Vector3::dot;0.030611;0.030611;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14006256d
+kp::CentreFriction::prepare;0.030594;0.030594;0.0;0.0;compare-ours.exe;kp::CentreFriction::prepare(kp::SolverBody const&, kp::SolverBody const&, kp::CentreFriction::Frame const&, kp::CentreFriction::Carried const&);CentreFriction.cpp;0x140061710
+kp::SmallVector<kp::ContactPoint,8>::~SmallVector;0.030590;0.030590;0.0;0.0;compare-ours.exe;kp::SmallVector<kp::ContactPoint,8>::~SmallVector;SmallVector.h;0x140020f63
+kp::`anonymous namespace'::radiusOf;0.030499;0.030499;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::radiusOf(const struct kp::Body & const, int);MissedContacts.cpp;0x140049940
+kp::operator*;0.030483;0.030483;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140047b9d
+kp::operator-;0.030450;0.030450;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x140044e52
+std::__1::vector<double,std::__1::allocator<double> >::operator[];0.030409;0.030409;0.0;0.0;compare-ours.exe;std::__1::vector<double,std::__1::allocator<double> >::operator[];vector.h;0x140048f93
+kp::operator*;0.030400;0.030400;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140046f7c
+kp::PairReach::PairReach;0.030362;0.030362;0.0;0.0;compare-ours.exe;kp::PairReach::PairReach(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3, double, double);PairReach.cpp;0x14004b000
+std::__1::iota;0.030330;0.030330;0.0;0.0;compare-ours.exe;std::__1::iota;iota.h;0x140043304
+kp::operator+;0.030321;0.030321;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x140061fd9
+kp::IslandNormals::choose::<lambda0>::operator();0.030258;0.030258;0.0;0.0;compare-ours.exe;kp::IslandNormals::choose::<lambda0>::operator();IslandNormals.cpp;0x140052b2e
+kp::operator-;0.030016;0.030016;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x140043c08
+kp::`anonymous namespace'::LiveContacts::solveAndMove::<lambda1>::operator();0.029988;0.029988;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::LiveContacts::solveAndMove::<lambda1>::operator();SoftStep.cpp;0x1400297e4
+kp::operator*;0.029949;0.029949;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140046f4a
+kp::Transform::relative;0.029878;0.029878;0.0;0.0;compare-ours.exe;kp::Transform::relative;Transform.h;0x140040a92
+kp::Vector3::dot;0.029865;0.029865;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x1400460b9
+kp::operator-;0.029848;0.029848;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x140044cdf
+kp::Vector3::cross;0.029817;0.029817;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x1400447ca
+kp::operator+;0.029809;0.029809;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x14004550d
+std::__1::__wrap_iter<kp::SoftContact::Point *>::operator++;0.029808;0.029808;0.0;0.0;compare-ours.exe;std::__1::__wrap_iter<kp::SoftContact::Point *>::operator++;wrap_iter.h;0x1400453a8
+kp::operator+=;0.029779;0.029779;0.0;0.0;compare-ours.exe;kp::operator+=;Vector3.h;0x14004568d
+kp::operator*;0.029773;0.029773;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x1400447a6
+kp::Vector3::cross;0.029749;0.029749;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x1400448c0
+std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::reserve;0.029743;0.029743;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::reserve;vector.h;0x140043992
+kp::Vector3::cross;0.029710;0.029710;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x1400621e8
+kp::SoftContact::normalRow;0.029667;0.029667;0.0;0.0;compare-ours.exe;kp::SoftContact::normalRow;SoftContact.h;0x140052b18
+std::__1::shared_ptr<const std::__1::vector<kp::Body::Part,std::__1::allocator<kp::Body::Part> > >::operator bool;0.016069;0.016069;0.0;0.0;compare-ours.exe;std::__1::shared_ptr<const std::__1::vector<kp::Body::Part,std::__1::allocator<kp::Body::Part> > >::operator bool;shared_ptr.h;0x14001fcdd
+kp::operator-;0.016032;0.016032;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x14004145a
+kp::TransformedHull::TransformedHull;0.016030;0.016030;0.0;0.0;compare-ours.exe;kp::TransformedHull::TransformedHull(kp::ConvexHull const&, kp::Transform const&);TransformedHull.h;0x14003e730
+kp::Vector3::dot;0.016020;0.016020;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14006b100
+kp::Vector2::dot;0.016010;0.016010;0.0;0.0;compare-ours.exe;kp::Vector2::dot;Vector2.h;0x14006235a
+std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::size;0.016008;0.016008;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::size;vector.h;0x140041e89
+kp::operator-;0.015997;0.015997;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x1400443d0
+kp::operator+;0.015996;0.015996;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x14000c1ee
+std::__1::function<void (unsigned long long)>::~function;0.015979;0.015979;0.0;0.0;compare-ours.exe;std::__1::function<void (unsigned long long)>::~function;function.h;0x140026fa6
+kp::Quaternion::conjugate;0.015977;0.015977;0.0;0.0;compare-ours.exe;kp::Quaternion::conjugate;Quaternion.h;0x140028da9
+kp::Vector3::dot;0.015977;0.015977;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140040e27
+kp::Quaternion::conjugate;0.015973;0.015973;0.0;0.0;compare-ours.exe;kp::Quaternion::conjugate;Quaternion.h;0x140040db1
+kp::`anonymous namespace'::clipAgainstFace;0.015971;0.015971;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::clipAgainstFace(const struct kp::TransformedHull & const, int, const struct kp::TransformedHull & const, double, double, double);HullVsHullAlgorithm.cpp;0x140066e20
+kp::operator+;0.015953;0.015953;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x1400448b4
+kp::operator+;0.015946;0.015946;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x1400447ed
+std::__1::vector<int,kp::StepAllocator<int> >::push_back;0.015935;0.015935;0.0;0.0;compare-ours.exe;std::__1::vector<int,kp::StepAllocator<int> >::push_back;vector.h;0x1400498bc
+kp::Vector3::dot;0.015929;0.015929;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14003d1d9
+kp::SmallVector<kp::ContactPoint,8>::push_back;0.015925;0.015925;0.0;0.0;compare-ours.exe;kp::SmallVector<kp::ContactPoint,8>::push_back;SmallVector.h;0x140066bd9
+kp::Vector3::cross;0.015921;0.015921;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x14004486d
+std::__1::vector<double,kp::StepAllocator<double> >::vector;0.015918;0.015918;0.0;0.0;compare-ours.exe;std::__1::vector<double,kp::StepAllocator<double> >::vector;vector.h;0x140049bd9
+kp::operator*;0.015915;0.015915;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140028f0e
+kp::operator+;0.015912;0.015912;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x14000c1af
+kp::operator-;0.015908;0.015908;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x140043bc7
+kp::SmallVector<kp::ContactPoint,8>::reserve;0.015900;0.015900;0.0;0.0;compare-ours.exe;kp::SmallVector<kp::ContactPoint,8>::reserve;SmallVector.h;0x140021009
+std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::operator[];0.015894;0.015894;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::operator[];vector.h;0x1400457a8
+std::__1::vector<double,kp::StepAllocator<double> >::push_back;0.015878;0.015878;0.0;0.0;compare-ours.exe;std::__1::vector<double,kp::StepAllocator<double> >::push_back;vector.h;0x1400497f3
+kp::Vector3::dot;0.015874;0.015874;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140040df9
+std::__1::vector<kp::PairFinder::Found,kp::StepAllocator<kp::PairFinder::Found> >::operator[];0.015872;0.015872;0.0;0.0;compare-ours.exe;std::__1::vector<kp::PairFinder::Found,kp::StepAllocator<kp::PairFinder::Found> >::operator[];vector.h;0x140021343
+kp::operator+=;0.015872;0.015872;0.0;0.0;compare-ours.exe;kp::operator+=;Vector3.h;0x140062617
+kp::`anonymous namespace'::Moving::poses;0.015865;0.015865;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::Moving::poses;SoftStep.cpp;0x1400266f3
+kp::Vector3::dot;0.015859;0.015859;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140061d82
+kp::operator-;0.015859;0.015859;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x14006223a
+std::__1::vector<kp::ManifoldMemory::Entry,kp::StepAllocator<kp::ManifoldMemory::Entry> >::vector;0.015801;0.015801;0.0;0.0;compare-ours.exe;std::__1::vector<kp::ManifoldMemory::Entry,kp::StepAllocator<kp::ManifoldMemory::Entry> >::vector;vector.h;0x140020b4b
+kp::IslandNormals::choose::<lambda0>::operator();0.015791;0.015791;0.0;0.0;compare-ours.exe;kp::IslandNormals::choose::<lambda0>::operator();IslandNormals.cpp;0x140050f7f
+kp::Quaternion::Quaternion;0.015782;0.015782;0.0;0.0;compare-ours.exe;kp::Quaternion::Quaternion;Quaternion.h;0x14002425a
+kp::Vector3::dot;0.015694;0.015694;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14003d0ca
+kp::isForced;0.015685;0.015685;0.0;0.0;compare-ours.exe;kp::isForced;Body.h;0x140025aa5
+kp::Body::isStatic;0.015634;0.015634;0.0;0.0;compare-ours.exe;kp::Body::isStatic;Body.h;0x1400249fd
+kp::DirectJoints::solve;0.015607;0.015607;0.0;0.0;compare-ours.exe;kp::DirectJoints::solve(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, double, double);DirectJoints.cpp;0x14004e880
+kp::operator+;0.015513;0.015513;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x140062660
+kp::operator+;0.015501;0.015501;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x140043b74
+std::__1::shared_ptr<const kp::ConvexShape>::operator->;0.015493;0.015493;0.0;0.0;compare-ours.exe;std::__1::shared_ptr<const kp::ConvexShape>::operator->;shared_ptr.h;0x140049a83
+std::__1::operator!=;0.015479;0.015479;0.0;0.0;compare-ours.exe;std::__1::operator!=;wrap_iter.h;0x1400476ef
+std::__1::vector<double,std::__1::allocator<double> >::operator[];0.015474;0.015474;0.0;0.0;compare-ours.exe;std::__1::vector<double,std::__1::allocator<double> >::operator[];vector.h;0x14004911e
+kp::operator-;0.015465;0.015465;0.0;0.0;compare-ours.exe;kp::operator-;Vector2.h;0x140062346
+std::__1::vector<double,kp::StepAllocator<double> >::push_back;0.015449;0.015449;0.0;0.0;compare-ours.exe;std::__1::vector<double,kp::StepAllocator<double> >::push_back;vector.h;0x14004984e
+std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator[];0.015433;0.015433;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator[];vector.h;0x140045839
+kp::Vector3::dot;0.015421;0.015421;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140061abf
+std::__1::vector<int,kp::StepAllocator<int> >::vector;0.015392;0.015392;0.0;0.0;compare-ours.exe;std::__1::vector<int,kp::StepAllocator<int> >::vector;vector.h;0x14004307b
+kp::operator+;0.015390;0.015390;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x14006222a
+kp::operator+;0.015377;0.015377;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x14006b143
+kp::operator-;0.015375;0.015375;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x140041450
+kp::operator+;0.015355;0.015355;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x140045526
+kp::operator+;0.015331;0.015331;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x1400455c2
+std::__1::shared_ptr<const kp::ConvexShape>::operator->;0.015230;0.015230;0.0;0.0;compare-ours.exe;std::__1::shared_ptr<const kp::ConvexShape>::operator->;shared_ptr.h;0x140012cd8
+kp::SoftStep::step::<lambda1>::operator();0.015163;0.015163;0.0;0.0;compare-ours.exe;kp::SoftStep::step::<lambda1>::operator();SoftStep.cpp;0x140029c70
+kp::operator*;0.015061;0.015061;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140042bc0
+std::__1::__wrap_iter<const kp::ConvexHull::Edge *>::operator++;0.015035;0.015035;0.0;0.0;compare-ours.exe;std::__1::__wrap_iter<const kp::ConvexHull::Edge *>::operator++;wrap_iter.h;0x140060b53
+kp::Vector3::cross;0.015030;0.015030;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x140027aeb
+kp::Vector3::dot;0.015013;0.015013;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x1400676cb
+kp::MissedContacts::find;0.015000;0.015000;0.0;0.0;compare-ours.exe;kp::MissedContacts::find(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, double, std::__1::function<kp::SoftContact (kp::ContactPair const&)> const&);MissedContacts.cpp;0x140049b90
+kp::operator*;0.014995;0.014995;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x1400448aa
+kp::Quaternion::fromRotationVector;0.014994;0.014994;0.0;0.0;compare-ours.exe;kp::Quaternion::fromRotationVector(kp::Vector3);Quaternion.cpp;0x14003a470
+std::__1::vector<kp::MassProperties,std::__1::allocator<kp::MassProperties> >::~vector;0.014992;0.014992;0.0;0.0;compare-ours.exe;std::__1::vector<kp::MassProperties,std::__1::allocator<kp::MassProperties> >::~vector;vector.h;0x14000b17a
+kp::Vector3::scaled;0.014990;0.014990;0.0;0.0;compare-ours.exe;kp::Vector3::scaled;Vector3.h;0x14000c204
+std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::data;0.014989;0.014989;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::data;vector.h;0x1400457b3
+kp::Quaternion::conjugate;0.014988;0.014988;0.0;0.0;compare-ours.exe;kp::Quaternion::conjugate;Quaternion.h;0x140044e90
+std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::operator[];0.014986;0.014986;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::operator[];vector.h;0x14002983e
+std::__1::__wrap_iter<kp::SoftContact::Point *>::operator++;0.014984;0.014984;0.0;0.0;compare-ours.exe;std::__1::__wrap_iter<kp::SoftContact::Point *>::operator++;wrap_iter.h;0x140047718
+kp::Vector3::dot;0.014977;0.014977;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x1400622bf
+kp::Body::boundingRadius;0.014977;0.014977;0.0;0.0;compare-ours.exe;kp::Body::boundingRadius;Body.h;0x140049a4b
+std::__1::vector<double,std::__1::allocator<double> >::operator[];0.014971;0.014971;0.0;0.0;compare-ours.exe;std::__1::vector<double,std::__1::allocator<double> >::operator[];vector.h;0x1400483db
+kp::operator*;0.014971;0.014971;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140043a98
+kp::Vector3::cross;0.014967;0.014967;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x140025eb1
+kp::ContactPair::ContactPair;0.014965;0.014965;0.0;0.0;compare-ours.exe;kp::ContactPair::ContactPair;ContactPair.h;0x1400222a6
+kp::operator*;0.014957;0.014957;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x1400454ea
+std::__1::vector<std::__1::vector<int,kp::StepAllocator<int> >,kp::StepAllocator<std::__1::vector<int,kp::StepAllocator<int> > > >::vector;0.014955;0.014955;0.0;0.0;compare-ours.exe;std::__1::vector<std::__1::vector<int,kp::StepAllocator<int> >,kp::StepAllocator<std::__1::vector<int,kp::StepAllocator<int> > > >::vector;vector.h;0x14004df1f
+const;0.014955;0.014955;0.0;0.0;compare-ours.exe;const;CandidateMemory.cpp;0x14003f740
+kp::`anonymous namespace'::ContactMaker::make;0.014953;0.014953;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::ContactMaker::make;SoftStep.cpp;0x140024d38
+std::__1::vector<unsigned long long,std::__1::allocator<unsigned long long> >::clear;0.014951;0.014951;0.0;0.0;compare-ours.exe;std::__1::vector<unsigned long long,std::__1::allocator<unsigned long long> >::clear;vector.h;0x1400484e0
+std::__1::pair<kp::ContactId,kp::ContactForce>::operator=;0.014950;0.014950;0.0;0.0;compare-ours.exe;std::__1::pair<kp::ContactId,kp::ContactForce>::operator=;pair.h;0x140031a94
+std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::operator[];0.014946;0.014946;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact,kp::StepAllocator<kp::SoftContact> >::operator[];vector.h;0x140045737
+kp::StepAllocator<int>::allocate;0.014944;0.014944;0.0;0.0;compare-ours.exe;kp::StepAllocator<int>::allocate;StepMemory.h;0x140043085
+kp::operator+;0.014939;0.014939;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x1400441b6
+kp::operator*;0.014937;0.014937;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x14004136b
+kp::operator+;0.014937;0.014937;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x1400413b8
+kp::SmallVector<kp::ContactPoint,8>::operator=;0.014935;0.014935;0.0;0.0;compare-ours.exe;kp::SmallVector<kp::ContactPoint,8>::operator=;SmallVector.h;0x1400222a6
+kp::operator*;0.014935;0.014935;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140025e7c
+kp::Vector3::cross;0.014934;0.014934;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x140061827
+kp::Quaternion::Quaternion;0.014932;0.014932;0.0;0.0;compare-ours.exe;kp::Quaternion::Quaternion;Quaternion.h;0x1400267b1
+kp::SmallVector<kp::ContactPoint,8>::SmallVector;0.014930;0.014930;0.0;0.0;compare-ours.exe;kp::SmallVector<kp::ContactPoint,8>::SmallVector;SmallVector.h;0x140040f6f
+std::__1::operator==;0.014929;0.014929;0.0;0.0;compare-ours.exe;std::__1::operator==;wrap_iter.h;0x140040d04
+std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::size;0.014927;0.014927;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::size;vector.h;0x140047b78
+std::__1::min;0.014927;0.014927;0.0;0.0;compare-ours.exe;std::__1::min;min.h;0x1400297a8
+kp::operator*;0.014920;0.014920;0.0;0.0;compare-ours.exe;kp::operator*;Quaternion.h;0x1400293fd
+kp::PairReach::exceeded;0.014920;0.014920;0.0;0.0;compare-ours.exe;kp::PairReach::exceeded(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, double);PairReach.cpp;0x14004bad0
+kp::Quaternion::rotate;0.014919;0.014919;0.0;0.0;compare-ours.exe;kp::Quaternion::rotate;Quaternion.h;0x140040fb9
+kp::Matrix3x3::fromColumns;0.014915;0.014915;0.0;0.0;compare-ours.exe;kp::Matrix3x3::fromColumns;Matrix3x3.h;0x14002a4bd
+kp::ContactLevels::arrange;0.014913;0.014913;0.0;0.0;compare-ours.exe;kp::ContactLevels::arrange(std::__1::vector<std::__1::pair<int, int>, kp::StepAllocator<std::__1::pair<int, int>>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&);ContactLevels.cpp;0x140041a40
+kp::Vector3::dot;0.014911;0.014911;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140027712
+kp::TransformedHull::support;0.014909;0.014909;0.0;0.0;compare-ours.exe;kp::TransformedHull::support;TransformedHull.h;0x140060e3a
+std::__1::vector<char,std::__1::allocator<char> >::operator[];0.014909;0.014909;0.0;0.0;compare-ours.exe;std::__1::vector<char,std::__1::allocator<char> >::operator[];vector.h;0x1400483b0
+kp::`anonymous namespace'::Moving::stirred;0.014908;0.014908;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::Moving::stirred;SoftStep.cpp;0x140027653
+kp::operator*;0.014907;0.014907;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x14000c255
+kp::RollingFriction::prepare;0.014903;0.014903;0.0;0.0;compare-ours.exe;kp::RollingFriction::prepare(kp::SolverBody const&, kp::SolverBody const&, kp::Vector3, kp::Vector3);RollingFriction.cpp;0x14006ae80
+kp::`anonymous namespace'::shortestEdge;0.014900;0.014900;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::shortestEdge;HullVsHullAlgorithm.cpp;0x140067451
+kp::Vector3::scaled;0.014900;0.014900;0.0;0.0;compare-ours.exe;kp::Vector3::scaled;Vector3.h;0x14002a374
+kp::Vector3::dot;0.014898;0.014898;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140027707
+std::__1::vector<double,std::__1::allocator<double> >::size;0.014893;0.014893;0.0;0.0;compare-ours.exe;std::__1::vector<double,std::__1::allocator<double> >::size;vector.h;0x1400481c5
+kp::`anonymous namespace'::eachOf<`lambda at C:/Users/sshuser/CODE/kinetica-physics/src/src/dynamics/time_stepping/SoftStep.cpp:258:37'>::<lambda1>::operator();0.014890;0.014890;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::eachOf<`lambda at C:/Users/sshuser/CODE/kinetica-physics/src/src/dynamics/time_stepping/SoftStep.cpp:258:37'>::<lambda1>::operator();SoftStep.cpp;0x14002979c
+malloc_base;0.014887;0.014887;0.0;0.0;ucrtbase.dll;malloc_base;[Unknown];0x18000fdb0
+std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::end;0.014887;0.014887;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::end;vector.h;0x1400452dd
+std::__1::operator!=;0.014886;0.014886;0.0;0.0;compare-ours.exe;std::__1::operator!=;wrap_iter.h;0x140043a25
+kp::Vector3::dot;0.014884;0.014884;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x14003d11c
+kp::operator*;0.014882;0.014882;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x1400246a7
+kp::operator+;0.014880;0.014880;0.0;0.0;compare-ours.exe;kp::operator+;Vector3.h;0x140025a3d
+kp::Matrix2x2::inverse;0.014878;0.014878;0.0;0.0;compare-ours.exe;kp::Matrix2x2::inverse;Matrix2x2.h;0x14006b1da
+kp::Vector3::dot;0.014874;0.014874;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x1400617e3
+kp::operator+=;0.014873;0.014873;0.0;0.0;compare-ours.exe;kp::operator+=;Vector3.h;0x140046f53
+std::__1::vector<double,kp::StepAllocator<double> >::vector;0.014870;0.014870;0.0;0.0;compare-ours.exe;std::__1::vector<double,kp::StepAllocator<double> >::vector;vector.h;0x140049cc3
+kp::SmallVector<kp::ContactPoint,8>::SmallVector;0.014869;0.014869;0.0;0.0;compare-ours.exe;kp::SmallVector<kp::ContactPoint,8>::SmallVector;SmallVector.h;0x140020fdc
+std::__1::max;0.014864;0.014864;0.0;0.0;compare-ours.exe;std::__1::max;max.h;0x140042c49
+kp::IslandNormals::solve::<lambda0>::operator();0.014861;0.014861;0.0;0.0;compare-ours.exe;kp::IslandNormals::solve::<lambda0>::operator();IslandNormals.cpp;0x140053248
+kp::Matrix2x2::determinant;0.014854;0.014854;0.0;0.0;compare-ours.exe;kp::Matrix2x2::determinant;Matrix2x2.h;0x14006b1da
+std::__1::vector<kp::PairFinder::Found::Pair,kp::StepAllocator<kp::PairFinder::Found::Pair> >::~vector;0.014848;0.014848;0.0;0.0;compare-ours.exe;std::__1::vector<kp::PairFinder::Found::Pair,kp::StepAllocator<kp::PairFinder::Found::Pair> >::~vector;vector.h;0x1400207bb
+kp::overlapping;0.014839;0.014839;0.0;0.0;compare-ours.exe;kp::overlapping;DynamicTree.h;0x14001f2f1
+std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::begin;0.014824;0.014824;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::begin;vector.h;0x1400476e7
+kp::Vector3::dot;0.014815;0.014815;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140049d58
+std::__1::vector<char,std::__1::allocator<char> >::operator[];0.014810;0.014810;0.0;0.0;compare-ours.exe;std::__1::vector<char,std::__1::allocator<char> >::operator[];vector.h;0x140048529
+std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::resize;0.014750;0.014750;0.0;0.0;compare-ours.exe;std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::resize(unsigned __int64);vector.h;0x1400425a0
+kp::operator-;0.014747;0.014747;0.0;0.0;compare-ours.exe;kp::operator-;Vector3.h;0x140046edf
+kp::SmallVector<int,16>::SmallVector;0.014697;0.014697;0.0;0.0;compare-ours.exe;kp::SmallVector<int,16>::SmallVector;SmallVector.h;0x1400687b9
+kp::SmallVector<kp::ContactCandidate,16>::~SmallVector;0.014624;0.014624;0.0;0.0;compare-ours.exe;kp::SmallVector<kp::ContactCandidate,16>::~SmallVector;SmallVector.h;0x140067cc9
+std::__1::vector<int,kp::StepAllocator<int> >::operator[];0.014591;0.014591;0.0;0.0;compare-ours.exe;std::__1::vector<int,kp::StepAllocator<int> >::operator[];vector.h;0x140049eb6
+std::__1::vector<unsigned long long,std::__1::allocator<unsigned long long> >::push_back;0.014569;0.014569;0.0;0.0;compare-ours.exe;std::__1::vector<unsigned long long,std::__1::allocator<unsigned long long> >::push_back;vector.h;0x140048533
+kp::Vector3::cross;0.014554;0.014554;0.0;0.0;compare-ours.exe;kp::Vector3::cross;Vector3.h;0x14004133c
+kp::operator*;0.014499;0.014499;0.0;0.0;compare-ours.exe;kp::operator*;Vector3.h;0x140061fd5
+std::__1::operator==;0.014439;0.014439;0.0;0.0;compare-ours.exe;std::__1::operator==;wrap_iter.h;0x1400476ef
+[pincrt.dll];0.004957;0.004957;0.0;0.0;pincrt.dll;[pincrt.dll];[Unknown];0x0
+NtOpenKey;0.000626;0.000626;0.0;0.0;ntdll.dll;NtOpenKey;[Unknown];0x18009d7d0
+LoadLibraryExW;0.000106;0.000106;0.0;0.0;KERNELBASE.dll;LoadLibraryExW;[Unknown];0x18002da10
