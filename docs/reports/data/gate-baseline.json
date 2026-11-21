@@ -1,53 +1,53 @@
 {
  "remote": {
-  "bench_all_ms": 35.36,
-  "bench_single": 60.88,
+  "bench_all_ms": 46.28,
+  "bench_single": 70.23,
   "pull": {
    "pyramid 1": {
     "body": 1,
-    "median_ms": 1.4483,
+    "median_ms": 1.8452,
     "mode": "realtime",
     "overlap_m": 0.000238788,
-    "p99_ms": 14.8674,
+    "p99_ms": 18.6463,
     "peak_speed": 2.48326,
     "scene": "pyramid",
-    "slow_frames": 1,
-    "worst_ms": 17.1066
+    "slow_frames": 6,
+    "worst_ms": 21.7563
    },
    "pyramid 12": {
     "body": 12,
-    "median_ms": 3.4749,
+    "median_ms": 4.0372,
     "mode": "realtime",
     "overlap_m": 0.000182494,
-    "p99_ms": 16.3226,
+    "p99_ms": 18.2836,
     "peak_speed": 5.4058,
     "scene": "pyramid",
-    "slow_frames": 2,
-    "worst_ms": 19.8656
+    "slow_frames": 4,
+    "worst_ms": 22.0358
    },
    "pyramid 9": {
     "body": 9,
-    "median_ms": 3.1404,
+    "median_ms": 4.0577,
     "mode": "realtime",
     "overlap_m": 0.000495588,
-    "p99_ms": 13.3069,
+    "p99_ms": 17.0081,
     "peak_speed": 6.385,
     "scene": "pyramid",
-    "slow_frames": 1,
-    "worst_ms": 20.9577
+    "slow_frames": 5,
+    "worst_ms": 24.4477
    }
   },
   "scene": {
-   "beam6": 0.174345,
-   "chain100": 0.482439667,
-   "column100": 2.416114,
-   "cube100": 0.0527253333,
-   "gap1mm": 0.0482755556,
-   "overlap": 0.079615,
-   "pendulum120": 0.0530831667,
-   "pyramid55": 1.31870567,
-   "rubble36": 1.6031675,
-   "stack10": 0.240716
+   "beam6": 0.215848333,
+   "chain100": 0.598329,
+   "column100": 2.97894533,
+   "cube100": 0.064464,
+   "gap1mm": 0.0563083333,
+   "overlap": 0.0931261111,
+   "pendulum120": 0.0658091667,
+   "pyramid55": 1.56388133,
+   "rubble36": 1.96130354,
+   "stack10": 0.287939667
   }
  },
  "standard": {
@@ -57,19 +57,19 @@
    "overlap_m": 9.568e-10
   },
   "balls": {
-   "energy_gain": 4.304e-07,
+   "energy_gain": 2.168e-07,
    "ok": true,
-   "overlap_m": 2.24e-07
+   "overlap_m": 2.18e-07
   },
   "bowl": {
-   "energy_gain": 3.179e-06,
+   "energy_gain": 7.793e-07,
    "ok": true,
-   "overlap_m": 0.002272
+   "overlap_m": 0.0007467
   },
   "buckets": {
-   "energy_gain": 5.403e-05,
+   "energy_gain": 0.001042,
    "ok": true,
-   "overlap_m": 0.0008229
+   "overlap_m": 0.0005429
   },
   "bullet": {
    "energy_gain": 3.789e-19,
@@ -132,9 +132,9 @@
    "overlap_m": 6.504e-11
   },
   "swing": {
-   "energy_gain": 0.000868,
+   "energy_gain": 0.0009352,
    "ok": true,
-   "overlap_m": 0.0009905
+   "overlap_m": 0.000934
   },
   "wall": {
    "energy_gain": 3.133e-07,

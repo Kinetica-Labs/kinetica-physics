@@ -40,16 +40,20 @@ public:
     std::vector<ContactPair> pairs(Real h, const JointSet& joints) const;
 
 private:
-    // Пары частей двух тел и запись памяти площадок для следующего обновления.
+    // Пары частей двух тел и записи памяти площадок для следующего обновления.
     struct Found {
-        StepArray<ContactPair> pairs;
-        // Запись памяти площадок пары простых тел: carried — прежняя, по ней пара перенесена; fresh — новая.
-        const ManifoldMemory::Entry* carried = nullptr;
-        std::optional<ManifoldMemory::Entry> fresh;
+        struct Pair {
+            ContactPair pair;
+            const ManifoldMemory::Entry* carried; // прежняя запись памяти, по которой пара перенесена
+            std::ptrdiff_t fresh;                 // или номер новой записи в fresh; −1 — записи нет
+        };
+        StepArray<Pair> pairs;
+        StepArray<ManifoldMemory::Entry> fresh;
     };
+    // Пара частей: площадка из памяти, если запись ещё годится, иначе поиск; найденное — в found.
+    void part(const Body& a, const Body& b, const Key& key, Real reach, Found& found) const;
     StepArray<std::pair<int, int>> candidates(Real h, const StepArray<Real>& fastest) const;
     Found between(int i, int j, Real h, Real reach) const;
-    Found simplePair(int i, int j, Real reach) const;
     bool listed(int i, int j, int partA, int partB) const;
 
     const std::vector<Body>& bodies_;

@@ -21,15 +21,21 @@ std::optional<ManifoldMemory::Entry> ManifoldMemory::entryOf(const ContactPair& 
     const Transform &face = found.faceOnB ? poseB : poseA, &lying = found.faceOnB ? poseA : poseB;
     const auto onFace = [&](int k) { return found.faceOnB ? found.points[size_t(k)].onB : found.points[size_t(k)].onA; };
     const auto onLying = [&](int k) { return found.faceOnB ? found.points[size_t(k)].onA : found.points[size_t(k)].onB; };
-    Entry entry{pair.a, pair.b, a.shape.get(), b.shape.get(), apartOf(a, b), pair.reach, found.faceOnB, face.localDirection(found.normal), face.localPoint(onFace(0)), found.count, {}};
+    Entry entry{pair.a, pair.b, pair.partA, pair.partB, a.shape.get(), b.shape.get(), apartOf(a, b), pair.reach, found.faceOnB, face.localDirection(found.normal), face.localPoint(onFace(0)), found.count, {}};
     for (int k = 0; k < found.count; ++k) entry.points[k] = {lying.localPoint(onLying(k)), found.points[size_t(k)].id};
     return entry;
 }
 
-const ManifoldMemory::Entry* ManifoldMemory::valid(int i, int j, const Body& a, const Body& b, Real reach) const {
-    const auto before = [](const Entry& entry, std::pair<int, int> key) { return std::make_pair(entry.a, entry.b) < key; };
-    const auto known = std::lower_bound(entries_.begin(), entries_.end(), std::make_pair(i, j), before);
-    if (known == entries_.end() || known->a != i || known->b != j || known->shapeA != a.shape.get() || known->shapeB != b.shape.get()) return nullptr;
+// a и b — части, как их отдаёт Body::part: у простого тела оно само. key — {тело a, тело b, часть a, часть b}.
+const ManifoldMemory::Entry* ManifoldMemory::valid(const std::array<int, 4>& key, const Body& a, const Body& b, Real reach) const {
+    const auto before = [](const Entry& entry, const std::array<int, 4>& wanted) {
+        if (entry.a != wanted[0]) return entry.a < wanted[0];
+        if (entry.b != wanted[1]) return entry.b < wanted[1];
+        return entry.partA != wanted[2] ? entry.partA < wanted[2] : entry.partB < wanted[3];
+    };
+    const auto known = std::lower_bound(entries_.begin(), entries_.end(), key, before);
+    if (known == entries_.end() || known->a != key[0] || known->b != key[1] || known->partA != key[2] || known->partB != key[3]) return nullptr;
+    if (known->shapeA != a.shape.get() || known->shapeB != b.shape.get()) return nullptr;
     const Transform now = apartOf(a, b);
     // 2 sin(θ/2) — удвоенная длина векторной части кватерниона относительного поворота.
     const Quaternion turn = now.orientation * known->apart.orientation.conjugate();

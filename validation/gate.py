@@ -27,7 +27,10 @@ clang++ ещё потоки 1, 4 и 12 и затирание памяти шаг
 кадра и ±4 % тактов процессора (2026-11-21), а сборка и прогоны мешают работать за ней. Свободная машина —
 другая система, компилятор и процессор: хэш обязан совпасть и там. Приборы скорости идут на ядре,
 закреплённом за ними; наименьшее из десяти прогонов повторяется до 0,1 %, порог 3 %; мерка, вышедшая за
-порог, перемеряется (помеха время только прибавляет). Связь — два сценария вне git (в них адрес и пароль):
+порог, перемеряется (помеха время только прибавляет). Скорость сравнивается не с записанными числами, а с
+программами последней принятой правки (каталог ref на той машине, обновляется при --accept и --update),
+которые меряются тут же, мерка за меркой: за несколько часов сама машина уходила на 16 %, и сравнение с
+утренними числами объявляло «хуже» всё подряд. Числа скорости в эталоне — для справки. Связь — два сценария вне git (в них адрес и пароль):
 build/remote/sync.sh — передать дерево и собрать, код выхода сборки; build/remote/rrun.sh "<команда>" —
 выполнить команду PowerShell в каталоге проекта той машины (исполняемые — в build\\, как здесь).
 Без --remote скорость меряется тактами (perf) с порогом 6 % и ловит только грубую порчу.
@@ -97,30 +100,35 @@ class Here:
 
 
 class There:
-    """Свободная машина: скорость — временем кадра на закреплённом ядре."""
+    """Свободная машина: скорость — временем кадра на закреплённом ядре. folder — откуда брать исполняемые:
+    нынешняя сборка или каталог ref с программами последней принятой правки."""
     section, unit, margin = "remote", "мс", 0.03
+
+    def __init__(self, folder=None):
+        self.studies = f".\\{folder}" if folder else ".\\build\\validation\\studies"
+        self.engines = folder if folder else "build\\validation\\engines"
 
     def command(self, env, line):
         settings = "".join(f'$env:{key}="{value}"; ' for key, value in (env or {}).items())
         return run([REMOTE / "rrun.sh", settings + line])[1]
 
     def study(self, name, arguments="", env=None):
-        return self.command(env, f".\\build\\validation\\studies\\{name}.exe {arguments}")
+        return self.command(env, f"{self.studies}\\{name}.exe {arguments}")
 
     def rows(self, name, arguments, env=None):
         # Приборы дописывают строки в файл, поэтому прежний файл сначала убирается.
         text = self.command(env, "Remove-Item gate-rows.jsonl -ErrorAction SilentlyContinue; "
-                            f".\\build\\validation\\studies\\{name}.exe {arguments.format(rows='gate-rows.jsonl')} | Out-Null; Get-Content gate-rows.jsonl -Encoding UTF8")
+                            f"{self.studies}\\{name}.exe {arguments.format(rows='gate-rows.jsonl')} | Out-Null; Get-Content gate-rows.jsonl -Encoding UTF8")
         return [json.loads(line) for line in text.splitlines() if line.startswith("{")]
 
     def single(self, env, repeats):
-        pinned = 'cmd /c "start /b /wait /affinity 0x100 build\\validation\\engines\\compare-ours.exe realtime 8"'
+        pinned = f'cmd /c "start /b /wait /affinity 0x100 {self.engines}\\compare-ours.exe realtime 8"'
         text = self.command(dict(env, KP_THREADS="1"), f"1..{repeats} | ForEach-Object {{ {pinned} }}")
         frames = re.findall(r"([\d.]+) мс на кадр", text) or [m for line in text.splitlines() if line.startswith("{") for m in json.loads(line)["numbers"]["ms_frame"]]
         return min(float(f) for f in frames)
 
     def allThreads(self):
-        return self.command({"BENCH": "14"}, "1..2 | ForEach-Object { .\\build\\validation\\engines\\compare-ours.exe realtime 8 }")
+        return self.command({"BENCH": "14"}, f"1..2 | ForEach-Object {{ .\\{self.engines}\\compare-ours.exe realtime 8 }}")
 
     def checks(self, quick):
         etalon = HASH.read_text(encoding="utf-8").split()
@@ -176,34 +184,60 @@ def pullOf(machine, body):
     return json.loads(machine.study("study-window-pull", f"realtime pyramid {body} 2 1 0 0", {"KP_REPEATS": "5"}).strip().splitlines()[-1])
 
 
-def speed(machine, quick):
-    """Мерки скорости на машине machine."""
-    numbers = {"pull": {f"pyramid {body}": pullOf(machine, body) for body in PULLS}}
-    numbers["bench_single"] = machine.single({"BENCH": "14"}, 10)
-    numbers["bench_all_ms"] = min(float(f) for _ in range(3) for f in re.findall(r"([\d.]+) мс на кадр", machine.allThreads()))
+def speedMeasures(quick):
+    """Мерки скорости: ключ → как снять её на машине."""
+    measures = {("pull", f"pyramid {body}"): (lambda machine, body=body: pullOf(machine, body)) for body in PULLS}
+    measures[("bench_single",)] = lambda machine: machine.single({"BENCH": "14"}, 10)
+    measures[("bench_all_ms",)] = lambda machine: min(float(f) for _ in range(3) for f in re.findall(r"([\d.]+) мс на кадр", machine.allThreads()))
     if not quick:
-        numbers["scene"] = {key: machine.single({"SCENE": key}, 5) for key in SCENES}
-    return numbers
+        measures.update({("scene", key): (lambda machine, key=key: machine.single({"SCENE": key}, 5)) for key in SCENES})
+    return measures
 
 
-def confirm(fast, old, machine):
-    """Мерку скорости, вышедшую за порог, перемерить: помеха время только прибавляет, поэтому второй замер
-    либо подтверждает замедление, либо снимает его (на свободной машине разовый выброс — до 3,5 %)."""
-    slow = lambda value, was: value > (1 + machine.margin) * was
-    for _ in range(2):
-        if slow(fast["bench_single"], old["bench_single"]):
-            fast["bench_single"] = min(fast["bench_single"], machine.single({"BENCH": "14"}, 10))
-        for key in fast.get("scene", {}):
-            if slow(fast["scene"][key], old["scene"][key]):
-                fast["scene"][key] = min(fast["scene"][key], machine.single({"SCENE": key}, 5))
-        for key, pull in fast["pull"].items():
-            if pull["worst_ms"] > 1.25 * old["pull"][key]["worst_ms"] or pull["p99_ms"] > 1.25 * old["pull"][key]["p99_ms"]:
-                again = pullOf(machine, int(key.split()[1]))
-                pull["worst_ms"], pull["p99_ms"] = min(pull["worst_ms"], again["worst_ms"]), min(pull["p99_ms"], again["p99_ms"])
+def speed(machines, quick):
+    """Мерки скорости на каждой из машин machines; мерка снимается на всех подряд — так прежняя и нынешняя
+    сборка меряются в одном состоянии машины (за часы свободная машина уходила на 16 %)."""
+    found = [{} for _ in machines]
+    for key, take in speedMeasures(quick).items():
+        for numbers, machine in zip(found, machines):
+            place = numbers
+            for step in key[:-1]:
+                place = place.setdefault(step, {})
+            place[key[-1]] = take(machine)
+    return found
 
 
-def measure(quick, machine):
-    numbers = {"standard": standardScenes(machine), machine.section: speed(machine, quick)}
+def better(first, second):
+    """Наименьшее из двух замеров одной мерки: число или строка прибора рывка."""
+    if not isinstance(first, dict):
+        return min(first, second)
+    return dict(first, worst_ms=min(first["worst_ms"], second["worst_ms"]), p99_ms=min(first["p99_ms"], second["p99_ms"]))
+
+
+def confirm(fast, old, machines, quick):
+    """Мерку скорости, вышедшую за порог, перемерить на обеих сборках: помеха время только прибавляет,
+    поэтому второй замер либо подтверждает замедление, либо снимает его."""
+    margin = machines[0].margin
+    for key, take in speedMeasures(quick).items():
+        now, was = fast, old
+        for step in key[:-1]:
+            now, was = now[step], was[step]
+        slow = (lambda a, b: a["worst_ms"] > 1.25 * b["worst_ms"] or a["p99_ms"] > 1.25 * b["p99_ms"]) if key[0] == "pull" else (lambda a, b: a > (1 + margin) * b)
+        for _ in range(2):
+            if not slow(now[key[-1]], was[key[-1]]):
+                break
+            if len(machines) > 1:
+                was[key[-1]] = better(was[key[-1]], take(machines[1]))
+            now[key[-1]] = better(now[key[-1]], take(machines[0]))
+
+
+def measure(quick, machine, reference):
+    """Числа нынешней сборки; reference — та же машина с программами последней принятой правки: её
+    скорость снимается тут же и идёт в ответ под ключом "reference"."""
+    fast = speed([machine] + ([reference] if reference else []), quick)
+    numbers = {"standard": standardScenes(machine), machine.section: fast[0]}
+    if reference:
+        numbers["reference"] = fast[1]
     if not quick:
         numbers["wall_overlap_median_mm"] = float(re.search(r"медиана ([\d.]+) мм", machine.study("study-overlap-spread", "wall")).group(1))
     return numbers
@@ -229,7 +263,7 @@ def compare(now, base, machine):
         add(f"сцена {key}: энергия", was["energy_gain"], scene["energy_gain"], lambda w: 10 * w + 1e-2)
     if "wall_overlap_median_mm" in now:
         add("стена под ударом: перекрытие, медиана", base["wall_overlap_median_mm"], now["wall_overlap_median_mm"], lambda w: 1.5 * w, unit="мм")
-    fast, old = now[machine.section], base[machine.section]
+    fast, old = now[machine.section], now.get("reference", base.get(machine.section))
     slower, faster = (lambda w: (1 + machine.margin) * w), (lambda w: (1 - machine.margin) * w)
     for key, pull in fast["pull"].items():
         was = old["pull"][key]
@@ -248,11 +282,20 @@ def show(value):
     return value if isinstance(value, str) else f"{value:.4g}"
 
 
+def keepReference():
+    """Программы нынешней сборки свободной машины становятся прежними (каталог ref): с ними сравнивается следующая правка."""
+    return run([REMOTE / "rrun.sh", "if (Test-Path ref) { Remove-Item -Recurse -Force ref }; New-Item -ItemType Directory ref | Out-Null; "
+                "Copy-Item build\\validation\\studies\\*.exe ref\\; Copy-Item build\\validation\\engines\\compare-ours.exe ref\\; 'REF_OK'"])[1]
+
+
 def accept():
     last = json.loads(LAST.read_text(encoding="utf-8"))
     if last["verdict"] == "ХУЖЕ":
         sys.exit("прошлый прогон был ХУЖЕ: эталон не тронут")
     base = json.loads(BASELINE.read_text(encoding="utf-8"))
+    last["numbers"].pop("reference", None)
+    if "remote" in last["numbers"] and "REF_OK" not in keepReference():
+        sys.exit("не удалось запомнить программы на свободной машине: эталон не тронут")
     BASELINE.write_text(json.dumps(dict(base, **last["numbers"]), ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     print(f"эталон записан числами прошлого прогона ({last['verdict']}): {BASELINE.relative_to(ROOT)}")
 
@@ -261,19 +304,22 @@ def main():
     if "--accept" in sys.argv:
         return accept()
     quick, update = "--quick" in sys.argv, "--update" in sys.argv
-    machine = There() if "--remote" in sys.argv else Here()
+    remote = "--remote" in sys.argv
+    machine = There() if remote else Here()
+    reference = There("ref") if remote and "REF_YES" in run([REMOTE / "rrun.sh", "if (Test-Path ref\\compare-ours.exe) { 'REF_YES' }"])[1] else None
     checks = passFail(machine, quick)
     for name, ok in checks.items():
         print(f"{name:46} {'ок' if ok else 'ОТКАЗ'}")
     failed = [name for name, ok in checks.items() if not ok]
     if failed and (update or not list(checks.values())[0]):
         sys.exit(f"ИТОГ: ХУЖЕ — не прошли: {', '.join(failed)}")
-    now = measure(quick, machine)
+    now = measure(quick, machine, reference)
     base = json.loads(BASELINE.read_text(encoding="utf-8")) if BASELINE.exists() else {}
     if update:
+        now.pop("reference", None)
         BASELINE.write_text(json.dumps(dict(base, **now), ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-        return print(f"эталон записан: {BASELINE.relative_to(ROOT)}")
-    confirm(now[machine.section], base[machine.section], machine)
+        return print(f"эталон записан: {BASELINE.relative_to(ROOT)}" + ("; " + ("программы запомнены" if "REF_OK" in keepReference() else "ПРОГРАММЫ НЕ ЗАПОМНЕНЫ") if remote else ""))
+    confirm(now[machine.section], now.get("reference", base.get(machine.section)), [machine] + ([reference] if reference else []), quick)
     rows = compare(now, base, machine)
     print(f"\n{'мерка':46} {'эталон':>10} {'сейчас':>10} {'порог':>10}  итог")
     for name, was, value, limit, verdict, unit in rows:

@@ -94,31 +94,29 @@ StepArray<std::pair<int, int>> partPairs(const Body& a, const Body& b, Vector3 g
 
 bool PairFinder::listed(int i, int j, int partA, int partB) const { return known && std::binary_search(known->begin(), known->end(), Key{i, j, partA, partB}); }
 
-// Пара простых тел: площадка из памяти, если запись пары ещё годится, иначе поиск.
-PairFinder::Found PairFinder::simplePair(int i, int j, Real reach) const {
-    Found found;
-    if (listed(i, j, 0, 0)) return found;
-    const Body &a = bodies_[size_t(i)], &b = bodies_[size_t(j)];
-    found.carried = memory ? memory->valid(i, j, a, b, reach) : nullptr;
-    if (found.carried) found.pairs.push_back(ManifoldMemory::carried(*found.carried, a, b, reach));
-    else if (const std::optional<ContactPair> pair = examinePairWithin(a, b, reach, boundary)) found.pairs.push_back(*pair);
-    if (found.pairs.empty()) return found;
-    found.pairs[0].a = i, found.pairs[0].b = j;
-    if (memory && !found.carried) found.fresh = ManifoldMemory::entryOf(found.pairs[0], a, b);
-    return found;
+// Пара частей: площадка из памяти, если запись пары ещё годится, иначе поиск. a и b — части (Body::part).
+void PairFinder::part(const Body& a, const Body& b, const Key& key, Real reach, Found& found) const {
+    if (listed(key[0], key[1], key[2], key[3])) return;
+    const ManifoldMemory::Entry* carried = memory ? memory->valid(key, a, b, reach) : nullptr;
+    if (carried) found.pairs.push_back({ManifoldMemory::carried(*carried, a, b, reach), carried, -1});
+    else if (const std::optional<ContactPair> pair = examinePairWithin(a, b, reach, boundary)) found.pairs.push_back({*pair, nullptr, -1});
+    else return;
+    Found::Pair& last = found.pairs.back();
+    last.pair.a = key[0], last.pair.b = key[1], last.pair.partA = key[2], last.pair.partB = key[3];
+    if (carried || !memory) return;
+    if (const std::optional<ManifoldMemory::Entry> fresh = ManifoldMemory::entryOf(last.pair, a, b)) last.fresh = std::ptrdiff_t(found.fresh.size()), found.fresh.push_back(*fresh);
 }
 
-// Пары частей тел i и j — в порядке partPairs. reach — путь сближения простых тел (approachReach).
+// Пары частей тел i и j — в порядке partPairs. reach — путь сближения простых тел (approachReach); у пары
+// частей он свой, по границам скорости точек этих частей.
 PairFinder::Found PairFinder::between(int i, int j, Real h, Real reach) const {
     const Body &a = bodies_[size_t(i)], &b = bodies_[size_t(j)];
-    if (!a.parts && !b.parts) return simplePair(i, j, reach);
     Found found;
+    if (!a.parts && !b.parts) return part(a, b, {i, j, 0, 0}, reach, found), found;
     for (const auto& [p, q] : partPairs(a, b, gravity_, h)) {
-        if (listed(i, j, p, q)) continue;
-        std::optional<ContactPair> pair = examinePair(a.part(p), b.part(q), gravity_, h, boundary);
-        if (!pair) continue;
-        pair->a = i, pair->b = j, pair->partA = p, pair->partB = q;
-        found.pairs.push_back(*pair);
+        const Body partA = a.part(p), partB = b.part(q);
+        if (!partA.shape || !partB.shape || (partA.isStatic() && partB.isStatic())) continue;
+        part(partA, partB, {i, j, p, q}, approachReach(maxPointSpeed(partA), maxPointSpeed(partB), gravity_, h), found);
     }
     return found;
 }
@@ -141,16 +139,18 @@ std::vector<ContactPair> PairFinder::pairs(Real h) const {
     if (parts < kParallelParts) for (size_t k = 0; k < candidates.size(); ++k) examine(k);
     else WorkerPool::shared().run(candidates.size(), examine);
     size_t total = 0;
-    StepArray<const ManifoldMemory::Entry*> kept;
+    StepArray<const ManifoldMemory::Entry*> kept; // кандидаты идут по возрастанию тел, пары частей внутри — тоже
     kept.reserve(memory ? found.size() : 0);
     for (const Found& some : found) {
         total += some.pairs.size();
-        if (some.carried || some.fresh) kept.push_back(some.carried ? some.carried : &*some.fresh);
+        for (const Found::Pair& one : some.pairs)
+            if (one.carried || one.fresh >= 0) kept.push_back(one.carried ? one.carried : &some.fresh[size_t(one.fresh)]);
     }
     if (memory) memory->replace(kept);
     std::vector<ContactPair> pairs; // ответ уходит наружу и живёт дольше шага: он в куче, одним куском
     pairs.reserve(total);
-    for (const Found& some : found) pairs.insert(pairs.end(), some.pairs.begin(), some.pairs.end());
+    for (const Found& some : found)
+        for (const Found::Pair& one : some.pairs) pairs.push_back(one.pair);
     return pairs;
 }
 

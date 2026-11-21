@@ -104,17 +104,17 @@ void carriedManifoldMatchesSearch() {
         memory.replace(StepArray<const ManifoldMemory::Entry*>(1, &*entry));
         const Vector3 turn = within(4e-5);
         bodies[1].position += within(4e-5), bodies[1].orientation = (Quaternion{1, turn.x, turn.y, turn.z} * bodies[1].orientation).unit();
-        const ManifoldMemory::Entry* known = memory.valid(0, 1, bodies[0], bodies[1], found->reach);
+        const ManifoldMemory::Entry* known = memory.valid({0, 1, 0, 0}, bodies[0], bodies[1], found->reach);
         CHECK(known != nullptr, "проба %d: запись не годится при сдвиге в пределах допуска", trial);
         const std::optional<ContactPair> fresh = examinePair(bodies, 0, 1, gravity, h);
         if (!known || !fresh) continue;
         const Mismatch worst = mismatchOf(ManifoldMemory::carried(*known, bodies[0], bodies[1], found->reach).manifold, fresh->manifold);
         CHECK(fresh->manifold.count >= 2 && worst.separation < Real(1e-6) && worst.place < 4 * tolerance, "проба %d: зазоры расходятся на %.2e м, места точек на %.2e м", trial,
               double(worst.separation), double(worst.place));
-        CHECK(memory.valid(0, 1, bodies[0], bodies[1], found->reach + 2 * tolerance) == nullptr, "проба %d: запись годится при выросшем пути сближения", trial);
-        CHECK(memory.valid(0, 1, bodies[0], Body::box({0.2, 0.2, 0.2}, 1000, bodies[1].position), found->reach) == nullptr, "проба %d: запись досталась телу с другой формой", trial);
+        CHECK(memory.valid({0, 1, 0, 0}, bodies[0], bodies[1], found->reach + 2 * tolerance) == nullptr, "проба %d: запись годится при выросшем пути сближения", trial);
+        CHECK(memory.valid({0, 1, 0, 0}, bodies[0], Body::box({0.2, 0.2, 0.2}, 1000, bodies[1].position), found->reach) == nullptr, "проба %d: запись досталась телу с другой формой", trial);
         bodies[1].position.x += 2 * tolerance;
-        CHECK(memory.valid(0, 1, bodies[0], bodies[1], found->reach) == nullptr, "проба %d: запись годится при сдвиге за допуском", trial);
+        CHECK(memory.valid({0, 1, 0, 0}, bodies[0], bodies[1], found->reach) == nullptr, "проба %d: запись годится при сдвиге за допуском", trial);
         ++carriedPairs;
     }
     CHECK(carriedPairs > 150, "площадок по грани слишком мало: %d из 200", carriedPairs);

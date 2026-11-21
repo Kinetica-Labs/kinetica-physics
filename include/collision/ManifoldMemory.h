@@ -17,6 +17,7 @@
 #include <math/StepMemory.h>
 #include <math/Transform.h>
 
+#include <array>
 #include <optional>
 #include <vector>
 
@@ -27,6 +28,7 @@ public:
     static constexpr int kPoints = 8; // площадку крупнее память не ведёт
     struct Entry {
         int a, b;
+        int partA, partB; // части составных тел (Body::part); у простого тела ноль
         const ConvexShape *shapeA, *shapeB; // тело с другим номером или другой формой чужую запись не получит
         Transform apart;                    // поза меньшего тела в осях большего на момент поиска
         Real reach;                         // путь сближения пары на момент поиска, м
@@ -45,7 +47,7 @@ public:
     static std::optional<Entry> entryOf(const ContactPair& pair, const Body& a, const Body& b);
     // Запись пары тел i и j, если она есть и при нынешних позах ещё годится; reach — нынешний путь
     // сближения пары.
-    const Entry* valid(int i, int j, const Body& a, const Body& b, Real reach) const;
+    const Entry* valid(const std::array<int, 4>& key, const Body& a, const Body& b, Real reach) const;
     // Площадка записи в нынешних позах тел.
     static ContactPair carried(const Entry& entry, const Body& a, const Body& b, Real reach);
     // Записи следующего обновления, по возрастанию (a, b).
