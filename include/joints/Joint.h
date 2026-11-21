@@ -79,6 +79,7 @@ protected:
 
     // Общий набор связей, из которого наследники берут нужные.
     Bond travelLine(const Motion& motion, int axis) const;  // перемещение вдоль оси сочленения
+    Bond travelLine(const Motion& motion, Vector3 along) const; // то же вдоль единичного направления, которое несёт тело a
     Bond turnLine(const Motion& motion, int axis) const;    // поворот вокруг оси сочленения
     void lockTravel(const Motion& motion, int axis, std::vector<Bond>& bonds) const;
     void lockAllTurns(const Motion& motion, std::vector<Bond>& bonds) const;

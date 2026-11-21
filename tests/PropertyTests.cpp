@@ -7,6 +7,7 @@
 
 #include <collision/PairFinder.h>
 #include <dynamics/event_driven/ContactSolver.h>
+#include <joints/Path.h>
 #include <math/Complementarity.h>
 #include <math/ProfileMatrix.h>
 #include <math/UpdatedCholesky.h>
@@ -354,6 +355,96 @@ ImpactTallies impactProperty(std::uint64_t seed, int cases, bool stacked, bool b
     return tally;
 }
 
+// --- Кривая пути (joints/Path.h) -------------------------------------------------------------------
+// Случайная пологая кривая: точки по окружности радиуса 1 м через равные углы (замкнутая — весь круг,
+// открытая — три четверти), каждая сдвинута не больше чем на 0,3 шага между точками: без петель и возвратов.
+struct GentlePath {
+    Path path;
+    double spacing; // шаг между точками, м
+};
+GentlePath gentlePath(Random& random) {
+    const int n = 4 + random.below(37);
+    const bool closed = random.below(2) == 1;
+    const double step = (closed ? 2.0 : 1.5) * 3.14159265358979323846 / (closed ? n : n - 1);
+    std::vector<Vector3> through;
+    for (int k = 0; k < n; ++k) through.push_back(Vector3{Real(std::cos(step * k)), 0, Real(std::sin(step * k))} + random.vector(0.3 * step / 1.7320508));
+    return {Path(std::move(through), closed), step};
+}
+
+struct PathTallies {
+    Tally nearest, foot, length, unit, across, twist, seam;
+};
+
+// Утверждение: для точки x = P(u₀) + d ближайшая точка кривой не дальше |d| (сама P(u₀) на таком
+// расстоянии), и в ней (P − x) · T = 0 — кроме концов открытой кривой, от которых кривая уходит прочь от x.
+// |d| — до 0,2 шага точек. Допуски 1e-12 м и 1e-9 м.
+void checkClosest(Random& random, const GentlePath& curve, PathTallies& tallies) {
+    const Path& path = curve.path;
+    const Vector3 shift = random.vector(0.2 * curve.spacing / 1.7320508), x = path.point(Real(random.between(0, double(path.span())))) + shift;
+    const Real u = path.closest(x);
+    const Vector3 gap = path.point(u) - x;
+    const double along = double(gap.dot(path.tangent(u)));
+    const bool atEnd = !path.closed() && ((u <= 0 && along >= 0) || (u >= path.span() && along <= 0));
+    tallies.nearest.add(double(gap.length() - shift.length()), 1e-12);
+    tallies.foot.add(atEnd ? 0 : std::fabs(along), 1e-9);
+}
+
+// Утверждение: нормаль единичная, поперёк касательной и идёт без кручения. Кручение между u и u + δ —
+// осевая часть поворота, переводящего тройку (T, N, B) в следующую: ½ (N₂ · B₁ − N₁ · B₂), B = T × N.
+// Допуск 1e-2 рад на метр; у замкнутой кривой к нему добавлено распределённое по ней (не больше π на её
+// длину). Шаг δ = 1/1024 отрезка: у самого переноса без кручения поворот на конечном шаге имеет осевую
+// часть, она убывает вместе с шагом (при δ = 1/64 — до 1,1e-2 рад/м, при 1/1024 — 3e-4).
+// У замкнутой кривой нормаль смыкается: в конце круга та же, что в начале, до 1e-9.
+void checkNormal(Random& random, const Path& path, PathTallies& tallies) {
+    const Real u = Real(random.between(0, double(path.span()) - (path.closed() ? 0 : 1.0 / 1024))), next = u + Real(1) / 1024;
+    const Vector3 t1 = path.tangent(u), n1 = path.normal(u), t2 = path.tangent(next), n2 = path.normal(next);
+    tallies.unit.add(std::fabs(double(n1.length()) - 1), 1e-12);
+    tallies.across.add(std::fabs(double(n1.dot(t1))), 1e-12);
+    double travelled = double(path.length(next) - path.length(u));
+    if (travelled < 0) travelled += double(path.length()); // замкнутая кривая: переход через начало
+    const double twist = 0.5 * std::fabs(double(n2.dot(t1.cross(n1)) - n1.dot(t2.cross(n2))));
+    tallies.twist.add(twist - ((path.closed() ? 3.14159265358979323846 / double(path.length()) : 0) + 1e-2) * travelled, 0);
+    if (path.closed()) tallies.seam.add(double((path.normal(0) - path.normal(path.span() * Real(1 - 1e-12))).length()), 1e-9);
+}
+
+// Длина дуги до случайного u против сумм хорд: на каждом отрезке кривой 128 и 256 хорд и уточнение
+// Ричардсона (ошибка суммы хорд — порядка квадрата шага). Допуск 1e-6 м.
+double lengthError(Random& random, const Path& path) {
+    const double u = random.between(0, double(path.span()));
+    double reference = 0;
+    for (int segment = 0; segment < u; ++segment) {
+        const double from = segment, span = std::fmin(segment + 1.0, u) - from;
+        double sum[2] = {0, 0};
+        for (int fine = 0; fine < 2; ++fine)
+            for (int k = 0, pieces = 128 << fine; k < pieces; ++k) sum[fine] += double((path.point(Real(from + span * (k + 1) / pieces)) - path.point(Real(from + span * k / pieces))).length());
+        reference += (4 * sum[1] - sum[0]) / 3;
+    }
+    return std::fabs(double(path.length(Real(u))) - reference);
+}
+
+PathTallies pathProperty(std::uint64_t seed, int cases) {
+    Random random{seed};
+    PathTallies tallies;
+    for (int c = 0; c < cases; ++c) {
+        const GentlePath curve = gentlePath(random);
+        checkClosest(random, curve, tallies);
+        checkNormal(random, curve.path, tallies);
+        if (c % 50 == 0) tallies.length.add(lengthError(random, curve.path), 1e-6);
+    }
+    return tallies;
+}
+
+// Плоское кольцо: нормаль, перенесённая без кручения, не поворачивается относительно плоскости — её
+// составляющая вдоль нормали плоскости постоянна.
+void planarPathKeepsNormal() {
+    std::vector<Vector3> ring;
+    for (int k = 0; k < 8; ++k) ring.push_back({Real(std::cos(0.785398163397448 * k)), 0, Real(std::sin(0.785398163397448 * k))});
+    const Path path(ring, true);
+    double out = 0;
+    for (int k = 0; k < 800; ++k) out = std::fmax(out, std::fabs(double(path.normal(Real(0.01 * k)).y - path.normal(0).y)));
+    CHECK(out < 1e-12, "нормаль плоского кольца повернулась относительно плоскости на %.2e", out);
+}
+
 void expectNone(const char* statement, const Tally& tally) {
     CHECK(tally.failures == 0, "%s: нарушений %ld из %ld, наибольшее %.3g", statement, tally.failures, tally.cases, tally.worst);
 }
@@ -369,6 +460,15 @@ void propertyTests() {
     expectNone("Холецкий по профилю, вырожденная матрица с совместной правой частью", choleskyProperty(2, 100000, true));
     expectNone("обновляемый Холецкий: добавления и удаления строк", updatedCholeskyProperty(5, 20000));
     updatedCholeskySkipsDependentRow();
+    const PathTallies path = pathProperty(11, 10000);
+    expectNone("путь: ближайшая точка не дальше исходного смещения", path.nearest);
+    expectNone("путь: в ближайшей точке (P − x) · T = 0", path.foot);
+    expectNone("путь: длина дуги против сумм хорд", path.length);
+    expectNone("путь: нормаль единичная", path.unit);
+    expectNone("путь: нормаль поперёк касательной", path.across);
+    expectNone("путь: нормаль идёт без кручения", path.twist);
+    expectNone("путь: нормаль замкнутой кривой смыкается", path.seam);
+    planarPathKeepsNormal();
     expectNone("задача дополнительности, независимые строки", complementarityProperty(3, 100000, false, Real(0.01)));
     expectNone("задача дополнительности, зависимые строки с проксимальной поправкой", complementarityProperty(4, 100000, true, Real(0.3)));
     // Без поправки знак остатка w на зависимой строке — шум округления: строка то входит в набор

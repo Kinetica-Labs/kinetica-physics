@@ -33,8 +33,8 @@ swing     точный   356eb5c2dfbbcdd2
 swing     быстрый  f0c88ea31a442a37
 drift     точный   998899e8df9e93f7
 drift     быстрый  9ebd73a7cd442030
-rail      точный   a291f0919b2fadcf
-rail      быстрый  c3b3c3b58ed31038
+rail      точный   6fd1d71868d1e8da
+rail      быстрый  77918af8d193388e
 pendulum  точный   6d218d2477a45ece
 pendulum  быстрый  51b2fa529f87a510
 gyroscope точный   b1ae548531ce4230

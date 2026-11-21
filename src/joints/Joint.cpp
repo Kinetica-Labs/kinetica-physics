@@ -47,8 +47,9 @@ std::vector<Bond> Joint::bonds(const std::vector<Body>& bodies, const std::vecto
     return bonds;
 }
 
-Bond Joint::travelLine(const Motion& m, int axis) const {
-    const Vector3 e = m.frameA.rotate(basis(axis));
+Bond Joint::travelLine(const Motion& m, int axis) const { return travelLine(m, m.frameA.rotate(basis(axis))); }
+
+Bond Joint::travelLine(const Motion& m, Vector3 e) const {
     return {a, b, e, m.armA.cross(e), m.armB.cross(e), e.dot(m.pb - m.pa), e.dot(m.apart) + m.wa.cross(e).dot(m.pointB - m.pointA)};
 }
 

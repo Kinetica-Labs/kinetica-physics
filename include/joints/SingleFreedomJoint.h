@@ -63,8 +63,14 @@ public:
 
 protected:
     using Joint::Joint;
-    // Привод, трение, пружина и предел вдоль линии свободы freedom.
+    // Привод, трение, пружина и предел вдоль линии свободы freedom; координату считает coordinate() — и
+    // только если она нужна пружине или пределу.
     void addFreedomBonds(const Motion& motion, const Bond& freedom, std::vector<Bond>& bonds) const;
+    // То же для наследника, который координату at уже знает (путь: ближайшая точка кривой ищется один раз).
+    void addFreedomBonds(const Bond& freedom, Real at, std::vector<Bond>& bonds) const;
+
+private:
+    LimitGap limitGapAt(Real at) const;
 };
 
 } // namespace kp

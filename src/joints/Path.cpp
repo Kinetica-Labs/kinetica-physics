@@ -7,19 +7,35 @@
 namespace kp {
 namespace {
 
-constexpr int kSteps = 16; // узлов таблицы длины дуги на отрезок
-constexpr int kProbes = 8; // проб на отрезок в грубом поиске ближайшей точки
+constexpr int kSteps = 16;             // узлов таблицы на отрезок
+constexpr int kProbes = 8;             // проб на отрезок в грубом поиске ближайшей точки
+constexpr Real kSettled = Real(1e-14); // шаг метода Ньютона по u, после которого ответ не уточняется
+
+// Зеркальное отражение v в плоскости с нормалью across; нулевая нормаль — без отражения.
+Vector3 reflected(Vector3 v, Vector3 across) {
+    const Real square = across.dot(across);
+    return square > 0 ? v - (2 * across.dot(v) / square) * across : v;
+}
+
+// Вектор v поперёк единичной оси, повёрнутый вокруг неё на угол angle.
+Vector3 turned(Vector3 v, Vector3 axis, Real angle) {
+    const SinCos turn = sinCos(angle);
+    return turn.cos * v + turn.sin * axis.cross(v);
+}
+
+// Единичный вектор поперёк единичного t: от той оси, вдоль которой t идёт меньше всего.
+Vector3 anyAcross(Vector3 t) {
+    const Vector3 axis = abs(t.x) <= abs(t.y) && abs(t.x) <= abs(t.z) ? Vector3{1, 0, 0} : abs(t.y) <= abs(t.z) ? Vector3{0, 1, 0} : Vector3{0, 0, 1};
+    const Vector3 across = axis - axis.dot(t) * t;
+    return (1 / across.length()) * across;
+}
 
 } // namespace
 
-// Длина дуги — интеграл |P′| по u; на шаге таблицы он берётся по Симпсону.
 Path::Path(std::vector<Vector3> through, bool closed) : through_(std::move(through)), closed_(closed), segments_(int(through_.size()) - (closed ? 0 : 1)) {
-    arc_.assign(size_t(segments_ * kSteps) + 1, 0);
-    const Real h = Real(1) / kSteps;
-    for (size_t k = 0; k + 1 < arc_.size(); ++k) {
-        const Real u = Real(k) * h;
-        arc_[k + 1] = arc_[k] + (h / 6) * (at(u).first.length() + 4 * at(u + h / 2).first.length() + at(std::min(u + h, span())).first.length());
-    }
+    tabulateLength();
+    boundSegments();
+    transportNormal();
 }
 
 Vector3 Path::control(int index) const {
@@ -60,27 +76,101 @@ Vector3 Path::curvature(Real u) const {
     return (1 / (speed * speed)) * (jet.second - jet.second.dot(t) * t);
 }
 
-Real Path::length(Real u) const {
-    const Real place = within(u) * kSteps;
-    const size_t k = std::min(size_t(place), arc_.size() - 2);
-    return arc_[k] + (place - Real(k)) * (arc_[k + 1] - arc_[k]);
+// Длина дуги от from до to — интеграл |P′| по u — по трём узлам Гаусса (точно для многочленов до пятой
+// степени; правило Симпсона с теми же тремя вычислениями ошибалось на извилистой кривой до 6e-6 м).
+// from и to не дальше шага таблицы.
+Real Path::stretch(Real from, Real to) const {
+    const Real middle = (from + to) / 2, half = (to - from) / 2, offset = half * Real(0.77459666924148338); // √(3/5)
+    return (half / 9) * (5 * at(middle - offset).first.length() + 8 * at(middle).first.length() + 5 * at(middle + offset).first.length());
 }
 
-Real Path::closest(Vector3 x) const {
-    Real best = 0, least = (at(0).point - x).dot(at(0).point - x);
-    for (int k = 1; k <= segments_ * kProbes - (closed_ ? 1 : 0); ++k) {
-        const Real u = Real(k) / kProbes;
-        const Vector3 gap = at(u).point - x;
-        if (gap.dot(gap) < least) least = gap.dot(gap), best = u;
+void Path::tabulateLength() {
+    arc_.assign(size_t(segments_ * kSteps) + 1, 0);
+    for (size_t k = 0; k + 1 < arc_.size(); ++k) arc_[k + 1] = arc_[k] + stretch(Real(k) / kSteps, Real(k + 1) / kSteps);
+}
+
+// До узла — по таблице, от узла до u — тем же правилом.
+Real Path::length(Real u) const {
+    u = within(u);
+    const size_t k = std::min(size_t(u * kSteps), arc_.size() - 2);
+    return arc_[k] + stretch(Real(k) / kSteps, u);
+}
+
+// Отрезок сплайна лежит в выпуклой оболочке своих точек Безье P₁, P₁ + (P₂ − P₀)/6, P₂ − (P₃ − P₁)/6, P₂.
+// Шар с центром в середине хорды P₁P₂, достающий до самой далёкой из них, охватывает отрезок.
+void Path::boundSegments() {
+    for (int s = 0; s < segments_; ++s) {
+        const Vector3 p1 = control(s), p2 = control(s + 1), center = Real(0.5) * (p1 + p2);
+        const Vector3 inner[2] = {p1 + (1 / Real(6)) * (p2 - control(s - 1)), p2 - (1 / Real(6)) * (control(s + 2) - p1)};
+        balls_.push_back({center, std::max((p1 - center).length(), std::max((inner[0] - center).length(), (inner[1] - center).length()))});
     }
+}
+
+// Нормаль переносится вдоль кривой двойным отражением (Wang, Jüttler, Zheng, Liu, «Computation of
+// rotation minimizing frames», ACM Trans. Graph. 27, 2008): первое отражение — в плоскости посередине между
+// точками from и to, второе совмещает отражённую касательную с касательной в to. Вместе это поворот,
+// который переводит касательную в касательную и вокруг неё не крутит.
+Vector3 Path::carry(Vector3 normal, Real from, Real to) const {
+    const Vector3 chord = at(to).point - at(from).point;
+    return reflected(reflected(normal, chord), tangent(to) - reflected(tangent(from), chord));
+}
+
+// У замкнутой кривой после круга нормаль повёрнута вокруг касательной на угол −turn_; узел на длине дуги
+// s доворачивается на turn_ · s / L, и нормаль смыкается.
+void Path::transportNormal() {
+    normal_.assign(1, anyAcross(tangent(0)));
+    for (size_t k = 0; k + 1 < arc_.size(); ++k) normal_.push_back(carry(normal_[k], Real(k) / kSteps, Real(k + 1) / kSteps));
+    if (!closed_) return;
+    const Vector3 first = normal_.front(), last = normal_.back();
+    turn_ = atan2(last.cross(first).dot(tangent(0)), last.dot(first));
+    for (size_t k = 0; k < normal_.size(); ++k) normal_[k] = turned(normal_[k], tangent(Real(k) / kSteps), turn_ * arc_[k] / arc_.back());
+}
+
+// От ближайшего узла таблицы — тем же переносом, поэтому между узлами нормаль не интерполируется.
+Vector3 Path::normal(Real u) const {
+    u = within(u);
+    const size_t k = std::min(size_t(u * kSteps), normal_.size() - 2);
+    const Vector3 carried = carry(normal_[k], Real(k) / kSteps, u);
+    if (turn_ == 0) return carried;
+    const Real share = (u * kSteps - Real(k)) * (arc_[k + 1] - arc_[k]) / arc_.back(); // доля длины кривой от узла до u
+    return turned(carried, tangent(u), turn_ * share);
+}
+
+// Расстояние до ближайшей из заданных точек — граница сверху. Пробы идут только в отрезки, чей шар
+// ближе этой границы: цена поиска — одно расстояние на отрезок и пробы в двух-трёх соседних.
+Real Path::closest(Vector3 x) const {
+    Real best = 0, least = (through_[0] - x).dot(through_[0] - x);
+    for (size_t k = 1; k < through_.size(); ++k) {
+        const Real gap = (through_[k] - x).dot(through_[k] - x);
+        if (gap < least) least = gap, best = Real(k);
+    }
+    Real reach = sqrt(least);
+    for (int s = 0; s < segments_; ++s) {
+        const Real far = balls_[size_t(s)].radius + reach;
+        if ((balls_[size_t(s)].center - x).dot(balls_[size_t(s)].center - x) >= far * far) continue;
+        for (int probe = 1; probe < kProbes; ++probe) {
+            const Real u = Real(s) + Real(probe) / kProbes;
+            const Vector3 gap = at(u).point - x;
+            if (gap.dot(gap) < least) least = gap.dot(gap), best = u, reach = sqrt(least);
+        }
+    }
+    return refine(best, x);
+}
+
+// Метод Ньютона по условию (P − x) · P′ = 0 от грубого приближения; шаг не длиннее четверти отрезка.
+// На конце открытой кривой шаг наружу оставляет u на месте — это тоже ответ.
+Real Path::refine(Real u, Vector3 x) const {
     for (int iteration = 0; iteration < 12; ++iteration) {
-        const Jet jet = at(best);
+        const Jet jet = at(u);
         const Real slope = jet.first.dot(jet.first) + (jet.point - x).dot(jet.second);
         if (!(slope > 0)) break; // вогнутость: шаг Ньютона увёл бы от ближайшей точки
-        const Real step = (jet.point - x).dot(jet.first) / slope;
-        best = within(best - std::min(std::max(step, Real(-0.25)), Real(0.25)));
+        const Real step = std::min(std::max((jet.point - x).dot(jet.first) / slope, Real(-0.25)), Real(0.25));
+        const Real next = within(u - step);
+        const bool settled = next == u || abs(step) <= kSettled;
+        u = next;
+        if (settled) break;
     }
-    return best;
+    return u;
 }
 
 } // namespace kp

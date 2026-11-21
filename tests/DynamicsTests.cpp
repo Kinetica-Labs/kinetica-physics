@@ -544,6 +544,32 @@ void jointsLeaveOnlyTheirFreedoms() {
         CHECK_NEAR(double(coordinate(world, rail)) - start, 2.0, 5e-3);
         CHECK(off < 1e-6, "вагонетка ушла с кольца на %.2e м", off);
     }
+    for (bool realtime : {false, true}) {
+        // Брусок съезжает по прямому пути длиной 1 м под 30° к горизонту и встаёт у упора на конце кривой:
+        // за конец не уходит — координата продолжается за него по касательной, и предел хода это видит.
+        World world;
+        world.realtime = realtime;
+        const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
+        const Vector3 axis{Real(0.86602540378443865), Real(-0.5), 0};
+        std::vector<Vector3> line;
+        for (int k = 0; k <= 4; ++k) line.push_back(Vector3{0, 3, 0} + Real(0.25 * k) * axis);
+        addPathJoint(world, base, world.addBody(Body::box({0.1, 0.07, 0.05}, 1000, line[0])), line[0], line).lockTurns = true;
+        for (int step = 0; step < 240; ++step) world.step(Real(1) / 60);
+        const Body& b = world.bodies()[1];
+        const double beyond = double((b.position - line[4]).dot(axis));
+        CHECK(beyond < 1e-4 && beyond > -2e-4, "брусок у конца пути, %s шаг: %.2e м за концом", realtime ? "быстрый" : "точный", beyond);
+        CHECK(double(b.linearVelocity().length()) < 1e-6, "брусок у конца пути, %s шаг: скорость %.2e м/с", realtime ? "быстрый" : "точный", double(b.linearVelocity().length()));
+    }
+    {
+        // Координата пути за концами открытой кривой: длина дуги плюс смещение по касательной в конце.
+        World world;
+        const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
+        const BodyId block = world.addBody(Body::box({0.1, 0.07, 0.05}, 1000, {Real(-0.01), 0, 0}));
+        const PathJoint& rail = addPathJoint(world, base, block, {Real(-0.01), 0, 0}, {{0, 0, 0}, {0.5, 0, 0}, {1, 0, 0}});
+        CHECK_NEAR(double(coordinate(world, rail)), -0.01, 1e-12);
+        world.body(block).position = {Real(1.02), Real(0.003), 0};
+        CHECK_NEAR(double(coordinate(world, rail)), 1.02, 1e-12);
+    }
     {
         // Консоль: брусок приварен к неподвижному телу боком.
         World world;
