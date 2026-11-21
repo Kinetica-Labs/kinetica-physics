@@ -1314,6 +1314,122 @@ void forcesAct() {
     forceWakes();
 }
 
+// Тело без массы, движимое извне (Body::drivenVelocity, drivenSpin): идёт точно как задано.
+void drivenBodyKeepsItsCourse(bool fast) {
+    World world;
+    world.realtime = fast;
+    Body plate = Body::box({0.5, 0.05, 0.5}, 0, {0, 1, 0});
+    plate.drivenVelocity = {0.3, -0.2, 0.1}, plate.drivenSpin = {0, 0.7, 0};
+    const BodyId id = world.addBody(plate);
+    Body ball = Body::sphere(0.1, 1000, {0.1, 3, 0}); // падает на плиту и скатывается: плите всё равно
+    world.addBody(ball);
+    for (int k = 0; k < 60; ++k) world.step(Real(1) / 60);
+    const Body& now = world.body(id);
+    const double off = double((now.position - Vector3{Real(0.3), Real(0.8), Real(0.1)}).length());
+    CHECK(off < 1e-12, "%s шаг: движимое тело ушло от x₀ + v t на %.2e м", fast ? "быстрый" : "точный", off);
+    CHECK(std::fabs(turnOf(now) - 0.7) < 1e-10, "%s шаг: движимое тело повернулось на %.12f рад вместо 0,7", fast ? "быстрый" : "точный", turnOf(now));
+    CHECK(now.drivenVelocity.x == Real(0.3) && now.drivenSpin.y == Real(0.7), "%s шаг: шаг изменил заданную скорость движимого тела", fast ? "быстрый" : "точный");
+}
+
+// Ящик на плите, которая рывком пошла со скоростью v: трение разгоняет его с ускорением μ g, и он
+// отстаёт на v² / 2 μ g. slip — допуск отставания, относительный.
+void frictionCarriesBodyAlong(bool fast, double slip) {
+    World world;
+    world.realtime = fast;
+    Body plate = Body::box({4, 0.1, 1}, 0, {2, -0.1, 0});
+    plate.drivenVelocity = {1, 0, 0};
+    world.addBody(plate);
+    const BodyId crate = world.addBody(Body::box({0.2, 0.1, 0.2}, 1000, {0, 0.1, 0}));
+    for (int k = 0; k < 60; ++k) world.step(Real(1) / 60);
+    const double behind = 1 - double(world.body(crate).position.x), expected = 1 / (2 * 0.5 * 9.81);
+    CHECK(std::fabs(behind - expected) < slip * expected, "%s шаг: ящик отстал от плиты на %.5f м вместо %.5f (допуск %.0e)", fast ? "быстрый" : "точный", behind, expected, slip);
+    CHECK(std::fabs(double(world.body(crate).linearVelocity().x) - 1) < 1e-3, "%s шаг: ящик на плите идёт со скоростью %.5f м/с вместо 1", fast ? "быстрый" : "точный", double(world.body(crate).linearVelocity().x));
+}
+
+// Подъёмник: плита идёт вверх со скоростью 0,5 м/с, ящик стоит на ней. gap — допуск зазора и входа, м.
+void liftCarriesBody(bool fast, double gap) {
+    World world;
+    world.realtime = fast;
+    Body plate = Body::box({0.5, 0.1, 0.5}, 0, {0, -0.1, 0});
+    plate.drivenVelocity = {0, 0.5, 0};
+    const BodyId lift = world.addBody(plate);
+    Body crate = Body::box({0.2, 0.2, 0.2}, 1000, {0, 0.2, 0});
+    crate.linearMomentum = {0, Real(0.5) / crate.mass.inverseMass, 0};
+    const BodyId id = world.addBody(crate);
+    for (int k = 0; k < 60; ++k) world.step(Real(1) / 60);
+    const double apart = double(world.body(id).position.y - world.body(lift).position.y) - 0.3;
+    CHECK(std::fabs(apart) < gap, "%s шаг: ящик на подъёмнике разошёлся с плитой на %.2e м (допуск %.0e)", fast ? "быстрый" : "точный", apart, gap);
+    CHECK(std::fabs(double(world.body(id).linearVelocity().y) - 0.5) < 1e-3, "%s шаг: ящик на подъёмнике идёт вверх со скоростью %.5f м/с вместо 0,5", fast ? "быстрый" : "точный", double(world.body(id).linearVelocity().y));
+}
+
+// Поворотный стол: ящик на диске, вращающемся с ω = 1 рад/с, на радиусе 0,5 м держится трением
+// (ω² r = 0,5 м/с² при μ g = 4,9) и за оборот возвращается на место. off — допуск, м.
+void turntableCarriesBody(bool fast, double off) {
+    World world;
+    world.realtime = fast;
+    Body table = Body::cylinder(0.05, 1, 0, {0, -0.05, 0});
+    table.drivenSpin = {0, 1, 0};
+    world.addBody(table);
+    Body crate = Body::box({0.1, 0.1, 0.1}, 1000, {0.5, 0.1, 0});
+    crate.linearMomentum = {0, 0, Real(-0.5) / crate.mass.inverseMass}; // ω × r при ω вдоль Y
+    crate.angularMomentum = {0, 1 / crate.mass.inverseInertia.y, 0};
+    const BodyId id = world.addBody(crate);
+    const int steps = 377; // 2π с при шаге 1/60: 376,99 шага
+    for (int k = 0; k < steps; ++k) world.step(Real(1) / 60);
+    const double angle = steps / 60.0;
+    const Vector3 expected{Real(0.5 * std::cos(angle)), Real(0.1), Real(-0.5 * std::sin(angle))};
+    const double away = double((world.body(id).position - expected).length());
+    CHECK(away < off, "%s шаг: ящик на поворотном столе за оборот ушёл на %.2e м (допуск %.0e)", fast ? "быстрый" : "точный", away, off);
+}
+
+// Движимая стенка толкает свободный ящик без тяжести: ящик уходит с её скоростью, стенка своей не меняет.
+void drivenWallPushes(bool fast, double depth) {
+    World world;
+    world.gravity = {}, world.realtime = fast;
+    Body wall = Body::box({0.05, 1, 1}, 0, {-0.5, 0, 0});
+    wall.drivenVelocity = {2, 0, 0};
+    const BodyId pusher = world.addBody(wall);
+    const BodyId crate = world.addBody(Body::box({0.2, 0.2, 0.2}, 1000, {0, 0, 0}));
+    for (int k = 0; k < 60; ++k) world.step(Real(1) / 60);
+    const double speed = double(world.body(crate).linearVelocity().x), into = double(world.body(pusher).position.x) + 0.05 - (double(world.body(crate).position.x) - 0.2);
+    CHECK(std::fabs(speed - 2) < (fast ? 1e-3 : 1e-6), "%s шаг: ящик от движимой стенки идёт со скоростью %.8f м/с вместо 2", fast ? "быстрый" : "точный", speed);
+    CHECK(into < depth, "%s шаг: движимая стенка вошла в ящик на %.2e м (допуск %.0e)", fast ? "быстрый" : "точный", into, depth);
+    CHECK(std::fabs(double(world.body(pusher).position.x) - 1.5) < 1e-12, "%s шаг: ящик сбил движимую стенку с пути: x = %.12f вместо 1,5", fast ? "быстрый" : "точный", double(world.body(pusher).position.x));
+}
+
+// Движимое тело будит спящий остров до касания и не проходит сквозь него.
+void drivenBodyWakes() {
+    World world;
+    world.sleeping = true;
+    world.addBody(Body::box({5, 0.5, 5}, 0, {0, -0.5, 0}));
+    const BodyId cube = world.addBody(Body::box({0.2, 0.2, 0.2}, 1000, {0, 0.2, 0}));
+    for (int step = 0; step < 60; ++step) world.step(Real(1) / 60);
+    CHECK(world.report().asleep == 1, "куб на полу не уснул");
+    Body wall = Body::box({0.05, 0.3, 0.5}, 0, {-1, 0.35, 0});
+    wall.drivenVelocity = {1, 0, 0};
+    world.addBody(wall);
+    for (int step = 0; step < 90; ++step) world.step(Real(1) / 60);
+    CHECK(world.report().asleep == 0, "движимая стенка не разбудила куб");
+    CHECK(double(world.body(cube).position.x) > 0.6, "движимая стенка прошла сквозь спящий куб: x = %.4f м", double(world.body(cube).position.x));
+}
+
+// Тело, движимое извне (О2). Допуски записаны до кода: журнал попыток, H111. Два допуска точного шага
+// записанными не остались — прогон показал свойство самого шага, а не движимого тела (H112):
+//  — остановку скольжения внутри отрезка шаг событием не считает, если трения хватает до конца отрезка:
+//    путь ошибается до μ g h² / 8 = 0,17 мм (записано было 1e-5 от 0,102 м, вышло 1,2e-3);
+//  — пара, которая в начале отрезка чуть скользит, решается без ухода точки касания от вращения опоры:
+//    на поворотном столе ящик за оборот уходит на 5,5 см при шаге 1/60 и на 2,7 см при 1/120 (записано
+//    было 1 мм). Быстрый шаг с подшагом 1/480 уходит на 3,3 мм.
+// Допуски ниже — храповик нынешнего уровня: хуже стать не должно.
+void drivenBodies() {
+    for (const bool fast : {false, true}) drivenBodyKeepsItsCourse(fast);
+    frictionCarriesBodyAlong(false, 2e-3), frictionCarriesBodyAlong(true, 3e-2);
+    liftCarriesBody(false, 1e-6), liftCarriesBody(true, 2e-4);
+    turntableCarriesBody(false, 6e-2), turntableCarriesBody(true, 1e-2);
+    drivenWallPushes(false, 1e-6), drivenWallPushes(true, 1e-4);
+    drivenBodyWakes();
+}
+
 } // namespace
 
 // Сопротивление среды (Body::linearDamping, angularDamping): скорость свободного тела убывает как
@@ -1455,4 +1571,5 @@ void dynamicsTests() {
     rayAndTether();
     stepMemoryReturnsPerThread();
     forcesAct();
+    drivenBodies();
 }

@@ -100,7 +100,7 @@ DebugGeometry debugGeometry(const World& world, bool withTree) {
     for (const Body& body : world.bodies()) {
         for (int i = 0; body.shape && i < body.partCount(); ++i) {
             const Body part = body.part(i);
-            geometry.add(*part.shape, part.pose(), body.isStatic() ? DebugKind::StaticShape : DebugKind::Shape);
+            geometry.add(*part.shape, part.pose(), body.isStatic() && !isDriven(body) ? DebugKind::StaticShape : DebugKind::Shape);
         }
     }
     // Кривые сочленений по траектории — ломаной, шестнадцать звеньев на отрезок сплайна.

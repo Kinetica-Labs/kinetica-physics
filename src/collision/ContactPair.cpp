@@ -15,7 +15,7 @@ Real forcedSpeedGain(const Body& body, Real h) {
 }
 
 Real maxPointSpeed(const Body& body) {
-    if (body.isStatic()) return 0;
+    if (body.isStatic()) return isDriven(body) ? body.drivenVelocity.length() + body.drivenSpin.length() * (body.shape ? body.boundingRadius() : Real(0)) : Real(0);
     const Real moving = body.linearVelocity().length();
     if (!body.shape) return moving;
     const Vector3 inverse = body.mass.inverseInertia;

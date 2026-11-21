@@ -11,7 +11,7 @@ namespace kp {
 // soft.contactDrift, с которым площадка пары и так идёт за телами (ManifoldMemory).
 bool World::quiet(Real dt) const {
     for (const Body& body : bodies_)
-        if (!body.isStatic() && (body.linearVelocity().length() + body.angularVelocity().length() * body.boundingRadius()) * dt > soft.contactDrift) return false;
+        if ((!body.isStatic() || isDriven(body)) && (body.linearVelocity().length() + body.angularVelocity().length() * body.boundingRadius()) * dt > soft.contactDrift) return false;
     return true;
 }
 

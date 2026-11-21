@@ -78,7 +78,10 @@ Real spinBound(Vector3 inverse, Real momentumSquared, Real twiceEnergy) {
 MotionBounds motionBounds(const Body& body, Vector3 force, Vector3 torque, Real h) {
     MotionBounds bounds;
     bounds.radius = body.boundingRadius();
-    if (body.isStatic()) return bounds;
+    if (body.isStatic()) {
+        if (isDriven(body)) bounds.speed = body.drivenVelocity.length(), bounds.spin = body.drivenSpin.length(); // скорости постоянны: ускорений нет
+        return bounds;
+    }
     Body later = body;
     integrateVelocity(later, force, torque, h);
     const Vector3 inverse = body.mass.inverseInertia;

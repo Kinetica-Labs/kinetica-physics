@@ -37,6 +37,8 @@ rail      точный   7a0d2d27f1e6766b
 rail      быстрый  4437a201c8c57c76
 thrust    точный   1bd417ee8063f3fb
 thrust    быстрый  d8770d4b15357d88
+platforms точный   601d3b208d03728a
+platforms быстрый  51452918106a6e05
 pendulum  точный   6d218d2477a45ece
 pendulum  быстрый  51b2fa529f87a510
 gyroscope точный   b1ae548531ce4230

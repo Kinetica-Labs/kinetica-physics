@@ -7,6 +7,7 @@
 #include <dynamics/time_stepping/PairReach.h>
 #include <dynamics/time_stepping/SoftContact.h>
 #include <dynamics/time_stepping/SoftJoint.h>
+#include <dynamics/Integrator.h>
 #include <math/WorkerPool.h>
 
 #include <algorithm>
@@ -15,13 +16,15 @@
 namespace kp {
 namespace {
 
-// Состояния тел для решателя на начало кадра; у неподвижного тела — нули.
+// Состояния тел для решателя на начало кадра. У тела без массы отклик нулевой, а скорости — заданные
+// (Body::drivenVelocity): у неподвижного это нули.
 StepArray<SolverBody> solverBodiesOf(const std::vector<Body>& bodies) {
     StepArray<SolverBody> states(bodies.size());
     for (size_t i = 0; i < bodies.size(); ++i) {
         const Body& body = bodies[i];
+        states[i].v = body.linearVelocity(), states[i].w = body.angularVelocity();
         if (body.isStatic()) continue;
-        states[i].inverseMass = body.mass.inverseMass, states[i].v = body.linearVelocity(), states[i].w = body.angularVelocity();
+        states[i].inverseMass = body.mass.inverseMass;
         states[i].inverseInertia = inverseInertiaInWorld(body);
     }
     return states;
@@ -104,14 +107,14 @@ struct Moving {
     Moving(std::vector<Body>& all, StepArray<SolverBody>& solved) : bodies(all), states(solved), radius(all.size(), 0) {
         origin = poses();
         for (size_t i = 0; i < bodies.size(); ++i)
-            if (states[i].inverseMass != 0) radius[i] = bodies[i].boundingRadius();
+            if (states[i].inverseMass != 0 || (isDriven(bodies[i]) && bodies[i].shape)) radius[i] = bodies[i].boundingRadius();
     }
     // Какие тела движутся: скорость точки тела больше speed. Выталкивание вдавленных тел разгоняет их и в
     // покое: тогда второе решение нормалей нужно, чтобы снять эту скорость (без него тела, вдавленные на
     // 10 см, разлетались на 1,7 м/с).
     StepArray<char> stirred(Real speed) const {
         StepArray<char> fast(states.size(), 0);
-        for (size_t i = 0; i < states.size(); ++i) fast[i] = states[i].inverseMass != 0 && states[i].v.length() + states[i].w.length() * radius[i] > speed;
+        for (size_t i = 0; i < states.size(); ++i) fast[i] = (states[i].inverseMass != 0 || isDriven(bodies[i])) && states[i].v.length() + states[i].w.length() * radius[i] > speed;
         return fast;
     }
     StepArray<Pose> poses() const {
@@ -125,8 +128,11 @@ struct Moving {
         before = poses(), statesBefore = states;
         eachOf(bodies.size(), [&](size_t i) {
             SolverBody& s = states[i];
-            if (s.inverseMass == 0) return;
             Body& body = bodies[i];
+            if (s.inverseMass == 0) { // тело без массы: движимое идёт как задано, неподвижное стоит
+                if (isDriven(body)) carryDriven(body, h), s.moved = body.position - origin[i].position, s.turned = body.orientation * origin[i].orientation.conjugate();
+                return;
+            }
             const Vector3 momentum = momentumOf(body, s.w);
             body.position += h * s.v;
             body.angularMomentum = momentum;

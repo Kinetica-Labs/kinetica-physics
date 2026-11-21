@@ -18,7 +18,7 @@ namespace {
 // У круглого тела точка касания перекатывается по поверхности, а вместе с телом движется точка
 // ядра moving — центр шара, точка оси цилиндра: по дуге идёт она, а не точка касания contact.
 Vector3 geometricAcceleration(const Body& body, Vector3 moving, Vector3 contact) {
-    if (body.isStatic()) return {};
+    if (body.isStatic() && !isDriven(body)) return {}; // у движимого тела ω задана и постоянна: остаётся ω × (ω × r)
     const Vector3 w = body.angularVelocity();
     const Vector3 alpha = inverseInertiaTimes(body, body.angularMomentum.cross(w));
     return w.cross(w.cross(moving - body.position)) + alpha.cross(contact - body.position);

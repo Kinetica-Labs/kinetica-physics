@@ -388,6 +388,7 @@ std::string railVerdict(const World& start, const World& now) {
 // --- тяга: ящик под постоянной силой на полу с трением и шар, висящий на силе −m g под моментом ----
 // Сила и момент прикладываются перед каждым шагом (Body::force, torque). Ящик с трением μ под силой
 // F = kThrust μ m g идёт с ускорением (kThrust − 1) μ g; шар под моментом τ набирает ω = τ t / I.
+// Ящик толкают две секунды — до момента проверки; дальше он тормозит трением и остаётся на полу.
 const double kThrust = 1.5, kThrustFriction = 0.5, kThrustTorque = 0.5; // доля, μ пары, Н·м
 World thrust() {
     World world = withFloor();
@@ -395,9 +396,9 @@ World thrust() {
     world.addBody(Body::sphere(0.2, 1000, {0, Real(1.5), Real(1.5)}));
     return world;
 }
-void thrustControl(World& world, double) {
+void thrustControl(World& world, double time) {
     const Real crate = 1 / world.mass(BodyId(1)).inverseMass, ball = 1 / world.mass(BodyId(2)).inverseMass;
-    world.body(BodyId(1)).force = {Real(kThrust * kThrustFriction) * crate * world.gravity.length(), 0, 0};
+    if (time < 2) world.body(BodyId(1)).force = {Real(kThrust * kThrustFriction) * crate * world.gravity.length(), 0, 0};
     world.body(BodyId(2)).force = -ball * world.gravity;
     applyTorque(world.body(BodyId(2)), {0, Real(kThrustTorque), 0});
 }
@@ -410,6 +411,46 @@ std::string thrustVerdict(const World& start, const World& now) {
     if (drift > 1e-6) return text("шар на силе −m g ушёл на %.2e м", drift);
     const double spin = double(ball.angularVelocity().y), wanted = kThrustTorque * time * double(ball.mass.inverseInertia.y);
     if (std::fabs(spin - wanted) > 5e-3 * wanted) return text("шар под моментом вращается на %.4f рад/с вместо %.4f", spin, wanted);
+    return "";
+}
+
+// --- платформы: тела без массы, движимые извне (Body::drivenVelocity, drivenSpin) -------------------
+// Поворотный стол с ящиком на радиусе 0,5 м (ω = 1 рад/с: ω² r = 0,5 м/с² при μ g = 4,9 — трение держит),
+// подъёмник, который ходит вверх-вниз по синусу (ускорение не больше 0,6 м/с²), и стенка, толкающая
+// ящик по полу со скоростью 0,5 м/с. Ящики обязаны остаться на своих опорах. Толкатель идёт шесть секунд —
+// до момента проверки — и встаёт: в окне ящик не уезжает за край пола.
+const Vector3 kTableCentre{-2, 0, 0};
+World platforms() {
+    World world = withFloor();
+    Body table = Body::cylinder(0.05, 0.8, 0, kTableCentre + Vector3{0, Real(0.05), 0});
+    table.drivenSpin = {0, 1, 0};
+    world.addBody(table);
+    Body rider = Body::box({0.1, 0.1, 0.1}, 1000, kTableCentre + Vector3{0.5, Real(0.2), 0});
+    rider.linearMomentum = {0, 0, Real(-0.5) / rider.mass.inverseMass}; // ω × r: ящик уже едет со столом
+    rider.angularMomentum = {0, 1 / rider.mass.inverseInertia.y, 0};
+    world.addBody(rider);
+    world.addBody(Body::box({0.4, 0.05, 0.4}, 0, {0, 0.5, 0}));
+    world.addBody(Body::box({0.15, 0.15, 0.15}, 1000, {0, Real(0.7), 0}));
+    Body pusher = Body::box({0.05, 0.2, 0.3}, 0, {2, 0.25, 0});
+    pusher.drivenVelocity = {0.5, 0, 0};
+    world.addBody(pusher);
+    world.addBody(Body::box({0.2, 0.2, 0.2}, 1000, {2.5, Real(0.2), 0}));
+    return world;
+}
+void platformsControl(World& world, double time) {
+    world.body(BodyId(3)).drivenVelocity = {0, Real(0.3 * sinCos(2 * time).cos), 0};
+    world.body(BodyId(5)).drivenVelocity = {time < 6 ? Real(0.5) : Real(0), 0, 0};
+}
+std::string platformsVerdict(const World&, const World& now) {
+    const double angle = 6; // стол за 6 с повернулся на 6 рад
+    const Vector3 seat = kTableCentre + Vector3{Real(0.5 * sinCos(angle).cos), Real(0.2), Real(-0.5 * sinCos(angle).sin)};
+    const double astray = double((now.bodies()[2].position - seat).length());
+    if (astray > 1e-2) return text("ящик на поворотном столе ушёл с места на %.4f м", astray);
+    const double lifted = double(now.bodies()[4].position.y - now.bodies()[3].position.y) - 0.2;
+    if (std::fabs(lifted) > 1e-3) return text("ящик на подъёмнике разошёлся с плитой на %.2e м", lifted);
+    const double pushed = double(now.bodies()[6].position.x - now.bodies()[5].position.x) - 0.25;
+    if (std::fabs(pushed) > 1e-3) return text("ящик перед стенкой разошёлся с ней на %.2e м", pushed);
+    if (std::fabs(double(now.bodies()[6].linearVelocity().x) - 0.5) > 0.02) return text("ящик перед стенкой идёт со скоростью %.3f м/с вместо 0,5", double(now.bodies()[6].linearVelocity().x));
     return "";
 }
 
@@ -616,7 +657,8 @@ const std::vector<StandardScene>& standardScenes() {
         {"swing", "раскачанная цепь: энергия не растёт", swingingChain, 40, 40, swingVerdict, nullptr, {0, 2, 0}, 6},
         {"drift", "куча без тяжести: импульс сохраняется", weightlessPile, 5, 5, driftVerdict, nullptr, {0, 0, 0}, 6},
         {"rail", "вагонетка на кольцевом пути и коробка на спирали", rail, 7, 7, railVerdict, nullptr, {1.5, 1.2, 0}, 6},
-        {"thrust", "ящик под постоянной силой и шар, висящий на силе под моментом", thrust, 2, 2, thrustVerdict, thrustControl, {-1.5, 0.6, 0.5}, 7},
+        {"thrust", "ящик под постоянной силой и шар, висящий на силе под моментом", thrust, 2, 2, thrustVerdict, thrustControl, {-0.5, 0.6, 0.5}, 9},
+        {"platforms", "поворотный стол, подъёмник и толкатель: тела, движимые извне", platforms, 6, 6, platformsVerdict, platformsControl, {1.3, 0.4, 0}, 10},
     };
     return all;
 }

@@ -28,6 +28,20 @@ void IslandSleep::wake(std::vector<Body>& bodies, size_t body) {
     if (asleep(body)) wakeIsland(bodies, sleepIsland_[body]);
 }
 
+// Движимое тело (isDriven) будит спящих, до которых может дойти за шаг. Пара двух тел без массы
+// поиском пар не проверяется, поэтому счёт свой — по охватывающим шарам, с запасом: большая плита будит
+// всё вокруг себя, пока движется.
+void IslandSleep::wakeNearDriven(std::vector<Body>& bodies, Real dt) {
+    for (size_t d = 0; d < bodies.size(); ++d) {
+        const Body& driven = bodies[d];
+        if (!isDriven(driven) || !driven.shape) continue;
+        const Real radius = driven.boundingRadius();
+        const Real reach = radius + (driven.drivenVelocity.length() + driven.drivenSpin.length() * radius) * dt + kContactDistance;
+        for (size_t i = 0; i < bodies.size(); ++i)
+            if (asleep_[i] && bodies[i].shape && (bodies[i].position - driven.position).length() <= reach + bodies[i].boundingRadius()) wakeIsland(bodies, sleepIsland_[i]);
+    }
+}
+
 // Кого пора будить перед шагом. Спящее тело неподвижно, поэтому пара «бодрствующее — спящее»
 // находится обычным поиском пар: если за шаг они могут коснуться, остров спящего просыпается.
 void IslandSleep::wakeTouched(std::vector<Body>& bodies, const JointSet& joints, Vector3 gravity, Real dt, bool enabled) {
@@ -46,6 +60,7 @@ void IslandSleep::wakeTouched(std::vector<Body>& bodies, const JointSet& joints,
         for (int body : {joint.a, joint.b})
             if (asleep_[size_t(body)]) wakeIsland(bodies, sleepIsland_[size_t(body)]);
     }
+    wakeNearDriven(bodies, dt);
     // Спящего будит касание (то же, что объединяет тела в остров, settle) или сосед, который
     // движется быстрее порога сна и может долететь за кадр: летящий шар будит стопку до удара.
     // Стоящий сосед с зазором больше kContactDistance не будит: такие пары засыпали двумя островами
@@ -83,6 +98,7 @@ void IslandSleep::putToSleep(std::vector<Body>& bodies, const std::vector<int>& 
         asleep_[i] = 1, sleepIsland_[i] = slept, sleepingMass_[i] = bodies[i].mass;
         bodies[i].mass = {};
         bodies[i].linearMomentum = bodies[i].angularMomentum = {};
+        bodies[i].drivenVelocity = bodies[i].drivenSpin = {}; // без массы эти поля читаются: спящее тело обязано стоять
     }
 }
 

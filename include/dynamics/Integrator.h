@@ -14,6 +14,14 @@ inline void integrateVelocity(Body& body, Vector3 force, Vector3 torque, Real dt
     body.angularMomentum += dt * torque;
 }
 
+// Тело без массы идёт с заданными скоростями (Body::drivenVelocity, drivenSpin): x += v dt, поворот —
+// точная экспонента ω dt. Неподвижное не трогается вовсе: его поза обязана остаться прежней бит в бит.
+inline void carryDriven(Body& body, Real dt) {
+    if (!isDriven(body)) return;
+    body.position += dt * body.drivenVelocity;
+    if (body.drivenSpin.x != 0 || body.drivenSpin.y != 0 || body.drivenSpin.z != 0) body.orientation = (Quaternion::fromRotationVector(dt * body.drivenSpin) * body.orientation).unit();
+}
+
 // Наибольший поворот несимметричного тела за одну часть шага, рад.
 constexpr Real kMaxTurn = Real(0.25);
 
@@ -70,7 +78,7 @@ inline Vector3 midpointTurn(Vector3 momentum, Vector3 inverse, Real step) {
 // только от состояния тела в её начале, поэтому путь за время t — начало пути за любое большее
 // время: поиск времени удара, который спрашивает позу в разные моменты, идёт по одной траектории.
 inline void integratePosition(Body& body, Real dt) {
-    if (body.mass.inverseMass == 0) return;
+    if (body.mass.inverseMass == 0) return carryDriven(body, dt);
     body.position += dt * body.linearVelocity();
     const Vector3 inverse = body.mass.inverseInertia;
     const bool symmetric = inverse.x == inverse.y && inverse.y == inverse.z; // ω постоянна: делить нечего
