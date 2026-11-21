@@ -56,10 +56,9 @@ void PairReach::spend() {
 
 StepArray<ContactPair> PairReach::discover(const std::vector<Body>& bodies, const JointSet& joints, Real remaining, Real boundary) {
     PairFinder finder(bodies, gravity_);
-    finder.boundary = boundary;
+    finder.boundary = boundary, finder.known = &listed_; // пары списка заново не проверяются: нужны только новые
     StepArray<ContactPair> fresh;
-    for (const ContactPair& pair : finder.pairs(remaining, joints))
-        if (!std::binary_search(listed_.begin(), listed_.end(), Key{pair.a, pair.b, pair.partA, pair.partB})) fresh.push_back(pair);
+    for (const ContactPair& pair : finder.pairs(remaining, joints)) fresh.push_back(pair);
     for (const ContactPair& pair : fresh) listed_.push_back({pair.a, pair.b, pair.partA, pair.partB});
     std::sort(listed_.begin(), listed_.end());
     allow(bodies, remaining);

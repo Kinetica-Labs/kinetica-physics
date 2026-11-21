@@ -10,6 +10,7 @@
 // Gilbert, Johnson, Keerthi, «A fast procedure for computing the distance between complex
 // objects in three-dimensional space», IEEE J. Robotics and Automation 4(2), 1988.
 
+#include <limits>
 #include <collision/shapes/ConvexShape.h>
 #include <math/Transform.h>
 
@@ -26,8 +27,14 @@ struct ClosestPoints {
     // перекрытии глубже самого цилиндра: его ядро ужимается, пока глубина не найдётся (Gjk.cpp).
     bool coresOverlap = false;
     int iterations = 0;
+    // Формы дальше запрошенного предела (closestPoints, farther): это доказано, точное расстояние, точки и
+    // нормаль не досчитаны.
+    bool beyond = false;
 };
 
-ClosestPoints closestPoints(const ConvexShape& a, const Transform& poseA, const ConvexShape& b, const Transform& poseB);
+// farther — предел, дальше которого расстояние вызывающему не нужно: поиск пар отвергает девять пар
+// частей из десяти именно так, а доказать «дальше предела» можно за шаг-два спуска вместо пяти-шести.
+ClosestPoints closestPoints(const ConvexShape& a, const Transform& poseA, const ConvexShape& b, const Transform& poseB,
+                            Real farther = std::numeric_limits<Real>::infinity());
 
 } // namespace kp

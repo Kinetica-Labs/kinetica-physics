@@ -18,9 +18,12 @@ struct Simplex {
     Real weight[4] = {0, 0, 0, 0}; // барицентрические веса ближайшей к началу точки
     int count = 0;
 
+    // Ближайшая точка — по вершинам с положительным весом, тем, что останутся после reduce: до сжатия и
+    // после него это одни и те же слагаемые в одном порядке.
     Vector3 closest() const {
         Vector3 v;
-        for (int i = 0; i < count; ++i) v += weight[i] * vertex[i].w;
+        for (int i = 0; i < count; ++i)
+            if (weight[i] > 0) v += weight[i] * vertex[i].w;
         return v;
     }
     // Оставляет только вершины с ненулевым весом: они несут ближайшую точку.
@@ -111,14 +114,25 @@ bool solve(Simplex& s) {
     return true;
 }
 
+// Запас, с которым нижняя граница расстояния обязана превысить предел: ошибка округления расстояния GJK —
+// порядка 1e-13 м, поэтому пара, отвергнутая по границе, отвергается и полным счётом.
+constexpr Real kBeyondMargin = Real(1e-9);
+
 // Спуск GJK: симплекс и ближайшая к началу координат точка v разности ядер. Ложь — ядра перекрылись.
+// apart — расстояние между ядрами, дальше которого точный ответ не нужен; beyond — оно превышено.
+//
+// Опорная точка w = support(−v) даёт нижнюю границу расстояния: вся разность ядер лежит по ту сторону
+// плоскости через w с нормалью v, то есть не ближе v·w / |v| к началу координат (van den Bergen, «Collision
+// Detection in Interactive 3D Environments», 2003, раздел 4.3.4).
 template <class Support>
-bool descend(Support&& support, Simplex& simplex, Vector3& v, int& iterations) {
+bool descend(Support&& support, Simplex& simplex, Vector3& v, int& iterations, Real apart, bool& beyond) {
     // Квадрат длины, ниже которого v считается нулём: относительно размера самой разности.
     Real scale = v.dot(v);
     for (iterations = 1; iterations <= 64; ++iterations) {
         if (v.dot(v) <= kEpsilon * kEpsilon * scale) return false;
         const Vertex next = support(-v);
+        const Real along = v.dot(next.w);
+        if (along > 0 && along * along > apart * apart * v.dot(v)) return beyond = true, true;
         scale = std::max(scale, next.w.dot(next.w));
         // v·v − v·w — насколько новая опорная точка ближе к началу вдоль v. Если продвижения
         // нет, v уже ближайшая точка разности.
@@ -129,16 +143,20 @@ bool descend(Support&& support, Simplex& simplex, Vector3& v, int& iterations) {
             repeated = repeated || (next.w.x == simplex.vertex[i].w.x && next.w.y == simplex.vertex[i].w.y &&
                                     next.w.z == simplex.vertex[i].w.z);
         if (repeated) break;
-        const Simplex previous = simplex;
+        // Прежний симплекс понадобится, только если расстояние не убудет. Вершины до сжатия (reduce) не
+        // меняются, поэтому помнить достаточно их число и веса, а не копировать симплекс на каждом шаге.
+        const int count = simplex.count;
+        const Real weight[4] = {simplex.weight[0], simplex.weight[1], simplex.weight[2], simplex.weight[3]};
         simplex.vertex[simplex.count++] = next;
         if (!solve(simplex)) return false;
-        simplex.reduce();
         const Vector3 closer = simplex.closest();
         // Расстояние обязано убывать. Если из-за округления оно не убыло, лучший ответ — прежний.
         if (closer.dot(closer) >= v.dot(v)) {
-            simplex = previous;
+            simplex.count = count;
+            for (int i = 0; i < 4; ++i) simplex.weight[i] = weight[i];
             break;
         }
+        simplex.reduce();
         v = closer;
     }
     return true;
@@ -146,8 +164,8 @@ bool descend(Support&& support, Simplex& simplex, Vector3& v, int& iterations) {
 
 } // namespace
 
-// Расстояние между ядрами как они есть.
-static ClosestPoints betweenCores(const ConvexShape& a, const Transform& poseA, const ConvexShape& b, const Transform& poseB) {
+// Расстояние между ядрами как они есть; farther — предел расстояния между поверхностями (closestPoints).
+static ClosestPoints betweenCores(const ConvexShape& a, const Transform& poseA, const ConvexShape& b, const Transform& poseB, Real farther) {
     // Вся работа идёт в осях тела A: там числа порядка размеров тел, а не их удалённости от
     // начала координат. В мир переводится только ответ.
     const Transform toB = poseA.relative(poseB);
@@ -167,7 +185,8 @@ static ClosestPoints betweenCores(const ConvexShape& a, const Transform& poseA, 
     Vector3 v = simplex.vertex[0].w;
 
     ClosestPoints result;
-    if (!descend(support, simplex, v, result.iterations)) return result.coresOverlap = true, result;
+    if (!descend(support, simplex, v, result.iterations, farther + a.radius + b.radius + kBeyondMargin, result.beyond)) return result.coresOverlap = true, result;
+    if (result.beyond) return result;
 
     const Real coreDistance = v.length();
     if (coreDistance == 0) return result.coresOverlap = true, result;
@@ -192,8 +211,8 @@ static ClosestPoints betweenCores(const ConvexShape& a, const Transform& poseA, 
 // настоящей формы — не больше 0,41 shrink и только у кромки. Если мало — ужатие растёт.
 constexpr Real kCoreShrink = Real(1e-6); // м: первое ужатие, допуск перекрытия
 
-ClosestPoints closestPoints(const ConvexShape& a, const Transform& poseA, const ConvexShape& b, const Transform& poseB) {
-    ClosestPoints result = betweenCores(a, poseA, b, poseB);
+ClosestPoints closestPoints(const ConvexShape& a, const Transform& poseA, const ConvexShape& b, const Transform& poseB, Real farther) {
+    ClosestPoints result = betweenCores(a, poseA, b, poseB, farther);
     const auto* cylinderA = dynamic_cast<const Cylinder*>(&a);
     const auto* cylinderB = dynamic_cast<const Cylinder*>(&b);
     if (!result.coresOverlap || (!cylinderA && !cylinderB)) return result;
@@ -205,7 +224,7 @@ ClosestPoints closestPoints(const ConvexShape& a, const Transform& poseA, const 
         const std::optional<Cylinder> smallerA = cylinderA ? std::optional<Cylinder>(shrunk(*cylinderA, byA)) : std::nullopt;
         const std::optional<Cylinder> smallerB = cylinderB ? std::optional<Cylinder>(shrunk(*cylinderB, byB)) : std::nullopt;
         const int spent = result.iterations;
-        result = betweenCores(smallerA ? static_cast<const ConvexShape&>(*smallerA) : a, poseA, smallerB ? static_cast<const ConvexShape&>(*smallerB) : b, poseB);
+        result = betweenCores(smallerA ? static_cast<const ConvexShape&>(*smallerA) : a, poseA, smallerB ? static_cast<const ConvexShape&>(*smallerB) : b, poseB, farther);
         result.iterations += spent;
         if (!result.coresOverlap || (shrink >= limit(cylinderA) && shrink >= limit(cylinderB))) return result;
     }

@@ -305,7 +305,8 @@ void decomposition() {
         double least = 1e30;
         for (const std::vector<Vector3>& points : parts) {
             double worst = -1e30;
-            for (const ConvexHull::Face& face : ConvexHull::fromPoints(points).faces()) worst = std::fmax(worst, double(face.normal.dot(point) - face.offset));
+            const ConvexHull hull = ConvexHull::fromPoints(points); // не временный: цикл по faces() временного объекта читал бы освобождённую память
+            for (const ConvexHull::Face& face : hull.faces()) worst = std::fmax(worst, double(face.normal.dot(point) - face.offset));
             least = std::fmin(least, worst);
         }
         return least;

@@ -92,9 +92,12 @@ StepArray<std::pair<int, int>> partPairs(const Body& a, const Body& b, Vector3 g
 
 } // namespace
 
+bool PairFinder::listed(int i, int j, int partA, int partB) const { return known && std::binary_search(known->begin(), known->end(), Key{i, j, partA, partB}); }
+
 // Пара простых тел: площадка из памяти, если запись пары ещё годится, иначе поиск.
 PairFinder::Found PairFinder::simplePair(int i, int j, Real reach) const {
     Found found;
+    if (listed(i, j, 0, 0)) return found;
     const Body &a = bodies_[size_t(i)], &b = bodies_[size_t(j)];
     found.carried = memory ? memory->valid(i, j, a, b, reach) : nullptr;
     if (found.carried) found.pairs.push_back(ManifoldMemory::carried(*found.carried, a, b, reach));
@@ -111,6 +114,7 @@ PairFinder::Found PairFinder::between(int i, int j, Real h, Real reach) const {
     if (!a.parts && !b.parts) return simplePair(i, j, reach);
     Found found;
     for (const auto& [p, q] : partPairs(a, b, gravity_, h)) {
+        if (listed(i, j, p, q)) continue;
         std::optional<ContactPair> pair = examinePair(a.part(p), b.part(q), gravity_, h, boundary);
         if (!pair) continue;
         pair->a = i, pair->b = j, pair->partA = p, pair->partB = q;

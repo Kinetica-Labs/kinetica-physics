@@ -13,6 +13,7 @@
 
 #include <math/StepMemory.h>
 #include <collision/ContactPair.h>
+#include <collision/PairFinder.h>
 #include <joints/JointSet.h>
 
 #include <array>
@@ -38,7 +39,7 @@ private:
     struct Path {
         Real linear = 0, angular = 0;
     };
-    using Key = std::array<int, 4>;
+    using Key = PairFinder::Key;
     void allow(const std::vector<Body>& bodies, Real time);
 
     Vector3 gravity_;

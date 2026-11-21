@@ -79,7 +79,8 @@ std::optional<ContactPair> examinePair(const Body& a, const Body& b, Vector3 gra
 std::optional<ContactPair> examinePairWithin(const Body& a, const Body& b, Real reach, Real boundary) {
     if (!a.shape || !b.shape || (a.isStatic() && b.isStatic())) return std::nullopt;
     if ((b.pose().position - a.pose().position).length() - a.shape->boundingRadius() - b.shape->boundingRadius() > reach + kContactDistance) return std::nullopt;
-    const ClosestPoints gap = closestPoints(*a.shape, a.pose(), *b.shape, b.pose());
+    const ClosestPoints gap = closestPoints(*a.shape, a.pose(), *b.shape, b.pose(), reach + kContactDistance);
+    if (gap.beyond) return std::nullopt;
     const Real distance = gap.coresOverlap ? 0 : gap.distance;
     if (distance > reach + kContactDistance) return std::nullopt;
     ContactPair pair;

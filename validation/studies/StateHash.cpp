@@ -3,7 +3,9 @@
 // постоянной ценой кадра. Перестановка кода, которая не должна менять физику, обязана оставить
 // каждый отпечаток прежним бит в бит.
 //
-//   study-state-hash [кадров на сцену, по умолчанию 60]
+//   study-state-hash [кадров на сцену, по умолчанию 60] [realtime]
+// realtime — только шаг с постоянной ценой кадра: сотни кадров точным шагом считаются часами, а длинный
+// прогон нужен, чтобы сверить две сборки там, куда 60 кадров не доходят (доиск пар, обвал кучи).
 
 #include <math/WorkerPool.h>
 #include <cstdlib>
@@ -58,15 +60,16 @@ void print(const char* key, const char* step, std::uint64_t value) {
 int main(int argc, char** argv) {
     if (const char* threads = std::getenv("KP_THREADS")) kp::WorkerPool::shared().resize(std::atoi(threads)); // число потоков пула
     const int frames = argc > 1 ? std::atoi(argv[1]) : 60;
+    const bool exact = argc < 3 || std::strcmp(argv[2], "realtime") != 0;
     for (const StandardScene& scene : standardScenes()) {
         // Стена точным шагом считается минутами: её отпечаток берётся только у быстрого шага.
-        if (std::strcmp(scene.key, "wall") != 0) print(scene.key, "точный   ", after(scene.build, scene.control, frames, false));
+        if (exact && std::strcmp(scene.key, "wall") != 0) print(scene.key, "точный   ", after(scene.build, scene.control, frames, false));
         print(scene.key, "быстрый  ", after(scene.build, scene.control, frames, true));
     }
     // Сочленения точного шага (подбор SHAKE) есть только в сценах с точным решением. Предел в 64
     // отрезка — как у прибора study-exact-scenes; цепь 100:1 точным шагом не досчитывается.
     for (const ExactScene& scene : exactScenes()) {
-        if (std::strcmp(scene.key, "chain100") != 0) print(scene.key, "точный   ", after(scene.build, nullptr, frames, false, 64));
+        if (exact && std::strcmp(scene.key, "chain100") != 0) print(scene.key, "точный   ", after(scene.build, nullptr, frames, false, 64));
         print(scene.key, "быстрый  ", after(scene.build, nullptr, frames, true));
     }
 }

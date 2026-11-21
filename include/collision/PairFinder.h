@@ -7,6 +7,7 @@
 #include <collision/broadphase/DynamicTree.h>
 #include <joints/JointSet.h>
 
+#include <array>
 #include <vector>
 
 namespace kp {
@@ -21,6 +22,12 @@ public:
     // Память площадок (ManifoldMemory): пара простых тел, чья запись ещё годится, получает площадку
     // из неё, без поиска; записи обновляются каждым вызовом pairs. Без памяти ищется каждая пара.
     ManifoldMemory* memory = nullptr;
+    // Пары, которые вызывающему уже известны: {a, b, partA, partB} по возрастанию. Такие пары не
+    // проверяются и в ответ не попадают — доиску пар посреди шага (PairReach) нужны только новые, а
+    // проверка геометрии пары стоит дороже всего остального поиска. nullptr — искать все. Вместе с
+    // памятью площадок не применяется: пропущенная пара выпала бы из неё.
+    using Key = std::array<int, 4>;
+    const StepArray<Key>* known = nullptr;
     // Дерево брусков всех тел; брусок охватывает всё, чего тело может достичь за время h.
     DynamicTree tree(Real h) const;
     // Пары по возрастанию номеров тел. Дерево отбирает кандидатов — тела с пересекающимися
@@ -43,6 +50,7 @@ private:
     StepArray<std::pair<int, int>> candidates(Real h, const StepArray<Real>& fastest) const;
     Found between(int i, int j, Real h, Real reach) const;
     Found simplePair(int i, int j, Real reach) const;
+    bool listed(int i, int j, int partA, int partB) const;
 
     const std::vector<Body>& bodies_;
     Vector3 gravity_;

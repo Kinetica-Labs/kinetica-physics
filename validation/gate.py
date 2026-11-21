@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """Ворота правки: одна команда и один итог — ХУЖЕ, НЕ ХУЖЕ или ЛУЧШЕ.
 
-  gate.py                 все проверки рядом с эталоном; код выхода 1, если хоть одна строка хуже
-  gate.py --remote        скорость меряется на свободной машине (см. ниже), а не здесь
-  gate.py --quick         без второго компилятора, таблицы случаев, разброса стены и сцен сравнения:
-                          для промежуточных шагов правки, не для коммита
-  gate.py --update        записать нынешние числа эталоном (те разделы, что измерены этим запуском);
+  gate.py --remote        всё считается на свободной машине: сборка, проверки, хэш, таблица случаев, сцены,
+                          скорость; здесь только разбор ответов. Так гонять перед каждым коммитом
+  gate.py --remote --gcc  то же и проверка вторым компилятором здесь: сборка g++ с низким приоритетом в два
+                          потока, ctest, хэш (на свободной машине только clang); перед пушем
+  gate.py                 всё здесь — если свободной машины нет; грузит эту машину на несколько минут
+  gate.py … --quick       без таблицы случаев, разброса стены и сцен сравнения: промежуточный шаг правки
+  gate.py … --update      записать нынешние числа эталоном (те разделы, что измерены этим запуском);
                           отказ, если не прошли проверки «да/нет»
   gate.py --accept        записать эталоном числа прошлого прогона (build/gate-last.json), не меряя заново;
                           отказ, если его итог был ХУЖЕ
 
 Эталон — docs/reports/data/gate-baseline.json; его изменение видно в diff коммита.
 
-Проверки «да/нет»: сборка, ctest, хэш состояния против эталона (1, 4 и 12 потоков, затирание памяти
-шага, clang++), стандарт кода, таблица случаев; с --remote — ещё сборка и хэш на свободной машине
-(другая система, компилятор и процессор). Мерки с эталоном (порог записан у каждой):
+Проверки «да/нет»: сборка, модульные проверки, хэш состояния против эталона (потоки по умолчанию, 1, 4 и
+12, затирание памяти шага), стандарт кода, таблица случаев. Мерки с эталоном (порог записан у каждой):
   стандартные сцены быстрым шагом — итог сцены, перекрытие и прирост энергии: сцена, прошедшая в эталоне,
     обязана пройти; порог на перекрытие и энергию грубый, от порчи на порядок (сцены с ударами хаотичны:
     от последнего бита перекрытие гуляет в полтора раза, а прирост энергии вёдер — от 5e-5 до 7e-3);
@@ -22,15 +23,14 @@
   рывок куба, как в окне (study-window-pull) — худший кадр, 99-й процентиль, скорость тел, перекрытие;
   скорость — пирамида из 1 015 кубов одним потоком и всеми, сцены сравнения одним потоком.
 
-Где мерить скорость. На рабочей машине рядом идут другие программы: тот же код давал +6…9 % времени
-кадра и ±4 % тактов процессора (2026-11-21), поэтому здесь скорость меряется тактами (perf) с порогом
-6 % и годится только против грубой порчи. Точный замер — --remote: дерево передаётся на свободную
-машину, собирается там, и приборы идут на ядре, закреплённом за ними; наименьшее из десяти прогонов
-повторяется там до 0,1 %, порог 3 %. Связь с машиной — два сценария вне git (в них адрес и пароль):
+Почему свободная машина. На рабочей машине рядом идут другие программы: тот же код давал +6…9 % времени
+кадра и ±4 % тактов процессора (2026-11-21), а сборка и прогоны мешают работать за ней. Свободная машина —
+другая система, компилятор и процессор: хэш обязан совпасть и там. Приборы скорости идут на ядре,
+закреплённом за ними; наименьшее из десяти прогонов повторяется до 0,1 %, порог 3 %; мерка, вышедшая за
+порог, перемеряется (помеха время только прибавляет). Связь — два сценария вне git (в них адрес и пароль):
 build/remote/sync.sh — передать дерево и собрать, код выхода сборки; build/remote/rrun.sh "<команда>" —
 выполнить команду PowerShell в каталоге проекта той машины (исполняемые — в build\\, как здесь).
-Время и такты берутся наименьшими из повторов: помеха их только прибавляет; «лучше» объявляется только
-за порогом в другую сторону.
+Без --remote скорость меряется тактами (perf) с порогом 6 % и ловит только грубую порчу.
 """
 import json
 import os
@@ -39,6 +39,8 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+import case_table
 
 ROOT = Path(__file__).resolve().parent.parent
 BUILD = ROOT / "build"
@@ -58,39 +60,18 @@ def run(command, env=None, timeout=1800):
     return done.returncode, done.stdout + done.stderr
 
 
-def passFail(quick):
-    """Проверки без чисел: имя → пройдена ли."""
-    hashed = lambda env, study=STUDIES: run([study / "study-state-hash", 60], env)[1] == HASH.read_text(encoding="utf-8")
-    checks = {
-        "сборка": run(["cmake", "--build", BUILD, "-j"])[0] == 0,
-        "ctest": run(["ctest", "--test-dir", BUILD])[0] == 0,
-        "стандарт кода": run([sys.executable, ROOT / "validation/code_metrics.py", "--check"])[0] == 0,
-    }
-    for threads in (1, 4, 12):
-        checks[f"хэш, потоков {threads}"] = hashed({"KP_THREADS": str(threads)})
-    checks["хэш, затирание памяти шага"] = hashed({"KP_STEP_MEMORY": "check"})
-    if not quick:
-        clang = BUILD / "clang"
-        built = clang.is_dir() and run(["cmake", "--build", clang, "-j"])[0] == 0
-        checks["хэш, clang++ (build/clang)"] = built and hashed({}, clang / "validation/studies")
-        checks["таблица случаев"] = run([sys.executable, ROOT / "validation/case_table.py", "--check"])[0] == 0
-    return checks
-
-
-def standardScenes():
-    with tempfile.TemporaryDirectory() as folder:
-        rows = Path(folder) / "rows.jsonl"
-        run([STUDIES / "study-standard-scenes", rows], {"KP_REALTIME": "1"})
-        found = [json.loads(line) for line in rows.read_text(encoding="utf-8").splitlines() if line.strip()]
-    return {r["scene"]: {"ok": r["ok"], "overlap_m": r["overlap_m"], "energy_gain": r["energy_gain"]} for r in found}
-
-
 class Here:
-    """Замеры скорости на этой машине: такты пользователя на закреплённом ядре."""
+    """Эта машина: скорость — тактами пользователя на закреплённом ядре."""
     section, unit, margin = "local", "млрд тактов", 0.06
 
-    def pull(self, body):
-        return run([STUDIES / "study-window-pull", "realtime", "pyramid", body, 2, 1, 0, 0])[1]
+    def study(self, name, arguments="", env=None):
+        return run([STUDIES / name] + arguments.split(), env)[1]
+
+    def rows(self, name, arguments, env=None):
+        """Строки JSON, которые прибор пишет в файл: в arguments его место отмечено {rows}."""
+        with tempfile.TemporaryDirectory() as folder:
+            run([STUDIES / name] + arguments.format(rows=Path(folder) / "rows.jsonl").split(), env)
+            return [json.loads(line) for line in (Path(folder) / "rows.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
 
     def single(self, env, repeats):
         best = float("inf")
@@ -102,17 +83,35 @@ class Here:
     def allThreads(self):
         return run([ENGINES / "compare-ours", "realtime", 8], {"BENCH": "14"})[1]
 
+    def checks(self, quick):
+        hashed = lambda env, study=STUDIES: run([study / "study-state-hash", 60], env)[1] == HASH.read_text(encoding="utf-8")
+        checks = {"сборка": run(["cmake", "--build", BUILD, "-j"])[0] == 0, "ctest": run(["ctest", "--test-dir", BUILD])[0] == 0}
+        for threads in (1, 4, 12):
+            checks[f"хэш, потоков {threads}"] = hashed({"KP_THREADS": str(threads)})
+        checks["хэш, затирание памяти шага"] = hashed({"KP_STEP_MEMORY": "check"})
+        if not quick:
+            clang = BUILD / "clang"
+            built = clang.is_dir() and run(["cmake", "--build", clang, "-j"])[0] == 0
+            checks["хэш, clang++ (build/clang)"] = built and hashed({}, clang / "validation/studies")
+        return checks
+
 
 class There:
-    """Замеры скорости на свободной машине: время кадра на закреплённом ядре."""
+    """Свободная машина: скорость — временем кадра на закреплённом ядре."""
     section, unit, margin = "remote", "мс", 0.03
 
     def command(self, env, line):
-        settings = "".join(f'$env:{key}="{value}"; ' for key, value in env.items())
+        settings = "".join(f'$env:{key}="{value}"; ' for key, value in (env or {}).items())
         return run([REMOTE / "rrun.sh", settings + line])[1]
 
-    def pull(self, body):
-        return self.command({"KP_REPEATS": "5"}, f".\\build\\validation\\studies\\study-window-pull.exe realtime pyramid {body} 2 1 0 0")
+    def study(self, name, arguments="", env=None):
+        return self.command(env, f".\\build\\validation\\studies\\{name}.exe {arguments}")
+
+    def rows(self, name, arguments, env=None):
+        # Приборы дописывают строки в файл, поэтому прежний файл сначала убирается.
+        text = self.command(env, "Remove-Item gate-rows.jsonl -ErrorAction SilentlyContinue; "
+                            f".\\build\\validation\\studies\\{name}.exe {arguments.format(rows='gate-rows.jsonl')} | Out-Null; Get-Content gate-rows.jsonl -Encoding UTF8")
+        return [json.loads(line) for line in text.splitlines() if line.startswith("{")]
 
     def single(self, env, repeats):
         pinned = 'cmd /c "start /b /wait /affinity 0x100 build\\validation\\engines\\compare-ours.exe realtime 8"'
@@ -123,10 +122,57 @@ class There:
     def allThreads(self):
         return self.command({"BENCH": "14"}, "1..2 | ForEach-Object { .\\build\\validation\\engines\\compare-ours.exe realtime 8 }")
 
+    def checks(self, quick):
+        etalon = HASH.read_text(encoding="utf-8").split()
+        checks = {"сборка на свободной машине": run([REMOTE / "sync.sh"])[0] == 0}
+        if not checks["сборка на свободной машине"]:
+            return checks
+        checks["модульные проверки"] = "отказов 0" in self.command({}, ".\\build\\tests\\unit-tests.exe")
+        for label, env in (("потоки по умолчанию", {}), ("потоков 1", {"KP_THREADS": "1"}), ("потоков 4", {"KP_THREADS": "4"}), ("потоков 12", {"KP_THREADS": "12"}),
+                           ("затирание памяти шага", {"KP_STEP_MEMORY": "check"})):
+            checks[f"хэш, {label}"] = self.study("study-state-hash", "60", env).split() == etalon
+        return checks
+
+
+def gccHere():
+    """Второй компилятор на этой машине, с низким приоритетом: сборка g++ в два потока, ctest, хэш."""
+    quiet = ["nice", "-n", "19"]
+    built = run(quiet + ["cmake", "--build", BUILD, "-j", "2"])[0] == 0
+    return {"сборка g++ здесь": built, "ctest здесь": built and run(quiet + ["ctest", "--test-dir", BUILD])[0] == 0,
+            "хэш, g++ здесь": built and run(quiet + [STUDIES / "study-state-hash", 60], {"KP_THREADS": "2"})[1] == HASH.read_text(encoding="utf-8")}
+
+
+def caseTable(machine):
+    """Счёт клеток таблицы случаев с нарушением по каждой мерке не больше эталона."""
+    cells = machine.rows("study-case-table", "4 {rows}")
+    base = json.loads(case_table.BASELINE.read_text(encoding="utf-8"))
+    return bool(cells) and all(sum(1 for cell in cells if broken(cell)) <= base[name] for name, broken in case_table.MEASURES)
+
+
+def passFail(machine, quick):
+    """Проверки без чисел: имя → пройдена ли."""
+    checks = machine.checks(quick)
+    if all(checks.values()):
+        checks["стандарт кода"] = run([sys.executable, ROOT / "validation/code_metrics.py", "--check"])[0] == 0
+        if not quick:
+            checks["таблица случаев"] = caseTable(machine)
+        if "--gcc" in sys.argv:
+            checks.update(gccHere())
+    return checks
+
+
+def standardScenes(machine):
+    found = machine.rows("study-standard-scenes", "{rows}", {"KP_REALTIME": "1"})
+    return {r["scene"]: {"ok": r["ok"], "overlap_m": r["overlap_m"], "energy_gain": r["energy_gain"]} for r in found}
+
+
+def pullOf(machine, body):
+    return json.loads(machine.study("study-window-pull", f"realtime pyramid {body} 2 1 0 0", {"KP_REPEATS": "5"}).strip().splitlines()[-1])
+
 
 def speed(machine, quick):
     """Мерки скорости на машине machine."""
-    numbers = {"pull": {f"pyramid {body}": json.loads(machine.pull(body).strip().splitlines()[-1]) for body in PULLS}}
+    numbers = {"pull": {f"pyramid {body}": pullOf(machine, body) for body in PULLS}}
     numbers["bench_single"] = machine.single({"BENCH": "14"}, 10)
     numbers["bench_all_ms"] = min(float(f) for _ in range(3) for f in re.findall(r"([\d.]+) мс на кадр", machine.allThreads()))
     if not quick:
@@ -146,15 +192,14 @@ def confirm(fast, old, machine):
                 fast["scene"][key] = min(fast["scene"][key], machine.single({"SCENE": key}, 5))
         for key, pull in fast["pull"].items():
             if pull["worst_ms"] > 1.25 * old["pull"][key]["worst_ms"] or pull["p99_ms"] > 1.25 * old["pull"][key]["p99_ms"]:
-                again = json.loads(machine.pull(int(key.split()[1])).strip().splitlines()[-1])
+                again = pullOf(machine, int(key.split()[1]))
                 pull["worst_ms"], pull["p99_ms"] = min(pull["worst_ms"], again["worst_ms"]), min(pull["p99_ms"], again["p99_ms"])
 
 
 def measure(quick, machine):
-    numbers = {"standard": standardScenes(), machine.section: speed(machine, quick)}
+    numbers = {"standard": standardScenes(machine), machine.section: speed(machine, quick)}
     if not quick:
-        spread = run([STUDIES / "study-overlap-spread", "wall"])[1]
-        numbers["wall_overlap_median_mm"] = float(re.search(r"медиана ([\d.]+) мм", spread).group(1))
+        numbers["wall_overlap_median_mm"] = float(re.search(r"медиана ([\d.]+) мм", machine.study("study-overlap-spread", "wall")).group(1))
     return numbers
 
 
@@ -209,17 +254,13 @@ def accept():
 def main():
     if "--accept" in sys.argv:
         return accept()
-    quick, update, remote = "--quick" in sys.argv, "--update" in sys.argv, "--remote" in sys.argv
-    machine = There() if remote else Here()
-    checks = passFail(quick)
-    if remote:
-        checks["сборка на свободной машине"] = run([REMOTE / "sync.sh"])[0] == 0
-        there = run([REMOTE / "rrun.sh", ".\\build\\validation\\studies\\study-state-hash.exe 60"])[1]
-        checks["хэш на свободной машине"] = there.split() == HASH.read_text(encoding="utf-8").split()
+    quick, update = "--quick" in sys.argv, "--update" in sys.argv
+    machine = There() if "--remote" in sys.argv else Here()
+    checks = passFail(machine, quick)
     for name, ok in checks.items():
         print(f"{name:46} {'ок' if ok else 'ОТКАЗ'}")
     failed = [name for name, ok in checks.items() if not ok]
-    if failed and (update or not checks["сборка"] or not checks.get("сборка на свободной машине", True)):
+    if failed and (update or not list(checks.values())[0]):
         sys.exit(f"ИТОГ: ХУЖЕ — не прошли: {', '.join(failed)}")
     now = measure(quick, machine)
     base = json.loads(BASELINE.read_text(encoding="utf-8")) if BASELINE.exists() else {}
