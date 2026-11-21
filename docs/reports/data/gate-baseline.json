@@ -1,40 +1,40 @@
 {
  "remote": {
-  "bench_all_ms": 47.97,
-  "bench_single": 87.4,
+  "bench_all_ms": 40.42,
+  "bench_single": 68.61,
   "pull": {
    "pyramid 1": {
     "body": 1,
-    "median_ms": 1.6393,
+    "median_ms": 1.5766,
     "mode": "realtime",
     "overlap_m": 0.000238788,
-    "p99_ms": 17.0601,
+    "p99_ms": 16.307,
     "peak_speed": 2.48326,
     "scene": "pyramid",
-    "slow_frames": 4,
-    "worst_ms": 19.8211
+    "slow_frames": 1,
+    "worst_ms": 18.9239
    },
    "pyramid 12": {
     "body": 12,
-    "median_ms": 4.1598,
+    "median_ms": 4.0082,
     "mode": "realtime",
     "overlap_m": 0.000182494,
-    "p99_ms": 19.9487,
+    "p99_ms": 18.0698,
     "peak_speed": 5.4058,
     "scene": "pyramid",
-    "slow_frames": 6,
-    "worst_ms": 22.9495
+    "slow_frames": 4,
+    "worst_ms": 22.441
    },
    "pyramid 9": {
     "body": 9,
-    "median_ms": 3.7221,
+    "median_ms": 3.5245,
     "mode": "realtime",
     "overlap_m": 0.000495588,
-    "p99_ms": 15.9732,
+    "p99_ms": 14.7919,
     "peak_speed": 6.385,
     "scene": "pyramid",
     "slow_frames": 1,
-    "worst_ms": 25.1385
+    "worst_ms": 23.2153
    }
   }
  },

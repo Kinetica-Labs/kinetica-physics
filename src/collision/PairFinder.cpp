@@ -11,13 +11,13 @@ namespace {
 // Брусок вокруг тела: точные габариты формы вдоль осей мира, увеличенные на путь, который любая
 // точка тела может пройти за h, и на полосу касания. Если бруски двух тел не пересеклись, тела за
 // это время не сблизятся до касания, и examinePair такую пару отверг бы. fastest — maxPointSpeed тела.
-Bounds reachBounds(const Body& body, Real fastest, Vector3 gravity, Real h) {
+Bounds reachBounds(const Body& body, Real fastest, Vector3 gravity, Real h, Real slack) {
     // Габарит вдоль оси — опорная точка формы в этом направлении плюс радиус скругления.
     const auto extent = [&](Vector3 axis) {
         const Vector3 local = body.pose().localDirection(axis);
         return local.dot(body.shape->support(local)) + body.shape->radius;
     };
-    const Real reach = (fastest + gravity.length() * h) * h + kContactDistance;
+    const Real reach = (fastest + gravity.length() * h) * h + kContactDistance + slack;
     const Vector3 grow{reach, reach, reach};
     return {body.position - Vector3{extent({-1, 0, 0}), extent({0, -1, 0}), extent({0, 0, -1})} - grow,
             body.position + Vector3{extent({1, 0, 0}), extent({0, 1, 0}), extent({0, 0, 1})} + grow};
@@ -35,10 +35,10 @@ struct Reaches {
     StepArray<Bounds> bounds;
     DynamicTree tree;
 
-    Reaches(const std::vector<Body>& bodies, const StepArray<Real>& fastest, Vector3 gravity, Real h) : bounds(bodies.size()) {
+    Reaches(const std::vector<Body>& bodies, const StepArray<Real>& fastest, Vector3 gravity, Real h, Real slack = 0) : bounds(bodies.size()) {
         tree.reserve(int(bodies.size()));
         for (int i = 0; i < int(bodies.size()); ++i)
-            if (bodies[size_t(i)].shape) tree.insert(bounds[size_t(i)] = reachBounds(bodies[size_t(i)], fastest[size_t(i)], gravity, h), i);
+            if (bodies[size_t(i)].shape) tree.insert(bounds[size_t(i)] = reachBounds(bodies[size_t(i)], fastest[size_t(i)], gravity, h, slack), i);
     }
 };
 
@@ -49,7 +49,10 @@ DynamicTree PairFinder::tree(Real h) const { return Reaches(bodies_, speedsOf(bo
 // Кандидаты — пары тел, чьи бруски досягаемости за время h пересеклись; отбирает их дерево брусков.
 // Идут по возрастанию номеров: порядок пар не должен зависеть от формы дерева.
 StepArray<std::pair<int, int>> PairFinder::candidates(Real h, const StepArray<Real>& fastest) const {
-    const Reaches reach(bodies_, fastest, gravity_, h);
+    StepArray<Real> path(bodies_.size()); // путь досягаемости тела — тот же, что в reachBounds
+    for (size_t i = 0; i < bodies_.size(); ++i) path[i] = (fastest[i] + gravity_.length() * h) * h + kContactDistance;
+    if (const std::vector<std::pair<int, int>>* kept = remembered ? remembered->valid(bodies_, path) : nullptr) return {kept->begin(), kept->end()};
+    const Reaches reach(bodies_, fastest, gravity_, h, remembered ? CandidateMemory::kSlack : Real(0));
     StepArray<std::pair<int, int>> candidates;
     for (int i = 0; i < int(bodies_.size()); ++i) {
         if (!bodies_[size_t(i)].shape) continue;
@@ -59,6 +62,7 @@ StepArray<std::pair<int, int>> PairFinder::candidates(Real h, const StepArray<Re
         });
         std::sort(candidates.begin() + std::ptrdiff_t(first), candidates.end());
     }
+    if (remembered) remembered->replace(bodies_, path, candidates);
     return candidates;
 }
 

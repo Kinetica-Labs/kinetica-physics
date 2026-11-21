@@ -32,7 +32,7 @@ void World::step(Real dt) {
         part.substeps = std::max(1, soft.substeps / updates);
         for (int update = 0; update < updates; ++update) {
             PairFinder finder(bodies_, gravity);
-            finder.boundary = soft.edgeSlop, finder.memory = &manifolds_;
+            finder.boundary = soft.edgeSlop, finder.memory = &manifolds_, finder.remembered = &candidates_;
             finder.collect(dt / updates, joints_, pairs_);
             notify(watch, StepStage::Pairs);
             part.step(bodies_, pairs_, joints_, gravity, dt / updates, contactForces_, jointImpulses_);

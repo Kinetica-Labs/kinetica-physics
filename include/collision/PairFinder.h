@@ -3,6 +3,7 @@
 
 #include <math/StepMemory.h>
 #include <collision/ContactPair.h>
+#include <collision/CandidateMemory.h>
 #include <collision/ManifoldMemory.h>
 #include <collision/broadphase/DynamicTree.h>
 #include <joints/JointSet.h>
@@ -28,6 +29,8 @@ public:
     // памятью площадок не применяется: пропущенная пара выпала бы из неё.
     using Key = std::array<int, 4>;
     const StepArray<Key>* known = nullptr;
+    // Память кандидатов (CandidateMemory): пока тела не вышли из своих брусков, дерево заново не строится.
+    CandidateMemory* remembered = nullptr;
     // Дерево брусков всех тел; брусок охватывает всё, чего тело может достичь за время h.
     DynamicTree tree(Real h) const;
     // Пары по возрастанию номеров тел. Дерево отбирает кандидатов — тела с пересекающимися
