@@ -14,8 +14,8 @@
 
 Эталон — docs/reports/data/gate-baseline.json; его изменение видно в diff коммита.
 
-Проверки «да/нет»: сборка, модульные проверки, хэш состояния против эталона (потоки по умолчанию, 1, 4 и
-12, затирание памяти шага), стандарт кода, таблица случаев. Мерки с эталоном (порог записан у каждой):
+Проверки «да/нет»: сборка clang++ и g++, модульные проверки и хэш состояния против эталона у обоих (у
+clang++ ещё потоки 1, 4 и 12 и затирание памяти шага), стандарт кода, таблица случаев. Мерки с эталоном (порог записан у каждой):
   стандартные сцены быстрым шагом — итог сцены, перекрытие и прирост энергии: сцена, прошедшая в эталоне,
     обязана пройти; порог на перекрытие и энергию грубый, от порчи на порядок (сцены с ударами хаотичны:
     от последнего бита перекрытие гуляет в полтора раза, а прирост энергии вёдер — от 5e-5 до 7e-3);
@@ -131,6 +131,12 @@ class There:
         for label, env in (("потоки по умолчанию", {}), ("потоков 1", {"KP_THREADS": "1"}), ("потоков 4", {"KP_THREADS": "4"}), ("потоков 12", {"KP_THREADS": "12"}),
                            ("затирание памяти шага", {"KP_STEP_MEMORY": "check"})):
             checks[f"хэш, {label}"] = self.study("study-state-hash", "60", env).split() == etalon
+        # Второй компилятор там же: g++ (tools\\gcc), каталог build-gcc.
+        gcc = '$env:PATH="$root\\tools\\gcc\\mingw64\\bin;$env:PATH"; '
+        built = "BUILD_EXIT=0" in self.command({}, gcc + 'cmake --build build-gcc -j 20 | Out-Null; "BUILD_EXIT=$LASTEXITCODE"')
+        checks["сборка g++"] = built
+        checks["хэш, g++"] = built and self.command({}, gcc + ".\\build-gcc\\validation\\studies\\study-state-hash.exe 60").split() == etalon
+        checks["модульные проверки, g++"] = built and "отказов 0" in self.command({}, gcc + ".\\build-gcc\\tests\\unit-tests.exe")
         return checks
 
 
