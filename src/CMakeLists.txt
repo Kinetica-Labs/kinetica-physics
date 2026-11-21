@@ -52,6 +52,8 @@ add_library(kinetica-physics STATIC
   joints/BallAndSocketJoint.cpp
   joints/HingeJoint.cpp
   joints/SliderJoint.cpp
+  joints/Path.cpp
+  joints/PathJoint.cpp
   joints/CylindricalJoint.cpp
   joints/FixedJoint.cpp
   joints/CardanJoint.cpp

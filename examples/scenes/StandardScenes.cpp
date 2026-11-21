@@ -336,6 +336,47 @@ std::string gripperVerdict(const World& start, const World& now) {
     return "";
 }
 
+// --- сочленение по траектории: вагонетка на волнистом кольце и коробка на спирали --------------------
+// Как пример PathConstraintTest в Jolt. Вагонетку ведёт привод 1,5 м/с по замкнутой кривой, она сохраняет
+// ориентацию. Коробка подвешена к нисходящей спирали за середину верхней грани: привода нет, она съезжает
+// под тяжестью, свободно вращается и качается, а в конце упирается в предел хода. Вязкое сопротивление вдоль
+// пути (1,5 Н·с/м) держит скорость спуска около 2 м/с: без него коробка приходит к упору на 5 м/с, и удар
+// раскручивает её до 25 рад/с. Кривые закреплены в полу.
+World rail() {
+    World world = withFloor();
+    const Real c = Real(0.70710678118654752); // cos 45° — без libm
+    const Real around[8][2] = {{1, 0}, {c, c}, {0, 1}, {-c, c}, {-1, 0}, {-c, -c}, {0, -1}, {c, -c}};
+    std::vector<Vector3> ring, spiral;
+    for (int k = 0; k < 8; ++k) ring.push_back({Real(1.2) * around[k][0], k % 2 ? Real(0.95) : Real(0.55), Real(1.2) * around[k][1]});
+    for (int k = 0; k <= 24; ++k) { // два витка радиуса 0,8 м вниз с 2,6 до 0,8 м, точка через 30°
+        const SinCos turn = sinCos(Real(k) * Real(0.52359877559829887));
+        spiral.push_back({Real(3) + Real(0.8) * turn.cos, Real(2.6) - Real(0.075) * Real(k), Real(0.8) * turn.sin});
+    }
+    const BodyId carriage = world.addBody(Body::box({0.12, 0.06, 0.08}, 500, ring[0]));
+    PathJoint& loop = addPathJoint(world, BodyId(0), carriage, ring[0], ring, true);
+    loop.lockTurns = true, loop.holdSpeed = true, loop.driveSpeed = Real(1.5);
+    Body box = Body::box({0.08, 0.12, 0.05}, 500, spiral[0] - Vector3{0, Real(0.12), 0});
+    box.angularDamping = Real(0.5);
+    addPathJoint(world, BodyId(0), world.addBody(box), spiral[0], spiral).damping = Real(1.5);
+    return world;
+}
+std::string railVerdict(const World& start, const World& now) {
+    const Transform floor = now.bodies()[0].pose();
+    for (size_t j = 0; j < 2; ++j) {
+        const PathJoint& joint = dynamic_cast<const PathJoint&>(now.joints()[j]);
+        const Body& body = now.bodies()[size_t(joint.b)];
+        const Vector3 local = floor.localPoint(body.pose().point(joint.anchorB));
+        const Real u = joint.path().closest(local);
+        const double off = double((local - joint.path().point(u)).length());
+        if (off > 1e-3) return text("тело %d ушло с пути на %.2e м", joint.b, off);
+        const double along = double(pointVelocity(body, body.pose().point(joint.anchorB)).dot(floor.direction(joint.path().tangent(u))));
+        if (j == 0 && std::fabs(along - 1.5) > 0.03) return text("вагонетка идёт по пути со скоростью %.3f м/с вместо 1,5", along);
+        const double sunk = double(start.bodies()[size_t(joint.b)].position.y - body.position.y);
+        if (j == 1 && sunk < 1.0) return text("коробка съехала по спирали всего на %.2f м высоты", sunk);
+    }
+    return "";
+}
+
 // Равномерное на [0, 1) псевдослучайное число: сцены одинаковы от запуска к запуску.
 struct Dice {
     unsigned long long state;
@@ -538,6 +579,7 @@ const std::vector<StandardScene>& standardScenes() {
         {"hills", "холмы по карте высот", hills, 8, 8, hillsVerdict, nullptr, {0, 0.6, 0}, 9},
         {"swing", "раскачанная цепь: энергия не растёт", swingingChain, 40, 40, swingVerdict, nullptr, {0, 2, 0}, 6},
         {"drift", "куча без тяжести: импульс сохраняется", weightlessPile, 5, 5, driftVerdict, nullptr, {0, 0, 0}, 6},
+        {"rail", "вагонетка на кольцевом пути и коробка на спирали", rail, 7, 7, railVerdict, nullptr, {1.5, 1.2, 0}, 6},
     };
     return all;
 }

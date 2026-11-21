@@ -483,6 +483,68 @@ void jointsLeaveOnlyTheirFreedoms() {
         CHECK(1 - std::fabs(double(b.orientation.w)) < 1e-12, "ползун повернулся: w = %.15f", double(b.orientation.w));
     }
     {
+        // Сочленение по траектории на прямой — тот же ответ, что у ползуна: путь за секунду ½ g cos 30°.
+        World world;
+        const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));
+        const BodyId block = world.addBody(Body::box({0.1, 0.07, 0.05}, 1000));
+        const Vector3 axis{Real(0.5), Real(-0.86602540378443865), 0};
+        std::vector<Vector3> line;
+        for (int k = -1; k <= 4; ++k) line.push_back(Real(2 * k) * axis);
+        addPathJoint(world, base, block, {}, line).lockTurns = true;
+        for (int step = 0; step < 60; ++step) world.step(Real(1) / 60);
+        const Body& b = world.bodies()[1];
+        const double along = double(b.position.dot(axis));
+        CHECK_NEAR(along, 0.5 * 9.81 * 0.86602540378443865, 1e-8);
+        CHECK(double((b.position - Real(along) * axis).length()) < 1e-8, "тело ушло с прямого пути на %.2e м", double((b.position - Real(along) * axis).length()));
+        CHECK(1 - std::fabs(double(b.orientation.w)) < 1e-12, "тело на пути повернулось: w = %.15f", double(b.orientation.w));
+    }
+    for (bool realtime : {false, true}) {
+        // Шар на параболе y = x²/2 из покоя с высоты 0,5 м: связь пути работы не совершает — энергия
+        // сохраняется, а шар остаётся на кривой.
+        World world;
+        world.realtime = realtime;
+        const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0, {0, -1, 0}));
+        const BodyId bead = world.addBody(Body::sphere(0.05, 1000, {-1, 0.5, 0}));
+        std::vector<Vector3> valley;
+        for (int k = -8; k <= 8; ++k) valley.push_back({Real(0.25 * k), Real(0.5 * 0.25 * k * 0.25 * k), 0});
+        const PathJoint& rail = addPathJoint(world, base, bead, {-1, 0.5, 0}, valley);
+        const double mass = 1 / double(world.body(bead).mass.inverseMass), fall = mass * 9.81 * 0.5;
+        double drift = 0, off = 0;
+        for (int step = 0; step < 120; ++step) {
+            world.step(Real(1) / 60);
+            const Body& b = world.bodies()[size_t(bead)];
+            const double speed = double(b.linearVelocity().length());
+            drift = std::fmax(drift, std::fabs(0.5 * mass * speed * speed + mass * 9.81 * (double(b.position.y) - 0.5)) / fall);
+            const Vector3 local = world.bodies()[size_t(base)].pose().localPoint(b.position);
+            off = std::fmax(off, double((local - rail.path().point(rail.path().closest(local))).length()));
+        }
+        CHECK(drift < (realtime ? 5e-2 : 2e-3), "шар на пути, %s шаг: энергия ушла на %.2e от m g h", realtime ? "быстрый" : "точный", drift);
+        CHECK(off < (realtime ? 1e-3 : 1e-6), "шар на пути, %s шаг: ушёл с кривой на %.2e м", realtime ? "быстрый" : "точный", off);
+    }
+    {
+        // Кольцо радиуса 1 м в горизонтальной плоскости, привод держит 1 м/с: за две секунды пройдено 2 м дуги.
+        World world;
+        const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0, {0, -1, 0}));
+        const BodyId carriage = world.addBody(Body::box({0.1, 0.07, 0.05}, 1000, {1, 0, 0}));
+        const Real c = Real(0.70710678118654752);
+        const std::vector<Vector3> ring = {{1, 0, 0}, {c, 0, c}, {0, 0, 1}, {-c, 0, c}, {-1, 0, 0}, {-c, 0, -c}, {0, 0, -1}, {c, 0, -c}};
+        PathJoint& rail = addPathJoint(world, base, carriage, {1, 0, 0}, ring, true);
+        rail.lockTurns = true, rail.holdSpeed = true, rail.driveSpeed = 1;
+        // Таблица длины дуги против прямого суммирования хорд на четверти кольца.
+        double chords = 0;
+        for (int k = 0; k < 4096; ++k) chords += double((rail.path().point(Real(2.0 * (k + 1) / 4096)) - rail.path().point(Real(2.0 * k / 4096))).length());
+        CHECK_NEAR(double(rail.path().length(2)), chords, 1e-6);
+        const double start = double(coordinate(world, rail));
+        double off = 0;
+        for (int step = 0; step < 120; ++step) {
+            world.step(Real(1) / 60);
+            const Vector3 local = world.bodies()[size_t(base)].pose().localPoint(world.bodies()[size_t(carriage)].position);
+            off = std::fmax(off, double((local - rail.path().point(rail.path().closest(local))).length()));
+        }
+        CHECK_NEAR(double(coordinate(world, rail)) - start, 2.0, 5e-3);
+        CHECK(off < 1e-6, "вагонетка ушла с кольца на %.2e м", off);
+    }
+    {
         // Консоль: брусок приварен к неподвижному телу боком.
         World world;
         const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0));

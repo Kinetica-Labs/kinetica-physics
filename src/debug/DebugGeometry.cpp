@@ -103,6 +103,14 @@ DebugGeometry debugGeometry(const World& world, bool withTree) {
             geometry.add(*part.shape, part.pose(), body.isStatic() ? DebugKind::StaticShape : DebugKind::Shape);
         }
     }
+    // Кривые сочленений по траектории — ломаной, шестнадцать звеньев на отрезок сплайна.
+    for (size_t j = 0; j < world.joints().size(); ++j) {
+        const PathJoint* rail = dynamic_cast<const PathJoint*>(&world.joints()[j]);
+        if (!rail) continue;
+        const Transform seat = world.bodies()[size_t(rail->a)].pose();
+        for (int k = 0; k < 16 * int(rail->path().span()); ++k)
+            geometry.lines.push_back({seat.point(rail->path().point(Real(k) / 16)), seat.point(rail->path().point(Real(k + 1) / 16)), DebugKind::StaticShape});
+    }
     for (const ContactPair& pair : PairFinder(world.bodies(), world.gravity).pairs(0))
         if (pair.inContact()) geometry.add(pair.manifold);
     return geometry;

@@ -7,6 +7,7 @@
 #include <joints/FixedJoint.h>
 #include <joints/HingeJoint.h>
 #include <joints/JointSet.h>
+#include <joints/PathJoint.h>
 #include <joints/SliderJoint.h>
 #include <joints/TetherJoint.h>
 #include <collision/CandidateMemory.h>
@@ -113,6 +114,10 @@ private:
 inline BallAndSocketJoint& addBallJoint(World& world, BodyId a, BodyId b, Vector3 anchor) { return world.addJoint<BallAndSocketJoint>(a, b, anchor); }
 inline HingeJoint& addHinge(World& world, BodyId a, BodyId b, Vector3 anchor, Vector3 axis) { return world.addJoint<HingeJoint>(a, b, anchor, axis); }
 inline SliderJoint& addSlider(World& world, BodyId a, BodyId b, Vector3 anchor, Vector3 axis) { return world.addJoint<SliderJoint>(a, b, anchor, axis); }
+// Точка anchor тела b идёт по кривой через точки through, закреплённой в теле a (PathJoint).
+inline PathJoint& addPathJoint(World& world, BodyId a, BodyId b, Vector3 anchor, const std::vector<Vector3>& through, bool closed = false) {
+    return world.addJoint<PathJoint>(a, b, anchor, through, closed);
+}
 inline FixedJoint& addWeld(World& world, BodyId a, BodyId b, Vector3 anchor) { return world.addJoint<FixedJoint>(a, b, anchor); }
 inline CardanJoint& addCardan(World& world, BodyId a, BodyId b, Vector3 anchor, Vector3 axis, Vector3 cross) { return world.addJoint<CardanJoint>(a, b, anchor, axis, cross); }
 inline TetherJoint& addTether(World& world, BodyId a, Vector3 pointA, BodyId b, Vector3 pointB, Real stiffness, Real damping) {
