@@ -1363,8 +1363,9 @@ void liftCarriesBody(bool fast, double gap) {
 }
 
 // Поворотный стол: ящик на диске, вращающемся с ω = 1 рад/с, на радиусе 0,5 м держится трением
-// (ω² r = 0,5 м/с² при μ g = 4,9) и за оборот возвращается на место. off — допуск, м.
-void turntableCarriesBody(bool fast, double off) {
+// (ω² r = 0,5 м/с² при μ g = 4,9) и за оборот возвращается на место. Возвращает, на сколько он ушёл, м;
+// stepsPerFrame — во сколько раз шаг мельче 1/60.
+double turntableDrift(bool fast, int stepsPerFrame) {
     World world;
     world.realtime = fast;
     Body table = Body::cylinder(0.05, 1, 0, {0, -0.05, 0});
@@ -1374,12 +1375,21 @@ void turntableCarriesBody(bool fast, double off) {
     crate.linearMomentum = {0, 0, Real(-0.5) / crate.mass.inverseMass}; // ω × r при ω вдоль Y
     crate.angularMomentum = {0, 1 / crate.mass.inverseInertia.y, 0};
     const BodyId id = world.addBody(crate);
-    const int steps = 377; // 2π с при шаге 1/60: 376,99 шага
-    for (int k = 0; k < steps; ++k) world.step(Real(1) / 60);
-    const double angle = steps / 60.0;
+    const int steps = 377 * stepsPerFrame; // 2π с при шаге 1/60: 376,99 шага
+    for (int k = 0; k < steps; ++k) world.step(Real(1) / (60 * stepsPerFrame));
+    const double angle = 377 / 60.0;
     const Vector3 expected{Real(0.5 * std::cos(angle)), Real(0.1), Real(-0.5 * std::sin(angle))};
-    const double away = double((world.body(id).position - expected).length());
-    CHECK(away < off, "%s шаг: ящик на поворотном столе за оборот ушёл на %.2e м (допуск %.0e)", fast ? "быстрый" : "точный", away, off);
+    return double((world.body(id).position - expected).length());
+}
+
+// Точный шаг держит ящик на столе во втором порядке по шагу: пара с малым остатком скольжения считается
+// прилипшей и решается с уходом точки касания от вращения опоры (ContactAssembly::addFriction, H113).
+// Быстрый шаг — в первом порядке, с подшагом 1/480.
+void turntableCarriesBody() {
+    const double exact = turntableDrift(false, 1), halved = turntableDrift(false, 2), fast = turntableDrift(true, 1);
+    CHECK(exact < 1e-3, "точный шаг: ящик на поворотном столе за оборот ушёл на %.2e м (допуск 1e-3)", exact);
+    CHECK(halved < exact / 3, "точный шаг на поворотном столе не второго порядка: уход %.2e м при шаге 1/60 и %.2e при 1/120", exact, halved);
+    CHECK(fast < 1e-2, "быстрый шаг: ящик на поворотном столе за оборот ушёл на %.2e м (допуск 1e-2)", fast);
 }
 
 // Движимая стенка толкает свободный ящик без тяжести: ящик уходит с её скоростью, стенка своей не меняет.
@@ -1413,19 +1423,16 @@ void drivenBodyWakes() {
     CHECK(double(world.body(cube).position.x) > 0.6, "движимая стенка прошла сквозь спящий куб: x = %.4f м", double(world.body(cube).position.x));
 }
 
-// Тело, движимое извне (О2). Допуски записаны до кода: журнал попыток, H111. Два допуска точного шага
-// записанными не остались — прогон показал свойство самого шага, а не движимого тела (H112):
-//  — остановку скольжения внутри отрезка шаг событием не считает, если трения хватает до конца отрезка:
-//    путь ошибается до μ g h² / 8 = 0,17 мм (записано было 1e-5 от 0,102 м, вышло 1,2e-3);
-//  — пара, которая в начале отрезка чуть скользит, решается без ухода точки касания от вращения опоры:
-//    на поворотном столе ящик за оборот уходит на 5,5 см при шаге 1/60 и на 2,7 см при 1/120 (записано
-//    было 1 мм). Быстрый шаг с подшагом 1/480 уходит на 3,3 мм.
-// Допуски ниже — храповик нынешнего уровня: хуже стать не должно.
+// Тело, движимое извне (О2). Допуски записаны до кода: журнал попыток, H111. Один допуск точного шага
+// записанным не остался — прогон показал свойство самого шага, а не движимого тела (H112): остановку
+// скольжения внутри отрезка шаг событием не считает, если трения хватает до конца отрезка, и путь ошибается
+// до μ g h² / 8 = 0,17 мм (записано было 1e-5 от 0,102 м, вышло 1,2e-3). Допуск 2e-3 — храповик нынешнего
+// уровня: хуже стать не должно.
 void drivenBodies() {
     for (const bool fast : {false, true}) drivenBodyKeepsItsCourse(fast);
     frictionCarriesBodyAlong(false, 2e-3), frictionCarriesBodyAlong(true, 3e-2);
     liftCarriesBody(false, 1e-6), liftCarriesBody(true, 2e-4);
-    turntableCarriesBody(false, 6e-2), turntableCarriesBody(true, 1e-2);
+    turntableCarriesBody();
     drivenWallPushes(false, 1e-6), drivenWallPushes(true, 1e-4);
     drivenBodyWakes();
 }

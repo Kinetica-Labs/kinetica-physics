@@ -100,7 +100,16 @@ ContactAssembly::System ContactAssembly::assemble(const StepArray<Real>& goal) {
 
 // Три линии трения на пару с участвующими строками. Не скользит пара, которая покоилась в начале
 // отрезка; при ударе — любая, пока трения хватает.
+//
+// Покоилась — не значит «скольжение ноль». Точки касания вращающихся тел расходятся с ускорением drift, и
+// прилипшая пара кончает отрезок со скольжением −h · drift при плечах его начала; к началу следующего
+// плечи повернулись, и от него остаётся порядка (h ω / 2) · h · drift. Поворот тела в контакте за отрезок
+// не больше kMaxTurn = 0,25 рад, поэтому остаток не больше восьмой доли h · drift. Пара, которая в самом
+// деле скользит из-за вращения, скользит быстрее h · drift не меньше чем вчетверо (ω r против h ω² r).
+// Граница kCarried = 1/4 — между ними. Без неё пара на вращающейся опоре через шаг считалась скользящей,
+// решалась без ухода и теряла a h² / 2 пути: ящик на поворотном столе уходил на 5,5 см за оборот (H112).
 void ContactAssembly::addFriction(System& s, const StepArray<Real>& goal) {
+    constexpr Real kCarried = Real(0.25);
     state_.stuck.assign(state_.pairs.size(), 0);
     for (size_t p = 0; p < state_.pairs.size(); ++p) {
         const Pair& pair = state_.pairs[p];
@@ -111,7 +120,8 @@ void ContactAssembly::addFriction(System& s, const StepArray<Real>& goal) {
         for (int k = 0; k < 3; ++k) s.lines.push_back(state_.frictionLine(pair, k));
         const Slip& start = pair.startSlip;
         const Real speed = start[0] * start[0] + start[1] * start[1] + pair.reach * pair.reach * start[2] * start[2];
-        state_.stuck[p] = !state_.holding || speed < kSliding * kSliding;
+        const Real drift = pair.drift[0] * pair.drift[0] + pair.drift[1] * pair.drift[1] + pair.reach * pair.reach * pair.drift[2] * pair.drift[2];
+        state_.stuck[p] = !state_.holding || speed < kSliding * kSliding || speed < kCarried * kCarried * state_.holdTime * state_.holdTime * drift;
     }
 }
 

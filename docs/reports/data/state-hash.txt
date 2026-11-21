@@ -8,7 +8,7 @@ arch      точный   dbdbec22bc5580ee
 arch      быстрый  1dd09445cb728880
 slope     точный   d2f117b338e08ff1
 slope     быстрый  0f7093509f769be8
-dominoes  точный   fde12a0aa277f1d1
+dominoes  точный   85ce375dfe1b81cf
 dominoes  быстрый  1b426ab5875595d8
 wall      быстрый  e4a4a7b56c6604fe
 bullet    точный   8554240f0e3f7f5a
@@ -21,15 +21,15 @@ buckets   точный   4d992759a641c075
 buckets   быстрый  dad651e95c5c93ac
 balls     точный   f38a5e91cf02f7ae
 balls     быстрый  ebbbb73b18cf4ae1
-pile      точный   95ea4541451f353b
+pile      точный   ec36bab82902fc52
 pile      быстрый  3382f4af3daccac4
 gripper   точный   086fdbc3400789fc
 gripper   быстрый  eebc753ac398fd47
-bowl      точный   b4ee4979b67f8736
+bowl      точный   d1e0c7d75f04741b
 bowl      быстрый  e4456aab90ecb191
-hills     точный   2f006340a763efb1
+hills     точный   3497918bb030bb29
 hills     быстрый  05e5ee0e59e3611a
-swing     точный   356eb5c2dfbbcdd2
+swing     точный   e8cb3e5de0d07c18
 swing     быстрый  f0c88ea31a442a37
 drift     точный   998899e8df9e93f7
 drift     быстрый  9ebd73a7cd442030
@@ -37,7 +37,7 @@ rail      точный   7a0d2d27f1e6766b
 rail      быстрый  4437a201c8c57c76
 thrust    точный   1bd417ee8063f3fb
 thrust    быстрый  d8770d4b15357d88
-platforms точный   601d3b208d03728a
+platforms точный   3067a4a691180248
 platforms быстрый  51452918106a6e05
 pendulum  точный   6d218d2477a45ece
 pendulum  быстрый  51b2fa529f87a510
