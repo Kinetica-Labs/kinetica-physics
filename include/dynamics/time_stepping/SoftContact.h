@@ -16,6 +16,8 @@
 
 namespace kp {
 
+struct BlockWork; // рабочая память решения площадки (SoftContact.cpp)
+
 class SoftContact {
 public:
     // Плечи, массы и центр трения считаются один раз на кадр; накопленные импульсы — из known, записей
@@ -82,8 +84,8 @@ private:
     // Нынешние нормаль и касательные; found — ближайшие точки форм, найденные заново, или nullptr.
     void aim(const BodyMotion& a, const BodyMotion& b, Vector3 apart, const ClosestPoints* found);
 
-    // Плечи r × n, повороты I⁻¹ (r × n) и матрица отклика K точек — в рабочие массивы потока.
-    void respond(const SolverBody& a, const SolverBody& b) const;
+    // Плечи r × n, повороты I⁻¹ (r × n) и матрица отклика K точек — в рабочую память work.
+    void respond(const SolverBody& a, const SolverBody& b, const BlockWork& work) const;
 
     struct Point {
         ContactId key;

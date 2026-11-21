@@ -39,12 +39,17 @@ StepArray<int> fourOf(const ContactManifold& manifold) {
     return kept;
 }
 
-// Рабочие массивы решения площадки живут в потоке: проход по контакту не выделяет память.
-struct BlockWork {
-    std::vector<Vector3> armA, armB, spinA, spinB; // r × n и I⁻¹ (r × n): поворот от единичного импульса в точке
-    std::vector<Real> matrix, q, scale, unscaled;
+// Память площадки на count точек: векторов 4 · count, чисел count² + 3 · count. Площадке до kSmallBlock точек
+// её даёт стек вызова, большей — массивы потока: проход по контакту не выделяет память.
+struct SmallBlock {
+    Vector3 vectors[4 * kSmallBlock];
+    Real numbers[kSmallBlock * kSmallBlock + 3 * kSmallBlock];
 };
-thread_local BlockWork work;
+struct LargeBlock {
+    std::vector<Vector3> vectors;
+    std::vector<Real> numbers;
+};
+thread_local LargeBlock large;
 constexpr std::uint32_t kEdgePair = 0xC0000000u; // номер точки пары рёбер (HullVsHullAlgorithm::clipFaces)
 
 // Средний поворот двух тел: кватернионы складываются в одном полушарии. Нужен только паре рёбер.
@@ -54,6 +59,18 @@ Quaternion meanTurn(const Quaternion& p, const Quaternion& q) {
 }
 
 } // namespace
+
+// Рабочая память решения площадки: armA, armB — r × n точек, spinA, spinB — I⁻¹ (r × n), поворот тела от
+// единичного импульса в точке; matrix — отклик K, q — свободные члены, scale — доля импульса точки,
+// unscaled — неизвестные задачи.
+struct BlockWork {
+    Vector3 *armA, *armB, *spinA, *spinB;
+    Real *matrix, *q, *scale, *unscaled;
+
+    BlockWork(Vector3* vectors, Real* numbers, size_t count)
+        : armA(vectors), armB(vectors + count), spinA(vectors + 2 * count), spinB(vectors + 3 * count), matrix(numbers), q(numbers + count * count),
+          scale(numbers + count * count + count), unscaled(numbers + count * count + 2 * count) {}
+};
 
 SoftContact::SoftContact(const ContactPair& pair, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, const Softness& soft, Span<ContactForces::Entry> known, Real h, bool fourPoints,
                          bool tracked)
@@ -177,11 +194,9 @@ void SoftContact::warmStart(StepArray<SolverBody>& states) const {
 
 // K — отклик нынешних тел: у вытянутого тела тензор инерции в мире меняется за кадр, и точное
 // решение по K начала кадра раскачивало цепь брусков до 10⁵ м/с.
-void SoftContact::respond(const SolverBody& a, const SolverBody& b) const {
+void SoftContact::respond(const SolverBody& a, const SolverBody& b, const BlockWork& w) const {
     const size_t count = points_.size();
-    BlockWork& w = work;
-    w.armA.resize(count), w.armB.resize(count), w.spinA.resize(count), w.spinB.resize(count);
-    w.matrix.resize(count * count), w.q.resize(count), w.scale.assign(count, 1), w.unscaled.resize(count);
+    std::fill(w.scale, w.scale + count, Real(1));
     for (size_t i = 0; i < count; ++i) {
         w.armA[i] = points_[i].rA.cross(normal_), w.armB[i] = points_[i].rB.cross(normal_);
         w.spinA[i] = a.spinFrom(w.armA[i]), w.spinB[i] = b.spinFrom(w.armB[i]);
@@ -195,8 +210,10 @@ void SoftContact::solveNormals(StepArray<SolverBody>& states, bool withBias, Rea
     SolverBody &a = states[size_t(a_)], &b = states[size_t(b_)];
     const Vector3 n = normal_;
     const size_t count = points_.size();
-    BlockWork& w = work;
-    respond(a, b);
+    SmallBlock small;
+    if (count > kSmallBlock) large.vectors.resize(4 * count), large.numbers.resize(count * count + 3 * count);
+    const BlockWork w = count > kSmallBlock ? BlockWork(large.vectors.data(), large.numbers.data(), count) : BlockWork(small.vectors, small.numbers, count);
+    respond(a, b, w);
     for (size_t i = 0; i < count; ++i) {
         const Point& p = points_[i];
         const Real gap = p.gap;
@@ -220,7 +237,7 @@ void SoftContact::solveNormals(StepArray<SolverBody>& states, bool withBias, Rea
         w.unscaled[i] = points_[i].impulse / w.scale[i]; // прошлый ответ — тёплый старт набора давящих точек
         w.matrix[i * count + i] += pull, w.q[i] -= pull * w.unscaled[i];
     }
-    solveComplementarity(w.matrix, w.q, w.unscaled);
+    solveComplementarity(w.matrix, w.q, w.unscaled, count);
     for (size_t i = 0; i < count; ++i) {
         Point& p = points_[i];
         const Real next = w.scale[i] * w.unscaled[i], change = next - p.impulse;
