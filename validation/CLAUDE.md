@@ -60,6 +60,17 @@ python3 validation/frame_covariance.py --cached    # собрать отчёт �
 по настройкам шага — время и перекрытие вместе. Брать его перед правкой ради плавности кадра, а обычный
 профиль (`study-frame-stages`, `perf`) — перед правкой ради среднего времени.
 
+## Отчёт страницей (`validation/report_page.py`)
+
+```
+python3 validation/report_page.py docs/reports/отчёт.md build/site/index.html   # одна страница, рисунки внутри
+python3 -m http.server 8765 --bind 0.0.0.0 --directory build/site               # открыть с телефона в той же сети
+```
+
+Пользователь читает отчёты с телефона и рисунков из локального Markdown в чате не видит: отчёт с рисунками
+отдавать ещё и страницей. Рисунки отчёта строит свой сценарий в `validation/studies/` (`status_figures.py`,
+`day_figures.py`) — из чисел замеров, не руками.
+
 ## Приборы (`validation/studies/`)
 
 `KP_SLEEP=1` включает сон островов в `study-standard-scenes`.
