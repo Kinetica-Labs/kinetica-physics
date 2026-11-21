@@ -245,6 +245,10 @@ std::string bucketsVerdict(const World&, const World& now) {
 }
 
 // --- шары в ведре ---------------------------------------------------------------------------------
+// Шары падают ровными столбиками по четыре и стоят друг на друге около 1,6 с, пока шум округления не
+// нарушит равновесие; после обвала им нужно ещё около трёх секунд. Поэтому сцена идёт 5 с: к четвёртой
+// секунде скорость самого медленного шара лежала у порога проверки (0,04–0,06 м/с), и итог зависел от
+// последнего бита решателя, а не от физики (проба с возмущением скорости шара 1–7 мм/с, H88).
 World ballsInBucket() {
     World world = withFloor();
     world.addBody(CompoundBodyBuilder::bucket(0.2, 0.25, 0.3, 0.01, 800));
@@ -527,7 +531,7 @@ const std::vector<StandardScene>& standardScenes() {
         {"cradle", "маятник Ньютона", cradle, 4, 0.65, cradleVerdict, nullptr, {0, 0.9, 0}, 4},
         {"chain", "цепь из шести торов", torusChain, 5, 5, chainVerdict, nullptr, {0, 2, 0}, 5},
         {"buckets", "ведро в ведре в ведре", nestedBuckets, 4, 4, bucketsVerdict, nullptr, {0, 0.4, 0}, 3},
-        {"balls", "шестнадцать шаров в ведре", ballsInBucket, 4, 4, ballsVerdict, nullptr, {0, 0.3, 0}, 2.5},
+        {"balls", "шестнадцать шаров в ведре", ballsInBucket, 5, 5, ballsVerdict, nullptr, {0, 0.3, 0}, 2.5},
         {"pile", "куча из тридцати тел в ящике", pile, 6, 6, pileVerdict, nullptr, {0, 0.5, 0}, 5},
         {"gripper", "захват поднимает кубик", gripper, 2.5, 2.5, gripperVerdict, gripperControl, {0, 0.4, 0}, 3},
         {"bowl", "чаша: чайники, лошадки, торы, чашки, ежи", bowl, 10, 10, bowlVerdict, nullptr, {0, 0.5, 0}, 4},

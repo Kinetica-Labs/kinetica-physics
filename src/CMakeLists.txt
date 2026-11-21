@@ -6,6 +6,7 @@ add_library(kinetica-physics STATIC
   math/Matrix3x3.cpp
   math/Quaternion.cpp
   math/StepMemory.cpp
+  math/UpdatedCholesky.cpp
   math/WorkerPool.cpp
   world/World.cpp
   world/IslandSleep.cpp
@@ -24,6 +25,7 @@ add_library(kinetica-physics STATIC
   dynamics/event_driven/ShockPropagation.cpp
   dynamics/event_driven/ContactSystem.cpp
   dynamics/event_driven/ActiveSet.cpp
+  dynamics/event_driven/SetFactor.cpp
   dynamics/event_driven/BodySpaceSolve.cpp
   dynamics/event_driven/ExactStep.cpp
   dynamics/event_driven/EventSearch.cpp

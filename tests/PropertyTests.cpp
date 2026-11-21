@@ -9,7 +9,9 @@
 #include <dynamics/event_driven/ContactSolver.h>
 #include <math/Complementarity.h>
 #include <math/ProfileMatrix.h>
+#include <math/UpdatedCholesky.h>
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <vector>
@@ -87,6 +89,80 @@ Tally choleskyProperty(std::uint64_t seed, int cases, bool singular) {
         tally.add(violation, 1e-12);
     }
     return tally;
+}
+
+// --- Обновляемое разложение Холецкого (UpdatedCholesky.h) ----------------------------------------
+// Утверждение: после любой последовательности добавлений и удалений строк ответ x решает A_S x = b, где
+// A_S — подматрица A на нынешнем наборе линий в порядке их входа. A = L Lᵀ + I с профилем: наименьшее
+// собственное число не меньше единицы, зависимых строк нет. Профиль новой строки — от самой ранней
+// связанной с ней линии набора, как в SetFactor. Нарушение и допуск — как у choleskyProperty: 1e-12.
+double updatedResidual(Random& random, const UpdatedCholesky& factor, const std::vector<Real>& A, int n, const std::vector<int>& lines) {
+    const size_t m = lines.size();
+    const auto a = [&](size_t i, size_t j) { return A[size_t(lines[i] * n + lines[j])]; };
+    StepArray<Real> z(m), b(m, 0);
+    for (size_t j = 0; j < m; ++j) {
+        z[j] = Real(random.between(-1, 1));
+        for (size_t i = 0; i < m; ++i) b[i] += a(i, j) * z[j];
+    }
+    StepArray<Real> x = b;
+    factor.solve(x);
+    double violation = 0;
+    for (size_t i = 0; i < m; ++i) {
+        double residual = -double(b[i]), scale = 0;
+        for (size_t j = 0; j < m; ++j) residual += double(a(i, j) * x[j]), scale += std::fabs(double(a(i, j))) * (std::fabs(double(x[j])) + std::fabs(double(z[j])));
+        if (scale > 0) violation = std::fmax(violation, std::fabs(residual) / scale);
+    }
+    return violation;
+}
+
+Tally updatedCholeskyProperty(std::uint64_t seed, int cases) {
+    Random random{seed};
+    Tally tally;
+    for (int c = 0; c < cases; ++c) {
+        const int n = 2 + random.below(23);
+        const auto at = [n](int i, int j) { return size_t(i * n + j); };
+        std::vector<Real> lower(size_t(n * n), 0), A(size_t(n * n), 0);
+        for (int i = 0; i < n; ++i) {
+            for (int j = random.below(i + 1); j < i; ++j) lower[at(i, j)] = Real(random.between(-1, 1));
+            lower[at(i, i)] = Real(random.between(0.5, 2));
+        }
+        for (int i = 0; i < n; ++i)
+            for (int j = 0; j <= i; ++j) {
+                for (int k = 0; k <= j; ++k) A[at(i, j)] += lower[at(i, k)] * lower[at(j, k)];
+                A[at(j, i)] = A[at(i, j)] += i == j ? Real(1) : Real(0);
+            }
+        UpdatedCholesky factor;
+        std::vector<int> lines; // линии набора в порядке разложения
+        double violation = 0;
+        for (int edit = 0; edit < 40; ++edit) {
+            if (!lines.empty() && (int(lines.size()) == n || random.unit() < 0.4)) {
+                const int place = random.below(int(lines.size()));
+                factor.remove(place), lines.erase(lines.begin() + place);
+            } else {
+                int line = random.below(n), first = int(lines.size());
+                while (std::find(lines.begin(), lines.end(), line) != lines.end()) line = (line + 1) % n;
+                for (int p = int(lines.size()); p-- > 0;)
+                    if (A[at(line, lines[size_t(p)])] != 0) first = p;
+                StepArray<Real> row;
+                for (size_t p = size_t(first); p < lines.size(); ++p) row.push_back(A[at(line, lines[p])]);
+                factor.append(first, row, A[at(line, line)]), lines.push_back(line);
+            }
+            violation = std::fmax(violation, updatedResidual(random, factor, A, n, lines));
+        }
+        tally.add(violation, 1e-12);
+    }
+    return tally;
+}
+
+// Строка, повторяющая прежнюю, пропускается: её неизвестная — ноль, остальные решают систему без неё.
+void updatedCholeskySkipsDependentRow() {
+    UpdatedCholesky factor;
+    factor.append(0, {}, 2), factor.append(0, {1}, 3), factor.append(0, {2, 1}, 2); // третья строка равна первой
+    StepArray<Real> x = {4, 5, 4};
+    factor.solve(x);
+    CHECK_NEAR(x[0], Real(1.4), Real(1e-12));
+    CHECK_NEAR(x[1], Real(1.2), Real(1e-12));
+    CHECK(x[2] == 0, "неизвестная зависимой строки %g, а не ноль", double(x[2]));
 }
 
 // --- Задача дополнительности (Complementarity.h) -------------------------------------------------
@@ -291,6 +367,8 @@ void expectSome(const char* hole, const Tally& tally) { CHECK(tally.failures > 0
 void propertyTests() {
     expectNone("Холецкий по профилю, положительно определённая матрица", choleskyProperty(1, 100000, false));
     expectNone("Холецкий по профилю, вырожденная матрица с совместной правой частью", choleskyProperty(2, 100000, true));
+    expectNone("обновляемый Холецкий: добавления и удаления строк", updatedCholeskyProperty(5, 20000));
+    updatedCholeskySkipsDependentRow();
     expectNone("задача дополнительности, независимые строки", complementarityProperty(3, 100000, false, Real(0.01)));
     expectNone("задача дополнительности, зависимые строки с проксимальной поправкой", complementarityProperty(4, 100000, true, Real(0.3)));
     // Без поправки знак остатка w на зависимой строке — шум округления: строка то входит в набор
