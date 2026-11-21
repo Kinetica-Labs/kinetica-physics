@@ -24,7 +24,7 @@ def groupOf(name, module, source):
     if "solveDenseBlock" in name or "solveComplementarity" in name: return "задача площадки: разложение и перебор"
     if ARRAYS.search(name) or "ucrtbase" in module: return "служебные массивы: resize, assign, копии"
     if any(word in name for word in CONTACT) or source in ("SoftContact.cpp", "CentreFriction.cpp", "RollingFriction.cpp", "SolverBody.h"): return "код контакта: нормали, трение, пересчёт точек"
-    if source in ("Vector3.h", "Quaternion.h", "Matrix3x3.h", "Matrix2x2.h", "math_functions.h") or name.startswith("kp::operator"): return "векторная арифметика внутри него"
+    if source in ("Vector3.h", "Quaternion.h", "Matrix3x3.h", "Matrix2x2.h", "math_functions.h") or name.startswith("kp::operator"): return "арифметика троек чисел (не векторные команды)"
     return "поиск пар, сдвиг тел и прочее"
 
 

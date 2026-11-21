@@ -311,7 +311,7 @@ kp::`anonymous namespace'::shortestEdge;0.014900;0.014900;0.0;0.0;compare-ours.e
 kp::Vector3::scaled;0.014900;0.014900;0.0;0.0;compare-ours.exe;kp::Vector3::scaled;Vector3.h;0x14002a374
 kp::Vector3::dot;0.014898;0.014898;0.0;0.0;compare-ours.exe;kp::Vector3::dot;Vector3.h;0x140027707
 std::__1::vector<double,std::__1::allocator<double> >::size;0.014893;0.014893;0.0;0.0;compare-ours.exe;std::__1::vector<double,std::__1::allocator<double> >::size;vector.h;0x1400481c5
-kp::`anonymous namespace'::eachOf<`lambda at C:/Users/sshuser/CODE/kinetica-physics/src/src/dynamics/time_stepping/SoftStep.cpp:258:37'>::<lambda1>::operator();0.014890;0.014890;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::eachOf<`lambda at C:/Users/sshuser/CODE/kinetica-physics/src/src/dynamics/time_stepping/SoftStep.cpp:258:37'>::<lambda1>::operator();SoftStep.cpp;0x14002979c
+kp::`anonymous namespace'::eachOf<`lambda at src/dynamics/time_stepping/SoftStep.cpp:258:37'>::<lambda1>::operator();0.014890;0.014890;0.0;0.0;compare-ours.exe;kp::`anonymous namespace'::eachOf<`lambda at src/dynamics/time_stepping/SoftStep.cpp:258:37'>::<lambda1>::operator();SoftStep.cpp;0x14002979c
 malloc_base;0.014887;0.014887;0.0;0.0;ucrtbase.dll;malloc_base;[Unknown];0x18000fdb0
 std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::end;0.014887;0.014887;0.0;0.0;compare-ours.exe;std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::end;vector.h;0x1400452dd
 std::__1::operator!=;0.014886;0.014886;0.0;0.0;compare-ours.exe;std::__1::operator!=;wrap_iter.h;0x140043a25
