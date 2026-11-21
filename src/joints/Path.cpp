@@ -33,17 +33,30 @@ Vector3 anyAcross(Vector3 t) {
 } // namespace
 
 Path::Path(std::vector<Vector3> through, bool closed) : through_(std::move(through)), closed_(closed), segments_(int(through_.size()) - (closed ? 0 : 1)) {
+    solveSlopes();
     tabulateLength();
     boundSegments();
     transportNormal();
 }
 
-Vector3 Path::control(int index) const {
+size_t Path::knot(int index) const {
     const int n = int(through_.size());
-    if (closed_) return through_[size_t(((index % n) + n) % n)];
-    if (index < 0) return 2 * through_[0] - through_[1];
-    if (index >= n) return 2 * through_[size_t(n - 1)] - through_[size_t(n - 2)];
-    return through_[size_t(index)];
+    return size_t(closed_ ? ((index % n) + n) % n : index);
+}
+
+// Система m_{k−1} + 4 m_k + m_{k+1} = 3 (P_{k+1} − P_{k−1}) с преобладающей диагональю: проход Гаусса —
+// Зейделя уменьшает ошибку вчетверо, 64 прохода — до округления. Начало — производные сплайна Катмулла — Рома.
+void Path::solveSlopes() {
+    const int n = int(through_.size()), last = n - 1;
+    const auto point = [&](int k) { return through_[knot(k)]; };
+    const auto ends = [&](int k) { return !closed_ && (k == 0 || k == last); };
+    slope_.resize(through_.size());
+    for (int k = 0; k < n; ++k) slope_[size_t(k)] = ends(k) ? point(k == 0 ? 1 : last) - point(k == 0 ? 0 : last - 1) : Real(0.5) * (point(k + 1) - point(k - 1));
+    for (int pass = 0; pass < 64; ++pass)
+        for (int k = 0; k < n; ++k) {
+            if (ends(k)) slope_[size_t(k)] = Real(0.5) * (3 * (point(k == 0 ? 1 : last) - point(k == 0 ? 0 : last - 1)) - slope_[size_t(k == 0 ? 1 : last - 1)]);
+            else slope_[size_t(k)] = Real(0.25) * (3 * (point(k + 1) - point(k - 1)) - slope_[knot(k - 1)] - slope_[knot(k + 1)]);
+        }
 }
 
 Real Path::within(Real u) const {
@@ -56,9 +69,9 @@ Path::Jet Path::at(Real u) const {
     u = within(u);
     const int segment = std::min(int(u), segments_ - 1); // на конце открытой кривой — последний отрезок, t = 1
     const Real t = u - Real(segment);
-    const Vector3 p0 = control(segment - 1), p1 = control(segment), p2 = control(segment + 1), p3 = control(segment + 2);
-    const Vector3 b = p2 - p0, c = 2 * p0 - 5 * p1 + 4 * p2 - p3, d = 3 * p1 - p0 - 3 * p2 + p3;
-    return {Real(0.5) * (2 * p1 + t * b + (t * t) * c + (t * t * t) * d), Real(0.5) * (b + (2 * t) * c + (3 * t * t) * d), c + (3 * t) * d};
+    const Vector3 p0 = through_[knot(segment)], p1 = through_[knot(segment + 1)], m0 = slope_[knot(segment)], m1 = slope_[knot(segment + 1)];
+    const Vector3 c = 3 * (p1 - p0) - 2 * m0 - m1, d = 2 * (p0 - p1) + m0 + m1;
+    return {p0 + t * m0 + (t * t) * c + (t * t * t) * d, m0 + (2 * t) * c + (3 * t * t) * d, 2 * c + (6 * t) * d, 6 * d};
 }
 
 Vector3 Path::point(Real u) const { return at(u).point; }
@@ -96,13 +109,13 @@ Real Path::length(Real u) const {
     return arc_[k] + stretch(Real(k) / kSteps, u);
 }
 
-// Отрезок сплайна лежит в выпуклой оболочке своих точек Безье P₁, P₁ + (P₂ − P₀)/6, P₂ − (P₃ − P₁)/6, P₂.
-// Шар с центром в середине хорды P₁P₂, достающий до самой далёкой из них, охватывает отрезок.
+// Отрезок сплайна лежит в выпуклой оболочке своих точек Безье P₀, P₀ + m₀/3, P₁ − m₁/3, P₁.
+// Шар с центром в середине хорды P₀P₁, достающий до самой далёкой из них, охватывает отрезок.
 void Path::boundSegments() {
     for (int s = 0; s < segments_; ++s) {
-        const Vector3 p1 = control(s), p2 = control(s + 1), center = Real(0.5) * (p1 + p2);
-        const Vector3 inner[2] = {p1 + (1 / Real(6)) * (p2 - control(s - 1)), p2 - (1 / Real(6)) * (control(s + 2) - p1)};
-        balls_.push_back({center, std::max((p1 - center).length(), std::max((inner[0] - center).length(), (inner[1] - center).length()))});
+        const Vector3 p0 = through_[knot(s)], p1 = through_[knot(s + 1)], center = Real(0.5) * (p0 + p1);
+        const Vector3 inner[2] = {p0 + (1 / Real(3)) * slope_[knot(s)], p1 - (1 / Real(3)) * slope_[knot(s + 1)]};
+        balls_.push_back({center, std::max((p0 - center).length(), std::max((inner[0] - center).length(), (inner[1] - center).length()))});
     }
 }
 
@@ -134,6 +147,21 @@ Vector3 Path::normal(Real u) const {
     if (turn_ == 0) return carried;
     const Real share = (u * kSteps - Real(k)) * (arc_[k + 1] - arc_[k]) / arc_.back(); // доля длины кривой от узла до u
     return turned(carried, tangent(u), turn_ * share);
+}
+
+Vector3 Path::turning(Real u) const {
+    const Vector3 t = tangent(u);
+    return t.cross(curvature(u)) + (turn_ / length()) * t;
+}
+
+// Ω = T × K + τ T, где K = d²P/ds² — кривизна, τ — распределённый остаток поворота. С v = |P′|:
+//   dK/ds = (P‴ − (P‴ · T) T) / v³ − |K|² T − 3 (T · P″ / v²) K,
+//   dΩ/ds = T × dK/ds + τ K = (T × P‴) / v³ − 3 (T · P″ / v²) (T × K) + τ K.
+Vector3 Path::turningChange(Real u) const {
+    const Jet jet = at(u);
+    const Real speed = jet.first.length();
+    const Vector3 t = (1 / speed) * jet.first, bend = curvature(u);
+    return (1 / (speed * speed * speed)) * t.cross(jet.third) - (3 * t.dot(jet.second) / (speed * speed)) * t.cross(bend) + (turn_ / length()) * bend;
 }
 
 // Расстояние до ближайшей из заданных точек — граница сверху. Пробы идут только в отрезки, чей шар

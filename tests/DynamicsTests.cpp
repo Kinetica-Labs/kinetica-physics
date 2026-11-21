@@ -490,7 +490,7 @@ void jointsLeaveOnlyTheirFreedoms() {
         const Vector3 axis{Real(0.5), Real(-0.86602540378443865), 0};
         std::vector<Vector3> line;
         for (int k = -1; k <= 4; ++k) line.push_back(Real(2 * k) * axis);
-        addPathJoint(world, base, block, {}, line).lockTurns = true;
+        addPathJoint(world, base, block, {}, line).rotation = PathRotation::Fixed;
         for (int step = 0; step < 60; ++step) world.step(Real(1) / 60);
         const Body& b = world.bodies()[1];
         const double along = double(b.position.dot(axis));
@@ -529,7 +529,7 @@ void jointsLeaveOnlyTheirFreedoms() {
         const Real c = Real(0.70710678118654752);
         const std::vector<Vector3> ring = {{1, 0, 0}, {c, 0, c}, {0, 0, 1}, {-c, 0, c}, {-1, 0, 0}, {-c, 0, -c}, {0, 0, -1}, {c, 0, -c}};
         PathJoint& rail = addPathJoint(world, base, carriage, {1, 0, 0}, ring, true);
-        rail.lockTurns = true, rail.holdSpeed = true, rail.driveSpeed = 1;
+        rail.rotation = PathRotation::Fixed, rail.holdSpeed = true, rail.driveSpeed = 1;
         // Таблица длины дуги против прямого суммирования хорд на четверти кольца.
         double chords = 0;
         for (int k = 0; k < 4096; ++k) chords += double((rail.path().point(Real(2.0 * (k + 1) / 4096)) - rail.path().point(Real(2.0 * k / 4096))).length());
@@ -553,12 +553,46 @@ void jointsLeaveOnlyTheirFreedoms() {
         const Vector3 axis{Real(0.86602540378443865), Real(-0.5), 0};
         std::vector<Vector3> line;
         for (int k = 0; k <= 4; ++k) line.push_back(Vector3{0, 3, 0} + Real(0.25 * k) * axis);
-        addPathJoint(world, base, world.addBody(Body::box({0.1, 0.07, 0.05}, 1000, line[0])), line[0], line).lockTurns = true;
+        addPathJoint(world, base, world.addBody(Body::box({0.1, 0.07, 0.05}, 1000, line[0])), line[0], line).rotation = PathRotation::Fixed;
         for (int step = 0; step < 240; ++step) world.step(Real(1) / 60);
         const Body& b = world.bodies()[1];
         const double beyond = double((b.position - line[4]).dot(axis));
         CHECK(beyond < 1e-4 && beyond > -2e-4, "брусок у конца пути, %s шаг: %.2e м за концом", realtime ? "быстрый" : "точный", beyond);
         CHECK(double(b.linearVelocity().length()) < 1e-6, "брусок у конца пути, %s шаг: скорость %.2e м/с", realtime ? "быстрый" : "точный", double(b.linearVelocity().length()));
+    }
+    for (int variant = 0; variant < 4; ++variant) {
+        // Вагон на кольце поворачивается вслед за кривой: касательная и нормаль кривой в осях тела остаются
+        // теми же, что в начале. Плоское кольцо радиуса 1 м — 2 с; волнистое (остаток поворота нормали за
+        // круг распределён по длине) — полный круг.
+        const bool realtime = variant & 1, wavy = variant & 2;
+        World world;
+        world.realtime = realtime;
+        const BodyId base = world.addBody(Body::box({0.05, 0.05, 0.05}, 0, {0, -1, 0}));
+        const Real c = Real(0.70710678118654752);
+        const Real around[8][2] = {{1, 0}, {c, c}, {0, 1}, {-c, c}, {-1, 0}, {-c, -c}, {0, -1}, {c, -c}};
+        std::vector<Vector3> ring;
+        for (int k = 0; k < 8; ++k) ring.push_back({around[k][0], wavy && k % 2 ? Real(0.4) : Real(0), around[k][1]});
+        const BodyId wagon = world.addBody(Body::box({0.05, 0.04, 0.1}, 1000, ring[0]));
+        PathJoint& rail = addPathJoint(world, base, wagon, ring[0], ring, true);
+        rail.rotation = PathRotation::FollowPath, rail.holdSpeed = true, rail.driveSpeed = 1;
+        const auto place = [&] { return rail.path().closest(world.bodies()[0].pose().localPoint(world.bodies()[1].position)); };
+        const auto inBody = [&](Vector3 inSeat) { return world.bodies()[1].orientation.rotateInverse(world.bodies()[0].pose().direction(inSeat)); };
+        const Vector3 tangent = inBody(rail.path().tangent(place())), normal = inBody(rail.path().normal(place()));
+        const double start = double(coordinate(world, rail));
+        const int frames = wavy ? int(60 * double(rail.path().length())) : 120;
+        double astray = 0;
+        for (int step = 0; step < frames; ++step) {
+            world.step(Real(1) / 60);
+            astray = std::fmax(astray, double((inBody(rail.path().tangent(place())) - tangent).length()));
+            astray = std::fmax(astray, double((inBody(rail.path().normal(place())) - normal).length()));
+        }
+        const char* name = realtime ? "быстрый" : "точный";
+        CHECK(astray < (realtime ? 2e-3 : 1e-6), "вагон вслед за %s кольцом, %s шаг: отстал от поворота кривой на %.2e рад", wavy ? "волнистым" : "плоским", name, astray);
+        const double spin = double(world.bodies()[1].angularVelocity().length());
+        CHECK_NEAR(spin, double(rail.path().turning(place()).length()), realtime ? 2e-2 : 1e-3);
+        if (wavy) continue;
+        CHECK_NEAR(double(coordinate(world, rail)) - start, 2.0, 5e-3);
+        CHECK_NEAR(spin, 1.0, 0.03);
     }
     {
         // Координата пути за концами открытой кривой: длина дуги плюс смещение по касательной в конце.

@@ -15,6 +15,30 @@ PathJoint::PathJoint(int a_, const Body& bodyA, int b_, const Body& bodyB, Vecto
     : SingleFreedomJoint(a_, bodyA, b_, bodyB, anchor), path_(std::make_shared<const Path>(localTo(bodyA, through), closed)) {
     // У открытой кривой есть концы: без пределов хода тело съехало бы с неё по касательной.
     if (!closed) lower = 0, upper = path_->length();
+    rider_ = bodyB.orientation.conjugate() * bodyA.orientation * frameAt(path_->closest(anchorA));
+}
+
+Quaternion PathJoint::frameAt(Real u) const {
+    const Vector3 tangent = path_->tangent(u), normal = path_->normal(u);
+    return Quaternion::fromAxes(tangent, normal, tangent.cross(normal));
+}
+
+// Три связи поворота между тройкой кривой и телом b. Из строки запертого поворота вокруг оси e
+// вычитается (e · Ω) строк свободы вдоль кривой: столько тройка поворачивается на метр пути. Вторая
+// производная: d/dt [(e · Ω) v] = (e · dΩ/ds) v² + (e · Ω) dv/dt — слагаемые от поворота самих e и Ω
+// вместе с телом a взаимно уничтожаются.
+void PathJoint::followPath(const Motion& m, Real u, Real speed, const Bond& freedom, std::vector<Bond>& bonds) const {
+    Motion turning = m;
+    turning.frameA = m.bodyA->orientation * frameAt(u), turning.frameB = m.bodyB->orientation * rider_;
+    const Vector3 rate = m.bodyA->orientation.rotate(path_->turning(u)), change = m.bodyA->orientation.rotate(path_->turningChange(u));
+    const size_t first = bonds.size();
+    lockAllTurns(turning, bonds);
+    for (size_t k = first; k < bonds.size(); ++k) {
+        const Real share = bonds[k].angularB.dot(rate), bend = bonds[k].angularB.dot(change);
+        bonds[k].linear = -share * freedom.linear;
+        bonds[k].angularA = bonds[k].angularA - share * freedom.angularA, bonds[k].angularB = bonds[k].angularB - share * freedom.angularB;
+        bonds[k].drift -= share * freedom.drift + bend * speed * speed;
+    }
 }
 
 // Координата — длина дуги до ближайшей точки кривой плюс смещение от неё вдоль касательной. Внутри кривой
@@ -54,7 +78,8 @@ void PathJoint::build(const Motion& m, std::vector<Bond>& bonds) const {
     }
     Bond freedom = travelLine(along, tangent);
     freedom.error = 0;
-    if (lockTurns) lockAllTurns(m, bonds);
+    if (rotation == PathRotation::Fixed) lockAllTurns(m, bonds);
+    if (rotation == PathRotation::FollowPath) followPath(m, place.u, speed, freedom, bonds);
     addFreedomBonds(freedom, place.along, bonds);
 }
 

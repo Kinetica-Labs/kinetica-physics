@@ -337,8 +337,8 @@ std::string gripperVerdict(const World& start, const World& now) {
 }
 
 // --- сочленение по траектории: вагонетка на волнистом кольце и коробка на спирали --------------------
-// Как пример PathConstraintTest в Jolt. Вагонетку ведёт привод 1,5 м/с по замкнутой кривой, она сохраняет
-// ориентацию. Коробка подвешена к нисходящей спирали за середину верхней грани: привода нет, она съезжает
+// Как пример PathConstraintTest в Jolt. Вагонетку ведёт привод 1,5 м/с по замкнутой кривой, она
+// поворачивается вслед за кривой, как вагон на рельсах. Коробка подвешена к нисходящей спирали за середину верхней грани: привода нет, она съезжает
 // под тяжестью, свободно вращается и качается, а в конце упирается в предел хода. Вязкое сопротивление вдоль
 // пути (1,5 Н·с/м) держит скорость спуска около 2 м/с: без него коробка приходит к упору на 5 м/с, и удар
 // раскручивает её до 25 рад/с. Кривые закреплены в полу.
@@ -352,13 +352,19 @@ World rail() {
         const SinCos turn = sinCos(Real(k) * Real(0.52359877559829887));
         spiral.push_back({Real(3) + Real(0.8) * turn.cos, Real(2.6) - Real(0.075) * Real(k), Real(0.8) * turn.sin});
     }
-    const BodyId carriage = world.addBody(Body::box({0.12, 0.06, 0.08}, 500, ring[0]));
+    const BodyId carriage = world.addBody(Body::box({0.08, 0.06, 0.12}, 500, ring[0])); // длинная сторона — вдоль пути
     PathJoint& loop = addPathJoint(world, BodyId(0), carriage, ring[0], ring, true);
-    loop.lockTurns = true, loop.holdSpeed = true, loop.driveSpeed = Real(1.5);
+    loop.rotation = PathRotation::FollowPath, loop.holdSpeed = true, loop.driveSpeed = Real(1.5);
     Body box = Body::box({0.08, 0.12, 0.05}, 500, spiral[0] - Vector3{0, Real(0.12), 0});
     box.angularDamping = Real(0.5);
     addPathJoint(world, BodyId(0), world.addBody(box), spiral[0], spiral).damping = Real(1.5);
     return world;
+}
+// Касательная пути в осях тела, которое по нему идёт.
+Vector3 tangentInBody(const World& world, const PathJoint& joint) {
+    const Body &seat = world.bodies()[size_t(joint.a)], &body = world.bodies()[size_t(joint.b)];
+    const Real u = joint.path().closest(seat.pose().localPoint(body.pose().point(joint.anchorB)));
+    return body.orientation.rotateInverse(seat.pose().direction(joint.path().tangent(u)));
 }
 std::string railVerdict(const World& start, const World& now) {
     const Transform floor = now.bodies()[0].pose();
@@ -371,6 +377,8 @@ std::string railVerdict(const World& start, const World& now) {
         if (off > 1e-3) return text("тело %d ушло с пути на %.2e м", joint.b, off);
         const double along = double(pointVelocity(body, body.pose().point(joint.anchorB)).dot(floor.direction(joint.path().tangent(u))));
         if (j == 0 && std::fabs(along - 1.5) > 0.03) return text("вагонетка идёт по пути со скоростью %.3f м/с вместо 1,5", along);
+        const double astray = double((tangentInBody(now, joint) - tangentInBody(start, joint)).length());
+        if (j == 0 && astray > 1e-2) return text("вагонетка отстала от поворота кривой на %.3f рад", astray);
         const double sunk = double(start.bodies()[size_t(joint.b)].position.y - body.position.y);
         if (j == 1 && sunk < 1.0) return text("коробка съехала по спирали всего на %.2f м высоты", sunk);
     }

@@ -355,12 +355,28 @@ ImpactTallies impactProperty(std::uint64_t seed, int cases, bool stacked, bool b
     return tally;
 }
 
+// --- Кватернион из тройки осей (Quaternion::fromAxes) -----------------------------------------------
+// Утверждение: оси, повёрнутые единичным кватернионом q, возвращают q или −q. Допуск 1e-12.
+Tally fromAxesProperty(std::uint64_t seed, int cases) {
+    Random random{seed};
+    Tally tally;
+    for (int c = 0; c < cases; ++c) {
+        const Quaternion q = Quaternion{Real(random.between(-1, 1)), Real(random.between(-1, 1)), Real(random.between(-1, 1)), Real(random.between(-1, 1))}.unit();
+        const Quaternion back = Quaternion::fromAxes(q.rotate({1, 0, 0}), q.rotate({0, 1, 0}), q.rotate({0, 0, 1}));
+        const double same = std::fabs(double(back.w - q.w)) + std::fabs(double(back.x - q.x)) + std::fabs(double(back.y - q.y)) + std::fabs(double(back.z - q.z));
+        const double opposite = std::fabs(double(back.w + q.w)) + std::fabs(double(back.x + q.x)) + std::fabs(double(back.y + q.y)) + std::fabs(double(back.z + q.z));
+        tally.add(std::fmin(same, opposite), 1e-12);
+    }
+    return tally;
+}
+
 // --- Кривая пути (joints/Path.h) -------------------------------------------------------------------
 // Случайная пологая кривая: точки по окружности радиуса 1 м через равные углы (замкнутая — весь круг,
 // открытая — три четверти), каждая сдвинута не больше чем на 0,3 шага между точками: без петель и возвратов.
 struct GentlePath {
     Path path;
     double spacing; // шаг между точками, м
+    std::vector<Vector3> through;
 };
 GentlePath gentlePath(Random& random) {
     const int n = 4 + random.below(37);
@@ -368,12 +384,22 @@ GentlePath gentlePath(Random& random) {
     const double step = (closed ? 2.0 : 1.5) * 3.14159265358979323846 / (closed ? n : n - 1);
     std::vector<Vector3> through;
     for (int k = 0; k < n; ++k) through.push_back(Vector3{Real(std::cos(step * k)), 0, Real(std::sin(step * k))} + random.vector(0.3 * step / 1.7320508));
-    return {Path(std::move(through), closed), step};
+    return {Path(through, closed), step, through};
 }
 
 struct PathTallies {
-    Tally nearest, foot, length, unit, across, twist, seam;
+    Tally nearest, foot, length, unit, across, twist, seam, through, bend;
 };
+
+// Утверждение: кривая проходит через заданные точки (1e-12 м), а кривизна по обе стороны заданной точки
+// одна и та же (1e-6 1/м) — вторая производная сплайна непрерывна.
+void checkKnot(Random& random, const GentlePath& curve, const std::vector<Vector3>& through, PathTallies& tallies) {
+    const Path& path = curve.path;
+    const int k = path.closed() ? random.below(int(through.size())) : 1 + random.below(int(through.size()) - 2);
+    tallies.through.add(double((path.point(Real(k)) - through[size_t(k)]).length()), 1e-12);
+    const Real before = k == 0 ? path.span() - Real(1e-9) : Real(k) - Real(1e-9);
+    tallies.bend.add(double((path.curvature(Real(k) + Real(1e-9)) - path.curvature(before)).length()), 1e-6);
+}
 
 // Утверждение: для точки x = P(u₀) + d ближайшая точка кривой не дальше |d| (сама P(u₀) на таком
 // расстоянии), и в ней (P − x) · T = 0 — кроме концов открытой кривой, от которых кривая уходит прочь от x.
@@ -429,6 +455,7 @@ PathTallies pathProperty(std::uint64_t seed, int cases) {
         const GentlePath curve = gentlePath(random);
         checkClosest(random, curve, tallies);
         checkNormal(random, curve.path, tallies);
+        checkKnot(random, curve, curve.through, tallies);
         if (c % 50 == 0) tallies.length.add(lengthError(random, curve.path), 1e-6);
     }
     return tallies;
@@ -443,6 +470,11 @@ void planarPathKeepsNormal() {
     double out = 0;
     for (int k = 0; k < 800; ++k) out = std::fmax(out, std::fabs(double(path.normal(Real(0.01 * k)).y - path.normal(0).y)));
     CHECK(out < 1e-12, "нормаль плоского кольца повернулась относительно плоскости на %.2e", out);
+    // То же кольцо — окружность радиуса 1 м через 8 точек: кривизна и длина близки к её собственным.
+    double bend = 0;
+    for (int k = 0; k < 800; ++k) bend = std::fmax(bend, std::fabs(double(path.curvature(Real(0.01 * k)).length()) - 1));
+    CHECK(bend < 0.06, "кривизна кольца через 8 точек отличается от 1 на %.3f", bend);
+    CHECK_NEAR(double(path.length()), 6.283185307179586, 5e-3);
 }
 
 void expectNone(const char* statement, const Tally& tally) {
@@ -460,6 +492,7 @@ void propertyTests() {
     expectNone("Холецкий по профилю, вырожденная матрица с совместной правой частью", choleskyProperty(2, 100000, true));
     expectNone("обновляемый Холецкий: добавления и удаления строк", updatedCholeskyProperty(5, 20000));
     updatedCholeskySkipsDependentRow();
+    expectNone("кватернион из тройки осей возвращает поворот", fromAxesProperty(12, 100000));
     const PathTallies path = pathProperty(11, 10000);
     expectNone("путь: ближайшая точка не дальше исходного смещения", path.nearest);
     expectNone("путь: в ближайшей точке (P − x) · T = 0", path.foot);
@@ -468,6 +501,8 @@ void propertyTests() {
     expectNone("путь: нормаль поперёк касательной", path.across);
     expectNone("путь: нормаль идёт без кручения", path.twist);
     expectNone("путь: нормаль замкнутой кривой смыкается", path.seam);
+    expectNone("путь: кривая проходит через заданные точки", path.through);
+    expectNone("путь: кривизна в заданной точке не рвётся", path.bend);
     planarPathKeepsNormal();
     expectNone("задача дополнительности, независимые строки", complementarityProperty(3, 100000, false, Real(0.01)));
     expectNone("задача дополнительности, зависимые строки с проксимальной поправкой", complementarityProperty(4, 100000, true, Real(0.3)));
