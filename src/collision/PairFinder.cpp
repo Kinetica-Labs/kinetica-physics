@@ -23,10 +23,11 @@ Bounds reachBounds(const Body& body, Real fastest, Vector3 gravity, Real h, Real
             body.position + Vector3{extent({1, 0, 0}), extent({0, 1, 0}), extent({0, 0, 1})} + grow};
 }
 
-// Наибольшая скорость точки каждого тела (maxPointSpeed).
-StepArray<Real> speedsOf(const std::vector<Body>& bodies) {
+// Наибольшая скорость точки каждого тела за время h: нынешняя (maxPointSpeed) и прибавка от приложенных
+// к телу силы и момента (forcedSpeedGain).
+StepArray<Real> speedsOf(const std::vector<Body>& bodies, Real h) {
     StepArray<Real> fastest(bodies.size());
-    for (size_t i = 0; i < bodies.size(); ++i) fastest[i] = maxPointSpeed(bodies[i]);
+    for (size_t i = 0; i < bodies.size(); ++i) fastest[i] = maxPointSpeed(bodies[i]) + forcedSpeedGain(bodies[i], h);
     return fastest;
 }
 
@@ -44,7 +45,7 @@ struct Reaches {
 
 } // namespace
 
-DynamicTree PairFinder::tree(Real h) const { return Reaches(bodies_, speedsOf(bodies_), gravity_, h).tree; }
+DynamicTree PairFinder::tree(Real h) const { return Reaches(bodies_, speedsOf(bodies_, h), gravity_, h).tree; }
 
 // Кандидаты — пары тел, чьи бруски досягаемости за время h пересеклись; отбирает их дерево брусков.
 // Идут по возрастанию номеров: порядок пар не должен зависеть от формы дерева.
@@ -78,11 +79,11 @@ StepArray<std::pair<int, int>> partPairs(const Body& a, const Body& b, Vector3 g
         const Body& other = a.partTree ? b : a;
         // Наибольший путь сближения, какой examinePair насчитает паре частей этих тел.
         const Vector3 inverse = treed.mass.inverseInertia;
-        const Real fastest = treed.linearVelocity().length() + treed.angularMomentum.length() * std::max({inverse.x, inverse.y, inverse.z}) * treed.shape->boundingRadius();
+        const Real fastest = treed.linearVelocity().length() + treed.angularMomentum.length() * std::max({inverse.x, inverse.y, inverse.z}) * treed.shape->boundingRadius() + forcedSpeedGain(treed, h);
         for (int q = 0; q < other.partCount(); ++q) {
             const Body part = other.part(q);
             const Vector3 centre = frameOf(treed).localPoint(part.pose().position);
-            const Real reach = part.shape->boundingRadius() + (fastest + maxPointSpeed(part) + gravity.length() * h) * h + kContactDistance;
+            const Real reach = part.shape->boundingRadius() + (fastest + maxPointSpeed(part) + forcedSpeedGain(part, h) + gravity.length() * h) * h + kContactDistance;
             const Vector3 grow{reach, reach, reach};
             treed.partTree->query({centre - grow, centre + grow}, [&](int p) { together.push_back(a.partTree ? std::make_pair(p, q) : std::make_pair(q, p)); });
         }
@@ -120,7 +121,7 @@ PairFinder::Found PairFinder::between(int i, int j, Real h, Real reach) const {
     for (const auto& [p, q] : partPairs(a, b, gravity_, h)) {
         const Body partA = a.part(p), partB = b.part(q);
         if (!partA.shape || !partB.shape || (partA.isStatic() && partB.isStatic())) continue;
-        part(partA, partB, {i, j, p, q}, approachReach(maxPointSpeed(partA), maxPointSpeed(partB), gravity_, h), found);
+        part(partA, partB, {i, j, p, q}, approachReach(maxPointSpeed(partA) + forcedSpeedGain(partA, h), maxPointSpeed(partB) + forcedSpeedGain(partB, h), gravity_, h), found);
     }
     return found;
 }
@@ -137,7 +138,7 @@ std::vector<ContactPair> PairFinder::pairs(Real h) const {
 
 void PairFinder::collect(Real h, std::vector<ContactPair>& pairs) const {
     constexpr int kParallelParts = 64;
-    const StepArray<Real> fastest = speedsOf(bodies_);
+    const StepArray<Real> fastest = speedsOf(bodies_, h);
     int parts = 0;
     for (const Body& body : bodies_) parts += body.shape ? body.partCount() : 0;
     const StepArray<std::pair<int, int>> candidates = this->candidates(h, fastest);

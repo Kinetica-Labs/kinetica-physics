@@ -61,6 +61,11 @@ struct Body {
     // со скоростью и покоя не создаёт: тело в неустойчивом равновесии всё равно упадёт.
     Real linearDamping = 0;
     Real angularDamping = 0;
+    // Внешние сила в центре масс, Н, и момент, Н·м, в мировых осях: действуют постоянными весь следующий
+    // шаг мира и после него обнуляются, как в ReactPhysics3D, Jolt и Box3D. Тому, кто держит силу
+    // постоянно, — прикладывать её перед каждым шагом (applyForce, applyTorque).
+    Vector3 force;
+    Vector3 torque;
 
     // Однородный брусок с полуразмерами halfExtents. Нулевая плотность — неподвижное тело.
     static Body box(Vector3 halfExtents, Real density, Vector3 position = {}) {
@@ -143,6 +148,17 @@ inline void applyImpulse(Body& body, Vector3 impulse, Vector3 point) {
     if (body.isStatic()) return;
     body.linearMomentum += impulse;
     body.angularMomentum += (point - body.position).cross(impulse);
+}
+// Сила F в точке мира на следующий шаг: к силе в центре масс прибавляется F, к моменту — r × F. Плечо r
+// берётся по нынешней позе и за шаг не меняется.
+inline void applyForce(Body& body, Vector3 force, Vector3 point) {
+    body.force += force;
+    body.torque += (point - body.position).cross(force);
+}
+inline void applyTorque(Body& body, Vector3 torque) { body.torque += torque; }
+// Приложена ли к телу внешняя сила или момент.
+inline bool isForced(const Body& body) {
+    return body.force.x != 0 || body.force.y != 0 || body.force.z != 0 || body.torque.x != 0 || body.torque.y != 0 || body.torque.z != 0;
 }
 // Кинетическая энергия: p²/2m + ½ L·ω.
 inline Real kineticEnergyOf(const Body& body) { return 0.5 * body.mass.inverseMass * body.linearMomentum.dot(body.linearMomentum) + 0.5 * body.angularMomentum.dot(body.angularVelocity()); }

@@ -1212,6 +1212,108 @@ void jointsResistMotion() {
     }
 }
 
+// Угол поворота тела от единичной ориентации, рад.
+double turnOf(const Body& body) {
+    const Quaternion& q = body.orientation;
+    return 2 * std::atan2(std::sqrt(double(q.x * q.x + q.y * q.y + q.z * q.z)), std::fabs(double(q.w)));
+}
+
+// Свободный шар без тяжести под силой F и моментом τ, приложенными перед каждым шагом:
+// p = F t, L = τ t, x = F t² / 2m, угол = τ t² / 2I. Допуск пути и угла path — относительный.
+void forceMovesFreeBody(bool fast, double path) {
+    World world;
+    world.gravity = {}, world.realtime = fast;
+    const BodyId id = world.addBody(Body::sphere(0.2, 1000));
+    const Vector3 force{3, -1, 2}, torque{0, 0.5, 0};
+    for (int k = 0; k < 60; ++k) {
+        applyForce(world.body(id), force, world.body(id).position), applyTorque(world.body(id), torque);
+        world.step(Real(1) / 60);
+    }
+    const Body& body = world.body(id);
+    const double mass = 1 / double(body.mass.inverseMass), inertia = 1 / double(body.mass.inverseInertia.y);
+    const double momentum = double((body.linearMomentum - force).length()) / double(force.length()), spin = double((body.angularMomentum - torque).length()) / double(torque.length());
+    CHECK(momentum < 1e-12, "%s шаг: импульс под силой отличается от F t на долю %.2e", fast ? "быстрый" : "точный", momentum);
+    CHECK(spin < 1e-12, "%s шаг: момент импульса под моментом отличается от τ t на долю %.2e", fast ? "быстрый" : "точный", spin);
+    const double travelled = double((body.position - (Real(0.5) / Real(mass)) * force).length()) / (0.5 * double(force.length()) / mass);
+    CHECK(travelled < path, "%s шаг: путь под силой отличается от F t² / 2m на долю %.2e (допуск %.0e)", fast ? "быстрый" : "точный", travelled, path);
+    const double angle = 0.5 * double(torque.y) / inertia, turned = std::fabs(turnOf(body) - angle) / angle;
+    CHECK(turned < path, "%s шаг: поворот под моментом %.6f рад вместо %.6f (допуск %.0e)", fast ? "быстрый" : "точный", turnOf(body), angle, path);
+}
+
+// Сила действует один шаг: после шага она ноль, и следующий шаг импульсов не меняет.
+void forceLastsOneStep(bool fast) {
+    World world;
+    world.gravity = {}, world.realtime = fast;
+    const BodyId id = world.addBody(Body::box({0.1, 0.1, 0.1}, 1000, {1, 2, 3}));
+    applyForce(world.body(id), {0, 0, 4}, {1.5, 2, 3}); // плечо (0,5; 0; 0): момент r × F = (0; −2; 0)
+    CHECK(double((world.body(id).force - Vector3{0, 0, 4}).length()) < 1e-12 && double((world.body(id).torque - Vector3{0, -2, 0}).length()) < 1e-12, "сила в точке: момент (%.3f; %.3f; %.3f) вместо (0; −2; 0)",
+          double(world.body(id).torque.x), double(world.body(id).torque.y), double(world.body(id).torque.z));
+    world.step(Real(1) / 60);
+    const Body after = world.body(id);
+    CHECK(!isForced(after), "%s шаг: сила осталась после шага", fast ? "быстрый" : "точный");
+    CHECK(double((after.linearMomentum - Real(1.0 / 60) * Vector3{0, 0, 4}).length()) < 1e-12 * 4 / 60 && double((after.angularMomentum - Real(1.0 / 60) * Vector3{0, -2, 0}).length()) < 1e-12 * 2 / 60,
+          "%s шаг: за шаг под силой в точке импульс или момент импульса не F t и не (r × F) t", fast ? "быстрый" : "точный");
+    world.step(Real(1) / 60);
+    const Body& later = world.body(id);
+    const bool same = later.linearMomentum.x == after.linearMomentum.x && later.linearMomentum.y == after.linearMomentum.y && later.linearMomentum.z == after.linearMomentum.z &&
+                      later.angularMomentum.x == after.angularMomentum.x && later.angularMomentum.y == after.angularMomentum.y && later.angularMomentum.z == after.angularMomentum.z;
+    CHECK(same, "%s шаг: шаг без силы изменил импульсы: Δp = %.2e, ΔL = %.2e", fast ? "быстрый" : "точный", double((later.linearMomentum - after.linearMomentum).length()),
+          double((later.angularMomentum - after.angularMomentum).length()));
+}
+
+// Сила −m g держит тело на месте.
+void forceBalancesWeight(bool fast) {
+    World world;
+    world.realtime = fast;
+    const BodyId id = world.addBody(Body::box({0.1, 0.2, 0.3}, 700, {0, 1, 0}));
+    for (int k = 0; k < 60; ++k) {
+        world.body(id).force = (-1 / world.body(id).mass.inverseMass) * world.gravity;
+        world.step(Real(1) / 60);
+    }
+    const double drift = double((world.body(id).position - Vector3{0, 1, 0}).length());
+    CHECK(drift < 1e-9, "%s шаг: тело под силой −m g ушло на %.2e м", fast ? "быстрый" : "точный", drift);
+}
+
+// Шар из покоя под силой, которая за кадр унесла бы его на 2 м, и стенка в 0,89 м: поиск пар обязан
+// видеть стенку, хотя скорость шара в начале шага — ноль. depth — допустимый вход в стенку, м.
+void forcedBodyMeetsWall(bool fast, double depth) {
+    World world;
+    world.gravity = {}, world.realtime = fast;
+    world.addBody(Body::box({0.01, 1, 1}, 0, {1, 0, 0}));
+    const BodyId ball = world.addBody(Body::sphere(0.1, 1000));
+    world.body(ball).force = {14400 / world.body(ball).mass.inverseMass, 0, 0};
+    world.step(Real(1) / 60);
+    const double front = double(world.body(ball).position.x) + 0.1;
+    CHECK(front < 0.99 + depth, "%s шаг: шар под силой вошёл в стенку: передняя точка x = %.6f м при стенке от 0,99 (допуск %.0e)", fast ? "быстрый" : "точный", front, depth);
+    CHECK(front > 0.98, "%s шаг: шар под силой не дошёл до стенки: x = %.4f м", fast ? "быстрый" : "точный", front);
+}
+
+// Сила будит спящий остров на том же шаге.
+void forceWakes() {
+    World world;
+    world.sleeping = true;
+    world.addBody(Body::box({5, 0.5, 5}, 0, {0, -0.5, 0}));
+    const BodyId cube = world.addBody(Body::box({0.2, 0.2, 0.2}, 1000, {0, 0.2, 0}));
+    for (int step = 0; step < 60; ++step) world.step(Real(1) / 60);
+    CHECK(world.report().asleep == 1, "куб на полу не уснул");
+    const Real mass = 1 / world.mass(cube).inverseMass;
+    for (int step = 0; step < 10; ++step) {
+        world.body(cube).force = {20 * mass, 0, 0}; // 20 м/с² при трении μ g = 4,9
+        world.step(Real(1) / 60);
+        if (step == 0) CHECK(world.report().asleep == 0, "сила не разбудила куб");
+    }
+    CHECK(double(world.body(cube).position.x) > 0.1, "куб под силой сдвинулся всего на %.4f м", double(world.body(cube).position.x));
+}
+
+// Сила и момент на теле (Body::force, torque). Допуски записаны до кода: журнал попыток, H110.
+void forcesAct() {
+    forceMovesFreeBody(false, 1e-9), forceMovesFreeBody(true, 5e-3);
+    forceLastsOneStep(false), forceLastsOneStep(true);
+    forceBalancesWeight(false), forceBalancesWeight(true);
+    forcedBodyMeetsWall(false, 1e-6), forcedBodyMeetsWall(true, 1e-3);
+    forceWakes();
+}
+
 } // namespace
 
 // Сопротивление среды (Body::linearDamping, angularDamping): скорость свободного тела убывает как
@@ -1352,4 +1454,5 @@ void dynamicsTests() {
     realtimeStep();
     rayAndTether();
     stepMemoryReturnsPerThread();
+    forcesAct();
 }

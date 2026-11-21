@@ -385,6 +385,34 @@ std::string railVerdict(const World& start, const World& now) {
     return "";
 }
 
+// --- тяга: ящик под постоянной силой на полу с трением и шар, висящий на силе −m g под моментом ----
+// Сила и момент прикладываются перед каждым шагом (Body::force, torque). Ящик с трением μ под силой
+// F = kThrust μ m g идёт с ускорением (kThrust − 1) μ g; шар под моментом τ набирает ω = τ t / I.
+const double kThrust = 1.5, kThrustFriction = 0.5, kThrustTorque = 0.5; // доля, μ пары, Н·м
+World thrust() {
+    World world = withFloor();
+    world.addBody(Body::box({0.2, 0.2, 0.2}, 1000, {-4, Real(0.2), 0}));
+    world.addBody(Body::sphere(0.2, 1000, {0, Real(1.5), Real(1.5)}));
+    return world;
+}
+void thrustControl(World& world, double) {
+    const Real crate = 1 / world.mass(BodyId(1)).inverseMass, ball = 1 / world.mass(BodyId(2)).inverseMass;
+    world.body(BodyId(1)).force = {Real(kThrust * kThrustFriction) * crate * world.gravity.length(), 0, 0};
+    world.body(BodyId(2)).force = -ball * world.gravity;
+    applyTorque(world.body(BodyId(2)), {0, Real(kThrustTorque), 0});
+}
+std::string thrustVerdict(const World& start, const World& now) {
+    const double time = 2, expected = (kThrust - 1) * kThrustFriction * 9.81 * time * time / 2;
+    const double travelled = double(now.bodies()[1].position.x - start.bodies()[1].position.x);
+    if (std::fabs(travelled - expected) > 1e-2 * expected) return text("ящик под силой прошёл %.4f м вместо %.4f", travelled, expected);
+    const Body& ball = now.bodies()[2];
+    const double drift = double((ball.position - start.bodies()[2].position).length());
+    if (drift > 1e-6) return text("шар на силе −m g ушёл на %.2e м", drift);
+    const double spin = double(ball.angularVelocity().y), wanted = kThrustTorque * time * double(ball.mass.inverseInertia.y);
+    if (std::fabs(spin - wanted) > 5e-3 * wanted) return text("шар под моментом вращается на %.4f рад/с вместо %.4f", spin, wanted);
+    return "";
+}
+
 // Равномерное на [0, 1) псевдослучайное число: сцены одинаковы от запуска к запуску.
 struct Dice {
     unsigned long long state;
@@ -588,6 +616,7 @@ const std::vector<StandardScene>& standardScenes() {
         {"swing", "раскачанная цепь: энергия не растёт", swingingChain, 40, 40, swingVerdict, nullptr, {0, 2, 0}, 6},
         {"drift", "куча без тяжести: импульс сохраняется", weightlessPile, 5, 5, driftVerdict, nullptr, {0, 0, 0}, 6},
         {"rail", "вагонетка на кольцевом пути и коробка на спирали", rail, 7, 7, railVerdict, nullptr, {1.5, 1.2, 0}, 6},
+        {"thrust", "ящик под постоянной силой и шар, висящий на силе под моментом", thrust, 2, 2, thrustVerdict, thrustControl, {-1.5, 0.6, 0.5}, 7},
     };
     return all;
 }

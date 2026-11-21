@@ -8,6 +8,12 @@
 
 namespace kp {
 
+Real forcedSpeedGain(const Body& body, Real h) {
+    const Vector3 inverse = body.mass.inverseInertia;
+    const Real spin = body.shape ? std::max({inverse.x, inverse.y, inverse.z}) * body.boundingRadius() : Real(0);
+    return (body.mass.inverseMass * body.force.length() + spin * body.torque.length()) * h;
+}
+
 Real maxPointSpeed(const Body& body) {
     if (body.isStatic()) return 0;
     const Real moving = body.linearVelocity().length();
@@ -73,7 +79,7 @@ Real gapAlong(const Body& a, const Body& b, Vector3 n) {
 
 std::optional<ContactPair> examinePair(const Body& a, const Body& b, Vector3 gravity, Real h, Real boundary) {
     if (!a.shape || !b.shape || (a.isStatic() && b.isStatic())) return std::nullopt;
-    return examinePairWithin(a, b, approachReach(maxPointSpeed(a), maxPointSpeed(b), gravity, h), boundary);
+    return examinePairWithin(a, b, approachReach(maxPointSpeed(a) + forcedSpeedGain(a, h), maxPointSpeed(b) + forcedSpeedGain(b, h), gravity, h), boundary);
 }
 
 std::optional<ContactPair> examinePairWithin(const Body& a, const Body& b, Real reach, Real boundary) {

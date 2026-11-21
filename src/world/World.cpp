@@ -44,6 +44,7 @@ void World::step(Real dt) {
         exact.observer = watch;
         exact.run(dt);
     }
+    for (Body& body : bodies_) body.force = body.torque = {}; // приложенная сила действует один шаг (Body::force)
     if (sleeping) sleep_.settle(bodies_, joints_, gravity, dt, sleepSpeed, sleepTime);
     report_.asleep = sleep_.count();
 }

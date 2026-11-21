@@ -38,7 +38,7 @@ void IslandSleep::wakeTouched(std::vector<Body>& bodies, const JointSet& joints,
     for (size_t i = 0; i < bodies.size(); ++i) {
         if (!asleep_[i]) continue;
         const Body& body = bodies[i];
-        const bool pushed = body.linearMomentum.dot(body.linearMomentum) + body.angularMomentum.dot(body.angularMomentum) > 0;
+        const bool pushed = body.linearMomentum.dot(body.linearMomentum) + body.angularMomentum.dot(body.angularMomentum) > 0 || isForced(body);
         if (everyone || pushed) wakeIsland(bodies, sleepIsland_[i]);
     }
     for (const Joint& joint : joints) {

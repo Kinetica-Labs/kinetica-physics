@@ -35,7 +35,9 @@ PairReach::PairReach(const std::vector<Body>& bodies, const std::vector<ContactP
 void PairReach::allow(const std::vector<Body>& bodies, Real time) {
     allowed_.assign(bodies.size(), {}), spent_.assign(bodies.size(), {});
     for (size_t i = 0; i < bodies.size(); ++i)
-        if (!bodies[i].isStatic()) allowed_[i] = {(bodies[i].linearVelocity().length() + gravity_.length() * time) * time, bodies[i].angularMomentum.length() * time};
+        if (!bodies[i].isStatic())
+            allowed_[i] = {(bodies[i].linearVelocity().length() + gravity_.length() * time + bodies[i].mass.inverseMass * bodies[i].force.length() * time) * time,
+                           (bodies[i].angularMomentum.length() + bodies[i].torque.length() * time) * time};
 }
 
 // Путь линеен по c, поэтому выход за границу у какой-нибудь части тела виден на концах отрезка c.

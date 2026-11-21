@@ -230,8 +230,12 @@ bool ExactStep::forcesPass(const std::vector<ContactPair>& pairs, Real h, int pa
     solver.settle(stopped_);
     if (pass > 0) solver.setDrift(middleOf(before, forces, h));
     solver.biasBonds(bias);
-    for (Body& body : bodies_)
-        if (!body.isStatic()) integrateVelocity(body, (1 / body.mass.inverseMass) * gravity_, {}, h);
+    for (Body& body : bodies_) {
+        if (body.isStatic()) continue;
+        const Vector3 weight = (1 / body.mass.inverseMass) * gravity_;
+        if (isForced(body)) integrateVelocity(body, weight + body.force, body.torque, h);
+        else integrateVelocity(body, weight, {}, h);
+    }
     for (const Joint& joint : joints_) joint.applyDrive(bodies_, h);
     contactForces_ = solver.solveRestingContacts(h, contactForces_, shockPropagation);
     forces.slidingStop = solver.slidingStop(h, stoppedThisStep_);

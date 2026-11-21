@@ -189,12 +189,16 @@ struct JointRows {
     }
 };
 
-// Начало подшага: сопротивление среды, v ← v / (1 + h c) (Body::linearDamping), и тяжесть.
+// Начало подшага: сопротивление среды, v ← v / (1 + h c) (Body::linearDamping), тяжесть и приложенные к
+// телу сила и момент (Body::force, torque): v += h F / m, ω += h I⁻¹ τ с нынешним I⁻¹ в мире.
 void applyForces(StepArray<SolverBody>& states, const std::vector<Body>& bodies, Vector3 gravity, Real h) {
     for (size_t i = 0; i < states.size(); ++i) {
         if (states[i].inverseMass <= 0) continue;
         states[i].v = (1 / (1 + h * bodies[i].linearDamping)) * states[i].v + h * gravity;
         states[i].w = (1 / (1 + h * bodies[i].angularDamping)) * states[i].w;
+        if (!isForced(bodies[i])) continue;
+        states[i].v += (h * states[i].inverseMass) * bodies[i].force;
+        states[i].w += h * states[i].spinFrom(bodies[i].torque);
     }
 }
 
