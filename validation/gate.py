@@ -7,6 +7,8 @@
                           для промежуточных шагов правки, не для коммита
   gate.py --update        записать нынешние числа эталоном (те разделы, что измерены этим запуском);
                           отказ, если не прошли проверки «да/нет»
+  gate.py --accept        записать эталоном числа прошлого прогона (build/gate-last.json), не меряя заново;
+                          отказ, если его итог был ХУЖЕ
 
 Эталон — docs/reports/data/gate-baseline.json; его изменение видно в diff коммита.
 
@@ -45,6 +47,7 @@ ENGINES = BUILD / "validation/engines"
 BASELINE = ROOT / "docs/reports/data/gate-baseline.json"
 HASH = ROOT / "docs/reports/data/state-hash.txt"
 REMOTE = BUILD / "remote"
+LAST = BUILD / "gate-last.json"
 PULLS = [1, 9, 12]  # кубы пирамиды из 36: нижний ряд, середина, верх
 SCENES = ["stack10", "pyramid55", "rubble36", "overlap", "gap1mm", "cube100", "column100", "pendulum120", "beam6", "chain100"]
 
@@ -194,7 +197,18 @@ def show(value):
     return value if isinstance(value, str) else f"{value:.4g}"
 
 
+def accept():
+    last = json.loads(LAST.read_text(encoding="utf-8"))
+    if last["verdict"] == "ХУЖЕ":
+        sys.exit("прошлый прогон был ХУЖЕ: эталон не тронут")
+    base = json.loads(BASELINE.read_text(encoding="utf-8"))
+    BASELINE.write_text(json.dumps(dict(base, **last["numbers"]), ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    print(f"эталон записан числами прошлого прогона ({last['verdict']}): {BASELINE.relative_to(ROOT)}")
+
+
 def main():
+    if "--accept" in sys.argv:
+        return accept()
     quick, update, remote = "--quick" in sys.argv, "--update" in sys.argv, "--remote" in sys.argv
     machine = There() if remote else Here()
     checks = passFail(quick)
@@ -221,6 +235,7 @@ def main():
     worse = failed + [r[0] for r in rows if r[4] == "ХУЖЕ"]
     better = [r[0] for r in rows if r[4] == "лучше"]
     print(f"стандартных сцен быстрым шагом прошло: {sum(s['ok'] for s in now['standard'].values())} из {len(now['standard'])}")
+    LAST.write_text(json.dumps({"verdict": "ХУЖЕ" if worse else "ЛУЧШЕ" if better else "НЕ ХУЖЕ", "numbers": now}, ensure_ascii=False), encoding="utf-8")
     if worse:
         sys.exit(f"ИТОГ: ХУЖЕ — {'; '.join(worse)}")
     print(f"ИТОГ: ЛУЧШЕ — {'; '.join(better)}" if better else "ИТОГ: НЕ ХУЖЕ")

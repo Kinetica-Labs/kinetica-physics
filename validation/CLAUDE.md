@@ -8,6 +8,7 @@
 python3 validation/gate.py --remote     # перед коммитом: всё «да/нет» + мерки с эталоном, скорость — на свободной машине
 python3 validation/gate.py --quick      # промежуточный шаг правки (без clang++, таблицы случаев, разброса стены, сцен сравнения)
 python3 validation/gate.py --remote --update   # записать эталон: только когда итог понят и объяснён в журнале
+python3 validation/gate.py --accept     # то же числами только что сделанного прогона, без нового замера
 ```
 
 Итог один: ХУЖЕ (код выхода 1), НЕ ХУЖЕ или ЛУЧШЕ; эталон — `docs/reports/data/gate-baseline.json`. Правка
