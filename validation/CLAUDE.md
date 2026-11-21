@@ -102,5 +102,12 @@ KP_THREADS=1 BENCH=14 perf stat -e cycles:u,instructions:u,LLC-load-misses:u bui
 глубиной по разделяющим осям (`overlap_mm`): CCD быстрого шага (упреждающие контакты) спасает от
 пролёта, но не от опоры, которую проходы решателя не донесли по длинной цепочке.
 
+Box3D собран и на свободной машине, тем же clang (2026-11-21): исходники в `box3d`, библиотека в `build-box3d`,
+программа `build-box3d\compare-box3d.exe` (собирать с `-std=gnu++17`: без расширений у mingw нет `M_PI`).
+Сравнивать там же, попеременно, одним потоком на закреплённом ядре:
+`build/remote/rrun.sh '$env:KP_THREADS="1"; $env:BENCH="14"; cmd /c "start /b /wait /affinity 0x100 build-box3d\compare-box3d.exe 8"'`
+и то же для `build\validation\engines\compare-ours.exe realtime 8`. Числа с рабочей машины и прошлых дней
+в одну таблицу не сводить: на Xeon той машины отставание от Box3D больше, чем здесь (у него счёт четвёрками AVX2).
+
 `research/refs` (клоны Box3D и ReactPhysics3D, вне git) — символическая ссылка наружу; если она пропала —
 `python3 research/facts.py restore`.
