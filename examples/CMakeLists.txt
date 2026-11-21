@@ -10,7 +10,8 @@ foreach(example
     02_geometry/Distance 02_geometry/Contact 02_geometry/TimeOfImpact 02_geometry/Hull
     03_collision/Pairs
     04_dynamics/FreeSpin
-    05_world/FallingBox 05_world/BouncingBall 05_world/BoxStack 05_world/DebugView)
+    05_world/FallingBox 05_world/BouncingBall 05_world/BoxStack 05_world/DebugView
+    05_world/Pendulum 05_world/PushedBox 05_world/Platform 05_world/Rail 05_world/Explosion)
   get_filename_component(name ${example} NAME)
   add_executable(${name} ${example}.cpp)
   target_link_libraries(${name} PRIVATE kinetica-physics)

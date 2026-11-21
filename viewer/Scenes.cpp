@@ -126,9 +126,9 @@ const std::vector<Scene>& scenes() {
         {"столбик из пятидесяти кубов", columnOfFifty, {0, 2, 0}, 8},
         {"столбик из четырёхсот кубов", columnOfFourHundred, {0, 1.5, 0}, 6},
       };
-      for (const ExactScene& scene : exactScenes()) list.push_back({scene.title, scene.build, scene.lookAt, scene.distance, nullptr, &scene});
+      for (const ExactScene& scene : exactScenes()) list.push_back({scene.title, scene.build, scene.lookAt, scene.distance, nullptr, &scene, nullptr, "с точным ответом"});
       // Стандартный набор сцен — тот же, что считает прибор с замерами.
-      for (const StandardScene& scene : standardScenes()) list.push_back({scene.title, scene.build, scene.lookAt, scene.distance, scene.control});
+      for (const StandardScene& scene : standardScenes()) list.push_back({scene.title, scene.build, scene.lookAt, scene.distance, scene.control, nullptr, &scene, "стандартный набор"});
       return list;
     }();
     return all;

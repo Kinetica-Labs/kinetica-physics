@@ -6,6 +6,8 @@
 #include "Scenes.h"
 #include <debug/DebugGeometry.h>
 
+#include <string>
+
 struct Viewer {
     size_t scene = 0;
     kp::World world;
@@ -52,6 +54,13 @@ struct Viewer {
     bool placeAt(kp::Vector3 direction); // ставит центр под курсор; true — щелчок потрачен на это
     void fireAll();                      // пуск всех разовых источников
     int frame = 0;
+    // Итог проверки стандартной сцены (StandardScene::verdict) в её момент проверки: пустая строка — как должно.
+    bool judged = false;
+    std::string verdict;
+    // Прибор с замерами считает сцены без воздуха, сна и трения качения, с умолчаниями шага: только при
+    // таких настройках итог проверки в окне — тот же, что у прибора. measure ставит их и начинает сцену заново.
+    bool asMeasured() const;
+    void measure();
     double worstError = 0, worstGap = 0; // наибольшие ошибка величины с точным решением и разрыв сочленений, м
     double lastStep = 0, slowestStep = 0; // время счёта шага, мс
     int mostSegments = 0;                 // наибольшее число отрезков в одном шаге

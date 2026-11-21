@@ -18,6 +18,7 @@ void Viewer::load(size_t index) {
     lag = 0;
     lastStep = slowestStep = 0;
     worstError = worstGap = 0;
+    judged = false, verdict.clear();
 }
 
 void Viewer::step() {
@@ -45,8 +46,22 @@ void Viewer::step() {
     lag += double(world.report().unfinished);
     ++frame;
     worstGap = std::max(worstGap, double(world.joints().largestError(world.bodies())));
+    if (const StandardScene* standard = scenes()[scene].standard; standard && !judged && frame * double(kFrame) >= standard->checkAt)
+        verdict = standard->verdict(standard->build(), world), judged = true;
     if (const ExactScene* exact = scenes()[scene].exact)
         worstError = std::max(worstError, std::abs(exact->measured(world) - exact->exact((frame * double(kFrame)) - lag)));
+}
+
+bool Viewer::asMeasured() const {
+    const SoftStep standard;
+    return damping == 0 && !sleeping && rollingResistance == 0 && !shockPropagation && substeps == standard.substeps && contactUpdates == standard.contactUpdates;
+}
+
+void Viewer::measure() {
+    const SoftStep standard;
+    damping = rollingResistance = 0, sleeping = shockPropagation = false;
+    substeps = standard.substeps, contactUpdates = standard.contactUpdates;
+    load(scene);
 }
 
 bool Viewer::placeAt(Vector3 direction) {
@@ -68,7 +83,7 @@ bool Viewer::grabAt(Vector3 direction) {
     if (world.bodies()[size_t(hit.body)].isStatic()) return false;
     // Второй конец привязи держит неподвижное тело сцены; если такого нет — тело без формы.
     int hand = 0;
-    while (hand < int(world.bodies().size()) && (!world.bodies()[size_t(hand)].isStatic() || world.asleep(BodyId(hand)))) ++hand;
+    while (hand < int(world.bodies().size()) && (!world.bodies()[size_t(hand)].isStatic() || world.asleep(BodyId(hand)) || isDriven(world.bodies()[size_t(hand)]))) ++hand;
     if (hand == int(world.bodies().size())) world.addBody(Body{});
     const BodyId held = BodyId(hit.body);
     const double mass = 1 / double(world.body(held).mass.inverseMass), omega = 2 * 3.14159265358979323846 * kGrabFrequency;

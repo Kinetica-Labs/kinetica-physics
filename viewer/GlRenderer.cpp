@@ -112,7 +112,7 @@ void drawFilled(const World& world) {
     glPolygonOffset(1, 1);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
     glLightfv(GL_LIGHT0, GL_POSITION, direction), glLightfv(GL_LIGHT0, GL_AMBIENT, ambient), glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-    const auto fixed = [&](size_t i) { return world.bodies()[i].isStatic() && !world.asleep(BodyId(int(i))); };
+    const auto fixed = [&](size_t i) { return world.bodies()[i].isStatic() && !world.asleep(BodyId(int(i))) && !isDriven(world.bodies()[i]); };
     for (size_t i = 0; i < world.bodies().size(); ++i) {
         if (fixed(i)) continue;
         const float shade = world.asleep(BodyId(int(i))) ? 0.6f : 1;
@@ -129,10 +129,10 @@ void drawFilled(const World& world) {
 
 } // namespace
 
-void render(const DebugGeometry& geometry, const Camera& camera, int width, int height, const World* filled) {
-    glViewport(0, 0, width, height);
+void render(const DebugGeometry& geometry, const Camera& camera, int left, int width, int height, const World* filled) {
     glClearColor(0.07f, 0.07f, 0.07f, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(left, 0, width, height);
 
     // Перспектива: в кадр попадает всё между ближней и дальней плоскостью.
     const double nearPlane = Camera::kNearPlane, farPlane = 500, halfHeight = Camera::kTanHalfFov * nearPlane, aspect = double(width) / height;

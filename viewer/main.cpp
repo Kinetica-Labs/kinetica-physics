@@ -1,6 +1,6 @@
 // Окно просмотра: сцены движка в реальном времени на OpenGL.
 //
-//   viewer [--scene N] [--exact 1] [--frames N] [--screenshot файл.ppm] [--record префикс] [--blast кадр]
+//   viewer [--scene N] [--exact 1] [--frames N] [--screenshot файл.ppm] [--record префикс] [--blast кадр] [--measured 1]
 //
 // Управление — на панели в окне и клавишами: 1–9 — сцена, пробел — пауза, → — один шаг,
 // R — сцена заново, T — состояние мира в консоль, левая кнопка мыши на теле — взять и тянуть его,
@@ -58,7 +58,7 @@ void pointer(GLFWwindow* window, Viewer& viewer, int width, int height) {
     glfwGetCursorPos(window, &x, &y);
     const bool down = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && (wasDown || !ImGui::GetIO().WantCaptureMouse);
     const bool turning = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !ImGui::GetIO().WantCaptureMouse;
-    const Vector3 direction = viewer.camera.ray(x, y, width, height);
+    const Vector3 direction = viewer.camera.ray(x - kPanelWidth, y, std::max(1, width - kPanelWidth), height); // сцена — правее панели
     if (down && !wasDown && !viewer.placeAt(direction)) viewer.grabAt(direction);
     if (!down) viewer.release();
     viewer.dragTo(direction);
@@ -110,7 +110,7 @@ void stopPanel() {
 int main(int argc, char** argv) {
     size_t firstScene = 0;
     int frameLimit = 0, blastFrame = -1;
-    bool exact = false;
+    bool exact = false, measured = false;
     std::string screenshot, record;
     for (int i = 1; i + 1 < argc; i += 2) {
         const std::string key = argv[i];
@@ -120,10 +120,11 @@ int main(int argc, char** argv) {
         if (key == "--screenshot") screenshot = argv[i + 1];
         if (key == "--record") record = argv[i + 1];
         if (key == "--blast") blastFrame = std::atoi(argv[i + 1]);
+        if (key == "--measured") measured = std::atoi(argv[i + 1]) != 0; // настройки прибора с замерами: кнопка «Считать как прибор»
     }
 
     if (!glfwInit()) return (std::fprintf(stderr, "не удалось запустить GLFW: нет графического экрана?\n"), 1);
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "kinetica-physics", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1480, 820, "kinetica-physics", nullptr, nullptr);
     if (!window) return (std::fprintf(stderr, "не удалось открыть окно OpenGL\n"), glfwTerminate(), 1);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // кадр окна на кадр экрана: при 60 Гц сцена идёт в реальном времени
@@ -131,6 +132,7 @@ int main(int argc, char** argv) {
     Viewer viewer;
     viewer.realtime = !exact;
     viewer.load(firstScene);
+    if (measured) viewer.measure();
     if (blastFrame >= 0) viewer.impulses.push_back({}), viewer.impulses.back().center = viewer.camera.target;
     glfwSetWindowUserPointer(window, &viewer);
     glfwSetKeyCallback(window, onKey);
@@ -152,7 +154,8 @@ int main(int argc, char** argv) {
 
         glfwGetFramebufferSize(window, &pixelsWide, &pixelsHigh);
         const DebugGeometry all = debugGeometry(viewer.world, viewer.show[int(DebugKind::TreeNode)]);
-        render(viewer.visible(all), viewer.camera, pixelsWide, pixelsHigh, viewer.fill ? &viewer.world : nullptr);
+        const int panel = width > 0 ? kPanelWidth * pixelsWide / width : 0; // ширина панели в пикселях кадра
+        render(viewer.visible(all), viewer.camera, panel, std::max(1, pixelsWide - panel), pixelsHigh, viewer.fill ? &viewer.world : nullptr);
         drawPanel(viewer, all, width, height);
         ImGui::Render();
         ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
