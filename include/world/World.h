@@ -98,6 +98,7 @@ private:
     JointSet joints_;
     ContactForces contactForces_; // силы в точках контакта с прошлого отрезка — для тёплого старта
     ManifoldMemory manifolds_;    // площадки пар с прошлого обновления быстрого шага
+    std::vector<ContactPair> pairs_; // пары обновления быстрого шага: память под них держится между обновлениями
     std::vector<std::vector<Real>> jointImpulses_; // импульсы связей сочленений с прошлого кадра (SoftStep)
     Report report_;
     // Пара, остановкой скольжения которой закончился прошлый отрезок: на следующем она не скользит.

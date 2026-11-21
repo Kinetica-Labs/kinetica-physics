@@ -33,9 +33,9 @@ void World::step(Real dt) {
         for (int update = 0; update < updates; ++update) {
             PairFinder finder(bodies_, gravity);
             finder.boundary = soft.edgeSlop, finder.memory = &manifolds_;
-            const std::vector<ContactPair> pairs = finder.pairs(dt / updates, joints_);
+            finder.collect(dt / updates, joints_, pairs_);
             notify(watch, StepStage::Pairs);
-            part.step(bodies_, pairs, joints_, gravity, dt / updates, contactForces_, jointImpulses_);
+            part.step(bodies_, pairs_, joints_, gravity, dt / updates, contactForces_, jointImpulses_);
         }
         report_.segments = part.substeps * updates;
     } else {

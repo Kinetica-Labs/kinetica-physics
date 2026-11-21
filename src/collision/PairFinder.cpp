@@ -126,6 +126,12 @@ PairFinder::Found PairFinder::between(int i, int j, Real h, Real reach) const {
 // склеиваются в порядке кандидатов, поэтому от числа потоков список не зависит. Сцену меньше
 // kParallelParts частей дешевле проверить в одном потоке, чем будить остальные.
 std::vector<ContactPair> PairFinder::pairs(Real h) const {
+    std::vector<ContactPair> pairs; // ответ уходит наружу и живёт дольше шага: он в куче, одним куском
+    collect(h, pairs);
+    return pairs;
+}
+
+void PairFinder::collect(Real h, std::vector<ContactPair>& pairs) const {
     constexpr int kParallelParts = 64;
     const StepArray<Real> fastest = speedsOf(bodies_);
     int parts = 0;
@@ -147,22 +153,25 @@ std::vector<ContactPair> PairFinder::pairs(Real h) const {
             if (one.carried || one.fresh >= 0) kept.push_back(one.carried ? one.carried : &some.fresh[size_t(one.fresh)]);
     }
     if (memory) memory->replace(kept);
-    std::vector<ContactPair> pairs; // ответ уходит наружу и живёт дольше шага: он в куче, одним куском
-    pairs.reserve(total);
+    pairs.clear(), pairs.reserve(total);
     for (const Found& some : found)
         for (const Found::Pair& one : some.pairs) pairs.push_back(one.pair);
-    return pairs;
 }
 
 std::vector<ContactPair> PairFinder::pairs(Real h, const JointSet& joints) const {
-    std::vector<ContactPair> pairs = this->pairs(h);
+    std::vector<ContactPair> pairs;
+    collect(h, joints, pairs);
+    return pairs;
+}
+
+void PairFinder::collect(Real h, const JointSet& joints, std::vector<ContactPair>& pairs) const {
+    collect(h, pairs);
     const auto jointed = [&](const ContactPair& pair) {
         for (const Joint& joint : joints)
             if (!joint.collides() && ((joint.a == pair.a && joint.b == pair.b) || (joint.a == pair.b && joint.b == pair.a))) return true;
         return false;
     };
     pairs.erase(std::remove_if(pairs.begin(), pairs.end(), jointed), pairs.end());
-    return pairs;
 }
 
 } // namespace kp

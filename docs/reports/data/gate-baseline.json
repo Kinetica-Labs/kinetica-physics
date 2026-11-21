@@ -1,53 +1,41 @@
 {
  "remote": {
-  "bench_all_ms": 46.28,
-  "bench_single": 70.23,
+  "bench_all_ms": 47.97,
+  "bench_single": 87.4,
   "pull": {
    "pyramid 1": {
     "body": 1,
-    "median_ms": 1.8452,
+    "median_ms": 1.6393,
     "mode": "realtime",
     "overlap_m": 0.000238788,
-    "p99_ms": 18.6463,
+    "p99_ms": 17.0601,
     "peak_speed": 2.48326,
     "scene": "pyramid",
-    "slow_frames": 6,
-    "worst_ms": 21.7563
+    "slow_frames": 4,
+    "worst_ms": 19.8211
    },
    "pyramid 12": {
     "body": 12,
-    "median_ms": 4.0372,
+    "median_ms": 4.1598,
     "mode": "realtime",
     "overlap_m": 0.000182494,
-    "p99_ms": 18.2836,
+    "p99_ms": 19.9487,
     "peak_speed": 5.4058,
     "scene": "pyramid",
-    "slow_frames": 4,
-    "worst_ms": 22.0358
+    "slow_frames": 6,
+    "worst_ms": 22.9495
    },
    "pyramid 9": {
     "body": 9,
-    "median_ms": 4.0577,
+    "median_ms": 3.7221,
     "mode": "realtime",
     "overlap_m": 0.000495588,
-    "p99_ms": 17.0081,
+    "p99_ms": 15.9732,
     "peak_speed": 6.385,
     "scene": "pyramid",
-    "slow_frames": 5,
-    "worst_ms": 24.4477
+    "slow_frames": 1,
+    "worst_ms": 25.1385
    }
-  },
-  "scene": {
-   "beam6": 0.215848333,
-   "chain100": 0.598329,
-   "column100": 2.97894533,
-   "cube100": 0.064464,
-   "gap1mm": 0.0563083333,
-   "overlap": 0.0931261111,
-   "pendulum120": 0.0658091667,
-   "pyramid55": 1.56388133,
-   "rubble36": 1.96130354,
-   "stack10": 0.287939667
   }
  },
  "standard": {
