@@ -10,8 +10,8 @@ namespace kp {
 
 // Запертая свобода сочленения. Скорость вдоль связи —
 //   linear · (v_b − v_a) + angularB · ω_b − angularA · ω_a,
-// и это производная нарушения связи по времени (proofs/travel_bond_is_derivative.smt2,
-// proofs/hinge_bond_is_derivative.smt2).
+// и это производная нарушения связи по времени (tests/proofs/travel_bond_is_derivative.smt2,
+// tests/proofs/hinge_bond_is_derivative.smt2).
 struct Bond {
     int a, b;
     Vector3 linear, angularA, angularB;

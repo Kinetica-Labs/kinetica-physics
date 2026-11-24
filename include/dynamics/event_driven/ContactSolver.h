@@ -12,7 +12,7 @@
 // активного набора: предполагается, в каких точках тела давят друг на друга, для них решается
 // линейная система, и предположение правится там, где вышла отрицательная сила или сближение.
 // Число шагов не зависит от отношения масс — в отличие от обхода «точка за точкой», которому
-// при отношении 1 : 1000 не хватает тысячи проходов (`docs/experiments/30-solver-experiment.md`).
+// при отношении 1 : 1000 не хватает тысячи проходов в опыте с тяжёлым телом на лёгком.
 // Júdice, Pires, «A block principal pivoting algorithm for large-scale strictly monotone linear
 // complementarity problems», Computers & Operations Research 21(5), 1994.
 //
@@ -20,6 +20,7 @@
 // точек по очереди и чередуется с точным решением нормалей, пока оба не перестанут меняться.
 // Пары тел упорядочены по высоте, обход трения идёт снизу вверх и обратно.
 
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ContactAssembly.h>
 #include <dynamics/event_driven/CoupledSolve.h>
 #include <dynamics/event_driven/ShockPropagation.h>
@@ -51,7 +52,7 @@ public:
     // Импульс и момент импульса свободной группы тел удар сохраняет, сближения после него нет;
     // неупругий удар (e = 0) не добавляет энергии. С отскоком энергия может вырасти: закон Ньютона,
     // заданный в каждой точке отдельно, её не бережёт — до 8 % у одной точки с трением и до 60 % у
-    // площадки из нескольких точек (замер и дыра Ж: tests/PropertyTests.cpp, proofs/README.md).
+    // площадки из нескольких точек (замер и дыра Ж: tests/PropertyTests.cpp, docs/testing.md).
     void solveImpacts();
 
     // Опора на интервале h: касающиеся точки не должны сблизиться. Сила на интервале постоянна,
@@ -63,29 +64,24 @@ public:
     // Точки, которые ещё не коснулись, сила опоры не удерживает: их ведёт поиск времени удара
     // (EventSearch::earliestImpact), и в момент касания решается удар. Удерживать их условием на
     // перемещение нельзя — оно разворачивает быстро сближающуюся точку и добавляет телу энергию
-    // (замер: validation/studies/DropStatistics.cpp).
+    // в опыте со свободным падением.
     //
     // previous — силы с прошлого отрезка: с них решение начинается (тёплый старт). Если прошлые
     // силы на новой геометрии добавили бы кинетическую энергию, они уменьшаются в α раз, где α —
     // наилучший масштаб вдоль них. Возвращает найденные силы.
     //
-    // shockPropagation — необязательный завершающий проход «ударной волны» (Guendelman, Bridson,
-    // Fedkiw, «Nonconvex rigid bodies with stacking», 2003). Пары обходятся снизу вверх, и каждая
-    // решается заново так, будто нижнее тело неподвижно; поправка прикладывается только к
-    // верхнему. Остаток, оставленный обходом трения, гасится за один проход — ценой третьего
-    // закона Ньютона: нижнее тело не получает противодействия, и импульс системы не сохраняется.
-    // Поэтому по умолчанию проход выключен.
-    ContactForces solveRestingContacts(Real h, const ContactForces& previous, bool shockPropagation = false);
+    // Завершающая поправка сближения по опорам. Обе подвижные стороны получают реакцию.
+    ContactForces solveRestingContacts(Real h, const ContactForces& previous, bool shockPropagation = true);
 
     // Поправки к целям связей на отрезке опоры: на сколько скорость вдоль каждой связи в конце
     // отрезка должна отличаться от найденной по касательной оценке. Ими World доводит связи до
     // точного выполнения в конце отрезка (ExactStep::computeForces).
-    void biasBonds(const std::vector<Real>& bias) { state_.bondBias = bias; }
+    void biasBonds(const StepArray<Real>& bias) { state_.bondBias = bias; }
 
     // Доля связей сочленений в найденных импульсах: что они дали каждому телу. Приводы, трение,
     // пружины и демпферы не считаются: это силы, а не связи, и толкают тело весь отрезок (World,
     // advanced).
-    void bondImpulses(std::vector<Vector3>& linear, std::vector<Vector3>& angular) const;
+    void bondImpulses(StepArray<Vector3>& linear, StepArray<Vector3>& angular) const;
 
     int iterations() const { return state_.iterations; }
 
@@ -107,7 +103,7 @@ public:
 
     // Когда скольжение какой-нибудь точки остановится и что считать остановкой — SlidingStopSearch.h.
     using SlidingStop = kp::SlidingStop;
-    SlidingStop slidingStop(Real h, const std::vector<std::pair<int, int>>& already = {}) const { return slides_.slidingStop(h, already); }
+    SlidingStop slidingStop(Real h, const StepArray<std::pair<int, int>>& already = {}) const { return slides_.slidingStop(h, already); }
     void settle(SlidingStop stopped) { slides_.settle(stopped); }
 
 private:
@@ -117,7 +113,7 @@ private:
 
     // goal[i] — наименьшая допустимая нормальная скорость в точке i; минус бесконечность — точка
     // в этой фазе не участвует. Накопленные импульсы — в state_.sum.
-    void solve(const std::vector<Real>& goal);
+    void solve(const StepArray<Real>& goal);
     void reset();
 
     ContactRows state_;

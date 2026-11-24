@@ -5,11 +5,17 @@
 #include <joints/CardanJoint.h>
 #include <joints/CylindricalJoint.h>
 #include <joints/FixedJoint.h>
+#include <joints/GearJoint.h>
+#include <joints/DistanceJoint.h>
+#include <joints/RackAndPinionJoint.h>
 #include <joints/HingeJoint.h>
 #include <joints/JointSet.h>
+#include <joints/PathJoint.h>
 #include <joints/SliderJoint.h>
 #include <joints/TetherJoint.h>
+#include <collision/CandidateMemory.h>
 #include <collision/ContactPair.h>
+#include <collision/ManifoldMemory.h>
 #include <collision/RayCast.h>
 #include <body/Body.h>
 #include <world/IslandSleep.h>
@@ -29,16 +35,19 @@ class StepObserver {
 public:
     virtual ~StepObserver() = default;
     virtual void after(StepStage stage, const World& world) = 0;
+    // Память тёплого старта после последнего решённого подшага. Касательная сила в мировых
+    // осях действует на тело b. Для импульса всего кадра требуется учесть каждый подшаг и удар.
+    static const ContactForces& cachedContactForces(const World& world);
 };
 
 class World {
 public:
     Vector3 gravity{0, Real(-9.81), 0}; // м/с²
     StepObserver* observer = nullptr;
-    // Проход «ударной волны» в решателе контактов (ContactSolver::solveRestingContacts). Гасит
-    // остаток скольжения в стопках с большим отношением масс, но нарушает сохранение импульса;
-    // выключен по умолчанию и нужен для сравнения.
-    bool shockPropagation = false;
+    // Проход по опорам исправляет остаточное сближение свыше геометрического допуска.
+    // Две подвижные стороны получают равные противоположные импульсы в точке контакта.
+    static constexpr bool kDefaultShockPropagation = true;
+    bool shockPropagation = kDefaultShockPropagation;
     // Наибольшее число отрезков в одном шаге; ноль — без предела. Шаг, которому отрезков не
     // хватило, кончается раньше dt (Report::unfinished): мир в нём отстаёт от часов, зато окно
     // с живой сценой не замирает на шаге с сотней событий.
@@ -52,7 +61,7 @@ public:
     // медленнее sleepSpeed дольше sleepTime, остров засыпает: его тела на время сна становятся
     // неподвижными (масса убирается, импульсы обнуляются) и не стоят шагу ничего. Остров
     // просыпается целиком, когда к нему может прикоснуться бодрствующее тело, когда его телу дали
-    // импульс, когда включили привод его сочленения или изменили силу тяжести. Сон выключен по
+    // импульс или приложили силу, когда включили привод его сочленения или изменили силу тяжести. Сон выключен по
     // умолчанию: он останавливает тело, которое двигалось, пусть и медленнее порога, — это
     // допуск, а не точность. Скорость тела — скорость его самой быстрой точки: |v| + |ω| R.
     // Неподвижное тело, которое передвинули из-под спящих, их не будит: разбудить нужно самому.
@@ -90,11 +99,15 @@ public:
         int asleep = 0; // сколько тел спит после шага
     };
     const Report& report() const { return report_; }
-
 private:
+    friend const ContactForces& StepObserver::cachedContactForces(const World&);
+    bool quiet(Real dt) const;
     std::vector<Body> bodies_;
     JointSet joints_;
     ContactForces contactForces_; // силы в точках контакта с прошлого отрезка — для тёплого старта
+    ManifoldMemory manifolds_;    // площадки пар с прошлого обновления быстрого шага
+    std::vector<ContactPair> pairs_; // пары обновления быстрого шага: память под них держится между обновлениями
+    CandidateMemory candidates_;     // кандидаты в пары с прошлого поиска: в покое дерево брусков заново не строится
     std::vector<std::vector<Real>> jointImpulses_; // импульсы связей сочленений с прошлого кадра (SoftStep)
     Report report_;
     // Пара, остановкой скольжения которой закончился прошлый отрезок: на следующем она не скользит.
@@ -102,11 +115,25 @@ private:
     IslandSleep sleep_;
 };
 
+inline const ContactForces& StepObserver::cachedContactForces(const World& world) { return world.contactForces_; }
+
 // Сочленения по общей точке и оси в мире, при нынешних позах тел; упругая привязь точки pointA тела a
 // к точке pointB тела b (точки — в мире). Удобства поверх World::addJoint.
 inline BallAndSocketJoint& addBallJoint(World& world, BodyId a, BodyId b, Vector3 anchor) { return world.addJoint<BallAndSocketJoint>(a, b, anchor); }
 inline HingeJoint& addHinge(World& world, BodyId a, BodyId b, Vector3 anchor, Vector3 axis) { return world.addJoint<HingeJoint>(a, b, anchor, axis); }
+inline GearJoint& addGear(World& world, BodyId a, BodyId b, Vector3 shaft, int teethA, int teethB) { return world.addJoint<GearJoint>(a, b, shaft, teethA, teethB); }
+inline DistanceJoint& addDistance(World& world, BodyId a, Vector3 pointA, BodyId b, Vector3 pointB) {
+    return world.addJoint<DistanceJoint>(a, b, pointA, pointB);
+}
+inline RackAndPinionJoint& addRackAndPinion(World& world, BodyId rack, BodyId pinion, Vector3 pivot,
+                                          Vector3 shaft, Vector3 travel, Real pitchRadius) {
+    return world.addJoint<RackAndPinionJoint>(rack, pinion, pivot, shaft, travel, pitchRadius);
+}
 inline SliderJoint& addSlider(World& world, BodyId a, BodyId b, Vector3 anchor, Vector3 axis) { return world.addJoint<SliderJoint>(a, b, anchor, axis); }
+// Точка anchor тела b идёт по кривой через точки through, закреплённой в теле a (PathJoint).
+inline PathJoint& addPathJoint(World& world, BodyId a, BodyId b, Vector3 anchor, const std::vector<Vector3>& through, bool closed = false) {
+    return world.addJoint<PathJoint>(a, b, anchor, through, closed);
+}
 inline FixedJoint& addWeld(World& world, BodyId a, BodyId b, Vector3 anchor) { return world.addJoint<FixedJoint>(a, b, anchor); }
 inline CardanJoint& addCardan(World& world, BodyId a, BodyId b, Vector3 anchor, Vector3 axis, Vector3 cross) { return world.addJoint<CardanJoint>(a, b, anchor, axis, cross); }
 inline TetherJoint& addTether(World& world, BodyId a, Vector3 pointA, BodyId b, Vector3 pointB, Real stiffness, Real damping) {

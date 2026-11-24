@@ -7,6 +7,7 @@
 // по одной, они сбивают друг друга и сходятся только за много проходов. Пружина, привод и предел
 // хода — по одной связи.
 
+#include <math/StepMemory.h>
 #include <dynamics/time_stepping/Softness.h>
 #include <dynamics/time_stepping/SolverBody.h>
 #include <joints/Bond.h>
@@ -19,16 +20,17 @@ namespace kp {
 class SoftJoint {
 public:
     // impulses — место накопленных импульсов этих связей; оно переживает кадр.
-    SoftJoint(const Bond* bonds, int count, const std::vector<SolverBody>& states, Real* impulses);
+    SoftJoint(const Bond* bonds, int count, const StepArray<SolverBody>& states, Real* impulses);
+    const Bond& firstRow() const { return bonds_[0]; }
     bool responds() const { return responds_; }
-    void warmStart(std::vector<SolverBody>& states) const;
-    void solve(std::vector<SolverBody>& states, bool withBias, Real h, const Softness& soft, Real pushSpeed);
+    void warmStart(StepArray<SolverBody>& states) const;
+    void solve(StepArray<SolverBody>& states, bool withBias, Real h, const Softness& soft, Real pushSpeed);
 
 private:
-    Real speed(int row, const std::vector<SolverBody>& states) const;
-    void push(int row, std::vector<SolverBody>& states, Real impulse) const;
-    void solveTogether(std::vector<SolverBody>& states, const Softness& soft);
-    void solveAlone(int row, std::vector<SolverBody>& states, bool withBias, Real h, const Softness& soft, Real pushSpeed);
+    Real speed(int row, const StepArray<SolverBody>& states) const;
+    void push(int row, StepArray<SolverBody>& states, Real impulse) const;
+    void solveTogether(StepArray<SolverBody>& states, const Softness& soft);
+    void solveAlone(int row, StepArray<SolverBody>& states, bool withBias, Real h, const Softness& soft, Real pushSpeed);
 
     Bond bonds_[3];
     int count_;

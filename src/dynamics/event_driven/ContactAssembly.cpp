@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ContactAssembly.h>
 
 #include <algorithm>
@@ -10,6 +11,26 @@ namespace {
 constexpr Real kIdle = ContactRows::kIdle;
 constexpr Real kSliding = ContactRows::kSliding;
 
+// Остров каждого тела: тела объединяются по парам и связям, неподвижное тело островов не связывает;
+// метка острова — наименьший номер его тела.
+StepArray<int> islandsOf(const ContactRows& state) {
+    StepArray<int> island(state.bodies.size());
+    for (size_t i = 0; i < island.size(); ++i) island[i] = int(i);
+    const auto root = [&](int body) {
+        while (island[size_t(body)] != body) body = island[size_t(body)] = island[size_t(island[size_t(body)])];
+        return body;
+    };
+    const auto join = [&](int x, int y) {
+        if (state.bodies[size_t(x)].isStatic() || state.bodies[size_t(y)].isStatic()) return;
+        const int a = root(x), b = root(y);
+        island[size_t(std::max(a, b))] = std::min(a, b);
+    };
+    for (const ContactRows::Pair& pair : state.pairs) join(pair.a, pair.b);
+    for (const Bond& bond : state.bonds) join(bond.a, bond.b);
+    for (size_t i = 0; i < island.size(); ++i) island[i] = root(int(i));
+    return island;
+}
+
 } // namespace
 
 // Порядок неизвестных для разложения: остров за островом, внутри острова пары снизу вверх, у
@@ -18,22 +39,9 @@ constexpr Real kSliding = ContactRows::kSliding;
 // стопки пара связана только с соседними, поэтому в таком порядке матрица блочно-диагональная с
 // узкой лентой в каждом блоке — и разложение, которое считает только внутри профиля
 // (math/ProfileMatrix.h), тратит время, пропорциональное числу неизвестных, а не его кубу.
-std::vector<size_t> ContactAssembly::eliminationOrder(const System& s) const {
-    // Острова: тела объединяются по парам; метка острова — наименьший номер его тела.
-    std::vector<int> island(state_.bodies.size());
-    for (size_t i = 0; i < island.size(); ++i) island[i] = int(i);
-    const auto root = [&](int body) {
-        while (island[size_t(body)] != body) body = island[size_t(body)] = island[size_t(island[size_t(body)])];
-        return body;
-    };
-    const auto join = [&](int x, int y) {
-        if (state_.bodies[size_t(x)].isStatic() || state_.bodies[size_t(y)].isStatic()) return;
-        const int a = root(x), b = root(y);
-        island[size_t(std::max(a, b))] = std::min(a, b);
-    };
-    for (const Pair& pair : state_.pairs) join(pair.a, pair.b);
-    for (const Bond& bond : state_.bonds) join(bond.a, bond.b);
-    const auto islandOf = [&](int a, int b) { return root(state_.bodies[size_t(a)].isStatic() ? b : a); };
+StepArray<size_t> ContactAssembly::eliminationOrder(const System& s) const {
+    const StepArray<int> island = islandsOf(state_);
+    const auto islandOf = [&](int a, int b) { return island[size_t(state_.bodies[size_t(a)].isStatic() ? b : a)]; };
 
     // Блоки неизвестных: пары (уже упорядочены снизу вверх), за ними связи в порядке создания.
     // Устойчивая сортировка по острову сохраняет этот порядок внутри острова.
@@ -42,13 +50,13 @@ std::vector<size_t> ContactAssembly::eliminationOrder(const System& s) const {
         bool bond;
         size_t index;
     };
-    std::vector<Block> blocks;
+    StepArray<Block> blocks;
     for (size_t p = 0; p < state_.pairs.size(); ++p) blocks.push_back({islandOf(state_.pairs[p].a, state_.pairs[p].b), false, p});
     for (size_t j = 0; j < state_.bonds.size(); ++j) blocks.push_back({islandOf(state_.bonds[j].a, state_.bonds[j].b), true, j});
     std::stable_sort(blocks.begin(), blocks.end(), [](const Block& x, const Block& y) { return x.island < y.island; });
 
     const size_t n = s.rows.size(), firstBond = n + 3 * s.pairs.size();
-    std::vector<size_t> order;
+    StepArray<size_t> order;
     for (const Block& block : blocks) {
         if (block.bond) {
             order.push_back(firstBond + block.index);
@@ -65,7 +73,7 @@ std::vector<size_t> ContactAssembly::eliminationOrder(const System& s) const {
 
 // Система задачи: нормали участвующих строк, трение пар, у которых такие строки есть, связи
 // сочленений; места строк и пар в ней, матрица отклика, её диагональ и порядок исключения.
-ContactAssembly::System ContactAssembly::assemble(const std::vector<Real>& goal) {
+ContactAssembly::System ContactAssembly::assemble(const StepArray<Real>& goal) {
     System s;
     for (size_t i = 0; i < state_.rows.size(); ++i)
         if (goal[i] != kIdle) s.rows.push_back(i), s.lines.push_back(state_.normalLine(state_.rows[i]));
@@ -92,7 +100,16 @@ ContactAssembly::System ContactAssembly::assemble(const std::vector<Real>& goal)
 
 // Три линии трения на пару с участвующими строками. Не скользит пара, которая покоилась в начале
 // отрезка; при ударе — любая, пока трения хватает.
-void ContactAssembly::addFriction(System& s, const std::vector<Real>& goal) {
+//
+// Покоилась — не значит «скольжение ноль». Точки касания вращающихся тел расходятся с ускорением drift, и
+// прилипшая пара кончает отрезок со скольжением −h · drift при плечах его начала; к началу следующего
+// плечи повернулись, и от него остаётся порядка (h ω / 2) · h · drift. Поворот тела в контакте за отрезок
+// не больше kMaxTurn = 0,25 рад, поэтому остаток не больше восьмой доли h · drift. Пара, которая в самом
+// деле скользит из-за вращения, скользит быстрее h · drift не меньше чем вчетверо (ω r против h ω² r).
+// Граница kCarried = 1/4 — между ними. Без неё пара на вращающейся опоре через шаг считалась скользящей,
+// решалась без ухода и теряла a h² / 2 пути: ящик на поворотном столе уходил на 5,5 см за оборот (H112).
+void ContactAssembly::addFriction(System& s, const StepArray<Real>& goal) {
+    constexpr Real kCarried = Real(0.25);
     state_.stuck.assign(state_.pairs.size(), 0);
     for (size_t p = 0; p < state_.pairs.size(); ++p) {
         const Pair& pair = state_.pairs[p];
@@ -103,7 +120,8 @@ void ContactAssembly::addFriction(System& s, const std::vector<Real>& goal) {
         for (int k = 0; k < 3; ++k) s.lines.push_back(state_.frictionLine(pair, k));
         const Slip& start = pair.startSlip;
         const Real speed = start[0] * start[0] + start[1] * start[1] + pair.reach * pair.reach * start[2] * start[2];
-        state_.stuck[p] = !state_.holding || speed < kSliding * kSliding;
+        const Real drift = pair.drift[0] * pair.drift[0] + pair.drift[1] * pair.drift[1] + pair.reach * pair.reach * pair.drift[2] * pair.drift[2];
+        state_.stuck[p] = !state_.holding || speed < kSliding * kSliding || speed < kCarried * kCarried * state_.holdTime * state_.holdTime * drift;
     }
 }
 

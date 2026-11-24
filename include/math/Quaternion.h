@@ -26,11 +26,18 @@ struct Quaternion {
     // ряда sin(a/2) / a = 1/2 − a²/48 + …, следующий член которого меньше точности числа.
     // Тело, которое вращается с постоянной угловой скоростью ω, за время t поворачивается ровно на ω t.
     static Quaternion fromRotationVector(Vector3 theta);
+    // Поворот, который переводит оси x, y, z в данную правую тройку единичных взаимно перпендикулярных
+    // векторов. Из четырёх формул берётся та, где делитель наибольший (Shepperd, «Quaternion from rotation
+    // matrix», J. Guidance and Control 1, 1978); знак кватерниона при этом не выбирается: q и −q — один поворот.
+    static Quaternion fromAxes(Vector3 x, Vector3 y, Vector3 z);
     // Отображение Кэли: вектор поворота θ -> кватернион (1, θ/2) / |(1, θ/2)| — поворот на угол
     // 2 arctg(|θ|/2) = |θ| − |θ|³/12 + …. Интегратор им больше не пользуется: при вращении он отстаёт
-    // по фазе (docs/DEVELOPMENT.md, «Отображение поворота»). Осталось как дешёвый способ задать
+    // по фазе. Осталось как дешёвый способ задать
     // поворот в проверках.
-    static Quaternion cayley(Vector3 theta) { return Quaternion{1, 0.5 * theta.x, 0.5 * theta.y, 0.5 * theta.z}.unit(); }
+    static Quaternion cayley(Vector3 theta) {
+        const Vector3 half = Real(0.5) * theta;
+        return Quaternion{1, half.x, half.y, half.z}.unit();
+    }
 };
 
 inline Quaternion operator*(Quaternion a, Quaternion b) {

@@ -2,6 +2,7 @@
 // Решение линейной системы с симметричной положительно определённой матрицей разложением
 // Холецкого: A = L Lᵀ, затем две подстановки. Только сложение, умножение, деление и корень.
 
+#include <math/StepMemory.h>
 #include <math/math_functions.h>
 
 #include <algorithm>
@@ -15,9 +16,9 @@ namespace kp {
 // за островом и пара за парой вдоль стопки, профиль узкий: и память, и время растут как
 // n · (ширина ленты)², а не как n² и n³.
 struct ProfileMatrix {
-    std::vector<int> first;    // первый хранимый столбец каждой строки
-    std::vector<size_t> start; // где в values начинается строка
-    std::vector<Real> values;
+    StepArray<int> first;    // первый хранимый столбец каждой строки
+    StepArray<size_t> start; // где в values начинается строка
+    StepArray<Real> values;
 
     int size() const { return int(first.size()); }
     // Добавляет следующую строку с профилем от столбца firstColumn; её элементы нулевые.
@@ -28,9 +29,10 @@ struct ProfileMatrix {
     }
     // Элемент строки i в столбце j, first[i] <= j <= i.
     Real& at(int i, int j) { return values[start[size_t(i)] + size_t(j - first[size_t(i)])]; }
+    Real at(int i, int j) const { return values[start[size_t(i)] + size_t(j - first[size_t(i)])]; }
 };
 
-// a — матрица (портится: в ней остаётся множитель L), b — правая часть, на выходе решение.
+// Разложение на месте: в a остаётся нижний множитель L, в skipped — маска пропущенных строк.
 //
 // Матрица может быть вырожденной: строка, которая линейно выражается через предыдущие, даёт
 // нулевой ведущий элемент. Такая строка пропускается, её неизвестная полагается равной нулю.
@@ -38,9 +40,8 @@ struct ProfileMatrix {
 // точками можно распределить по-разному при тех же скоростях, и здесь выбирается распределение
 // без лишней точки. Ведущий элемент считается нулевым, если он меньше dependent от исходного
 // диагонального.
-inline void solveCholesky(ProfileMatrix& a, std::vector<Real>& b, Real dependent = Real(1e-14)) {
+template <class Mask> void factorCholesky(ProfileMatrix& a, Mask& skipped, Real dependent = Real(1e-14)) {
     const int n = a.size();
-    thread_local std::vector<char> skipped; // рабочий массив потока: решение не выделяет память
     skipped.assign(size_t(n), 0);
     for (int i = 0; i < n; ++i) { // строка i множителя L
         const int from = a.first[size_t(i)];
@@ -65,6 +66,11 @@ inline void solveCholesky(ProfileMatrix& a, std::vector<Real>& b, Real dependent
         }
         a.at(i, i) = sqrt(diagonal);
     }
+}
+
+// Две подстановки для новой правой части b. Разложение остаётся неизменным.
+template <class Mask, class Vector> void solveFactored(const ProfileMatrix& a, const Mask& skipped, Vector& b) {
+    const int n = a.size();
     for (int i = 0; i < n; ++i) { // L y = b
         for (int k = a.first[size_t(i)]; k < i; ++k) b[size_t(i)] -= a.at(i, k) * b[size_t(k)];
         b[size_t(i)] = skipped[size_t(i)] ? Real(0) : b[size_t(i)] / a.at(i, i);
@@ -73,6 +79,13 @@ inline void solveCholesky(ProfileMatrix& a, std::vector<Real>& b, Real dependent
         b[size_t(i)] = skipped[size_t(i)] ? Real(0) : b[size_t(i)] / a.at(i, i);
         for (int k = a.first[size_t(i)]; k < i; ++k) b[size_t(k)] -= a.at(i, k) * b[size_t(i)];
     }
+}
+
+// Однократное решение. При нескольких правых частях достаточно одного factorCholesky.
+template <class Vector> void solveCholesky(ProfileMatrix& a, Vector& b, Real dependent = Real(1e-14)) {
+    thread_local std::vector<char> skipped;
+    factorCholesky(a, skipped, dependent);
+    solveFactored(a, skipped, b);
 }
 
 } // namespace kp

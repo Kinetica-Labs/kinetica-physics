@@ -17,14 +17,17 @@ constexpr Real kEqualDepth = Real(1e-7); // м
 // (зазор не больше touching или такой же, как у самой глубокой), в порядке построения; за ними
 // остальные по возрастанию зазора — они коснутся следующими, и поиск времени удара обязан о них
 // знать. Ни одна точка не отбрасывается. Порядок зависит только от самих чисел.
-std::vector<ContactCandidate> ContactCandidate::ordered(const std::vector<ContactCandidate>& points, Real touching) {
+ContactCandidates ContactCandidate::ordered(const ContactCandidates& points, Real touching) {
     Real deepest = std::numeric_limits<Real>::infinity();
     for (const ContactCandidate& p : points) deepest = std::min(deepest, p.separation);
     const Real supportLevel = std::max(deepest + kEqualDepth, touching);
-    std::vector<ContactCandidate> support, approaching;
+    ContactCandidates support, approaching;
     for (const ContactCandidate& p : points) (p.separation <= supportLevel ? support : approaching).push_back(p);
-    std::stable_sort(approaching.begin(), approaching.end(), [](const ContactCandidate& x, const ContactCandidate& y) { return x.separation < y.separation; });
-    support.insert(support.end(), approaching.begin(), approaching.end());
+    // Устойчивая сортировка вставками: порядок равных сохраняется, как у std::stable_sort, а к куче она
+    // не обращается.
+    for (size_t i = 1; i < approaching.size(); ++i)
+        for (size_t k = i; k > 0 && approaching[k].separation < approaching[k - 1].separation; --k) std::swap(approaching[k], approaching[k - 1]);
+    for (const ContactCandidate& p : approaching) support.push_back(p);
     return support;
 }
 

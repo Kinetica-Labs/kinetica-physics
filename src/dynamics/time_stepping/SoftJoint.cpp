@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/time_stepping/SoftJoint.h>
 
 #include <algorithm>
@@ -13,7 +14,7 @@ Real component(Vector3 v, int k) { return k == 0 ? v.x : k == 1 ? v.y : v.z; }
 
 } // namespace
 
-SoftJoint::SoftJoint(const Bond* bonds, int count, const std::vector<SolverBody>& states, Real* impulses) : count_(count), impulses_(impulses) {
+SoftJoint::SoftJoint(const Bond* bonds, int count, const StepArray<SolverBody>& states, Real* impulses) : count_(count), impulses_(impulses) {
     const SolverBody &a = states[size_t(bonds[0].a)], &b = states[size_t(bonds[0].b)];
     // Матрица отклика; место строки, которой нет или которая ни на что не действует, занимает единица.
     Real k[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
@@ -34,25 +35,25 @@ SoftJoint::SoftJoint(const Bond* bonds, int count, const std::vector<SolverBody>
     if (together_) inverse_ = matrix.inverse();
 }
 
-Real SoftJoint::speed(int row, const std::vector<SolverBody>& states) const {
+Real SoftJoint::speed(int row, const StepArray<SolverBody>& states) const {
     const Bond& bond = bonds_[row];
     const SolverBody &a = states[size_t(bond.a)], &b = states[size_t(bond.b)];
     return bond.linear.dot(b.v - a.v) + bond.angularB.dot(b.w) - bond.angularA.dot(a.w);
 }
 
-void SoftJoint::push(int row, std::vector<SolverBody>& states, Real impulse) const {
+void SoftJoint::push(int row, StepArray<SolverBody>& states, Real impulse) const {
     const Bond& bond = bonds_[row];
     SolverBody &a = states[size_t(bond.a)], &b = states[size_t(bond.b)];
     a.v -= (a.inverseMass * impulse) * bond.linear, a.w -= a.spinFrom(impulse * bond.angularA);
     b.v += (b.inverseMass * impulse) * bond.linear, b.w += b.spinFrom(impulse * bond.angularB);
 }
 
-void SoftJoint::warmStart(std::vector<SolverBody>& states) const {
+void SoftJoint::warmStart(StepArray<SolverBody>& states) const {
     for (int i = 0; i < count_; ++i)
         if (mass_[i] > 0) push(i, states, impulses_[i]);
 }
 
-void SoftJoint::solve(std::vector<SolverBody>& states, bool withBias, Real h, const Softness& soft, Real pushSpeed) {
+void SoftJoint::solve(StepArray<SolverBody>& states, bool withBias, Real h, const Softness& soft, Real pushSpeed) {
     if (together_) return solveTogether(states, withBias ? soft : Softness::rigid());
     for (int i = 0; i < count_; ++i)
         if (mass_[i] > 0) solveAlone(i, states, withBias, h, soft, pushSpeed);
@@ -60,7 +61,7 @@ void SoftJoint::solve(std::vector<SolverBody>& states, bool withBias, Real h, co
 
 // Δλ = −K⁻¹ · доля · (скорость + поправка · нарушение) − возврат · λ: то же, что у одной связи,
 // с матрицей на месте числа.
-void SoftJoint::solveTogether(std::vector<SolverBody>& states, const Softness& s) {
+void SoftJoint::solveTogether(StepArray<SolverBody>& states, const Softness& s) {
     Real wanted[3] = {0, 0, 0};
     for (int i = 0; i < count_; ++i)
         if (mass_[i] > 0) wanted[i] = s.massScale * (speed(i, states) + s.biasRate * bonds_[i].error);
@@ -73,7 +74,7 @@ void SoftJoint::solveTogether(std::vector<SolverBody>& states, const Softness& s
     }
 }
 
-void SoftJoint::solveAlone(int row, std::vector<SolverBody>& states, bool withBias, Real h, const Softness& soft, Real pushSpeed) {
+void SoftJoint::solveAlone(int row, StepArray<SolverBody>& states, bool withBias, Real h, const Softness& soft, Real pushSpeed) {
     const Bond& bond = bonds_[row];
     const Real mass = mass_[row], speed = this->speed(row, states);
     Real& impulse = impulses_[row];

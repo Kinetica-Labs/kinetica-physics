@@ -3,8 +3,16 @@
 #include <collision/shapes/Flat.h>
 #include <collision/shapes/Outline.h>
 #include <collision/shapes/Tube.h>
+#include <algorithm>
 
 namespace kp {
+
+Vector3 ConvexShape::coreExtents() const {
+    const auto along = [&](Vector3 axis) {
+        return std::max(axis.dot(support(axis)), -axis.dot(support(-1 * axis)));
+    };
+    return {along({1, 0, 0}), along({0, 1, 0}), along({0, 0, 1})};
+}
 
 std::optional<Flat> ConvexShape::flatTowards(const Transform&, Vector3) const { return std::nullopt; }
 

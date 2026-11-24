@@ -14,11 +14,46 @@ inline void integrateVelocity(Body& body, Vector3 force, Vector3 torque, Real dt
     body.angularMomentum += dt * torque;
 }
 
+// Тело без массы идёт с заданными скоростями (Body::drivenVelocity, drivenSpin): x += v dt, поворот —
+// точная экспонента ω dt. Неподвижное не трогается вовсе: его поза обязана остаться прежней бит в бит.
+inline void carryDriven(Body& body, Real dt) {
+    if (!isDriven(body)) return;
+    body.position += dt * body.drivenVelocity;
+    if (body.drivenSpin.x != 0 || body.drivenSpin.y != 0 || body.drivenSpin.z != 0) body.orientation = (Quaternion::fromRotationVector(dt * body.drivenSpin) * body.orientation).unit();
+}
+
 // Наибольший поворот несимметричного тела за одну часть шага, рад.
 constexpr Real kMaxTurn = Real(0.25);
 
 // γ = 1 / (2 − ∛2) — вес крайних шагов композиции четвёртого порядка.
 constexpr Real kJump = Real(1.3512071919596578);
+
+// Поворот тела за время step по правилу средней точки: θ = step · I⁻¹ L(середина), где momentum —
+// момент импульса в осях тела, inverse — обратные главные моменты; уравнение решается методом Ньютона.
+inline Vector3 midpointTurn(Vector3 momentum, Vector3 inverse, Real step) {
+    Vector3 turn = step * inverse.scaled(momentum);
+    for (int iteration = 0; iteration < 4; ++iteration) {
+        const Vector3 half = Real(-0.5) * turn;
+        const Vector3 middle = Quaternion::fromRotationVector(half).rotate(momentum); // L в середине части
+        const Vector3 residual = turn - step * inverse.scaled(middle);
+        // Матрица Ньютона точная: приблизительная сходится у вытянутых тел слишком медленно.
+        // Добавка δ к θ поворачивает L середины на −J δ / 2, где J = I + a [u]× + b [u]×² —
+        // производная экспоненты в точке u = −θ/2; a = (1 − cos|u|) / |u|² и
+        // b = (|u| − sin|u|) / |u|³ взяты рядами, |u| здесь не больше kMaxTurn / 2.
+        const Real squared = half.dot(half), a = Real(0.5) - squared / 24, b = Real(1) / 6 - squared / 120;
+        Vector3 column[3];
+        const Vector3 axis[3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        for (int k = 0; k < 3; ++k) {
+            const Vector3 swept = axis[k] + a * half.cross(axis[k]) + b * half.cross(half.cross(axis[k]));
+            column[k] = axis[k] + (step / 2) * inverse.scaled(swept.cross(middle));
+        }
+        // Правило Крамера для системы 3 × 3.
+        const Real determinant = column[0].dot(column[1].cross(column[2]));
+        turn = turn - (1 / determinant) * Vector3{residual.dot(column[1].cross(column[2])), column[0].dot(residual.cross(column[2])),
+                                              column[0].dot(column[1].cross(residual))};
+    }
+    return turn;
+}
 
 // Свободный полёт: поза меняется при неизменных p и L.
 //
@@ -43,7 +78,7 @@ constexpr Real kJump = Real(1.3512071919596578);
 // только от состояния тела в её начале, поэтому путь за время t — начало пути за любое большее
 // время: поиск времени удара, который спрашивает позу в разные моменты, идёт по одной траектории.
 inline void integratePosition(Body& body, Real dt) {
-    if (body.mass.inverseMass == 0) return;
+    if (body.mass.inverseMass == 0) return carryDriven(body, dt);
     body.position += dt * body.linearVelocity();
     const Vector3 inverse = body.mass.inverseInertia;
     const bool symmetric = inverse.x == inverse.y && inverse.y == inverse.z; // ω постоянна: делить нечего
@@ -58,30 +93,8 @@ inline void integratePosition(Body& body, Real dt) {
         // и остаётся четвёртый (Yoshida, 1990; Hairer, Lubich, Wanner, раздел II.4). Средний шаг
         // идёт назад во времени — для свободного вращения это законно.
         for (Real weight : {kJump, 1 - 2 * kJump, kJump}) {
-            const Real step = weight * h;
             const Vector3 momentum = body.orientation.rotateInverse(body.angularMomentum); // L₀ в осях тела
-            Vector3 turn = step * inverse.scaled(momentum);
-            for (int iteration = 0; iteration < 4; ++iteration) {
-                const Vector3 half = Real(-0.5) * turn;
-                const Vector3 middle = Quaternion::fromRotationVector(half).rotate(momentum); // L в середине части
-                const Vector3 residual = turn - step * inverse.scaled(middle);
-                // Матрица Ньютона точная: приблизительная сходится у вытянутых тел слишком медленно.
-                // Добавка δ к θ поворачивает L середины на −J δ / 2, где J = I + a [u]× + b [u]×² —
-                // производная экспоненты в точке u = −θ/2; a = (1 − cos|u|) / |u|² и
-                // b = (|u| − sin|u|) / |u|³ взяты рядами, |u| здесь не больше kMaxTurn / 2.
-                const Real squared = half.dot(half), a = Real(0.5) - squared / 24, b = Real(1) / 6 - squared / 120;
-                Vector3 column[3];
-                const Vector3 axis[3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-                for (int k = 0; k < 3; ++k) {
-                    const Vector3 swept = axis[k] + a * half.cross(axis[k]) + b * half.cross(half.cross(axis[k]));
-                    column[k] = axis[k] + (step / 2) * inverse.scaled(swept.cross(middle));
-                }
-                // Правило Крамера для системы 3 × 3.
-                const Real determinant = column[0].dot(column[1].cross(column[2]));
-                turn = turn - (1 / determinant) * Vector3{residual.dot(column[1].cross(column[2])), column[0].dot(residual.cross(column[2])),
-                                                      column[0].dot(column[1].cross(residual))};
-            }
-            body.orientation = (body.orientation * Quaternion::fromRotationVector(turn)).unit();
+            body.orientation = (body.orientation * Quaternion::fromRotationVector(midpointTurn(momentum, inverse, weight * h))).unit();
         }
     }
 }

@@ -22,6 +22,8 @@
 // приближённый. Признак — по островку целиком: если часть его точек решать жёстко, а часть на
 // пружинах, он не успокаивается (шары в ведре).
 
+#include <math/StepMemory.h>
+#include <dynamics/time_stepping/ContactLevels.h>
 #include <dynamics/time_stepping/SoftContact.h>
 
 #include <vector>
@@ -30,28 +32,50 @@ namespace kp {
 
 class IslandNormals {
 public:
-    IslandNormals(int rowLimit, Real biasRate) : rowLimit_(rowLimit), biasRate_(biasRate) {}
-    void solve(std::vector<SoftContact>& contacts, const std::vector<Body>& bodies, std::vector<SolverBody>& states, bool withBias, Real h, Real pushSpeed);
+    // iterations — SoftStep::directIterations: шагов перебора набора на островок за одно решение, не больше; ноль — без предела.
+    IslandNormals(int rowLimit, Real biasRate, int iterations) : rowLimit_(rowLimit), iterations_(iterations), biasRate_(biasRate) {}
+    // moving — по телам: решаются только контакты и островки, где движется хоть одно тело; nullptr — все.
+    void solve(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed,
+               const StepArray<char>* moving = nullptr);
+    // Заканчивает только попарное решение больших островков. Жёсткая совместная реакция уже найдена.
+    void solveSupports(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, Vector3 gravity, Real h) const;
+    // Уровни зависимости контактов шага: ими же идут проходы тёплого старта и трения (SoftStep).
+    ContactLevels levels;
 
 private:
+    // Точка контакта в задаче островка; a и b — места её тел в островке.
     struct Row {
         size_t contact, point;
+        int a, b;
+    };
+    // Островок решается своей системой, со своей нумерацией тел: цена решения зависит от его размера,
+    // а не от размера мира, и островки идут в разных потоках. Одной системой на всех цена росла как
+    // куб числа тел: 400 кубов столбиками по четыре стоили 800 мс на кадр (замер study-scale).
+    struct Island {
+        StepArray<Row> rows;      // в порядке контактов
+        StepArray<int> members;   // номера тел мира
+        StepArray<Body> bodies;     // их масса, инерция и нынешняя ориентация — всё, что берёт решатель
+        StepArray<char> working;  // по rows: рабочий набор
+        int localBody(int body, const std::vector<Body>& world, StepArray<int>& place);
     };
     struct Pass {
         bool withBias;
         Real h, pushSpeed;
     };
     // Какие контакты идут в общую задачу: островки, уложившиеся в предел.
-    void choose(const std::vector<SoftContact>& contacts, const std::vector<Body>& bodies);
-    Real excess(const SoftContact::NormalRow& row, const std::vector<SolverBody>& states, const Pass& pass) const;
-    void solveWorking(std::vector<SoftContact>& contacts, const std::vector<Body>& bodies, std::vector<SolverBody>& states, const Pass& pass);
-    bool extend(const std::vector<SoftContact>& contacts, const std::vector<SolverBody>& states, const Pass& pass);
+    void choose(const StepArray<SoftContact>& contacts, const std::vector<Body>& bodies);
+    Real excess(const SoftContact::NormalRow& row, const StepArray<SolverBody>& states, const Pass& pass) const;
+    void solveIsland(Island& island, StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, const Pass& pass) const;
+    // allowed — предел ActiveSet::iterations этого решения; возвращает, сколько шагов перебора ушло.
+    int solveWorking(Island& island, StepArray<SoftContact>& contacts, StepArray<SolverBody>& states, const Pass& pass, int allowed) const;
+    bool extend(Island& island, const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states, const Pass& pass) const;
 
-    int rowLimit_;
+    int rowLimit_, iterations_;
     Real biasRate_;
-    std::vector<char> direct_;  // по контактам; пусто — ещё не выбрано
-    std::vector<Row> rows_;     // точки контактов общей задачи, в порядке контактов
-    std::vector<char> working_; // по rows_: рабочий набор
+    enum class Method : char { Together, Pairwise, Layered };
+    StepArray<Method> methods_; // по контактам, одно решение на весь остров
+    bool hasLayers_ = false;
+    StepArray<Island> islands_;
 };
 
 } // namespace kp

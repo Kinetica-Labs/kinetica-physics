@@ -2,6 +2,7 @@
 // Сборка системы решателя контактов: строки давящих точек, трение покоящихся пар и связи сочленений —
 // и порядок исключения неизвестных.
 
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ContactRows.h>
 
 namespace kp {
@@ -12,7 +13,7 @@ public:
 
     // goal[i] — наименьшая допустимая нормальная скорость в точке i; минус бесконечность — точка
     // в этой фазе не участвует.
-    ContactSystem assemble(const std::vector<Real>& goal);
+    ContactSystem assemble(const StepArray<Real>& goal);
 
 private:
     using Row = ContactRows::Row;
@@ -23,9 +24,9 @@ private:
     using Entry = ContactSystem::Entry;
     using System = ContactSystem;
 
-    void addFriction(System& system, const std::vector<Real>& goal);
+    void addFriction(System& system, const StepArray<Real>& goal);
     void addBonds(System& system);
-    std::vector<size_t> eliminationOrder(const System& system) const;
+    StepArray<size_t> eliminationOrder(const System& system) const;
 
     ContactRows& state_;
 };

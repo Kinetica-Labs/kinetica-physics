@@ -41,6 +41,9 @@ public:
     // неподвижное составное тело. Толщина нужна только затем, чтобы у призмы был объём: тела
     // останавливает поиск времени удара, а не она.
     static Body ground(const TriangleMesh& surface, Real thickness = Real(0.1));
+
+private:
+    static void markSectorEnds(std::vector<Body>& pieces, size_t first, int segments);
 };
 
 } // namespace kp

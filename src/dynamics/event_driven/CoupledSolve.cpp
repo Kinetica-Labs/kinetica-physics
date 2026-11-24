@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/CoupledSolve.h>
 
 #include <dynamics/event_driven/ActiveSet.h>
@@ -16,7 +17,7 @@ constexpr int kMaxDriveFlips = 4; // сколько раз привод може
 // Накопленные импульсы и цели скорости по всем линиям системы: нормали, трение пар, связи. Пара,
 // которая не скользит, за отрезок не должна сдвинуться. Без сил её точка касания сама ушла бы с
 // ускорением drift, поэтому трение обязано оставить ей встречную скорость.
-void CoupledSolve::startTogether(const System& s, const std::vector<Real>& goal, std::vector<Real>& current, std::vector<Real>& target) const {
+void CoupledSolve::startTogether(const System& s, const StepArray<Real>& goal, StepArray<Real>& current, StepArray<Real>& target) const {
     const size_t n = s.rows.size(), firstBond = n + 3 * s.pairs.size();
     for (size_t i = 0; i < n; ++i) current[i] = state_.sum[s.rows[i]], target[i] = goal[s.rows[i]];
     for (size_t p = 0; p < s.pairs.size(); ++p) {
@@ -30,9 +31,9 @@ void CoupledSolve::startTogether(const System& s, const std::vector<Real>& goal,
 
 // Неизвестные: все нормали, линии трения несорвавшихся пар и связи без упора. Вращение вокруг
 // нормали — только если у пары больше одной точки касания.
-std::vector<char> CoupledSolve::unknownsOf(const System& s) const {
+StepArray<char> CoupledSolve::unknownsOf(const System& s) const {
     const size_t n = s.rows.size(), firstBond = n + 3 * s.pairs.size();
-    std::vector<char> unknown(s.lines.size(), 0);
+    StepArray<char> unknown(s.lines.size(), 0);
     for (size_t i = 0; i < n; ++i) unknown[i] = 1;
     for (size_t p = 0; p < s.pairs.size(); ++p)
         for (size_t k = 0; k < 3; ++k) unknown[n + 3 * p + k] = state_.stuck[s.pairs[p]] && (k < 2 || state_.pairs[s.pairs[p]].reach > 0);
@@ -43,8 +44,8 @@ std::vector<char> CoupledSolve::unknownsOf(const System& s) const {
 // Запас скорости над целью вдоль линии i при импульсах λ равен free[i] + Σ A[i][j] λ[j]; free —
 // запас, какой был бы без неизвестных импульсов вовсе. Слагаемое, удерживающее импульсы вблизи
 // прежних: к диагонали добавляется ε Aᵢᵢ, к свободному члену — −ε Aᵢᵢ λᵢ.
-std::vector<Real> CoupledSolve::freeTerms(const System& s, const std::vector<char>& unknown, const std::vector<Real>& current, const std::vector<Real>& target) const {
-    std::vector<Real> free(s.lines.size(), 0);
+StepArray<Real> CoupledSolve::freeTerms(const System& s, const StepArray<char>& unknown, const StepArray<Real>& current, const StepArray<Real>& target) const {
+    StepArray<Real> free(s.lines.size(), 0);
     for (size_t i = 0; i < s.lines.size(); ++i) {
         if (!unknown[i]) continue;
         free[i] = state_.speed(s.lines[i]) - target[i] - kProximal * s.diagonal[i] * current[i];
@@ -56,7 +57,7 @@ std::vector<Real> CoupledSolve::freeTerms(const System& s, const std::vector<cha
 
 // Предел Кулона для несорвавшихся пар: сила — μ Σ λn, момент — μ Σ λn rᵢ. Пара, вышедшая за
 // предел, срывается; true — сорвалась хоть одна.
-bool CoupledSolve::releaseSlipping(const System& s, const std::vector<Real>& force) {
+bool CoupledSolve::releaseSlipping(const System& s, const StepArray<Real>& force) {
     const size_t n = s.rows.size();
     bool released = false;
     for (size_t p = 0; p < s.pairs.size(); ++p) {
@@ -79,7 +80,7 @@ bool CoupledSolve::releaseSlipping(const System& s, const std::vector<Real>& for
 // Предел силы привода. Привод, которому для заданной скорости нужен импульс больше предельного,
 // прикладывает предельный и из неизвестных выходит. Упёршийся привод возвращается, если скорость
 // перешла заданную: значит, полная сила уже не нужна. true — набор неизвестных изменился.
-bool CoupledSolve::releaseDrives(const System& s, const std::vector<char>& unknown, std::vector<Real>& current, const std::vector<Real>& target, const std::vector<Real>& force) {
+bool CoupledSolve::releaseDrives(const System& s, const StepArray<char>& unknown, StepArray<Real>& current, const StepArray<Real>& target, const StepArray<Real>& force) {
     const size_t firstBond = s.rows.size() + 3 * s.pairs.size();
     bool released = false;
     for (size_t j = 0; j < state_.bonds.size(); ++j) {
@@ -103,7 +104,7 @@ bool CoupledSolve::releaseDrives(const System& s, const std::vector<char>& unkno
 }
 
 // Найденные импульсы прикладываются к телам; возвращает наибольшую поправку скорости.
-Real CoupledSolve::applyTogether(const System& s, const std::vector<Real>& force) {
+Real CoupledSolve::applyTogether(const System& s, const StepArray<Real>& force) {
     const size_t n = s.rows.size(), firstBond = n + 3 * s.pairs.size();
     Real worst = 0;
     for (size_t i = 0; i < n; ++i) {
@@ -139,12 +140,12 @@ Real CoupledSolve::applyTogether(const System& s, const std::vector<Real>& force
 // равенства, и они решаются одной системой с нормалями. Пара, у которой нужное трение вышло за
 // предел Кулона, срывается: её трение дальше считается отдельно (solveFriction). Перебор повторяется,
 // пока срываются пары или упираются приводы. Возвращает наибольшую поправку скорости.
-Real CoupledSolve::solveTogether(const System& s, const std::vector<Real>& goal) {
+Real CoupledSolve::solveTogether(const System& s, const StepArray<Real>& goal) {
     const size_t total = s.lines.size();
-    std::vector<Real> current(total), target(total, 0), force(total);
+    StepArray<Real> current(total), target(total, 0), force(total);
     startTogether(s, goal, current, target);
     for (bool released = true; released;) {
-        const std::vector<char> unknown = unknownsOf(s);
+        const StepArray<char> unknown = unknownsOf(s);
         ActiveSet(state_.bodies, s, state_.bonds, state_.pressing, state_.bondPressing).solve(unknown, freeTerms(s, unknown, current, target), force);
         released = releaseSlipping(s, force);
         if (releaseDrives(s, unknown, current, target, force)) released = true;
@@ -155,7 +156,7 @@ Real CoupledSolve::solveTogether(const System& s, const std::vector<Real>& goal)
 // Невязка точной части задачи при нынешних импульсах, в единицах скорости: насколько скорость
 // давящей точки отличается от цели, а недавящей — меньше её; насколько скользит пара, которую
 // держит трение покоя; насколько не выполнены связи сочленений.
-Real CoupledSolve::residual(const System& s, const std::vector<Real>& goal) const {
+Real CoupledSolve::residual(const System& s, const StepArray<Real>& goal) const {
     Real worst = 0;
     for (size_t i : s.rows) {
         const Real excess = state_.relativeSpeed(state_.rows[i], state_.rows[i].normal) - goal[i];

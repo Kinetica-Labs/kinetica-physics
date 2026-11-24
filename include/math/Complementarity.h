@@ -26,11 +26,19 @@
 namespace kp {
 
 constexpr Real kDependent = Real(1e-4);
+constexpr size_t kSmallBlock = 8; // задаче до стольких строк рабочая память даётся со стека вызова
 
-// Плотное разложение Холецкого блока A по строкам rows, на месте; затем решение для rhs.
-inline void solveDenseBlock(const std::vector<Real>& A, size_t n, const std::vector<size_t>& rows, std::vector<Real>& L, std::vector<Real>& rhs) {
-    const size_t k = rows.size();
-    L.assign(k * k, 0);
+// Рабочая память задачи на n строк: разложение n × n, правая часть, номера давящих строк и признак «давит».
+struct BlockMemory {
+    Real* L;
+    Real* rhs;
+    size_t* rows;
+    char* active;
+};
+
+// Плотное разложение Холецкого блока A (n × n по строкам) по k строкам rows, на месте; затем решение для rhs.
+inline void solveDenseBlock(const Real* A, size_t n, const size_t* rows, size_t k, Real* L, Real* rhs) {
+    std::fill(L, L + k * k, Real(0));
     for (size_t i = 0; i < k; ++i)
         for (size_t j = 0; j <= i; ++j) {
             Real value = A[rows[i] * n + rows[j]];
@@ -48,30 +56,47 @@ inline void solveDenseBlock(const std::vector<Real>& A, size_t n, const std::vec
     }
 }
 
-inline void solveComplementarity(const std::vector<Real>& A, const std::vector<Real>& q, std::vector<Real>& lambda) {
-    const size_t n = q.size();
-    thread_local std::vector<char> active; // рабочие массивы потока: решение не выделяет память
-    thread_local std::vector<Real> L, rhs;
-    thread_local std::vector<size_t> rows;
-    active.resize(n);
-    for (size_t i = 0; i < n; ++i) active[i] = lambda[i] > 0 || q[i] < 0;
+inline void solveComplementarity(const Real* A, const Real* q, Real* lambda, size_t n, const BlockMemory& work) {
+    for (size_t i = 0; i < n; ++i) work.active[i] = lambda[i] > 0 || q[i] < 0;
     for (size_t round = 0; round < (size_t(1) << n); ++round) {
-        rows.clear(), rhs.clear();
+        size_t pressing = 0;
         for (size_t i = 0; i < n; ++i)
-            if (active[i]) rows.push_back(i), rhs.push_back(-q[i]);
-        solveDenseBlock(A, n, rows, L, rhs);
-        std::fill(lambda.begin(), lambda.end(), Real(0));
-        for (size_t r = 0; r < rows.size(); ++r) lambda[rows[r]] = rhs[r];
+            if (work.active[i]) work.rows[pressing] = i, work.rhs[pressing] = -q[i], ++pressing;
+        solveDenseBlock(A, n, work.rows, pressing, work.L, work.rhs);
+        std::fill(lambda, lambda + n, Real(0));
+        for (size_t r = 0; r < pressing; ++r) lambda[work.rows[r]] = work.rhs[r];
         size_t broken = n;
         for (size_t i = 0; i < n && broken == n; ++i) {
             Real w = q[i];
             for (size_t j = 0; j < n; ++j) w += A[i * n + j] * lambda[j];
-            if (active[i] ? lambda[i] < 0 : w < 0) broken = i;
+            if (work.active[i] ? lambda[i] < 0 : w < 0) broken = i;
         }
         if (broken == n) return;
-        active[broken] = !active[broken];
+        work.active[broken] = !work.active[broken];
     }
-    for (Real& value : lambda) value = std::max(value, Real(0));
+    for (size_t i = 0; i < n; ++i) lambda[i] = std::max(lambda[i], Real(0));
+}
+
+// Задача на n строк: A — n × n по строкам, q и lambda — по n чисел. Рабочая память — со стека вызова, если
+// строк не больше kSmallBlock, иначе из массивов потока: решение не выделяет память. Площадку пары тел
+// решатель зовёт десятки тысяч раз за кадр, и векторы потока, менявшие размер на каждом вызове, стоили
+// заметной доли кадра (профиль VTune, H116).
+inline void solveComplementarity(const Real* A, const Real* q, Real* lambda, size_t n) {
+    if (n <= kSmallBlock) {
+        Real L[kSmallBlock * kSmallBlock], rhs[kSmallBlock];
+        size_t rows[kSmallBlock];
+        char active[kSmallBlock];
+        return solveComplementarity(A, q, lambda, n, {L, rhs, rows, active});
+    }
+    thread_local std::vector<Real> L, rhs;
+    thread_local std::vector<size_t> rows;
+    thread_local std::vector<char> active;
+    L.resize(n * n), rhs.resize(n), rows.resize(n), active.resize(n);
+    solveComplementarity(A, q, lambda, n, {L.data(), rhs.data(), rows.data(), active.data()});
+}
+
+inline void solveComplementarity(const std::vector<Real>& A, const std::vector<Real>& q, std::vector<Real>& lambda) {
+    solveComplementarity(A.data(), q.data(), lambda.data(), q.size());
 }
 
 } // namespace kp

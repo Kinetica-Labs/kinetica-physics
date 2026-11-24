@@ -14,6 +14,7 @@ public:
     // Отклик относительного вращения тел вокруг касательных t1 и t2.
     void prepare(const SolverBody& a, const SolverBody& b, Vector3 t1, Vector3 t2);
     void warmStart(SolverBody& a, SolverBody& b, Vector3 t1, Vector3 t2) const;
+    bool hasImpulse() const { return roll_.x != 0 || roll_.y != 0; }
     // load — сумма нормальных импульсов точек контакта.
     void solve(SolverBody& a, SolverBody& b, Vector3 t1, Vector3 t2, Real arm, Real load);
 

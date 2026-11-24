@@ -37,6 +37,7 @@ struct DebugGeometry {
     DebugGeometry& add(const ConvexShape& shape, const Transform& pose, DebugKind kind = DebugKind::Shape);
     // Точки контакта на теле A и нормаль из каждой.
     DebugGeometry& add(const ContactManifold& manifold);
+    void addContactMarkers(const World& world);
     // Ближайшие точки двух форм и отрезок между ними.
     DebugGeometry& add(const ClosestPoints& closest);
     // Бруски внутренних узлов дерева поиска пар.
@@ -45,6 +46,8 @@ struct DebugGeometry {
 
 // Весь мир: формы всех тел и контакты касающихся пар; по желанию — узлы дерева поиска пар.
 DebugGeometry debugGeometry(const World& world, bool withTree = false);
+// Формы и сочленения в текущих позах. Просмотрщик отдельно добавляет на них контактные отметки.
+DebugGeometry debugBodyGeometry(const World& world, bool withTree = false);
 
 // То же словами, для консоли: по строке на тело, на пару в контакте и на последний шаг.
 std::string debugText(const World& world);

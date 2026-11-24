@@ -1,0 +1,11 @@
+# Сравниваем все строки в том же порядке. Git и Windows могут выбрать разные окончания строк.
+execute_process(COMMAND "${PROGRAM}" 60 RESULT_VARIABLE status OUTPUT_VARIABLE actual ENCODING UTF-8)
+if(NOT status STREQUAL "0")
+  message(FATAL_ERROR "StateHash exited with ${status}")
+endif()
+file(READ "${CMAKE_CURRENT_LIST_DIR}/../data/state-hash.txt" expected)
+string(REPLACE "\r\n" "\n" actual "${actual}")
+string(REPLACE "\r\n" "\n" expected "${expected}")
+if(NOT actual STREQUAL expected)
+  message(FATAL_ERROR "State after 60 frames differs from the reference:\n${actual}")
+endif()

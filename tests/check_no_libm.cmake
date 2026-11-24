@@ -1,0 +1,7 @@
+execute_process(COMMAND "${NM}" -u "${LIBRARY}" RESULT_VARIABLE status OUTPUT_VARIABLE symbols)
+if(NOT status STREQUAL "0")
+  message(FATAL_ERROR "Cannot read symbols from ${LIBRARY}: ${status}")
+endif()
+if(symbols MATCHES "(^|[ \t\r\n])_?(sin|cos|tan|asin|acos|atan|atan2|sinh|cosh|tanh|exp|exp2|log|log2|log10|pow|cbrt|hypot)[fl]?([ \t\r\n]|$)")
+  message(FATAL_ERROR "Unexpected libm symbol in ${LIBRARY}: ${CMAKE_MATCH_0}")
+endif()

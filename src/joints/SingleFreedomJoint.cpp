@@ -4,14 +4,20 @@
 
 namespace kp {
 
-LimitGap SingleFreedomJoint::limitGap(const Body& bodyA, const Body& bodyB) const {
+LimitGap SingleFreedomJoint::limitGap(const Body& bodyA, const Body& bodyB) const { return limitGapAt(coordinate(bodyA, bodyB)); }
+
+LimitGap SingleFreedomJoint::limitGapAt(Real at) const {
     Real low = lower, high = upper;
     if (angular()) low = std::max(low, -kHingeReach), high = std::min(high, kHingeReach);
-    const Real at = coordinate(bodyA, bodyB);
     return high - at < at - low ? LimitGap{high - at, -1} : LimitGap{at - low, 1};
 }
 
 void SingleFreedomJoint::addFreedomBonds(const Motion& m, const Bond& freedom, std::vector<Bond>& bonds) const {
+    const bool placed = stiffness > 0 || damping > 0 || limited();
+    addFreedomBonds(freedom, placed ? coordinate(*m.bodyA, *m.bodyB) : Real(0), bonds);
+}
+
+void SingleFreedomJoint::addFreedomBonds(const Bond& freedom, Real at, std::vector<Bond>& bonds) const {
     // Привод: связь вдоль свободы с заданной скоростью.
     if (holdSpeed) {
         Bond drive = freedom;
@@ -27,12 +33,12 @@ void SingleFreedomJoint::addFreedomBonds(const Motion& m, const Bond& freedom, s
     if (stiffness > 0 || damping > 0) {
         Bond spring = freedom;
         spring.soft = true, spring.stiffness = stiffness, spring.damping = damping;
-        spring.stretch = coordinate(*m.bodyA, *m.bodyB) - restPosition;
+        spring.stretch = at - restPosition;
         bonds.push_back(spring);
     }
     // Предел хода: та же линия, повёрнутая от предела в разрешённую сторону.
     if (limited()) {
-        const LimitGap limit = limitGap(*m.bodyA, *m.bodyB);
+        const LimitGap limit = limitGapAt(at);
         Bond stop = freedom;
         stop.linear = limit.side * stop.linear, stop.angularA = limit.side * stop.angularA, stop.angularB = limit.side * stop.angularB;
         stop.drift = limit.side * stop.drift;

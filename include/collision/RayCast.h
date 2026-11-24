@@ -21,5 +21,6 @@ struct RayHit {
 // Ближайшее к началу луча пересечение с поверхностями тел. Начало луча внутри тела — попадание
 // на нулевом расстоянии.
 RayHit castRay(const std::vector<Body>& bodies, const Ray& ray);
+RayHit castRay(const std::vector<Body>& bodies, const Ray& ray, const Body* excluded);
 
 } // namespace kp

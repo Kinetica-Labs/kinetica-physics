@@ -22,8 +22,19 @@ public:
     virtual ~ConvexShape() = default;
     // Направление и результат — в осях формы. Направление не обязано быть единичным.
     virtual Vector3 support(Vector3 direction) const = 0;
+    // Максимумы |x|, |y|, |z| точек ядра в осях формы, м. Скругление radius учитывает вызывающий.
+    virtual Vector3 coreExtents() const;
     // Наибольшее расстояние от начала осей формы до её поверхности: радиус охватывающего шара.
     virtual Real boundingRadius() const = 0;
+
+    // Ядро состоит только из начала осей. Нулевые экстремумы вдоль трёх осей
+    // отличают точку от короткого отрезка даже при округлении boundingRadius() до radius.
+    bool hasPointCore() const {
+        if (boundingRadius() != radius) return false;
+        return support({1, 0, 0}).x == 0 && support({-1, 0, 0}).x == 0 &&
+               support({0, 1, 0}).y == 0 && support({0, -1, 0}).y == 0 &&
+               support({0, 0, 1}).z == 0 && support({0, 0, -1}).z == 0;
+    }
 
     // Чем форма упирается в касательную плоскость (collision/narrowphase): по этим элементам
     // строятся точки контакта. pose — поза формы в мире, направления — в мире.

@@ -4,7 +4,9 @@
 
 #include <body/Body.h>
 #include <body/MassFrame.h>
+#include <collision/ContactPair.h>
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <stdexcept>
@@ -21,6 +23,12 @@ double uniform(std::uint64_t& state) { // детерминированный г�
 // Оболочка верна, если: все исходные точки внутри; грани плоские и выпуклые; формула Эйлера
 // В − Р + Г = 2 выполняется. tolerance — допуск на расстояния, м.
 void checkHull(const char* name, const ConvexHull& hull, const std::vector<Vector3>& points, double tolerance) {
+    const ConvexShape& shape = hull;
+    const Vector3 extent = shape.coreExtents();
+    for (const Vector3 axis : {Vector3{1,0,0}, Vector3{0,1,0}, Vector3{0,0,1}}) {
+        const Real expected = std::max(axis.dot(hull.support(axis)), -axis.dot(hull.support(-axis)));
+        CHECK_NEAR(axis.dot(extent), expected, 0);
+    }
     double worstOutside = 0, worstFlatness = 0;
     bool convex = true;
     for (const ConvexHull::Face& face : hull.faces()) {
@@ -128,6 +136,29 @@ void flatCloudIsRejected() {
     CHECK(rejected, "плоское облако точек не отвергнуто");
 }
 
+void offsetCoreExtents() {
+    const std::vector<Vector3> points{{3,-4,5}, {4,-4,5}, {3,-2,5}, {3,-4,8}};
+    auto hull = std::make_shared<ConvexHull>(ConvexHull::fromPoints(points));
+    const ConvexShape& shape = *hull;
+    Body body = Body::box({1,2,3}, 1);
+    body.shape = hull;
+    body.orientation = Quaternion{1, 2, -1, 3}.unit();
+    for (Real skin : {Real(0), Real(.125)}) {
+        hull->radius = skin;
+        const Vector3 extent = shape.coreExtents();
+        CHECK_NEAR(extent.x, 4, 0);
+        CHECK_NEAR(extent.y, 4, 0);
+        CHECK_NEAR(extent.z, 8, 0);
+    }
+    hull->radius = 0;
+    CHECK_NEAR(maxPointSpeed(body), 0, 0);
+    body.angularMomentum = {3, -7, 1};
+    for (Vector3 p : points) {
+        const Real speed = pointVelocity(body, body.pose().point(p)).length();
+        CHECK(speed <= maxPointSpeed(body), "скорость вершины %.12g м/с выше оценки", double(speed));
+    }
+}
+
 // Масса и моменты инерции оболочки сверяются с формулами бруска; затем тот же брусок задаётся
 // повёрнутым и сдвинутым — тело обязано получиться тем же, а его вершины в мире — на своих местах.
 void massOfBox() {
@@ -169,6 +200,7 @@ void massOfBox() {
 } // namespace
 
 void hullTests() {
+    offsetCoreExtents();
     cubeFromRedundantPoints();
     prism();
     randomClouds();

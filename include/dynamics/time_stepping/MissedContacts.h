@@ -14,8 +14,10 @@
 // точек заново не ищет: иначе в начале подшага он совпал бы с прежним. Так же шаг без пересечений
 // (IPC) проверяет сдвиг до того, как его принять; здесь проверяется поза конца подшага, а не путь.
 
+#include <math/StepMemory.h>
 #include <dynamics/time_stepping/SoftContact.h>
 
+#include <algorithm>
 #include <functional>
 #include <vector>
 
@@ -25,20 +27,30 @@ class MissedContacts {
 public:
     using Maker = std::function<SoftContact(const ContactPair&)>;
     // owner — номер пары каждого контакта; depth — допуск глубины, м; boundary — PairFinder::boundary.
-    MissedContacts(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, std::vector<size_t> owner, Real depth, Real boundary);
+    // Список pairs не копируется: он обязан пережить этот объект.
+    MissedContacts(const std::vector<ContactPair>& pairs, const std::vector<Body>& bodies, StepArray<size_t> owner, Real depth, Real boundary);
     // Пара, найденная посреди шага (PairReach); withContact — вызывающий дописывает в contacts её контакт.
     void adopt(const ContactPair& pair, const std::vector<Body>& bodies, bool withContact);
-    // Глубина каждой пары до сдвига — по точкам её контактов.
-    void note(const std::vector<SoftContact>& contacts);
+    // Глубина каждой пары до сдвига — наибольшая по её контактам: forget перед сдвигом, затем note на
+    // каждый контакт. Глубину контакт отдаёт в том же проходе, в котором идёт за телами (follow):
+    // отдельный проход по всем точкам ради неё стоил восьмой части обращений шага в память.
+    void forget() { known_.assign(pairCount(), 0); }
+    void note(size_t contact, Real depth) { known_[owner_[contact]] = std::max(known_[owner_[contact]], depth); }
     // Проверяет пары в позах после сдвига и дописывает недостающие контакты (их создаёт make);
     // h — подшаг. true — дописан хотя бы один.
-    bool find(std::vector<SoftContact>& contacts, const std::vector<Body>& bodies, const std::vector<SolverBody>& states, Real h, const Maker& make);
+    bool find(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, Real h, const Maker& make);
 
 private:
-    std::vector<ContactPair> pairs_;
-    std::vector<size_t> owner_;
-    std::vector<Real> radiusA_, radiusB_; // охватывающие радиусы частей пары от центров масс тел
-    std::vector<Real> known_;             // глубина пары до сдвига
+    size_t pairCount() const { return listed_.size() + adopted_.size(); }
+    const ContactPair& pair(size_t p) const { return p < listed_.size() ? listed_[p] : adopted_[p - listed_.size()]; }
+    void measure(const ContactPair& pair, const std::vector<Body>& bodies);
+
+    const std::vector<ContactPair>& listed_; // пары шага
+    StepArray<ContactPair> adopted_;         // пары, найденные посреди шага: их номера идут следом
+    StepArray<size_t> owner_;
+    StepArray<int> bodyA_, bodyB_;      // тела пары: первый отсев идёт по плотным массивам, запись пары (624 байта) не читается
+    StepArray<Real> radiusA_, radiusB_; // охватывающие радиусы частей пары от центров масс тел
+    StepArray<Real> known_;             // глубина пары до сдвига
     Real depth_, boundary_;
 };
 

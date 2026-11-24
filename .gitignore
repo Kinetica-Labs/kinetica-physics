@@ -1,20 +1,29 @@
-# Сборка
-build*/
+# Local build products and viewer captures
+/build*/
+CMakeUserPresets.json
 *.o
 *.a
 *.so
-
-# Клоны чужих движков для сравнения (research/refs — ссылка на локальную папку)
-refs
-
-# Окно просмотра: раскладка панелей, снимки и записи
 imgui.ini
 *.ppm
 
-# Python и редакторы
-__pycache__/
-*.pyc
+# Editors and local agent context
 .vscode/
 .idea/
+.obsidian/
+.claude/
+.codex/
+.agents/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+__pycache__/
+*.pyc
 *.swp
 *~
+
+# Development notebooks and measurements live on dev
+/research/
+/validation/
+/docs/experiments/
+/docs/reports/

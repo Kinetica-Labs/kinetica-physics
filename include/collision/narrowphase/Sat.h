@@ -33,10 +33,15 @@ struct SeparatingAxis {
 };
 
 SeparatingAxis findSeparatingAxis(const ConvexHull& a, const Transform& poseA, const ConvexHull& b, const Transform& poseB, Real preference = kFacePreference);
-
+// То же для оболочек, уже переведённых в общие оси; ось — в этих же осях. Отсечение граней строит
+// оболочки один раз на пару и пользуется ими и здесь, и дальше.
+SeparatingAxis findSeparatingAxis(const TransformedHull& A, const TransformedHull& B, Real preference = kFacePreference);
+// Любая разделяющая ось за пределами margin исключает контакт, включая внутренний стык частей.
+// При успехе response содержит геометрически предпочтительную ось для построения площадки.
+bool findContactAxis(const TransformedHull& A, const TransformedHull& B, Real margin, Real preference, SeparatingAxis& response);
 // Лучшая ось только среди нормалей граней. Нужна контакту почти параллельных граней: точная ось
 // там — пара рёбер, но касаются тела всей площадкой (HullVsHullAlgorithm).
-SeparatingAxis findFaceAxis(const ConvexHull& a, const Transform& poseA, const ConvexHull& b, const Transform& poseB, Real preference = kFacePreference);
+SeparatingAxis findFaceAxis(const TransformedHull& A, const TransformedHull& B, Real preference = kFacePreference);
 
 // Ось наружной грани (ConvexHull::outerFace), если она есть у одного из тел: зазор — от плоскости
 // этой грани до самой глубокой вершины другого тела. Тела даны в общих осях; false — наружной

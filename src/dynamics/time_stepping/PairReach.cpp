@@ -26,6 +26,7 @@ PairReach::PairReach(const std::vector<Body>& bodies, const std::vector<ContactP
             least_[i] = k ? std::min(least_[i], c) : c, most_[i] = std::max(most_[i], c);
         }
     }
+    listed_.reserve(pairs.size());
     for (const ContactPair& pair : pairs) listed_.push_back({pair.a, pair.b, pair.partA, pair.partB});
     std::sort(listed_.begin(), listed_.end());
     allow(bodies, time);
@@ -34,7 +35,9 @@ PairReach::PairReach(const std::vector<Body>& bodies, const std::vector<ContactP
 void PairReach::allow(const std::vector<Body>& bodies, Real time) {
     allowed_.assign(bodies.size(), {}), spent_.assign(bodies.size(), {});
     for (size_t i = 0; i < bodies.size(); ++i)
-        if (!bodies[i].isStatic()) allowed_[i] = {(bodies[i].linearVelocity().length() + gravity_.length() * time) * time, bodies[i].angularMomentum.length() * time};
+        if (!bodies[i].isStatic())
+            allowed_[i] = {(bodies[i].linearVelocity().length() + gravity_.length() * time + bodies[i].mass.inverseMass * bodies[i].force.length() * time) * time,
+                           (bodies[i].angularMomentum.length() + bodies[i].torque.length() * time) * time};
 }
 
 // Путь линеен по c, поэтому выход за границу у какой-нибудь части тела виден на концах отрезка c.
@@ -53,12 +56,11 @@ void PairReach::spend() {
     for (size_t i = 0; i < spent_.size(); ++i) spent_[i].linear += next_[i].linear, spent_[i].angular += next_[i].angular;
 }
 
-std::vector<ContactPair> PairReach::discover(const std::vector<Body>& bodies, const JointSet& joints, Real remaining, Real boundary) {
+StepArray<ContactPair> PairReach::discover(const std::vector<Body>& bodies, const JointSet& joints, Real remaining, Real boundary) {
     PairFinder finder(bodies, gravity_);
-    finder.boundary = boundary;
-    std::vector<ContactPair> fresh;
-    for (const ContactPair& pair : finder.pairs(remaining, joints))
-        if (!std::binary_search(listed_.begin(), listed_.end(), Key{pair.a, pair.b, pair.partA, pair.partB})) fresh.push_back(pair);
+    finder.boundary = boundary, finder.known = &listed_; // пары списка заново не проверяются: нужны только новые
+    StepArray<ContactPair> fresh;
+    for (const ContactPair& pair : finder.pairs(remaining, joints)) fresh.push_back(pair);
     for (const ContactPair& pair : fresh) listed_.push_back({pair.a, pair.b, pair.partA, pair.partB});
     std::sort(listed_.begin(), listed_.end());
     allow(bodies, remaining);

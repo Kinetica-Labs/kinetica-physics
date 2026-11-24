@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <cmath>
 #include <optional>
-#include <vector>
 
 namespace kp {
 namespace {
@@ -34,21 +33,44 @@ bool overlapOf(const Tube& tube, const Tube& lower, Vector3& from, Vector3& to) 
     return true;
 }
 
+// Отбор точек общего участка двух трубок по зазору [м].
+ContactManifold tubeContacts(const ContactManifold& single, const ContactPoint& first, const ContactPoint& last, Real margin, Real touching) {
+    const ContactPoint found[] = {single.points[0], first, last};
+    // Если касаются оба конца общего участка, трубки лежат вдоль друг друга, и ближайшая точка —
+    // случайная точка между концами: площадку задают концы.
+    const bool along = found[1].separation <= touching && found[2].separation <= touching;
+    ContactCandidates candidates;
+    // Ни одна точка контакта не бывает ближе ближайших точек тел. Цилиндр, упёртый кромкой под
+    // 45°, считался трубкой, и концы «общего участка» получали зазор −7 см; выталкивание по ним
+    // подбрасывало тело вверх на каждом отрезке, и оно никогда не долетало до второго.
+    for (std::uint32_t i = along ? 1 : 0; i < 3; ++i)
+        if (i == 0 || (found[i].separation <= margin && found[i].separation >= found[0].separation - kOnBoundary)) candidates.push_back({found[i].onA, found[i].separation, i});
+    ContactManifold manifold;
+    manifold.normal = single.normal;
+    manifold.roundA = single.roundA, manifold.roundB = single.roundB;
+    for (const ContactCandidate& kept : ContactCandidate::ordered(candidates, touching)) manifold.add(found[kept.id]);
+    return manifold;
+}
+
 } // namespace
 
 ContactManifold RoundVsRoundAlgorithm::collide(const ConvexShape& a, const Transform& poseA, const ConvexShape& b, const Transform& poseB, const ClosestPoints& closest, Real margin,
                                                Real touching, Real) const {
     // Две круглые формы с перекрывшимися ядрами здесь не разрешаются.
     if (closest.coresOverlap || closest.distance > margin) return {};
-    // Торец цилиндра — плоский элемент: всё, что на нём лежит, даёт площадку общим способом.
-    const ContactManifold patch = ContactPatch::between(a, poseA, b, poseB, closest, margin, touching);
-    if (patch.count > 0) return patch;
-
+    // У двух совпадающих точечных ядер нормаль выбрана при расчёте свидетелей.
+    // Торец цилиндра в общем случае даёт площадку, в том числе при глубоком перекрытии.
+    const bool points = closest.distance <= -a.radius - b.radius && a.hasPointCore() && b.hasPointCore();
+    if (!points) {
+        const ContactManifold patch = ContactPatch::between(a, poseA, b, poseB, closest, margin, touching);
+        if (patch.count > 0) return patch;
+    }
     ContactManifold single;
     single.normal = closest.normal;
     single.add({closest.onA, closest.onB, closest.distance, 0});
     single.roundA = a.rollingRadius(poseA, closest.normal);
     single.roundB = b.rollingRadius(poseB, -1 * closest.normal);
+    if (points) return single;
 
     // Плоского элемента нет: контакт — ближайшие точки. Две трубки, лежащие вдоль друг друга,
     // касаются по отрезку, и к ближайшим точкам добавляются точки на концах их общего участка.
@@ -58,21 +80,7 @@ ContactManifold RoundVsRoundAlgorithm::collide(const ConvexShape& a, const Trans
     const std::optional<Tube> ta = a.tubeTowards(poseA, closest.normal), tb = b.tubeTowards(poseB, -1 * closest.normal);
     Vector3 from, to;
     if (!ta || !tb || !overlapOf(*tb, *ta, from, to)) return single;
-    const ContactPoint found[3] = {single.points[0], above(*ta, *tb, from, 1), above(*ta, *tb, to, 2)};
-    // Если касаются оба конца общего участка, трубки лежат вдоль друг друга, и ближайшая точка —
-    // случайная точка между концами: площадку задают концы.
-    const bool along = found[1].separation <= touching && found[2].separation <= touching;
-    std::vector<ContactCandidate> candidates;
-    // Ни одна точка контакта не бывает ближе ближайших точек тел. Цилиндр, упёртый кромкой под
-    // 45°, считался трубкой, и концы «общего участка» получали зазор −7 см; выталкивание по ним
-    // подбрасывало тело вверх на каждом отрезке, и оно никогда не долетало до второго.
-    for (std::uint32_t i = along ? 1 : 0; i < 3; ++i)
-        if (i == 0 || (found[i].separation <= margin && found[i].separation >= closest.distance - kOnBoundary)) candidates.push_back({found[i].onA, found[i].separation, i});
-    ContactManifold manifold;
-    manifold.normal = closest.normal;
-    manifold.roundA = single.roundA, manifold.roundB = single.roundB;
-    for (const ContactCandidate& kept : ContactCandidate::ordered(candidates, touching)) manifold.add(found[kept.id]);
-    return manifold;
+    return tubeContacts(single, above(*ta, *tb, from, 1), above(*ta, *tb, to, 2), margin, touching);
 }
 
 } // namespace kp

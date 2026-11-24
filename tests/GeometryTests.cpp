@@ -1,10 +1,13 @@
 // Геометрия против формул: расстояния и глубины, у которых есть точный ответ.
 
 #include <body/CompoundBodyBuilder.h>
+#include <collision/ContactPair.h>
 #include <collision/narrowphase/HullVsHullAlgorithm.h>
 #include "Check.h"
 
 #include <collision/shapes/Capsule.h>
+#include <collision/shapes/Cylinder.h>
+#include <collision/narrowphase/NarrowPhaseAlgorithm.h>
 #include <collision/shapes/Sphere.h>
 #include <body/Body.h>
 #include <body/MassFrame.h>
@@ -15,6 +18,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <utility>
 #include <vector>
 
@@ -56,6 +60,47 @@ void spheres() {
     const ClosestPoints overlapping = closestPoints(a, at({0, 0, 0}), b, at({0, 1, 0}));
     CHECK_NEAR(overlapping.distance, -0.5, kExact);
     CHECK(!overlapping.coresOverlap, "ядра двух разных точек не перекрываются");
+}
+
+void pointCoreWitnesses() {
+    const Vector3 centre{7.25, -3.75, 12.5};
+    const Body ball = Body::sphere(.25, 1, centre);
+    Body cap = Body::capsule(0, .125, 1, centre);
+    cap.orientation = aboutAxis({1, 0, 0}, 37);
+    const Body* shapes[] = {&ball, &cap};
+    for (const Body* a : shapes) {
+        for (const Body* b : shapes) {
+            const Real ra = a->shape->radius, rb = b->shape->radius;
+            const auto gap = closestPoints(*a->shape, a->pose(), *b->shape, b->pose());
+            CHECK(!gap.coresOverlap && !gap.beyond, "для двух точечных ядер глубина известна");
+            CHECK_NEAR(gap.normal.length(), 1, kExact);
+            CHECK_NEAR(gap.distance, -ra - rb, kExact);
+            CHECK_NEAR((gap.onA - centre - ra * gap.normal).length(), 0, kExact);
+            CHECK_NEAR((gap.onB - centre + rb * gap.normal).length(), 0, kExact);
+            CHECK_NEAR(separationOf(*a, *b).distance, gap.distance, kExact);
+            const auto pair = examinePairWithin(*a, *b, 0);
+            CHECK(pair && pair->manifold.count == 1, "ожидается одна пара точек поверхности");
+            if (!pair || pair->manifold.count != 1) continue;
+            const auto& p = pair->manifold.points[0];
+            CHECK_NEAR((p.onA - gap.onA).length(), 0, kExact);
+            CHECK_NEAR((p.onB - gap.onB).length(), 0, kExact);
+            CHECK_NEAR((p.onB - p.onA).dot(pair->manifold.normal), gap.distance, kExact);
+        }
+    }
+    // Почти совпавшие центры всё ещё задают направление. Длина короткого отрезка
+    // может теряться при сложении с радиусом оболочки, а в опорной функции сохраняется.
+    const Real tiny = std::numeric_limits<Real>::denorm_min();
+    const Sphere sphere(.25);
+    const Capsule segment(tiny, .25);
+    CHECK(!segment.hasPointCore(), "ненулевой отрезок принят за точку");
+    const auto near = closestPoints(sphere, at({}), sphere, at({tiny, 2 * tiny, 0}));
+    CHECK_NEAR((near.normal - (1 / std::sqrt(Real(5))) * Vector3{1, 2, 0}).length(), 0, kExact);
+    // Разность центров превышает max(), но расстояние между поверхностями представимо.
+    const Real large = std::numeric_limits<Real>::max();
+    const Sphere huge(large / 2);
+    const auto far = closestPoints(huge, at({-0.75 * large, 0, 0}), huge, at({0.75 * large, 0, 0}));
+    CHECK_NEAR(far.distance / large, 0.5, kExact);
+    CHECK_NEAR(far.normal.x, 1, kExact);
 }
 
 void boxes() {
@@ -184,7 +229,7 @@ void boxesAboutCommonAxis() {
 // Почти параллельные грани двух брусков, вошедшие друг в друга на микрон. Точная ось наименьшего
 // перекрытия здесь — пара рёбер, и она даёт одну точку; но касаются бруски всей площадкой, и
 // контакт обязан её показать. С одной точкой удар останавливал сближение только в ней: два бруска
-// на 100 м/с входили друг в друга на 36 см (docs/reports/case-table.md).
+// на 100 м/с входили друг в друга на 36 см.
 void contactPatchOfParallelFaces() {
     Sequence random;
     int edgeAxes = 0, singlePoints = 0;
@@ -255,7 +300,7 @@ void contactPoints() {
     CHECK_NEAR(patchArea(shifted), 1.5, 1e-9);
 
     // Куб, повёрнутый на 45° вокруг вертикали: общая область — правильный восьмиугольник.
-    // В контакт идут все восемь вершин: четыре точки не покрыли бы площадку (proofs/README.md).
+    // В контакт идут все восемь вершин: четыре точки не покрыли бы площадку (docs/testing.md).
     const ContactManifold turned = HullVsHullAlgorithm::clipFaces(big, at({}), big, at({0, 2 - depth, 0}, aboutAxis({0, 1, 0}, 45)), margin);
     const double octagon = 8 * (std::sqrt(2.0) - 1);
     CHECK(turned.count == 8, "точек %d вместо 8", turned.count);
@@ -293,6 +338,57 @@ void contactPoints() {
         for (int j = i + 1; j < flush.count; ++j) CHECK(flush.points[i].id != flush.points[j].id, "два контакта с одним номером");
 }
 
+// Точное знаковое расстояние: ядро цилиндра в радиально-осевом сечении — прямоугольник,
+// поверхность скругления отстоит от него на radius.
+Real cylinderSurfaceDistance(const Cylinder& c, Vector3 p) {
+    const Real radial = std::hypot(p.x, p.z) - c.coreRadius;
+    const Real axial = std::abs(p.y) - c.coreHalfHeight;
+    return std::hypot(std::max(radial, Real(0)), std::max(axial, Real(0))) +
+           std::min(std::max(radial, axial), Real(0)) - c.radius;
+}
+
+void cylinderCapWitnesses() {
+    const Cylinder lower(.23, .16), upper(.23, .16, .025);
+    const Vector3 up{0, 1, 0};
+    // При таком наклоне мировая вертикаль в осях нижнего цилиндра равна (0.6, 0.8, 0).
+    const Quaternion tilt = Quaternion{3, 0, 0, 1}.unit();
+    const Vector3 rim{lower.coreRadius, lower.coreHalfHeight, 0};
+    const Real lensDepth = .001; // м: ширина перекрытия почти касательных параллельных дисков
+    for (Real gap : {Real(0), Real(5e-5)}) {
+        const auto check = [&](Transform a, Transform b, Real minArea) {
+            for (bool swap : {false, true}) {
+                const Cylinder& first = swap ? upper : lower;
+                const Cylinder& second = swap ? lower : upper;
+                const Transform& from = swap ? b : a;
+                const Transform& to = swap ? a : b;
+                const auto closest = closestPoints(first, from, second, to);
+                const auto patch = NarrowPhaseAlgorithm::between(first, second).collide(
+                    first, from, second, to, closest, kContactDistance, kContactDistance, kOnBoundary);
+                CHECK(patch.count > 0, "пустая площадка при зазоре %.8g м", double(gap));
+                for (const ContactPoint& point : patch.points) {
+                    CHECK_NEAR(cylinderSurfaceDistance(first, from.localPoint(point.onA)), 0, kOnBoundary);
+                    CHECK_NEAR(cylinderSurfaceDistance(second, to.localPoint(point.onB)), 0, kOnBoundary);
+                    CHECK_NEAR(point.separation, gap, kOnBoundary);
+                    CHECK_NEAR((point.onB - point.onA - point.separation * patch.normal).length(), 0, kOnBoundary);
+                }
+                if (minArea > 0) {
+                    CHECK(patch.count >= 3 && patchArea(patch) > minArea,
+                          "площадь опоры меньше %.8g м², точек %d", double(minArea), patch.count);
+                }
+            }
+        };
+        // Самая верхняя точка обода находится в начале координат. Проекция окружности —
+        // эллипс, часть описанной вокруг него окружности проходит вне цилиндра.
+        const Transform leaning{-tilt.rotate(rim) - lower.radius * up, tilt};
+        check(leaning, at({0, .23 + gap, .3 * upper.coreRadius}), 0);
+        const Transform flat = at({0, -.23, 0});
+        check(flat, at({0, .23 + gap, 0}), upper.coreRadius * upper.coreRadius);
+        const Real offset = lower.coreRadius + upper.coreRadius - lensDepth;
+        check(flat, at({.8 * offset, .23 + gap, .6 * offset}),
+              lensDepth * std::sqrt(upper.coreRadius * lensDepth) / 8);
+    }
+}
+
 // Разбиение невыпуклого тела на выпуклые части и точные тела вращения.
 void decomposition() {
     const auto volumeOf = [](const std::vector<std::vector<Vector3>>& parts) {
@@ -305,7 +401,8 @@ void decomposition() {
         double least = 1e30;
         for (const std::vector<Vector3>& points : parts) {
             double worst = -1e30;
-            for (const ConvexHull::Face& face : ConvexHull::fromPoints(points).faces()) worst = std::fmax(worst, double(face.normal.dot(point) - face.offset));
+            const ConvexHull hull = ConvexHull::fromPoints(points); // не временный: цикл по faces() временного объекта читал бы освобождённую память
+            for (const ConvexHull::Face& face : hull.faces()) worst = std::fmax(worst, double(face.normal.dot(point) - face.offset));
             least = std::fmin(least, worst);
         }
         return least;
@@ -354,6 +451,7 @@ void decomposition() {
 void geometryTests() {
     polytopeTopology();
     spheres();
+    pointCoreWitnesses();
     boxes();
     roundedShapes();
     separatingAxes();
@@ -362,5 +460,6 @@ void geometryTests() {
     boxesAboutCommonAxis();
     contactPatchOfParallelFaces();
     contactPoints();
+    cylinderCapWitnesses();
     decomposition();
 }

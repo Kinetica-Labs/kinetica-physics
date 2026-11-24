@@ -15,6 +15,7 @@ public:
         Vector3 normal;           // единичная, наружу
         Real offset = 0;     // normal · x = offset на грани
         std::vector<int> loop; // вершины против часовой стрелки, если смотреть снаружи
+        bool internal = false; // вся грань закрыта соседней частью того же составного тела
     };
     struct Edge {
         int tail = 0, head = 0; // вершины; направление — как в обходе грани left
@@ -53,6 +54,9 @@ public:
     const std::vector<Edge>& edges() const { return edges_; }
 
 private:
+    friend class CompoundBodyBuilder; // отмечает стыки до передачи частей составному телу
+    Vector3 coreExtents() const override { return coreExtents_; }
+    Vector3 coreExtents_;
     std::vector<Vector3> vertices_;
     std::vector<Face> faces_;
     std::vector<Edge> edges_;

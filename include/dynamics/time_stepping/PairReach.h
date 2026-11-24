@@ -11,7 +11,9 @@
 // вывел бы тело за неё, пары ищутся заново — при нынешних скоростях, на оставшееся время обновления,
 // — и те, которых в списке не было, отдаются шагу до сдвига тел.
 
+#include <math/StepMemory.h>
 #include <collision/ContactPair.h>
+#include <collision/PairFinder.h>
 #include <joints/JointSet.h>
 
 #include <array>
@@ -30,21 +32,21 @@ public:
     void spend();
     // Пары заново, на время remaining; возвращает те, которых в списке не было. Границы всех тел
     // ставятся по нынешним скоростям. boundary — PairFinder::boundary.
-    std::vector<ContactPair> discover(const std::vector<Body>& bodies, const JointSet& joints, Real remaining, Real boundary);
+    StepArray<ContactPair> discover(const std::vector<Body>& bodies, const JointSet& joints, Real remaining, Real boundary);
 
 private:
     // Путь точки тела: linear + c · angular, c — от наименьшего до наибольшего у частей тела.
     struct Path {
         Real linear = 0, angular = 0;
     };
-    using Key = std::array<int, 4>;
+    using Key = PairFinder::Key;
     void allow(const std::vector<Body>& bodies, Real time);
 
     Vector3 gravity_;
     Real slack_;
-    std::vector<Real> least_, most_; // c частей тела: наименьшее и наибольшее
-    std::vector<Path> allowed_, spent_, next_;
-    std::vector<Key> listed_; // пары списка, по возрастанию
+    StepArray<Real> least_, most_; // c частей тела: наименьшее и наибольшее
+    StepArray<Path> allowed_, spent_, next_;
+    StepArray<Key> listed_; // пары списка, по возрастанию
 };
 
 } // namespace kp

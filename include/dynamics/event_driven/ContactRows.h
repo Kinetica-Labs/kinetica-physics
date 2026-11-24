@@ -3,6 +3,7 @@
 // импульс вдоль строки меняет скорости тел. Общее состояние механизмов решателя: трения пары
 // (PairFriction), сборки системы (ContactAssembly), решения вместе (CoupledSolve).
 
+#include <math/StepMemory.h>
 #include <collision/ContactPair.h>
 #include <dynamics/ContactForces.h>
 #include <dynamics/event_driven/ContactSystem.h>
@@ -79,22 +80,22 @@ struct ContactRows {
     std::vector<Body>& bodies;
     const ContactForces* pressure;
     Vector3 up;
-    std::vector<Row> rows;
-    std::vector<Pair> pairs;
-    std::vector<Real> sum;      // накопленные нормальные импульсы строк
-    std::vector<char> pressing; // активный набор: точки, где тела давят друг на друга
-    std::vector<char> stuck;    // пары, которые не скользят: их трение решается вместе с нормалями
+    StepArray<Row> rows;
+    StepArray<Pair> pairs;
+    StepArray<Real> sum;      // накопленные нормальные импульсы строк
+    StepArray<char> pressing; // активный набор: точки, где тела давят друг на друга
+    StepArray<char> stuck;    // пары, которые не скользят: их трение решается вместе с нормалями
     Real restBounceSpeed;
     const JointSet* joints;
     std::vector<Bond> bonds;         // связи всех сочленений подряд
-    std::vector<Real> bondImpulse;   // накопленные импульсы связей
-    std::vector<Real> bondStart;     // скорость вдоль связи при создании решателя
-    std::vector<Real> bondGoal;      // скорость вдоль связи, которой добивается нынешняя фаза
-    std::vector<Real> bondBias;      // поправки к целям на отрезке опоры, см. ContactSolver::biasBonds
-    std::vector<char> bondActive;    // связь участвует в нынешнем решении
-    std::vector<char> bondPressing;  // активный набор пределов хода: сочленение давит на предел
-    std::vector<signed char> saturated; // привод упёрся в предел силы: знак его импульса; 0 — не упёрся
-    std::vector<int> bondFlips;      // сколько раз привод упирался и отпускался: перебор обязан кончиться
+    StepArray<Real> bondImpulse;   // накопленные импульсы связей
+    StepArray<Real> bondStart;     // скорость вдоль связи при создании решателя
+    StepArray<Real> bondGoal;      // скорость вдоль связи, которой добивается нынешняя фаза
+    StepArray<Real> bondBias;      // поправки к целям на отрезке опоры, см. ContactSolver::biasBonds
+    StepArray<char> bondActive;    // связь участвует в нынешнем решении
+    StepArray<char> bondPressing;  // активный набор пределов хода: сочленение давит на предел
+    StepArray<signed char> saturated; // привод упёрся в предел силы: знак его импульса; 0 — не упёрся
+    StepArray<int> bondFlips;      // сколько раз привод упирался и отпускался: перебор обязан кончиться
     bool holding = false; // решается опора на отрезке, а не мгновенный удар
     Real holdTime = 0;    // длина отрезка, на котором решается опора; при ударе ноль
     int iterations = 0;

@@ -12,12 +12,13 @@
 //   ползун   (slider)     2                     3                   перемещение вдоль оси
 //   цилиндрическое        2                     2                   поворот и перемещение по оси
 //   жёсткое  (weld)       3                     3                   ни одной
+//   по траектории (path)  2 поперёк кривой      0 или 3             перемещение вдоль кривой (PathJoint)
 //
 // У каждого тела своя точка сочленения и свои оси, заданные в осях тела; ось x — главная: ось
 // шарнира, направление ползуна. Запертая свобода — линия связи (Bond): скорость вдоль неё обязана
 // быть нулевой. Перемещение запирается в точке сочленения тела b: импульс связи приложен к обоим
 // телам в одной и той же точке с противоположным знаком, поэтому суммарные импульс и момент
-// импульса пары не меняются вовсе (proofs/bond_conserves_momenta.smt2). Линии связи решаются той же
+// импульса пары не меняются вовсе (tests/proofs/bond_conserves_momenta.smt2). Линии связи решаются той же
 // точной системой, что и контакты (ContactSolver): для неё связь — равенство, контакт —
 // неравенство.
 //
@@ -48,6 +49,8 @@ public:
     // Связи при нынешних позах тел bodies; уход связей считается по скоростям тел moving. У
     // сочленения двух неподвижных (или спящих) тел связей нет: двигать ими некого.
     std::vector<Bond> bonds(const std::vector<Body>& bodies, const std::vector<Body>& moving) const;
+    // Перезаписывает result, сохраняя его запас для следующего сочленения.
+    void writeBonds(const std::vector<Body>& bodies, const std::vector<Body>& moving, std::vector<Bond>& result) const;
 
     // Тела сочленения сталкиваются друг с другом. Обычно нет: они соединены вплотную.
     virtual bool collides() const { return false; }
@@ -78,6 +81,7 @@ protected:
 
     // Общий набор связей, из которого наследники берут нужные.
     Bond travelLine(const Motion& motion, int axis) const;  // перемещение вдоль оси сочленения
+    Bond travelLine(const Motion& motion, Vector3 along) const; // то же вдоль единичного направления, которое несёт тело a
     Bond turnLine(const Motion& motion, int axis) const;    // поворот вокруг оси сочленения
     void lockTravel(const Motion& motion, int axis, std::vector<Bond>& bonds) const;
     void lockAllTurns(const Motion& motion, std::vector<Bond>& bonds) const;

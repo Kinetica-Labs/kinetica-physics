@@ -28,6 +28,20 @@ void IslandSleep::wake(std::vector<Body>& bodies, size_t body) {
     if (asleep(body)) wakeIsland(bodies, sleepIsland_[body]);
 }
 
+// Движимое тело (isDriven) будит спящих, до которых может дойти за шаг. Пара двух тел без массы
+// поиском пар не проверяется, поэтому счёт свой — по охватывающим шарам, с запасом: большая плита будит
+// всё вокруг себя, пока движется.
+void IslandSleep::wakeNearDriven(std::vector<Body>& bodies, Real dt) {
+    for (size_t d = 0; d < bodies.size(); ++d) {
+        const Body& driven = bodies[d];
+        if (!isDriven(driven) || !driven.shape) continue;
+        const Real radius = driven.boundingRadius();
+        const Real reach = radius + (driven.drivenVelocity.length() + driven.drivenSpin.length() * radius) * dt + kContactDistance;
+        for (size_t i = 0; i < bodies.size(); ++i)
+            if (asleep_[i] && bodies[i].shape && (bodies[i].position - driven.position).length() <= reach + bodies[i].boundingRadius()) wakeIsland(bodies, sleepIsland_[i]);
+    }
+}
+
 // Кого пора будить перед шагом. Спящее тело неподвижно, поэтому пара «бодрствующее — спящее»
 // находится обычным поиском пар: если за шаг они могут коснуться, остров спящего просыпается.
 void IslandSleep::wakeTouched(std::vector<Body>& bodies, const JointSet& joints, Vector3 gravity, Real dt, bool enabled) {
@@ -38,7 +52,7 @@ void IslandSleep::wakeTouched(std::vector<Body>& bodies, const JointSet& joints,
     for (size_t i = 0; i < bodies.size(); ++i) {
         if (!asleep_[i]) continue;
         const Body& body = bodies[i];
-        const bool pushed = body.linearMomentum.dot(body.linearMomentum) + body.angularMomentum.dot(body.angularMomentum) > 0;
+        const bool pushed = body.linearMomentum.dot(body.linearMomentum) + body.angularMomentum.dot(body.angularMomentum) > 0 || isForced(body);
         if (everyone || pushed) wakeIsland(bodies, sleepIsland_[i]);
     }
     for (const Joint& joint : joints) {
@@ -46,6 +60,7 @@ void IslandSleep::wakeTouched(std::vector<Body>& bodies, const JointSet& joints,
         for (int body : {joint.a, joint.b})
             if (asleep_[size_t(body)]) wakeIsland(bodies, sleepIsland_[size_t(body)]);
     }
+    wakeNearDriven(bodies, dt);
     // Спящего будит касание (то же, что объединяет тела в остров, settle) или сосед, который
     // движется быстрее порога сна и может долететь за кадр: летящий шар будит стопку до удара.
     // Стоящий сосед с зазором больше kContactDistance не будит: такие пары засыпали двумя островами
@@ -59,7 +74,8 @@ void IslandSleep::wakeTouched(std::vector<Body>& bodies, const JointSet& joints,
 
 // Кому пора спать после шага: острова бодрствующих тел, в которых каждое тело медленнее порога
 // дольше time. Остров с работающим приводом не засыпает.
-void IslandSleep::settle(std::vector<Body>& bodies, const JointSet& joints, Vector3 gravity, Real dt, Real speedLimit, Real time) {
+// Время покоя каждого тела; true — какое-то покоится уже не меньше time.
+bool IslandSleep::restingLongEnough(const std::vector<Body>& bodies, Real dt, Real speedLimit, Real time) {
     bool candidate = false;
     for (size_t i = 0; i < bodies.size(); ++i) {
         const Body& body = bodies[i];
@@ -68,7 +84,26 @@ void IslandSleep::settle(std::vector<Body>& bodies, const JointSet& joints, Vect
         quiet_[i] = speed < speedLimit ? quiet_[i] + dt : Real(0);
         candidate = candidate || quiet_[i] >= time;
     }
-    if (!candidate) return;
+    return candidate;
+}
+
+// Усыпляет тела островов, которым спать можно: top — корень острова каждого тела, restless —
+// пометка в корне острова, которому спать нельзя.
+void IslandSleep::putToSleep(std::vector<Body>& bodies, const std::vector<int>& top, const std::vector<char>& restless) {
+    std::vector<int> number(bodies.size(), -1);
+    for (size_t i = 0; i < bodies.size(); ++i) {
+        if (bodies[i].isStatic() || restless[size_t(top[i])]) continue;
+        int& slept = number[size_t(top[i])];
+        if (slept < 0) slept = sleptIslands_++;
+        asleep_[i] = 1, sleepIsland_[i] = slept, sleepingMass_[i] = bodies[i].mass;
+        bodies[i].mass = {};
+        bodies[i].linearMomentum = bodies[i].angularMomentum = {};
+        bodies[i].drivenVelocity = bodies[i].drivenSpin = {}; // без массы эти поля читаются: спящее тело обязано стоять
+    }
+}
+
+void IslandSleep::settle(std::vector<Body>& bodies, const JointSet& joints, Vector3 gravity, Real dt, Real speedLimit, Real time) {
+    if (!restingLongEnough(bodies, dt, speedLimit, time)) return;
     std::vector<int> island(bodies.size());
     for (size_t i = 0; i < island.size(); ++i) island[i] = int(i);
     const auto root = [&](int body) {
@@ -87,20 +122,14 @@ void IslandSleep::settle(std::vector<Body>& bodies, const JointSet& joints, Vect
         join(joint.a, joint.b);
         if (joint.pushes()) restless[size_t(root(bodies[size_t(joint.a)].isStatic() ? joint.b : joint.a))] = 1;
     }
+    std::vector<int> top(bodies.size());
     for (size_t i = 0; i < bodies.size(); ++i) {
+        top[i] = root(int(i));
         if (bodies[i].isStatic()) continue;
-        if (restless[i] && root(int(i)) != int(i)) restless[size_t(root(int(i)))] = 1;
-        if (quiet_[i] < time) restless[size_t(root(int(i)))] = 1;
+        if (restless[i] && top[i] != int(i)) restless[size_t(top[i])] = 1;
+        if (quiet_[i] < time) restless[size_t(top[i])] = 1;
     }
-    std::vector<int> number(bodies.size(), -1);
-    for (size_t i = 0; i < bodies.size(); ++i) {
-        if (bodies[i].isStatic() || restless[size_t(root(int(i)))]) continue;
-        int& slept = number[size_t(root(int(i)))];
-        if (slept < 0) slept = sleptIslands_++;
-        asleep_[i] = 1, sleepIsland_[i] = slept, sleepingMass_[i] = bodies[i].mass;
-        bodies[i].mass = {};
-        bodies[i].linearMomentum = bodies[i].angularMomentum = {};
-    }
+    putToSleep(bodies, top, restless);
     sleepGravity_ = gravity;
 }
 

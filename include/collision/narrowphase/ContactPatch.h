@@ -13,6 +13,7 @@
 // Число точек меняется вместе с общей частью непрерывно: отдельного кода для «вершина на грани»,
 // «ребро на торце» или «торец шире грани» нет.
 
+#include <math/StepMemory.h>
 #include <collision/narrowphase/ContactManifold.h>
 #include <collision/shapes/Flat.h>
 #include <collision/narrowphase/Gjk.h>
@@ -33,10 +34,10 @@ struct ContactPatch {
     };
     Flat flat;
     Outline outline;
-    std::vector<Point> points;
+    StepArray<Point> points;
     Real gap = 0; // зазор между плоскостью элемента и самой низкой точкой другого тела
 
-    static std::vector<Point> pointsOf(const Flat& flat, const Outline& outline);
+    static StepArray<Point> pointsOf(const Flat& flat, const Outline& outline);
     // Площадка на плоском элементе, которым reference обращено в сторону towards; у формы без
     // такого элемента её нет.
     static std::optional<ContactPatch> on(const ConvexShape& reference, const Transform& referencePose, const ConvexShape& other, const Transform& otherPose, Vector3 towards);

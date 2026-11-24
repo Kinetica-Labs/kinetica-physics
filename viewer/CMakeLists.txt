@@ -36,6 +36,8 @@ add_library(imgui STATIC
 target_include_directories(imgui SYSTEM PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
 target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
 
-add_executable(viewer main.cpp Viewer.cpp Panel.cpp GlRenderer.cpp Scenes.cpp)
+configure_file(data/hull-events.csv data/hull-events.csv COPYONLY)
+add_executable(viewer main.cpp Viewer.cpp ImpulseTool.cpp Panel.cpp GlRenderer.cpp Scenes.cpp)
 target_link_libraries(viewer PRIVATE kinetica-physics kinetica-scenes imgui)
 target_compile_options(viewer PRIVATE -Wall -Wextra)
+target_compile_definitions(viewer PRIVATE KP_HULL_EVENTS_FILE="${CMAKE_CURRENT_BINARY_DIR}/data/hull-events.csv")

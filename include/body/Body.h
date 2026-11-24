@@ -61,6 +61,18 @@ struct Body {
     // со скоростью и покоя не создаёт: тело в неустойчивом равновесии всё равно упадёт.
     Real linearDamping = 0;
     Real angularDamping = 0;
+    // Внешние сила в центре масс, Н, и момент, Н·м, в мировых осях: действуют постоянными весь следующий
+    // шаг мира и после него обнуляются, как в ReactPhysics3D, Jolt и Box3D. Тому, кто держит силу
+    // постоянно, — прикладывать её перед каждым шагом (applyForce, applyTorque).
+    Vector3 force;
+    Vector3 torque;
+    // Заданные скорости тела без массы (плотность ноль), м/с и рад/с, в мировых осях. Такое тело идёт с
+    // ними точно как задано — силы и удары их не меняют, — а остальные тела отвечают на него как на
+    // движущуюся опору: платформа, дверь, захват робота, ведомый программой (kinematic body в Jolt,
+    // ReactPhysics3D и Box3D). Неподвижное тело — то же тело с нулевыми скоростями. У тела с массой
+    // скорости выводятся из импульсов, и эти поля не читаются.
+    Vector3 drivenVelocity;
+    Vector3 drivenSpin;
 
     // Однородный брусок с полуразмерами halfExtents. Нулевая плотность — неподвижное тело.
     static Body box(Vector3 halfExtents, Real density, Vector3 position = {}) {
@@ -113,6 +125,7 @@ struct Body {
         return piece;
     }
 
+    // Тело без массы: силы его не двигают. Стоит оно или идёт с заданной скоростью — isDriven(тело).
     bool isStatic() const { return mass.inverseMass == 0; }
     // Поза формы в мире: у простого тела она же — оси тела.
     Transform pose() const {
@@ -122,10 +135,15 @@ struct Body {
     // Радиус шара с центром в центре масс, охватывающего форму.
     Real boundingRadius() const { return (placed ? placement.position.length() : Real(0)) + shape->boundingRadius(); }
 
-    Vector3 linearVelocity() const { return mass.inverseMass * linearMomentum; }
-    Vector3 angularVelocity() const { return orientation.rotate(mass.inverseInertia.scaled(orientation.rotateInverse(angularMomentum))); }
+    Vector3 linearVelocity() const { return isStatic() ? drivenVelocity : mass.inverseMass * linearMomentum; }
+    Vector3 angularVelocity() const { return isStatic() ? drivenSpin : orientation.rotate(mass.inverseInertia.scaled(orientation.rotateInverse(angularMomentum))); }
 };
 
+// Идёт ли тело без массы с заданной скоростью (Body::drivenVelocity, drivenSpin).
+inline bool isDriven(const Body& body) {
+    const Vector3 &v = body.drivenVelocity, &w = body.drivenSpin;
+    return body.isStatic() && (v.x != 0 || v.y != 0 || v.z != 0 || w.x != 0 || w.y != 0 || w.z != 0);
+}
 // Оси тела в мире: начало — центр масс.
 inline Transform frameOf(const Body& body) { return {body.position, body.orientation}; }
 // ω при заданной ориентации: L переводится в оси тела, делится на моменты, возвращается в мир.
@@ -143,6 +161,17 @@ inline void applyImpulse(Body& body, Vector3 impulse, Vector3 point) {
     if (body.isStatic()) return;
     body.linearMomentum += impulse;
     body.angularMomentum += (point - body.position).cross(impulse);
+}
+// Сила F в точке мира на следующий шаг: к силе в центре масс прибавляется F, к моменту — r × F. Плечо r
+// берётся по нынешней позе и за шаг не меняется.
+inline void applyForce(Body& body, Vector3 force, Vector3 point) {
+    body.force += force;
+    body.torque += (point - body.position).cross(force);
+}
+inline void applyTorque(Body& body, Vector3 torque) { body.torque += torque; }
+// Приложена ли к телу внешняя сила или момент.
+inline bool isForced(const Body& body) {
+    return body.force.x != 0 || body.force.y != 0 || body.force.z != 0 || body.torque.x != 0 || body.torque.y != 0 || body.torque.z != 0;
 }
 // Кинетическая энергия: p²/2m + ½ L·ω.
 inline Real kineticEnergyOf(const Body& body) { return 0.5 * body.mass.inverseMass * body.linearMomentum.dot(body.linearMomentum) + 0.5 * body.angularMomentum.dot(body.angularVelocity()); }

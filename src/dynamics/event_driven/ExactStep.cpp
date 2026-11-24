@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/ExactStep.h>
 
 #include <collision/PairFinder.h>
@@ -64,7 +65,7 @@ std::vector<ContactPair> ExactStep::contacts(Real h) const { return PairFinder(b
 // Поэтому короче половины этого времени отрезок за один раз не делается.
 void ExactStep::limitTurn(const std::vector<ContactPair>& pairs, Real& time, Forces& forces, Cut& cut) {
     for (Real turn; (turn = events_.contactTurn(pairs, forces.rates, time)) > kMaxContactTurn;) {
-        const Real atPresentSpin = events_.contactTurn(pairs, std::vector<Rate>(bodies_.size()), time); // поворот без сил
+        const Real atPresentSpin = events_.contactTurn(pairs, StepArray<Rate>(bodies_.size()), time); // поворот без сил
         const Real unforced = atPresentSpin > 0 ? time * kMaxContactTurn / atPresentSpin : time;
         time = std::max(time * std::min(Real(0.5), kMaxContactTurn / turn), std::min(time, unforced) / 2);
         forces = forcesWithin(pairs, time);
@@ -115,10 +116,10 @@ void ExactStep::cutAtEvents(const std::vector<ContactPair>& pairs, Real h, Real&
 // двух тел за отрезок расходятся, и плечо тела до этой точки ко второй половине толчка меняется на
 // Δc − Δr: без этой поправки пара сил ±F меняла момент импульса системы (куча без тяжести — 5·10⁻⁶
 // за 5 с). С поправкой момент импульса пары не меняется при любом смещении общей точки
-// (proofs/half_kick_keeps_momenta.smt2); выбор точки решает другое — энергию: у тела, которое само
+// (tests/proofs/half_kick_keeps_momenta.smt2); выбор точки решает другое — энергию: у тела, которое само
 // несёт точку, плечо прежнее, и шар катится по полу, как катился.
 void ExactStep::move(const std::vector<ContactPair>& pairs, const Forces& forces, Real time) {
-    std::vector<Vector3> from(bodies_.size()), lever(bodies_.size());
+    StepArray<Vector3> from(bodies_.size()), lever(bodies_.size());
     for (size_t i = 0; i < bodies_.size(); ++i) {
         from[i] = bodies_[i].position;
         integrateVelocity(bodies_[i], forces.rates[i].force, forces.rates[i].torque, time / 2);
@@ -199,7 +200,7 @@ void ExactStep::resolveImpacts(const std::vector<ContactPair>& touching) {
 //    (shakeBonds).
 ExactStep::Forces ExactStep::computeForces(const std::vector<ContactPair>& pairs, Real h) {
     const std::vector<Body> before = bodies_;
-    Forces forces{std::vector<Rate>(bodies_.size()), {h}, std::vector<Rate>(bodies_.size())};
+    Forces forces{StepArray<Rate>(bodies_.size()), {h}, StepArray<Rate>(bodies_.size())};
     BondShake shake;
     for (int pass = 0;; ++pass) {
         bool again = forcesPass(pairs, h, pass, before, shake.bias, forces);
@@ -224,18 +225,22 @@ std::vector<Body> ExactStep::middleOf(const std::vector<Body>& before, const For
 
 // Один проход решателя: силы — изменение импульсов за отрезок, делённое на h; тела возвращаются к
 // началу отрезка. true — тела вращаются заметно, и силы нужно уточнить по импульсам середины.
-bool ExactStep::forcesPass(const std::vector<ContactPair>& pairs, Real h, int pass, const std::vector<Body>& before, const std::vector<Real>& bias, Forces& forces) {
+bool ExactStep::forcesPass(const std::vector<ContactPair>& pairs, Real h, int pass, const std::vector<Body>& before, const StepArray<Real>& bias, Forces& forces) {
     ContactSolver solver(bodies_, pairs, up(), restBounceSpeed(), &contactForces_, &joints_); // запоминает скорости до толчка
     solver.settle(stopped_);
     if (pass > 0) solver.setDrift(middleOf(before, forces, h));
     solver.biasBonds(bias);
-    for (Body& body : bodies_)
-        if (!body.isStatic()) integrateVelocity(body, (1 / body.mass.inverseMass) * gravity_, {}, h);
+    for (Body& body : bodies_) {
+        if (body.isStatic()) continue;
+        const Vector3 weight = (1 / body.mass.inverseMass) * gravity_;
+        if (isForced(body)) integrateVelocity(body, weight + body.force, body.torque, h);
+        else integrateVelocity(body, weight, {}, h);
+    }
     for (const Joint& joint : joints_) joint.applyDrive(bodies_, h);
     contactForces_ = solver.solveRestingContacts(h, contactForces_, shockPropagation);
     forces.slidingStop = solver.slidingStop(h, stoppedThisStep_);
     report_.solverIterations = std::max(report_.solverIterations, solver.iterations());
-    std::vector<Vector3> bondLinear, bondAngular;
+    StepArray<Vector3> bondLinear, bondAngular;
     solver.bondImpulses(bondLinear, bondAngular);
     for (size_t i = 0; i < bodies_.size(); ++i) {
         forces.rates[i] = {(1 / h) * (bodies_[i].linearMomentum - before[i].linearMomentum), (1 / h) * (bodies_[i].angularMomentum - before[i].angularMomentum)};
@@ -243,6 +248,23 @@ bool ExactStep::forcesPass(const std::vector<ContactPair>& pairs, Real h, int pa
         bodies_[i] = before[i];
     }
     return pass == 0 && solver.setDrift(middleOf(before, forces, h)) * h >= kDriftResolved;
+}
+
+// Поправка связей — малая добавка к движению без неё: нарушение C в конце отрезка второго порядка
+// по повороту тел. Если она меняет поворот тела за отрезок больше чем на kMaxTurn, подбор разошёлся
+// (тяжёлый груз на лёгкой цепи): касательная поправка «−2 C / h» отклик уже не описывает, а честно
+// интегрировать такое пробное состояние — миллионы частей поворота (integratePosition). true —
+// отрезок слишком длинен; проход 0 идёт без поправки и запоминается как точка отсчёта.
+bool ExactStep::shakeDiverged(BondShake& shake, const std::vector<Body>& before, const Forces& forces, int pass, Real h) {
+    const std::vector<Body> middle = middleOf(before, forces, h);
+    if (pass == 0) shake.spin.clear();
+    bool diverged = false;
+    for (size_t i = 0; i < middle.size(); ++i) {
+        const Vector3 spin = middle[i].angularVelocity();
+        if (pass == 0) shake.spin.push_back(spin);
+        else diverged = diverged || (spin - shake.spin[i]).length() * h > kMaxTurn;
+    }
+    return diverged;
 }
 
 // Сила связи постоянна на отрезке и направлена как в его начале, а тела за отрезок
@@ -254,6 +276,10 @@ bool ExactStep::forcesPass(const std::vector<ContactPair>& pairs, Real h, int pa
 // system with constraints», J. Comput. Phys. 23, 1977. false — подбор не сходится, отрезок
 // слишком длинен (его укоротит forcesWithin).
 bool ExactStep::shakeBonds(BondShake& shake, const std::vector<Body>& before, Forces& forces, int pass, Real h) const {
+    if (shakeDiverged(shake, before, forces, pass, h)) {
+        forces.resolved = false;
+        return false;
+    }
     std::vector<Body> end = before;
     for (size_t i = 0; i < end.size(); ++i) end[i] = advanced(before[i], forces.rates[i].force, forces.rates[i].torque, h);
     shake.errors.clear();

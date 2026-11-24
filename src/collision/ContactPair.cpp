@@ -8,8 +8,14 @@
 
 namespace kp {
 
+Real forcedSpeedGain(const Body& body, Real h) {
+    const Vector3 inverse = body.mass.inverseInertia;
+    const Real spin = body.shape ? std::max({inverse.x, inverse.y, inverse.z}) * body.boundingRadius() : Real(0);
+    return (body.mass.inverseMass * body.force.length() + spin * body.torque.length()) * h;
+}
+
 Real maxPointSpeed(const Body& body) {
-    if (body.isStatic()) return 0;
+    if (body.isStatic()) return isDriven(body) ? body.drivenVelocity.length() + body.drivenSpin.length() * (body.shape ? body.boundingRadius() : Real(0)) : Real(0);
     const Real moving = body.linearVelocity().length();
     if (!body.shape) return moving;
     const Vector3 inverse = body.mass.inverseInertia;
@@ -24,8 +30,7 @@ Real maxPointSpeed(const Body& body) {
     // |L| √Σ (ρₖ / Iₖ)². У вытянутого тела быстрое вращение возможно только вокруг длинной оси, а
     // от неё точки близко: у стержня эта оценка на порядок точнее первой.
     const ConvexShape& shape = *body.shape;
-    const auto extent = [&](Vector3 axis) { return std::max(axis.dot(shape.support(axis)), -axis.dot(shape.support(-1 * axis))) + shape.radius; };
-    const Vector3 e{extent({1, 0, 0}), extent({0, 1, 0}), extent({0, 0, 1})};
+    const Vector3 e = shape.coreExtents() + Vector3{shape.radius, shape.radius, shape.radius};
     const Real x = sqrt(e.y * e.y + e.z * e.z) * inverse.x, y = sqrt(e.x * e.x + e.z * e.z) * inverse.y, z = sqrt(e.x * e.x + e.y * e.y) * inverse.z;
     const Real axial = momentum * sqrt(x * x + y * y + z * z);
     return moving + std::min(round, axial);
@@ -73,10 +78,14 @@ Real gapAlong(const Body& a, const Body& b, Vector3 n) {
 
 std::optional<ContactPair> examinePair(const Body& a, const Body& b, Vector3 gravity, Real h, Real boundary) {
     if (!a.shape || !b.shape || (a.isStatic() && b.isStatic())) return std::nullopt;
-    // За время h сила тяжести добавляет к скорости не больше g h.
-    const Real reach = (maxPointSpeed(a) + maxPointSpeed(b) + gravity.length() * h) * h;
+    return examinePairWithin(a, b, approachReach(maxPointSpeed(a) + forcedSpeedGain(a, h), maxPointSpeed(b) + forcedSpeedGain(b, h), gravity, h), boundary);
+}
+
+std::optional<ContactPair> examinePairWithin(const Body& a, const Body& b, Real reach, Real boundary) {
+    if (!a.shape || !b.shape || (a.isStatic() && b.isStatic())) return std::nullopt;
     if ((b.pose().position - a.pose().position).length() - a.shape->boundingRadius() - b.shape->boundingRadius() > reach + kContactDistance) return std::nullopt;
-    const ClosestPoints gap = closestPoints(*a.shape, a.pose(), *b.shape, b.pose());
+    const ClosestPoints gap = closestPoints(*a.shape, a.pose(), *b.shape, b.pose(), reach + kContactDistance);
+    if (gap.beyond) return std::nullopt;
     const Real distance = gap.coresOverlap ? 0 : gap.distance;
     if (distance > reach + kContactDistance) return std::nullopt;
     ContactPair pair;

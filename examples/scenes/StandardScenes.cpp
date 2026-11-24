@@ -2,6 +2,7 @@
 #include <collision/ContactPair.h>
 #include <collision/shapes/Meshes.h>
 #include "StandardScenes.h"
+#include "BucketRim.h"
 
 #include <algorithm>
 #include <cmath>
@@ -25,7 +26,7 @@ std::string text(const char* format, ...) {
 // libm» касается ядра.
 Quaternion about(Vector3 axis, double degrees) {
     const double half = degrees * 3.14159265358979323846 / 360;
-    return {Real(std::cos(half)), Real(std::sin(half)) * axis.x, Real(std::sin(half)) * axis.y, Real(std::sin(half)) * axis.z};
+    return {Real(sinCos(half).cos), Real(sinCos(half).sin) * axis.x, Real(sinCos(half).sin) * axis.y, Real(sinCos(half).sin) * axis.z};
 }
 
 World withFloor() {
@@ -89,7 +90,7 @@ World arch() {
         for (int end = 0; end < 2; ++end) {
             const double angle = (k + end) * 3.14159265358979323846 / 9;
             for (double radius : {inner, outer})
-                for (double z : {-depth, depth}) wedge.push_back({Real(radius * std::cos(angle)), Real(radius * std::sin(angle)), Real(z)});
+                for (double z : {-depth, depth}) wedge.push_back({Real(radius * sinCos(angle).cos), Real(radius * sinCos(angle).sin), Real(z)});
         }
         world.addBody(Body::hull(wedge, 2000));
     }
@@ -120,7 +121,7 @@ World slope() {
 std::string slopeVerdict(const World& start, const World& now) {
     const double friction[3] = {0.2, 0.5, 0.8}, time = 1;
     for (int k = 0; k < 3; ++k) {
-        const double expected = std::max(0.0, 9.81 * (std::sin(kSlope) - friction[k] * std::cos(kSlope))) * time * time / 2;
+        const double expected = std::max(0.0, 9.81 * (sinCos(kSlope).sin - friction[k] * sinCos(kSlope).cos)) * time * time / 2;
         const double travelled = double((now.bodies()[size_t(k + 1)].position - start.bodies()[size_t(k + 1)].position).length());
         if (std::fabs(travelled - expected) > 1e-3 + 1e-3 * expected) return text("брусок с трением %.1f прошёл %.4f м вместо %.4f", friction[k], travelled, expected);
     }
@@ -195,7 +196,7 @@ std::string cradleVerdict(const World&, const World& now) {
     // Через 0,65 с первый шар уже ударил: стоять должны все, кроме последнего.
     for (size_t i = 1; i <= 4; ++i)
         if (double(now.bodies()[i].linearVelocity().length()) > 0.1) return text("шар %zu после удара движется: %.2f м/с", i, double(now.bodies()[i].linearVelocity().length()));
-    const double last = double(now.bodies()[5].linearVelocity().length()), expected = std::sqrt(2 * 9.81 * (1 - std::cos(30 * 3.14159265358979323846 / 180)));
+    const double last = double(now.bodies()[5].linearVelocity().length()), expected = std::sqrt(2 * 9.81 * (1 - sinCos(30 * 3.14159265358979323846 / 180).cos));
     return last > 0.8 * expected ? "" : text("последний шар получил %.2f м/с из %.2f", last, expected);
 }
 
@@ -236,7 +237,7 @@ std::string bucketsVerdict(const World&, const World& now) {
     const double base = double(now.bodies()[1].position.y);
     for (int k = 1; k < 3; ++k) {
         const Body& bucket = now.bodies()[size_t(k + 1)];
-        const double lift = double(bucket.position.y) - base, aside = std::hypot(double(bucket.position.x), double(bucket.position.z));
+        const double lift = double(bucket.position.y) - base, aside = std::sqrt(double(bucket.position.x) * double(bucket.position.x) + double(bucket.position.z) * double(bucket.position.z));
         if (std::fabs(lift - 0.06 * k) > 0.01) return text("ведро %d стоит на %.3f м выше нижнего вместо %.3f", k + 1, lift, 0.06 * k);
         if (aside > 0.01) return text("ведро %d смещено вбок на %.3f м", k + 1, aside);
         if (speedOf(bucket) > 0.02) return text("ведро %d движется: %.3f м/с", k + 1, speedOf(bucket));
@@ -245,6 +246,10 @@ std::string bucketsVerdict(const World&, const World& now) {
 }
 
 // --- шары в ведре ---------------------------------------------------------------------------------
+// Шары падают ровными столбиками по четыре и стоят друг на друге около 1,6 с, пока шум округления не
+// нарушит равновесие; после обвала им нужно ещё около трёх секунд. Поэтому сцена идёт 5 с: к четвёртой
+// секунде скорость самого медленного шара лежала у порога проверки (0,04–0,06 м/с), и итог зависел от
+// последнего бита решателя, а не от физики (проба с возмущением скорости шара 1–7 мм/с, H88).
 World ballsInBucket() {
     World world = withFloor();
     world.addBody(CompoundBodyBuilder::bucket(0.2, 0.25, 0.3, 0.01, 800));
@@ -255,7 +260,7 @@ std::string ballsVerdict(const World&, const World& now) {
     const Body& bucket = now.bodies()[1];
     for (size_t i = 2; i < now.bodies().size(); ++i) {
         const Vector3 p = now.bodies()[i].position - bucket.position;
-        if (std::hypot(double(p.x), double(p.z)) > 0.25 || double(now.bodies()[i].position.y) < 0.04) return text("шар %zu выпал из ведра", i - 1);
+        if (std::sqrt(double(p.x) * double(p.x) + double(p.z) * double(p.z)) > 0.25 || double(now.bodies()[i].position.y) < 0.04) return text("шар %zu выпал из ведра", i - 1);
         // Покой — по скорости центра. Вращение шара на месте вокруг нормали контакта модель не гасит:
         // у точечного контакта нет момента трения вокруг нормали, и без сопротивления среды шар
         // крутится вечно (1,3 рад/с на замере) — это не движение по ведру.
@@ -332,6 +337,124 @@ std::string gripperVerdict(const World& start, const World& now) {
     return "";
 }
 
+// --- сочленение по траектории: вагонетка на волнистом кольце и коробка на спирали --------------------
+// Как пример PathConstraintTest в Jolt. Вагонетку ведёт привод 1,5 м/с по замкнутой кривой, она
+// поворачивается вслед за кривой, как вагон на рельсах. Коробка подвешена к нисходящей спирали за середину верхней грани: привода нет, она съезжает
+// под тяжестью, свободно вращается и качается, а в конце упирается в предел хода. Вязкое сопротивление вдоль
+// пути (1,5 Н·с/м) держит скорость спуска около 2 м/с: без него коробка приходит к упору на 5 м/с, и удар
+// раскручивает её до 25 рад/с. Кривые закреплены в полу.
+World rail() {
+    World world = withFloor();
+    const Real c = Real(0.70710678118654752); // cos 45° — без libm
+    const Real around[8][2] = {{1, 0}, {c, c}, {0, 1}, {-c, c}, {-1, 0}, {-c, -c}, {0, -1}, {c, -c}};
+    std::vector<Vector3> ring, spiral;
+    for (int k = 0; k < 8; ++k) ring.push_back({Real(1.2) * around[k][0], k % 2 ? Real(0.95) : Real(0.55), Real(1.2) * around[k][1]});
+    for (int k = 0; k <= 24; ++k) { // два витка радиуса 0,8 м вниз с 2,6 до 0,8 м, точка через 30°
+        const SinCos turn = sinCos(Real(k) * Real(0.52359877559829887));
+        spiral.push_back({Real(3) + Real(0.8) * turn.cos, Real(2.6) - Real(0.075) * Real(k), Real(0.8) * turn.sin});
+    }
+    const BodyId carriage = world.addBody(Body::box({0.08, 0.06, 0.12}, 500, ring[0])); // длинная сторона — вдоль пути
+    PathJoint& loop = addPathJoint(world, BodyId(0), carriage, ring[0], ring, true);
+    loop.rotation = PathRotation::FollowPath, loop.holdSpeed = true, loop.driveSpeed = Real(1.5);
+    Body box = Body::box({0.08, 0.12, 0.05}, 500, spiral[0] - Vector3{0, Real(0.12), 0});
+    box.angularDamping = Real(0.5);
+    addPathJoint(world, BodyId(0), world.addBody(box), spiral[0], spiral).damping = Real(1.5);
+    return world;
+}
+// Касательная пути в осях тела, которое по нему идёт.
+Vector3 tangentInBody(const World& world, const PathJoint& joint) {
+    const Body &seat = world.bodies()[size_t(joint.a)], &body = world.bodies()[size_t(joint.b)];
+    const Real u = joint.path().closest(seat.pose().localPoint(body.pose().point(joint.anchorB)));
+    return body.orientation.rotateInverse(seat.pose().direction(joint.path().tangent(u)));
+}
+std::string railVerdict(const World& start, const World& now) {
+    const Transform floor = now.bodies()[0].pose();
+    for (size_t j = 0; j < 2; ++j) {
+        const PathJoint& joint = dynamic_cast<const PathJoint&>(now.joints()[j]);
+        const Body& body = now.bodies()[size_t(joint.b)];
+        const Vector3 local = floor.localPoint(body.pose().point(joint.anchorB));
+        const Real u = joint.path().closest(local);
+        const double off = double((local - joint.path().point(u)).length());
+        if (off > 1e-3) return text("тело %d ушло с пути на %.2e м", joint.b, off);
+        const double along = double(pointVelocity(body, body.pose().point(joint.anchorB)).dot(floor.direction(joint.path().tangent(u))));
+        if (j == 0 && std::fabs(along - 1.5) > 0.03) return text("вагонетка идёт по пути со скоростью %.3f м/с вместо 1,5", along);
+        const double astray = double((tangentInBody(now, joint) - tangentInBody(start, joint)).length());
+        if (j == 0 && astray > 1e-2) return text("вагонетка отстала от поворота кривой на %.3f рад", astray);
+        const double sunk = double(start.bodies()[size_t(joint.b)].position.y - body.position.y);
+        if (j == 1 && sunk < 1.0) return text("коробка съехала по спирали всего на %.2f м высоты", sunk);
+    }
+    return "";
+}
+
+// --- тяга: ящик под постоянной силой на полу с трением и шар, висящий на силе −m g под моментом ----
+// Сила и момент прикладываются перед каждым шагом (Body::force, torque). Ящик с трением μ под силой
+// F = kThrust μ m g идёт с ускорением (kThrust − 1) μ g; шар под моментом τ набирает ω = τ t / I.
+// Ящик толкают две секунды — до момента проверки; дальше он тормозит трением и остаётся на полу.
+const double kThrust = 1.5, kThrustFriction = 0.5, kThrustTorque = 0.5; // доля, μ пары, Н·м
+World thrust() {
+    World world = withFloor();
+    world.addBody(Body::box({0.2, 0.2, 0.2}, 1000, {-4, Real(0.2), 0}));
+    world.addBody(Body::sphere(0.2, 1000, {0, Real(1.5), Real(1.5)}));
+    return world;
+}
+void thrustControl(World& world, double time) {
+    const Real crate = 1 / world.mass(BodyId(1)).inverseMass, ball = 1 / world.mass(BodyId(2)).inverseMass;
+    if (time < 2) world.body(BodyId(1)).force = {Real(kThrust * kThrustFriction) * crate * world.gravity.length(), 0, 0};
+    world.body(BodyId(2)).force = -ball * world.gravity;
+    applyTorque(world.body(BodyId(2)), {0, Real(kThrustTorque), 0});
+}
+std::string thrustVerdict(const World& start, const World& now) {
+    const double time = 2, expected = (kThrust - 1) * kThrustFriction * 9.81 * time * time / 2;
+    const double travelled = double(now.bodies()[1].position.x - start.bodies()[1].position.x);
+    if (std::fabs(travelled - expected) > 1e-2 * expected) return text("ящик под силой прошёл %.4f м вместо %.4f", travelled, expected);
+    const Body& ball = now.bodies()[2];
+    const double drift = double((ball.position - start.bodies()[2].position).length());
+    if (drift > 1e-6) return text("шар на силе −m g ушёл на %.2e м", drift);
+    const double spin = double(ball.angularVelocity().y), wanted = kThrustTorque * time * double(ball.mass.inverseInertia.y);
+    if (std::fabs(spin - wanted) > 5e-3 * wanted) return text("шар под моментом вращается на %.4f рад/с вместо %.4f", spin, wanted);
+    return "";
+}
+
+// --- платформы: тела без массы, движимые извне (Body::drivenVelocity, drivenSpin) -------------------
+// Поворотный стол с ящиком на радиусе 0,5 м (ω = 1 рад/с: ω² r = 0,5 м/с² при μ g = 4,9 — трение держит),
+// подъёмник, который ходит вверх-вниз по синусу (ускорение не больше 0,6 м/с²), и стенка, толкающая
+// ящик по полу со скоростью 0,5 м/с. Ящики обязаны остаться на своих опорах. Толкатель идёт шесть секунд —
+// до момента проверки — и встаёт: в окне ящик не уезжает за край пола.
+const Vector3 kTableCentre{-2, 0, 0};
+World platforms() {
+    World world = withFloor();
+    Body table = Body::cylinder(0.05, 0.8, 0, kTableCentre + Vector3{0, Real(0.05), 0});
+    table.drivenSpin = {0, 1, 0};
+    world.addBody(table);
+    Body rider = Body::box({0.1, 0.1, 0.1}, 1000, kTableCentre + Vector3{0.5, Real(0.2), 0});
+    rider.linearMomentum = {0, 0, Real(-0.5) / rider.mass.inverseMass}; // ω × r: ящик уже едет со столом
+    rider.angularMomentum = {0, 1 / rider.mass.inverseInertia.y, 0};
+    world.addBody(rider);
+    world.addBody(Body::box({0.4, 0.05, 0.4}, 0, {0, 0.5, 0}));
+    world.addBody(Body::box({0.15, 0.15, 0.15}, 1000, {0, Real(0.7), 0}));
+    Body pusher = Body::box({0.05, 0.2, 0.3}, 0, {2, 0.25, 0});
+    pusher.drivenVelocity = {0.5, 0, 0};
+    world.addBody(pusher);
+    world.addBody(Body::box({0.2, 0.2, 0.2}, 1000, {2.5, Real(0.2), 0}));
+    return world;
+}
+void platformsControl(World& world, double time) {
+    world.body(BodyId(3)).drivenVelocity = {0, Real(0.3 * sinCos(2 * time).cos), 0};
+    world.body(BodyId(5)).drivenVelocity = {time < 6 ? Real(0.5) : Real(0), 0, 0};
+}
+std::string platformsVerdict(const World&, const World& now) {
+    const double angle = 6; // стол за 6 с повернулся на 6 рад
+    const Vector3 seat = kTableCentre + Vector3{Real(0.5 * sinCos(angle).cos), Real(0.2), Real(-0.5 * sinCos(angle).sin)};
+    const double astray = double((now.bodies()[2].position - seat).length());
+    if (astray > 1e-2) return text("ящик на поворотном столе ушёл с места на %.4f м", astray);
+    const double lifted = double(now.bodies()[4].position.y - now.bodies()[3].position.y) - 0.2;
+    if (std::fabs(lifted) > 1e-3) return text("ящик на подъёмнике разошёлся с плитой на %.2e м", lifted);
+    const double pushed = double(now.bodies()[6].position.x - now.bodies()[5].position.x) - 0.25;
+    if (std::fabs(pushed) > 1e-3) return text("ящик перед стенкой разошёлся с ней на %.2e м", pushed);
+    if (std::fabs(double(now.bodies()[6].linearVelocity().x) - 0.5) > 0.02) return text("ящик перед стенкой идёт со скоростью %.3f м/с вместо 0,5", double(now.bodies()[6].linearVelocity().x));
+    return "";
+}
+
 // Равномерное на [0, 1) псевдослучайное число: сцены одинаковы от запуска к запуску.
 struct Dice {
     unsigned long long state;
@@ -354,7 +477,7 @@ const double kBowlInner = 0.80, kBowlOuter = 0.85, kBowlRim = 0.84;
 Body bowlShell() {
     const auto on = [](double radius, double degrees) {
         const double angle = degrees * 3.14159265358979323846 / 180;
-        return std::pair<Real, Real>{Real(radius * std::sin(angle)), Real(kBowlOuter - radius * std::cos(angle))};
+        return std::pair<Real, Real>{Real(radius * sinCos(angle).sin), Real(kBowlOuter - radius * sinCos(angle).cos)};
     };
     std::vector<std::vector<std::pair<Real, Real>>> profiles;
     for (int k = 0; k < 5; ++k) profiles.push_back({on(kBowlOuter, 16 * k), on(kBowlOuter, 16 * k + 16), on(kBowlInner, 16 * k + 16), on(kBowlInner, 16 * k)});
@@ -397,7 +520,7 @@ World bowl() {
         default: body = k % 12 == 5 ? dice.hull(0.2) : Body::cylinder(0.06, 0.07, 1000, {}, Real(0.005));
         }
         body.orientation = (dice.turn() * body.orientation).unit();
-        body.position = {Real(0.3 * std::cos(2.4 * k)), Real(0.9 + 0.25 * k), Real(0.3 * std::sin(2.4 * k))};
+        body.position = {Real(0.3 * sinCos(2.4 * k).cos), Real(0.9 + 0.25 * k), Real(0.3 * sinCos(2.4 * k).sin)};
         world.addBody(body);
     }
     return world;
@@ -405,7 +528,7 @@ World bowl() {
 std::string bowlVerdict(const World&, const World& now) {
     for (size_t i = 2; i < now.bodies().size(); ++i) {
         const Body& body = now.bodies()[i];
-        if (std::hypot(double(body.position.x), double(body.position.z)) > kBowlRim || double(body.position.y) < 0.02) return text("тело %zu вне чаши: (%.2f, %.2f, %.2f)", i - 1, double(body.position.x), double(body.position.y), double(body.position.z));
+        if (std::sqrt(double(body.position.x) * double(body.position.x) + double(body.position.z) * double(body.position.z)) > kBowlRim || double(body.position.y) < 0.02) return text("тело %zu вне чаши: (%.2f, %.2f, %.2f)", i - 1, double(body.position.x), double(body.position.y), double(body.position.z));
         if (speedOf(body) > 0.05) return text("тело %zu движется: %.3f м/с", i - 1, speedOf(body));
     }
     return "";
@@ -416,7 +539,7 @@ std::string bowlVerdict(const World&, const World& now) {
 // 0,25 м: 8 × 8 м, 2048 треугольников (heightfieldMesh → CompoundBodyBuilder::ground). Плоского пола нет.
 const int kHillSide = 33;
 const double kHillCell = 0.25;
-double hillHeight(double x, double z) { return 0.2 + 0.03 * (x * x + z * z) + 0.12 * std::sin(1.7 * x) * std::cos(1.3 * z); }
+double hillHeight(double x, double z) { return 0.2 + 0.03 * (x * x + z * z) + 0.12 * sinCos(1.7 * x).sin * sinCos(1.3 * z).cos; }
 World hills() {
     World world;
     std::vector<Real> heights;
@@ -514,6 +637,8 @@ std::string driftVerdict(const World& start, const World& now) {
 
 } // namespace
 
+kp::World bucketsOnRim() { return bucket_rim::releaseOnRim(nestedBuckets()); }
+
 const std::vector<StandardScene>& standardScenes() {
     static const std::vector<StandardScene> all = {
         {"stack", "стопка из десяти кубов", stack, 5, 5, stackVerdict, nullptr, {0, 2, 0}, 8},
@@ -527,13 +652,16 @@ const std::vector<StandardScene>& standardScenes() {
         {"cradle", "маятник Ньютона", cradle, 4, 0.65, cradleVerdict, nullptr, {0, 0.9, 0}, 4},
         {"chain", "цепь из шести торов", torusChain, 5, 5, chainVerdict, nullptr, {0, 2, 0}, 5},
         {"buckets", "ведро в ведре в ведре", nestedBuckets, 4, 4, bucketsVerdict, nullptr, {0, 0.4, 0}, 3},
-        {"balls", "шестнадцать шаров в ведре", ballsInBucket, 4, 4, ballsVerdict, nullptr, {0, 0.3, 0}, 2.5},
+        {"balls", "шестнадцать шаров в ведре", ballsInBucket, 5, 5, ballsVerdict, nullptr, {0, 0.3, 0}, 2.5},
         {"pile", "куча из тридцати тел в ящике", pile, 6, 6, pileVerdict, nullptr, {0, 0.5, 0}, 5},
         {"gripper", "захват поднимает кубик", gripper, 2.5, 2.5, gripperVerdict, gripperControl, {0, 0.4, 0}, 3},
         {"bowl", "чаша: чайники, лошадки, торы, чашки, ежи", bowl, 10, 10, bowlVerdict, nullptr, {0, 0.5, 0}, 4},
         {"hills", "холмы по карте высот", hills, 8, 8, hillsVerdict, nullptr, {0, 0.6, 0}, 9},
         {"swing", "раскачанная цепь: энергия не растёт", swingingChain, 40, 40, swingVerdict, nullptr, {0, 2, 0}, 6},
         {"drift", "куча без тяжести: импульс сохраняется", weightlessPile, 5, 5, driftVerdict, nullptr, {0, 0, 0}, 6},
+        {"rail", "сплайны — вагонетка на кольце и груз на спирали", rail, 7, 7, railVerdict, nullptr, {1.5, 1.2, 0}, 6},
+        {"thrust", "ящик под постоянной силой и шар, висящий на силе под моментом", thrust, 2, 2, thrustVerdict, thrustControl, {-0.5, 0.6, 0.5}, 9},
+        {"platforms", "поворотный стол, подъёмник и толкатель: тела, движимые извне", platforms, 6, 6, platformsVerdict, platformsControl, {1.3, 0.4, 0}, 10},
     };
     return all;
 }

@@ -59,7 +59,40 @@ std::shared_ptr<DynamicTree> treeOf(const std::vector<Body::Part>& parts) {
     return tree;
 }
 
+// На торце клина наружная нормаль направлена по касательной к окружности.
+// QuickHull нумерует грани каждого клина независимо. Ищем грань в собственных осях формы.
+int sectorEnd(const Body& wedge, Vector3 outward) {
+    const Vector3 local = wedge.pose().localDirection(outward);
+    const auto& faces = wedge.shape->hull()->faces();
+    for (size_t i = 0; i < faces.size(); ++i)
+        if (faces[i].normal.dot(local) >= 1 - 64 * kEpsilon) return int(i);
+    return -1;
+}
+
 } // namespace
+
+// Соседние клинья построены из одного профиля: конец предыдущего и начало следующего
+// содержат одни и те же точки around(point, seam). Отмечаем только подтверждённую пару.
+void CompoundBodyBuilder::markSectorEnds(std::vector<Body>& pieces, size_t first, int segments) {
+    struct Ends { int begin = -1, end = -1; };
+    std::vector<Ends> ends(static_cast<size_t>(segments));
+    for (int seam = 0; seam < segments; ++seam) {
+        const size_t prev = size_t(seam == 0 ? segments - 1 : seam - 1), next = size_t(seam);
+        const SinCos turn = sinCos(2 * kPi * Real(seam) / Real(segments));
+        const Vector3 tangent{-turn.sin, 0, turn.cos};
+        const int left = sectorEnd(pieces[first + prev], tangent);
+        const int right = sectorEnd(pieces[first + next], -tangent);
+        if (left >= 0 && right >= 0) ends[prev].end = left, ends[next].begin = right;
+    }
+    for (size_t i = 0; i < ends.size(); ++i) {
+        if (ends[i].begin < 0 && ends[i].end < 0) continue;
+        Body& piece = pieces[first + i];
+        auto hull = std::make_shared<ConvexHull>(*piece.shape->hull());
+        if (ends[i].begin >= 0) hull->faces_[size_t(ends[i].begin)].internal = true;
+        if (ends[i].end >= 0) hull->faces_[size_t(ends[i].end)].internal = true;
+        piece.shape = std::move(hull);
+    }
+}
 
 Body CompoundBodyBuilder::compound(const std::vector<Body>& pieces) {
     Body body;
@@ -104,7 +137,9 @@ Body CompoundBodyBuilder::revolved(const std::vector<std::vector<std::pair<Real,
             pieces.push_back(Body::hull(whole, density, position));
             continue;
         }
+        const size_t first = pieces.size();
         for (const std::vector<Vector3>& wedge : wedges) pieces.push_back(Body::hull(wedge, density, position));
+        markSectorEnds(pieces, first, segments);
     }
     return compound(pieces);
 }

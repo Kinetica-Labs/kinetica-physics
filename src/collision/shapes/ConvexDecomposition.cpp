@@ -103,6 +103,7 @@ private:
     };
 
     bool voxelize();
+    void fillColumn(int j, int k, std::vector<Real>& crossings);
     void distanceField();
     std::vector<Vector3> corners(const std::vector<Cell>& cells);
     Gap gapOf(const ConvexHull& hull) const;
@@ -115,6 +116,8 @@ private:
     int ownerOf(Vector3 point) const;
     std::vector<std::vector<Vector3>> fitToSurface() const;
     void merge(std::vector<Part>& parts) const;
+    std::optional<ConvexHull> mergedHull(const Part& a, const Part& b) const;
+    Real mergeScore(const Part& a, const Part& b) const;
 
     size_t index(int i, int j, int k) const { return size_t(i) + size_t(nx_) * (size_t(j) + size_t(ny_) * size_t(k)); }
     bool inside(int i, int j, int k) const { return i >= 0 && j >= 0 && k >= 0 && i < nx_ && j < ny_ && k < nz_; }
@@ -145,6 +148,29 @@ private:
 // между нечётным и чётным пересечениями — внутри. Попадание луча в треугольник проверяется в
 // проекции правилом «чёт-нечет» с полуоткрытыми отрезками: точка на общем ребре двух
 // треугольников засчитывается ровно одному из них.
+// Столбик вокселей (j, k) вдоль x: пересечения его оси с поверхностью тела и воксели между
+// нечётным и чётным пересечениями. crossings — рабочий массив.
+void Decomposer::fillColumn(int j, int k, std::vector<Real>& crossings) {
+    const Real y = low_.y + (j + Real(0.5)) * h_, z = low_.z + (k + Real(0.5)) * h_;
+    crossings.clear();
+    for (const std::array<int, 3>& t : solid_.triangles) {
+        const Vector3 p[3] = {solid_.vertices[size_t(t[0])], solid_.vertices[size_t(t[1])], solid_.vertices[size_t(t[2])]};
+        bool hit = false;
+        for (int e = 0; e < 3; ++e) {
+            const Vector3 a = p[e], b = p[(e + 1) % 3];
+            if ((a.z > z) != (b.z > z) && y < a.y + (b.y - a.y) * (z - a.z) / (b.z - a.z)) hit = !hit;
+        }
+        const Vector3 normal = (p[1] - p[0]).cross(p[2] - p[0]);
+        if (hit && normal.x != 0) crossings.push_back(p[0].x - (normal.y * (y - p[0].y) + normal.z * (z - p[0].z)) / normal.x);
+    }
+    std::sort(crossings.begin(), crossings.end());
+    for (size_t c = 0; c + 1 < crossings.size(); c += 2)
+        for (int i = 0; i < nx_; ++i) {
+            const Real x = low_.x + (i + Real(0.5)) * h_;
+            if (x > crossings[c] && x < crossings[c + 1]) occupied_[index(i, j, k)] = 1;
+        }
+}
+
 bool Decomposer::voxelize() {
     if (solid_.vertices.empty() || solid_.triangles.empty()) return false;
     Vector3 high = low_ = solid_.vertices[0];
@@ -160,28 +186,8 @@ bool Decomposer::voxelize() {
     occupied_.assign(size_t(nx_) * size_t(ny_) * size_t(nz_), 0);
 
     std::vector<Real> crossings;
-    for (int k = 0; k < nz_; ++k) {
-        for (int j = 0; j < ny_; ++j) {
-            const Real y = low_.y + (j + Real(0.5)) * h_, z = low_.z + (k + Real(0.5)) * h_;
-            crossings.clear();
-            for (const std::array<int, 3>& t : solid_.triangles) {
-                const Vector3 p[3] = {solid_.vertices[size_t(t[0])], solid_.vertices[size_t(t[1])], solid_.vertices[size_t(t[2])]};
-                bool hit = false;
-                for (int e = 0; e < 3; ++e) {
-                    const Vector3 a = p[e], b = p[(e + 1) % 3];
-                    if ((a.z > z) != (b.z > z) && y < a.y + (b.y - a.y) * (z - a.z) / (b.z - a.z)) hit = !hit;
-                }
-                const Vector3 normal = (p[1] - p[0]).cross(p[2] - p[0]);
-                if (hit && normal.x != 0) crossings.push_back(p[0].x - (normal.y * (y - p[0].y) + normal.z * (z - p[0].z)) / normal.x);
-            }
-            std::sort(crossings.begin(), crossings.end());
-            for (size_t c = 0; c + 1 < crossings.size(); c += 2)
-                for (int i = 0; i < nx_; ++i) {
-                    const Real x = low_.x + (i + Real(0.5)) * h_;
-                    if (x > crossings[c] && x < crossings[c + 1]) occupied_[index(i, j, k)] = 1;
-                }
-        }
-    }
+    for (int k = 0; k < nz_; ++k)
+        for (int j = 0; j < ny_; ++j) fillColumn(j, k, crossings);
     for (int k = 0; k < nz_; ++k)
         for (int j = 0; j < ny_; ++j)
             for (int i = 0; i < nx_; ++i)
@@ -439,13 +445,15 @@ std::vector<std::vector<Vector3>> Decomposer::fitToSurface() const {
 
 // Наименьший набор: жадно сливается пара соседей, слитая оболочка которых ближе всего к выпуклой,
 // — пока она в допуске, а сверх предела числа частей — какой бы она ни была.
-void Decomposer::merge(std::vector<Part>& parts) const {
-    const int n = int(parts.size());
-    const auto merged = [&](int i, int j) {
-        std::vector<Vector3> both = parts[size_t(i)].points;
-        both.insert(both.end(), parts[size_t(j)].points.begin(), parts[size_t(j)].points.end());
-        return hullOf(both);
-    };
+// Оболочка двух частей вместе.
+std::optional<ConvexHull> Decomposer::mergedHull(const Part& a, const Part& b) const {
+    std::vector<Vector3> both = a.points;
+    both.insert(both.end(), b.points.begin(), b.points.end());
+    return hullOf(both);
+}
+
+// Цена слияния двух частей (scoreOf); kFar — не соседи или общей оболочки нет.
+Real Decomposer::mergeScore(const Part& a, const Part& b) const {
     const auto boundsOf = [](const Part& part, Vector3& low, Vector3& high) {
         low = high = part.points[0];
         for (Vector3 p : part.points) {
@@ -453,14 +461,18 @@ void Decomposer::merge(std::vector<Part>& parts) const {
             high = {std::max(high.x, p.x), std::max(high.y, p.y), std::max(high.z, p.z)};
         }
     };
-    const auto pairScore = [&](int i, int j) {
-        Vector3 lowI, highI, lowJ, highJ;
-        boundsOf(parts[size_t(i)], lowI, highI), boundsOf(parts[size_t(j)], lowJ, highJ);
-        // Только соседи: бруски частей, раздвинутые на воксель, пересекаются.
-        if (lowI.x - h_ > highJ.x || lowJ.x > highI.x + h_ || lowI.y - h_ > highJ.y || lowJ.y > highI.y + h_ || lowI.z - h_ > highJ.z || lowJ.z > highI.z + h_) return kFar;
-        const std::optional<ConvexHull> hull = merged(i, j);
-        return hull ? scoreOf(*hull, parts[size_t(i)].solidVolume + parts[size_t(j)].solidVolume, gapOf(*hull)) : kFar;
-    };
+    Vector3 lowI, highI, lowJ, highJ;
+    boundsOf(a, lowI, highI), boundsOf(b, lowJ, highJ);
+    // Только соседи: бруски частей, раздвинутые на воксель, пересекаются.
+    if (lowI.x - h_ > highJ.x || lowJ.x > highI.x + h_ || lowI.y - h_ > highJ.y || lowJ.y > highI.y + h_ || lowI.z - h_ > highJ.z || lowJ.z > highI.z + h_) return kFar;
+    const std::optional<ConvexHull> hull = mergedHull(a, b);
+    return hull ? scoreOf(*hull, a.solidVolume + b.solidVolume, gapOf(*hull)) : kFar;
+}
+
+void Decomposer::merge(std::vector<Part>& parts) const {
+    const int n = int(parts.size());
+    const auto merged = [&](int i, int j) { return mergedHull(parts[size_t(i)], parts[size_t(j)]); };
+    const auto pairScore = [&](int i, int j) { return mergeScore(parts[size_t(i)], parts[size_t(j)]); };
     std::vector<Real> score(size_t(n) * size_t(n), kFar);
     std::vector<char> alive(size_t(n), 1);
     for (int i = 0; i < n; ++i)

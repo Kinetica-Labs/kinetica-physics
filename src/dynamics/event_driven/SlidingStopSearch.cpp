@@ -1,3 +1,4 @@
+#include <math/StepMemory.h>
 #include <dynamics/event_driven/SlidingStopSearch.h>
 
 #include <algorithm>
@@ -18,9 +19,13 @@ void SlidingStopSearch::settle(SlidingStop stopped) {
         if (pair.a == stopped.a && pair.b == stopped.b) pair.startSlip = {};
 }
 
-SlidingStop SlidingStopSearch::slidingStop(Real h, const std::vector<std::pair<int, int>>& already) const {
+SlidingStop SlidingStopSearch::slidingStop(Real h, const StepArray<std::pair<int, int>>& already) const {
     SlidingStop earliest{h};
-    for (const Pair& pair : state_.pairs) {
+    for (size_t p = 0; p < state_.pairs.size(); ++p) {
+        const Pair& pair = state_.pairs[p];
+        // Прилипшая пара не скользит по определению (ContactAssembly::addFriction): её остаток скольжения
+        // в начале отрезка — не скольжение, и разворота у него нет.
+        if (p < state_.stuck.size() && state_.stuck[p]) continue;
         if (std::find(already.begin(), already.end(), std::make_pair(pair.a, pair.b)) != already.end()) continue;
         bool touching = false;
         for (size_t i = pair.first; i < pair.last; ++i) touching = touching || state_.rows[i].touching;

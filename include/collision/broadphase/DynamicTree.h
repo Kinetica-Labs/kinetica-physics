@@ -49,6 +49,8 @@ public:
         bool leaf() const { return left < 0; }
     };
 
+    // Место под items листьев сразу: дерево из n листьев — это 2n − 1 узел.
+    void reserve(int items) { nodes_.reserve(size_t(2 * items)); }
     void insert(const Bounds& bounds, int item);
 
     // Вызывает visit(item) для каждого листа, брусок которого пересекается с bounds.
@@ -64,11 +66,32 @@ public:
         }
     }
 
+    // У пары листьев один ближайший общий предок. Его дети содержат по одному листу этой пары.
+    template <class Visit> void queryPairs(Visit&& visit) const {
+        for (const Node& node : nodes_)
+            if (!node.leaf()) crossPairs(node.left, node.right, visit);
+    }
+
     int height() const { return root_ < 0 ? 0 : nodes_[size_t(root_)].height; }
     int root() const { return root_; }
     const std::vector<Node>& nodes() const { return nodes_; }
 
 private:
+    template <class Visit> void crossPairs(int first, int second, Visit& visit) const {
+        const Node& a = nodes_[size_t(first)];
+        const Node& b = nodes_[size_t(second)];
+        if (!overlapping(a.bounds, b.bounds)) return;
+        if (a.leaf() && b.leaf()) {
+            visit(a.item, b.item);
+        } else if (a.height >= b.height) {
+            crossPairs(a.left, second, visit);
+            crossPairs(a.right, second, visit);
+        } else {
+            crossPairs(first, b.left, visit);
+            crossPairs(first, b.right, visit);
+        }
+    }
+
     static constexpr int kMaxHeight = 96; // с запасом: выровненному дереву из 2³² листьев хватает 47
 
     void refit(int node);
