@@ -1,64 +1,105 @@
 #include <dynamics/time_stepping/FrictionIslands.h>
 #include <dynamics/time_stepping/CoupledFriction.h>
 #include <algorithm>
+#include <numeric>
 
 namespace kp {
 namespace {
+// Нумеруем только подвижные тела, связанные контактами или сочленениями.
+// Рабочие векторы потока переиспользуются на следующем подшаге.
 class Components {
 public:
-    explicit Components(const StepArray<SolverBody>& states) : parent_(states.size(), -1) {
-        for (size_t i = 0; i < states.size(); ++i)
-            if (states[i].inverseMass > 0) parent_[i] = int(i);
+    void build(const StepArray<SolverBody>& states, const std::vector<std::pair<int,int>>& edges) {
+        ids_.clear();
+        for (const auto& [a,b] : edges) for (int id : {a,b})
+            if (states[size_t(id)].inverseMass > 0) ids_.push_back(id);
+        std::sort(ids_.begin(), ids_.end());
+        ids_.erase(std::unique(ids_.begin(), ids_.end()), ids_.end());
+        parent_.resize(ids_.size());
+        std::iota(parent_.begin(), parent_.end(), 0);
+        for (const auto& [a,b] : edges) {
+            const int i = root(a), j = root(b);
+            if (i >= 0 && j >= 0) parent_[size_t(std::max(i,j))] = std::min(i,j);
+        }
     }
     int of(int a, int b) {
-        if (parent_[size_t(a)] >= 0) return find(a);
-        if (parent_[size_t(b)] >= 0) return find(b);
-        return -1; // связь двух неподвижных тел не принадлежит динамическому острову
+        const int i = root(a);
+        return i >= 0 ? i : root(b);
     }
-    void join(int a, int b) {
-        if (parent_[size_t(a)] < 0 || parent_[size_t(b)] < 0) return;
-        a = find(a), b = find(b);
-        parent_[size_t(std::max(a,b))] = std::min(a,b);
-    }
+    size_t size() const { return ids_.size(); }
 private:
-    int find(int a) {
-        while (parent_[size_t(a)] != a) a = parent_[size_t(a)] = parent_[size_t(parent_[size_t(a)])];
-        return a;
+    int root(int id) {
+        const auto p = std::lower_bound(ids_.begin(), ids_.end(), id);
+        if (p == ids_.end() || *p != id) return -1;
+        int i = int(p - ids_.begin());
+        while (parent_[size_t(i)] != i) i = parent_[size_t(i)] = parent_[size_t(parent_[size_t(i)])];
+        return i;
     }
-    StepArray<int> parent_;
+    std::vector<int> ids_, parent_;
 };
 
 struct Island {
     size_t contacts[2]{}, count = 0;
-    StepArray<size_t> guides;
+    std::vector<size_t> guides;
     bool hasSoft = false;
     bool coupled() const { return count == 2 && !hasSoft; }
     void append(size_t c) { if (count < 2) contacts[count] = c; ++count; }
 };
 
-StepArray<Island> partition(const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states,
-                            const DirectJoints& locked, const StepArray<SoftJoint>& soft) {
-    Components groups(states);
-    for (const auto& c : contacts) { const auto r = c.normalRow(0); groups.join(r.a, r.b); }
-    for (const auto& b : locked.rows()) groups.join(b.a, b.b);
-    for (const auto& link : soft) { const auto& b = link.firstRow(); groups.join(b.a, b.b); }
-    StepArray<Island> islands(states.size());
-    const auto islandFor = [&](const auto& row) -> Island* {
-        const int root = groups.of(row.a, row.b);
-        return root >= 0 ? &islands[size_t(root)] : nullptr;
-    };
-    for (size_t i = 0; i < contacts.size(); ++i) {
-        if (Island* group = islandFor(contacts[i].normalRow(0))) group->append(i);
+class Partition {
+public:
+    void build(const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states,
+               const DirectJoints& locked, const StepArray<SoftJoint>& soft) {
+        edges_.clear();
+        present_.clear();
+        for (size_t i = 0; i < contacts.size(); ++i) {
+            if (!CoupledFriction::participates(contacts[i])) continue;
+            present_.push_back(i);
+            const auto row = contacts[i].normalRow(0);
+            edges_.emplace_back(row.a, row.b);
+        }
+        for (const auto& b : locked.rows()) edges_.emplace_back(b.a,b.b);
+        for (const auto& s : soft) edges_.emplace_back(s.firstRow().a,s.firstRow().b);
+        groups_.build(states, edges_);
+        slots_.assign(groups_.size(), -1);
+        used_ = 0;
+        for (size_t i : present_) {
+            const auto row = contacts[i].normalRow(0);
+            const int root = groups_.of(row.a,row.b);
+            if (root >= 0) ensure(size_t(root)).append(i);
+        }
+        for (const auto& link : soft)
+            if (auto* group = find(link.firstRow())) group->hasSoft = true;
+        for (size_t i = 0; i < locked.rows().size(); ++i)
+            if (auto* group = find(locked.rows()[i]); group && group->coupled()) group->guides.push_back(i);
     }
-    for (const auto& link : soft) {
-        if (Island* group = islandFor(link.firstRow())) group->hasSoft = true;
+    auto begin() const { return islands_.begin(); }
+    auto end() const { return islands_.begin() + used_; }
+
+private:
+    Island& ensure(size_t root) {
+        int& slot = slots_[root];
+        if (slot >= 0) return islands_[size_t(slot)];
+        slot = int(used_++);
+        if (islands_.size() < used_) islands_.emplace_back();
+        Island& island = islands_[size_t(slot)];
+        island.count = 0;
+        island.hasSoft = false;
+        island.guides.clear();
+        return island;
     }
-    for (size_t i = 0; i < locked.rows().size(); ++i) {
-        Island* group = islandFor(locked.rows()[i]);
-        if (group && group->coupled()) group->guides.push_back(i);
+    Island* find(const Bond& b) {
+        const int root = groups_.of(b.a,b.b);
+        if (root < 0 || slots_[size_t(root)] < 0) return nullptr;
+        return &islands_[size_t(slots_[size_t(root)])];
     }
-    return islands;
-}
+    Components groups_;
+    std::vector<std::pair<int,int>> edges_;
+    std::vector<int> slots_;
+    std::vector<size_t> present_;
+    std::vector<Island> islands_;
+    size_t used_ = 0;
+};
 
 // Направляющие острова перечислены в порядке мировой матрицы. Если здесь все её строки,
 // готовое разложение уже подходит. Иначе собираем только строки этого острова.
@@ -76,7 +117,8 @@ void solveFrictionIslands(StepArray<SoftContact>& contacts, StepArray<SolverBody
                           const StepArray<SoftJoint>& soft, ContactLevels& levels, Real h, Real rollingArm) {
     StepArray<char> solved;
     if (contacts.size() >= 2) {
-        const auto islands = partition(contacts, states, locked, soft);
+        thread_local Partition islands;
+        islands.build(contacts, states, locked, soft);
         DirectJoints subset;
         for (const Island& island : islands) {
             if (!island.coupled()) continue;

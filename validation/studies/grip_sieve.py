@@ -112,11 +112,12 @@ def measure_oblique(directory, output, hashes):
         for key, value in zip(maxima, (pole, relative, jaw, normal)):
             maxima[key] = max(maxima[key], value)
         passed = pole <= SPEED_M_S and normal <= BALANCE_NS
-        if int(row["pass"]) != int(passed):
-            raise ValueError("oblique grip: inconsistent pole/load oracle")
+        full_pass = passed and max(relative, jaw) <= SPEED_M_S
+        if int(row["pass"]) != int(full_pass):
+            raise ValueError("oblique grip: inconsistent relative slip, jaw speed or load")
         original_passes += passed
-        full_passes += passed and max(relative, jaw) <= SPEED_M_S
-    if status != int(original_passes != len(grid)):
+        full_passes += full_pass
+    if status != int(full_passes != len(grid)):
         raise ValueError("oblique grip: inconsistent exit code")
     return dict(oblique_pass=full_passes, oblique_max=maxima, oblique_pole_pass=original_passes)
 
@@ -124,9 +125,11 @@ def measure_oblique(directory, output, hashes):
 def measure(directory, output, hashes):
     grip_status = record(directory, "study-grip-limit", ["shared8"], output / "grip.csv", hashes)
     groups = read_cases(output / "grip.csv")
-    cases = {key: group["kinetica-shared8"] for key, group in groups.items()}
-    if any(set(group) != {"kinetica-shared8"} for group in groups.values()):
-        raise ValueError("mixed solver modes")
+    suffix = "coupled" if os.environ.get("KP_COUPLED_FRICTION") == "1" else "sequential"
+    engine = f"kinetica-shared8-{suffix}"
+    if any(set(group) != {engine} for group in groups.values()):
+        raise ValueError(f"expected a single friction mode: {engine}")
+    cases = {key: group[engine] for key, group in groups.items()}
     if any(row["complete"] != "1" or row["pass"] not in ("0", "1") or
            not all(math.isfinite(float(v)) for k, v in row.items() if k != "engine") for row in cases.values()):
         raise ValueError("incomplete grip observation")

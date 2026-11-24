@@ -99,8 +99,8 @@ failed=0
 for variant in kinetica-default kinetica-coupled box3d rp3d; do
     export KP_COUPLED_FRICTION=0
     case $variant in
-        kinetica-default) exe=$kexe; expected='kinetica-shared8' ;;
-        kinetica-coupled) exe=$kexe; expected='kinetica-shared8'; export KP_COUPLED_FRICTION=1 ;;
+        kinetica-default) exe=$kexe; expected='kinetica-shared8-sequential'; export KP_COUPLED_FRICTION=0 ;;
+        kinetica-coupled) exe=$kexe; expected='kinetica-shared8-coupled'; export KP_COUPLED_FRICTION=1 ;;
         box3d) exe=$bexe; expected='box3d-shared8' ;;
         rp3d) exe=$rexe; expected='rp3d-f(32|64)-shared8' ;;
     esac

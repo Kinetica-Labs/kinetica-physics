@@ -82,6 +82,74 @@ SlipSystem projectedSystem(const StepArray<SolverBody>& states, const DirectJoin
     return result;
 }
 
+// Трение и направляющие могут снова сблизить точки, уже разделённые решением нормалей.
+// Для каждой такой точки сохраняем нижнюю границу предыдущего прохода, м/с.
+struct NormalLimit {
+    SoftContact* contact;
+    size_t point;
+    Bond row;
+    Real speed;
+};
+
+StepArray<NormalLimit> normalLimits(const std::array<SoftContact*, 2>& pair, const StepArray<SolverBody>& states) {
+    StepArray<NormalLimit> limits;
+    for (SoftContact* c : pair) for (size_t i = 0; i < c->pointCount(); ++i) {
+        const auto p = c->normalRow(i);
+        if (p.impulse == 0 && p.gap > 0) continue;
+        const Bond row{p.a, p.b, p.normal, p.rA.cross(p.normal), p.rB.cross(p.normal), 0, 0};
+        limits.push_back({c, i, row, std::min(Real(0), velocity(row, states))});
+    }
+    return limits;
+}
+
+// Матрица нормалей после исключения направляющих: W = A_NN − A_NB A_BB⁺ A_BN.
+StepArray<Real> normalResponse(const StepArray<NormalLimit>& limits, const DirectJoints& guides, const StepArray<SolverBody>& states) {
+    const size_t n = limits.size(), m = guides.rows().size();
+    StepArray<Real> matrix(n*n), cross(n*m), column(m);
+    for (size_t j = 0; j < n; ++j) {
+        const UnitResponse probe(limits[j].row, states);
+        for (size_t i = 0; i < n; ++i) matrix[i*n+j] = velocity(limits[i].row, probe);
+        for (size_t k = 0; k < m; ++k) cross[j*m+k] = velocity(guides.rows()[k], probe);
+    }
+    for (size_t j = 0; m && j < n; ++j) {
+        std::copy_n(cross.begin() + j*m, m, column.begin());
+        guides.solveResponse(column);
+        for (size_t i = 0; i < n; ++i) for (size_t k = 0; k < m; ++k) matrix[i*n+j] -= cross[i*m+k] * column[k];
+    }
+    return matrix;
+}
+
+void restoreNormals(const StepArray<NormalLimit>& limits, const DirectJoints& guides, StepArray<SolverBody>& states, Real h) {
+    constexpr Real tolerance = Real(1e-11); // м/с
+    const size_t n = limits.size();
+    StepArray<Real> residual(n), correction(n, 0);
+    bool closing = false;
+    for (size_t i = 0; i < n; ++i) {
+        residual[i] = velocity(limits[i].row, states) - limits[i].speed;
+        closing |= residual[i] < -tolerance;
+    }
+    if (!closing) return;
+    const auto matrix = normalResponse(limits, guides, states);
+    // Дополнительные опорные импульсы только отталкивают. Прежние диски Кулона остаются допустимыми.
+    for (int pass = 0; pass < 128; ++pass) {
+        Real change = 0;
+        for (size_t i = 0; i < n; ++i) {
+            const Real diagonal = matrix[i*n+i];
+            if (diagonal <= 0) continue;
+            const Real added = std::max(-correction[i], -residual[i] / diagonal);
+            correction[i] += added;
+            for (size_t j = 0; j < n; ++j) residual[j] += matrix[j*n+i] * added;
+            change = std::max(change, abs(added * diagonal));
+        }
+        if (change <= tolerance) break;
+    }
+    for (size_t i = 0; i < n; ++i) if (correction[i] > 0) {
+        const auto& p = limits[i];
+        p.contact->setNormalImpulse(states, p.point, p.contact->normalRow(p.point).impulse + correction[i]);
+    }
+    guides.solve(states, 0, h);
+}
+
 Real dot(const Four& a, const Four& b) {
     Real sum = 0;
     for (size_t i = 0; i < 4; ++i) sum += a[i] * b[i];
@@ -108,19 +176,30 @@ Real rowSumBound(const std::array<Four, 4>& response) {
     return bound;
 }
 
-// Минимизируем кинетическую энергию на двух дисках Кулона. Градиент по импульсу — это
-// скорость скольжения. 1/L даёт невозрастающую энергию при L ≥ λmax(W).
-Four frictionImpulse(const SlipSystem& system, const Four& warm, const Radii& radius) {
-    Four free{}, stick{};
+Four stickingImpulse(const SlipSystem& system, const Four& free) {
+    Four stick{};
     ProfileMatrix mass;
     for (int i = 0; i < 4; ++i) {
         const auto k = size_t(i);
-        free[k] = system.slip[k] - dot(system.response[k], warm);
         stick[k] = -free[k];
         mass.addRow(0);
         for (int j = 0; j <= i; ++j) mass.at(i, j) = system.response[k][size_t(j)];
     }
     solveCholesky(mass, stick);
+    return stick;
+}
+
+// Минимизируем кинетическую энергию на двух дисках Кулона. Градиент по импульсу — это
+// скорость скольжения. 1/L даёт невозрастающую энергию при L ≥ λmax(W).
+Four frictionImpulse(SlipSystem system, const Four& warm, const Radii& radius) {
+    Four free{};
+    for (size_t i = 0; i < 4; ++i) free[i] = system.slip[i] - dot(system.response[i], warm);
+    // При μN = 0 обе неизвестные равны нулю. Прежний импульс уже вычтен из свободной скорости.
+    for (size_t i = 0; i < 4; ++i) if (radius[i / 2] == 0) {
+        free[i] = 0;
+        for (size_t j = 0; j < 4; ++j) system.response[i][j] = system.response[j][i] = 0;
+    }
+    const Four stick = stickingImpulse(system, free);
     const Real bound = rowSumBound(system.response);
     const Real tolerance = 64 * kEpsilon * (bound * (radius[0] + radius[1]) + sqrt(dot(free, free)));
     bool rest = onDisks(stick, radius) == stick;
@@ -163,6 +242,12 @@ std::array<Bond, 4> CoupledFriction::tangentRows() const {
     return rows;
 }
 
+bool CoupledFriction::participates(const SoftContact& c) {
+    for (const auto& point : c.points_) if (point.impulse != 0 || point.gap <= 0) return true;
+    return c.friction_.rub_.x != 0 || c.friction_.rub_.y != 0 || c.friction_.twistImpulse_ != 0
+           || c.friction_.rolling_.hasImpulse();
+}
+
 bool CoupledFriction::solve(StepArray<SolverBody>& states, const DirectJoints& guides, Real h, Real rollingArm) {
     Radii radius{}, load{}, lever{};
     Four warm{};
@@ -172,7 +257,9 @@ bool CoupledFriction::solve(StepArray<SolverBody>& states, const DirectJoints& g
         radius[i] = c.friction_.coefficient * load[i];
         warm[2*i] = c.friction_.rub_.x; warm[2*i+1] = c.friction_.rub_.y;
     }
-    if (radius[0] == 0 && radius[1] == 0) return false;
+    if (radius == Radii{} && warm == Four{} && rollingArm == 0
+        && pair_[0]->friction_.twistImpulse_ == 0 && pair_[1]->friction_.twistImpulse_ == 0) return false;
+    const auto limits = normalLimits(pair_, states);
     for (size_t i = 0; i < 2; ++i) {
         auto& c = *pair_[i];
         c.friction_.solveTwist(states[size_t(c.a_)], states[size_t(c.b_)], c.frame(), lever[i]);
@@ -185,6 +272,7 @@ bool CoupledFriction::solve(StepArray<SolverBody>& states, const DirectJoints& g
         c.friction_.rolling_.solve(sa, sb, c.tangent1_, c.tangent2_, rollingArm, load[i]);
     }
     guides.solve(states, 0, h);
+    restoreNormals(limits, guides, states, h);
     return true;
 }
 }

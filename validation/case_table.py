@@ -11,6 +11,7 @@
 «чего касается у B», отношения размеров и режима (validation/studies/CaseTable.cpp).
 """
 import datetime
+import itertools
 import json
 import subprocess
 import sys
@@ -21,6 +22,20 @@ ROOT = Path(__file__).resolve().parent.parent
 STUDY = ROOT / "build/validation/studies/study-case-table"
 BASELINE = ROOT / "docs/reports/data/case-table-counts.json"
 HISTORY = ROOT / "docs/reports/case-table-history.jsonl"
+TRIALS = 4
+KEY = ("a_shape", "a_element", "b_shape", "b_element", "size", "regime")
+FEATURES = {
+    "шар": ("выпуклость",),
+    "капсула": ("выпуклость", "бок"),
+    "цилиндр": ("грань", "ребро", "бок"),
+    "скругл. цилиндр": ("грань", "ребро", "бок"),
+    "брусок": ("грань", "ребро", "вершина"),
+    "оболочка": ("грань", "ребро", "вершина"),
+}
+SIZES = ("A впятеро меньше", "размеры равны", "A впятеро больше")
+REGIMES = ("покой", "склон 35°", "волчок 20 рад/с", "удар 1 м/с", "удар 100 м/с",
+           "удар 10 км/с", "удар 1 м/с с вращением", "удар 1 м/с, B свободно",
+           "удар 100 м/с, B свободно", "удар 10 км/с, B свободно", "удар с вращением, B свободно")
 # Мерка и её нарушение в строке прибора; пороги — docs/reports/case-table.md, раздел 2.
 MEASURES = [
     # Если основной шаг не увидел удара, мелкий шаг различает пролёт (passed) и геометрический промах (missed).
@@ -35,12 +50,36 @@ MEASURES = [
 ]
 
 
+def check_cells(cells, status):
+    variants = [(shape, feature) for shape, features in FEATURES.items() for feature in features]
+    expected = {(*a, *b, size, regime) for a, b, size, regime in itertools.product(variants, variants, SIZES, REGIMES)}
+    seen = set()
+    for cell in cells:
+        key = tuple(cell[field] for field in KEY)
+        if key not in expected:
+            raise ValueError(f"непредусмотренная клетка: {key}")
+        if key in seen:
+            raise ValueError(f"повторная клетка: {key}")
+        if cell["trials"] != TRIALS:
+            raise ValueError(f"ожидалось {TRIALS} пробы, получено {cell['trials']}: {key}")
+        seen.add(key)
+    missing = expected - seen
+    if missing:
+        raise ValueError(f"пропущено клеток: {len(missing)}; первая: {min(missing)}")
+    # bad считается в C++ по неокруглённым значениям, JSONL хранит округлённые.
+    if status != int(any(cell["bad"] for cell in cells)):
+        raise ValueError(f"код прибора {status} расходится с отметками bad")
+
+
 def measure():
     """Счёт клеток с нарушением по каждой мерке на нынешней сборке."""
     with tempfile.TemporaryDirectory() as folder:
         rows = Path(folder) / "rows.jsonl"
-        subprocess.run([str(STUDY), "4", str(rows)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        process = subprocess.run([str(STUDY), str(TRIALS), str(rows)], stdout=subprocess.DEVNULL)
+        if process.returncode not in (0, 1):
+            raise RuntimeError(f"study-case-table завершился с кодом {process.returncode}")
         cells = [json.loads(line) for line in rows.read_text(encoding="utf-8").splitlines()]
+    check_cells(cells, process.returncode)
     counts = {name: sum(1 for cell in cells if broken(cell)) for name, broken in MEASURES}
     counts["плохих всего"] = sum(1 for cell in cells if any(broken(cell) for _, broken in MEASURES))
     return len(cells), counts

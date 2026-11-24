@@ -221,6 +221,16 @@ struct LiveContacts {
         if (!bounces) return;
         for (SoftContact& contact : contacts) contact.bounce(moving.states, bounceSpeed);
     }
+    // После сдвига снимаем скорость выталкивания. Нулевой порог включает все тела.
+    void relaxNormals(Moving& moving, Real h, Real restSpeed) {
+        if (restSpeed == 0) {
+            normals.solve(contacts, moving.bodies, moving.states, false, h, pushSpeed);
+            return;
+        }
+        const auto stirred = moving.stirred(restSpeed);
+        if (std::find(stirred.begin(), stirred.end(), 1) != stirred.end())
+            normals.solve(contacts, moving.bodies, moving.states, false, h, pushSpeed, restSpeed > 0 ? &stirred : nullptr);
+    }
     // Нормали с поправкой положения и сдвиг тел на h; remaining — время до конца обновления. Сдвиг
     // пробный: если после него нашлись пропущенные контакты, тела возвращаются и нормали решаются
     // снова, уже с ними.
@@ -290,9 +300,7 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
         live.solveAndMove(moving, h, (substeps - substep) * h);
         rows.build(joints, bodies, states, jointMemory, directJoints);
         rows.solve(states, false, jointCorrection, h, jointSoft, pushSpeed), notify(observer, StepStage::Joints);
-        const StepArray<char> stirred = moving.stirred(restSpeed);
-        if (restSpeed == 0 || std::find(stirred.begin(), stirred.end(), 1) != stirred.end()) normals.solve(contacts, bodies, states, false, h, pushSpeed, restSpeed > 0 ? &stirred : nullptr);
-        notify(observer, StepStage::Normals);
+        live.relaxNormals(moving, h, restSpeed), notify(observer, StepStage::Normals);
         if (coupledFriction) solveFrictionIslands(contacts, states, rows.locked, rows.links, normals.levels, h, rollingResistance);
         else normals.levels.each(contacts, states, [&](size_t c) { contacts[c].solveFriction(states, rollingResistance); });
         notify(observer, StepStage::Friction);

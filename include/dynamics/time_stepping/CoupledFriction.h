@@ -7,6 +7,7 @@ namespace kp {
 class CoupledFriction {
 public:
     CoupledFriction(SoftContact& first, SoftContact& second) : pair_{&first, &second} {}
+    static bool participates(const SoftContact& contact);
     bool solve(StepArray<SolverBody>& states, const DirectJoints& guides, Real h, Real rollingArm);
 
 private:

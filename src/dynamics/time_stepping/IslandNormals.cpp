@@ -16,6 +16,20 @@ constexpr Real kViolated = Real(1e-6);      // м/с: сближение све�
 constexpr char kOutside = 0, kWorking = 1, kEntered = 2; // точка вне рабочего набора, в нём, только что вошла
 constexpr size_t kParallelRows = 256;       // меньше точек дешевле решить в одном потоке, чем будить остальные
 
+// Свободные скорости: убираем отклик уже приложенных импульсов, включая диагональную регуляризацию.
+void subtractWarmStart(ContactSystem& system, const StepArray<Real>& impulse, StepArray<Real>& free) {
+    const size_t total = impulse.size();
+    system.diagonal.assign(total, 0), system.soft.assign(total, 0);
+    for (size_t i = 0; i < total; ++i) {
+        system.rows.push_back(i), system.order.push_back(i);
+        for (const ContactSystem::Entry& entry : system.matrix[i]) {
+            if (entry.column == i) system.diagonal[i] = entry.value;
+            free[i] -= entry.value * impulse[entry.column];
+        }
+        free[i] -= kProximal * system.diagonal[i] * impulse[i];
+    }
+}
+
 } // namespace
 
 int IslandNormals::Island::localBody(int body, const std::vector<Body>& world, StepArray<int>& place) {
@@ -145,15 +159,7 @@ int IslandNormals::solveWorking(Island& island, StepArray<SoftContact>& contacts
         pressing.push_back(row.impulse > 0 || island.working[r] == kEntered), island.working[r] = kWorking;
     }
     system.matrix = ContactSystem::responseMatrix(island.bodies, system.lines);
-    system.diagonal.assign(total, 0), system.soft.assign(total, 0);
-    for (size_t i = 0; i < total; ++i) {
-        system.rows.push_back(i), system.order.push_back(i);
-        for (const ContactSystem::Entry& entry : system.matrix[i]) {
-            if (entry.column == i) system.diagonal[i] = entry.value;
-            free[i] -= entry.value * impulse[entry.column];
-        }
-        free[i] -= kProximal * system.diagonal[i] * impulse[i];
-    }
+    subtractWarmStart(system, impulse, free);
     const std::vector<Bond> noBonds;
     StepArray<char> noBondSet;
     StepArray<Real> force(total);

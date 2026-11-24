@@ -6,7 +6,7 @@ source_tree=$(realpath "$1")
 output=$(realpath -m "$2")
 grep -qi microsoft /proc/sys/kernel/osrelease
 mkdir -p "$output"
-tool_env=/tmp/kinetica-anatomy-20261122/env
+tool_env=${KP_TOOL_ENV:-/tmp/kinetica-anatomy-20261122/env}
 if [[ ! -f "$tool_env" && -n ${3:-} ]] && ! command -v cmake >/dev/null; then
     bash "$3"
 fi

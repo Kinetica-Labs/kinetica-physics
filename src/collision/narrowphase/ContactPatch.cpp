@@ -1,10 +1,13 @@
 #include <math/StepMemory.h>
+#include <math/SmallVector.h>
 #include <collision/narrowphase/ContactPatch.h>
 
 #include <collision/narrowphase/ContactCandidate.h>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
+#include <limits>
 
 namespace kp {
 namespace {
@@ -69,14 +72,83 @@ void addCircleOverFace(const Flat& flat, const Outline& outline, Add&& add) {
     }
 }
 
-// В плоскости опорного торца проекция наклонного диска помещается в окружность его радиуса.
-// Пересечение окружностей даёт кандидатов. После переноса в плоскость второго диска
-// оставляем только точки внутри его настоящей границы.
+using Polynomial = std::array<Real, 5>; // от свободного члена до четвёртой степени
+
+Real valueAt(const Polynomial& p, int degree, Real x) {
+    Real result = p[size_t(degree)];
+    while (degree > 0) result = x * result + p[size_t(--degree)];
+    return result;
+}
+
+Real bracketedRoot(const Polynomial& p, int degree, Real left, Real right, bool negativeLeft) {
+    for (int i = 0; i < std::numeric_limits<Real>::digits + 1; ++i) {
+        const Real mid = (left + right) / 2, value = valueAt(p, degree, mid);
+        if (value == 0) return mid;
+        if ((value < 0) == negativeLeft) left = mid;
+        else right = mid;
+    }
+    return (left + right) / 2;
+}
+
+// На [-1,1] корни производной делят полином на монотонные участки. На каждом корень
+// либо меняет знак, либо совпадает с концом участка (в том числе при касании).
+SmallVector<Real, 8> arcRoots(const Polynomial& p, int degree) {
+    SmallVector<Real, 8> roots;
+    while (degree > 0 && p[size_t(degree)] == 0) --degree;
+    if (degree == 0) return roots;
+    Polynomial derivative{};
+    Real scale = abs(p[0]);
+    for (int i = 1; i <= degree; ++i) {
+        derivative[size_t(i - 1)] = Real(i) * p[size_t(i)];
+        scale += abs(p[size_t(i)]);
+    }
+    auto stops = arcRoots(derivative, degree - 1);
+    stops.push_back(1);
+    const Real roundoff = 16 * kEpsilon * scale;
+    Real left = -1, before = valueAt(p, degree, left);
+    if (abs(before) <= roundoff) roots.push_back(left);
+    for (Real right : stops) {
+        if (right <= left) continue;
+        const Real after = valueAt(p, degree, right);
+        if (abs(before) > roundoff && abs(after) > roundoff && (before < 0) != (after < 0))
+            roots.push_back(bracketedRoot(p, degree, left, right, before < 0));
+        if (abs(after) <= roundoff) roots.push_back(right);
+        left = right;
+        before = after;
+    }
+    return roots;
+}
+
+// Полуокружность p(t) = centre + ((1-t²)u + 2tv)/(1+t²), -1 ≤ t ≤ 1.
+// Подстановка её проекции в уравнение опорной окружности |p - c|² = R² даёт полином.
+template <class Add>
+void addTiltedRims(const Flat& flat, const Outline& outline, Add&& add) {
+    const Vector3 centre = flat.flatten(outline.centre - flat.centre);
+    const Real rSquared = flat.radius * flat.radius;
+    std::uint32_t id = 0x100u;
+    for (Real sign : {Real(1), Real(-1)}) {
+        const Vector3 u = sign * (outline.points[0] - outline.centre), v = sign * (outline.points[1] - outline.centre);
+        const Vector3 a = centre + flat.flatten(u), b = 2 * flat.flatten(v), c = centre - flat.flatten(u);
+        const Polynomial p{a.dot(a) - rSquared, 2 * a.dot(b), b.dot(b) + 2 * a.dot(c) - 2 * rSquared,
+                           2 * b.dot(c), c.dot(c) - rSquared};
+        for (Real t : arcRoots(p, 4)) {
+            if (t == 1) continue; // начало следующей полуокружности
+            const Real tt = t * t;
+            const Vector3 point = outline.centre + (1 / (1 + tt)) * ((1 - tt) * u + (2 * t) * v);
+            if (abs(flat.flatten(point - flat.centre).length() - flat.radius) <= kOnBoundary) add(point, id++);
+        }
+    }
+}
+
 template <class Add>
 void addCircleOverDisc(const Flat& flat, const Outline& outline, Add&& add) {
     const Vector3 between = flat.flatten(outline.centre - flat.centre);
     const Real d = between.length(), r1 = flat.radius, r2 = outline.radius;
-    if (d > kOnBoundary && d < r1 + r2 && d > abs(r1 - r2)) {
+    const Real cosine = abs(flat.normal.dot(outline.normal));
+    if (d > r1 + r2 || d + r2 < r1 || d + r1 < r2 * cosine) return;
+    if (cosine < 1 - 4 * kEpsilon) {
+        addTiltedRims(flat, outline, add);
+    } else if (d > kOnBoundary && d >= abs(r1 - r2)) {
         const Real a = (d * d + r1 * r1 - r2 * r2) / (2 * d), h = sqrt(std::max(Real(0), r1 * r1 - a * a));
         const Vector3 along = (1 / d) * between, across = flat.normal.cross(along);
         for (int sign : {1, -1}) {

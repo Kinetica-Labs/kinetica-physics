@@ -81,7 +81,8 @@ bool measure(int trial, int angle, Pair u, std::array<double, 2> mu, int preload
     const Pair relative{actual[0] - jaws[0], actual[1] - jaws[1]};
     const double jawError = largestError(std::abs(jaws[0]), std::abs(jaws[1]));
     const double relativeError = largestError(std::abs(relative[0] - expected[0]), std::abs(relative[1] - expected[1]));
-    const bool pass = stepped && normalError <= impulseTolerance && slipError <= speedTolerance;
+    const bool pass = stepped && normalError <= impulseTolerance && slipError <= speedTolerance
+                      && jawError <= speedTolerance && relativeError <= speedTolerance;
     std::printf("%d,%d,%.3g,%.3g", trial, angle, mu[0], mu[1]);
     printPair(u);
     printPair(expected);

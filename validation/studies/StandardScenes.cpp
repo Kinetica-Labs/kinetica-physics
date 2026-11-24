@@ -13,7 +13,6 @@
 // момент проверки, сбоку (вдоль оси z) и с торца (вдоль оси x): по ним строится рисунок сцен.
 
 #include <math/WorkerPool.h>
-#include <cstdlib>
 #include <collision/PairFinder.h>
 #include "../../examples/scenes/StandardScenes.h"
 #include "OverlapDepth.h"

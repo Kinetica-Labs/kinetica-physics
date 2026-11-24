@@ -8,7 +8,6 @@
 // прогон нужен, чтобы сверить две сборки там, куда 60 кадров не доходят (доиск пар, обвал кучи).
 
 #include <math/WorkerPool.h>
-#include <cstdlib>
 #include "../../examples/scenes/ExactScenes.h"
 #include "../../examples/scenes/StandardScenes.h"
 

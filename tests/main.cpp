@@ -3,7 +3,9 @@
 void geometryTests();
 void hullTests();
 void collisionTests();
+void contactPatchTests();
 void dynamicsTests();
+void frictionTests();
 void gearTests();
 void linkageTests();
 void wheelTests();
@@ -14,7 +16,9 @@ int main() {
     geometryTests();
     hullTests();
     collisionTests();
+    contactPatchTests();
     dynamicsTests();
+    frictionTests();
     gearTests();
     linkageTests();
     wheelTests();

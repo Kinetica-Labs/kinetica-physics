@@ -163,7 +163,9 @@ int main(int argc, char** argv) {
         pass &= grip::sweep("kinetica-realtime", [](grip::Load load) { return Rig(kp::SoftStep{}.substeps, load); });
     if (mode == "realtime32")
         pass &= grip::sweep("kinetica-realtime32", [](grip::Load load) { return Rig(32, load); });
-    if (mode == "shared8")
-        pass &= grip::sweep("kinetica-shared8", [](grip::Load load) { return Rig(1, load, true); });
+    if (mode == "shared8") {
+        const char* engine = study::coupledFrictionRequested() ? "kinetica-shared8-coupled" : "kinetica-shared8-sequential";
+        pass &= grip::sweep(engine, [](grip::Load load) { return Rig(1, load, true); });
+    }
     return pass ? 0 : 1;
 }

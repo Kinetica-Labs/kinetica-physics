@@ -15,7 +15,7 @@ $programs = [ordered]@{
     box3d = (Resolve-Path $Box3D).Path
     rp3d = (Resolve-Path $ReactPhysics3D).Path
 }
-$labels = @{kinetica='kinetica-shared8';box3d='box3d-shared8';rp3d='rp3d-f64-shared8'}
+$labels = @{kinetica='kinetica-shared8-coupled';box3d='box3d-shared8';rp3d='rp3d-f64-shared8'}
 $precisions = @{kinetica='double';box3d='float';rp3d='double'}
 if ((Test-Path $OutputDir) -and @(Get-ChildItem -Force $OutputDir).Count) {
     throw "Output directory is not empty: $OutputDir"
@@ -120,8 +120,17 @@ try {
         $pairs=@($ratioRows | Where-Object { $_.peer -eq $other })
         $cases=@($accuracy | Where-Object { $_.peer -eq $other })
         $forceValid=@($cases | Where-Object { $_.both_force_gates_pass })
+        $timed=@($cases | Where-Object {
+            [int]$_.hz -eq $meta.timer_hz -and [double]$_.mu -eq $meta.timer_friction -and
+            [double]$_.jaw_N -eq $meta.timer_squeeze_per_jaw_N -and [double]$_.load_N -eq $meta.timer_load_N -and [int]$_.open -eq 0
+        })
+        if ($timed.Count -ne 1) { throw "Missing or ambiguous timed case: $other" }
+        $rawRatio=Get-Median $pairs.kinetica_over_peer
+        $qualified=$timed[0].kinetica_pass -eq '1' -and $timed[0].peer_pass -eq '1'
         $tieMm=1e-6
-        [pscustomobject]@{ peer=$other; blocks=$pairs.Count; median_kinetica_over_peer=(Get-Median $pairs.kinetica_over_peer)
+        [pscustomobject]@{ peer=$other; blocks=$pairs.Count; median_kinetica_over_peer=$rawRatio
+            timed_kinetica_pass=$timed[0].kinetica_pass; timed_peer_pass=$timed[0].peer_pass
+            median_at_tolerance=$(if ($qualified) { $rawRatio })
             blocks_kinetica_faster=@($pairs | Where-Object { $_.kinetica_over_peer -lt 1 }).Count
             all_cases=$cases.Count; kinetica_pass=@($cases | Where-Object { $_.kinetica_pass -eq '1' }).Count
             peer_pass=@($cases | Where-Object { $_.peer_pass -eq '1' }).Count; force_valid_pairs=$forceValid.Count

@@ -21,23 +21,30 @@ Real axisRoundoff(const TransformedHull& a, const TransformedHull& b) {
 }
 
 FaceChoice faceAxis(const TransformedHull& of, const TransformedHull& other, Real tie) {
-    SmallVector<Real, 32> gaps;
-    Real maximum = -std::numeric_limits<Real>::infinity();
-    for (int i = 0; i < int(of.normals.size()); ++i) {
+    const auto gap = [&](int i) {
         const Vector3 n = of.normals[size_t(i)];
-        const Real s = n.dot(other.support(-n) - of.pointOnFace(i));
-        gaps.push_back(s);
-        maximum = std::max(maximum, s);
+        return n.dot(other.support(-n) - of.pointOnFace(i));
+    };
+    int best = 0;
+    Real maximum = gap(0), runnerUp = -std::numeric_limits<Real>::infinity();
+    for (int i = 1; i < int(of.normals.size()); ++i) {
+        const Real s = gap(i);
+        if (s > maximum) {
+            runnerUp = maximum;
+            maximum = s;
+            best = i;
+        } else runnerUp = std::max(runnerUp, s);
     }
-    // При равенстве в пределах округления поверхность детали важнее её внутреннего шва.
-    // Сравнение с единым максимумом исключает цепочку попарно «почти равных» зазоров.
-    int first = -1;
-    for (int i = 0; i < int(gaps.size()); ++i) {
-        if (maximum - gaps[size_t(i)] > tie) continue;
-        if (first < 0) first = i;
-        if (!of.shape.isInternalFace(i)) return {i, gaps[size_t(i)], maximum};
+    if (maximum - runnerUp > tie) return {best, maximum, maximum};
+    // При равенстве в пределах округления выбираем первую наружную грань, иначе первый шов.
+    FaceChoice first{-1, 0, maximum};
+    for (int i = 0; i < int(of.normals.size()); ++i) {
+        const Real s = gap(i);
+        if (maximum - s > tie) continue;
+        if (!of.shape.faces()[size_t(i)].internal) return {i, s, maximum};
+        if (first.face < 0) first = {i, s, maximum};
     }
-    return {first, gaps[size_t(first)], maximum};
+    return first;
 }
 
 // Образуют ли два ребра грань разности Минковского. На единичной сфере ребру A соответствует
@@ -103,7 +110,7 @@ static SeparatingAxis bestEdgePair(const TransformedHull& A, const TransformedHu
 static SeparatingAxis bestFaceInA(const TransformedHull& A, const TransformedHull& B, Real preference, Real tie, Real& maximum) {
     const FaceChoice a = faceAxis(A, B, tie), b = faceAxis(B, A, tie);
     maximum = std::max(a.maximum, b.maximum);
-    const bool surfaceB = A.shape.isInternalFace(a.face) && !B.shape.isInternalFace(b.face) && b.gap >= a.maximum - tie;
+    const bool surfaceB = A.shape.faces()[size_t(a.face)].internal && !B.shape.faces()[size_t(b.face)].internal && b.gap >= a.maximum - tie;
     if (surfaceB || b.gap > a.gap + preference) return {SeparatingAxis::Kind::FaceB, b.gap, -B.normals[size_t(b.face)], 0, b.face};
     return {SeparatingAxis::Kind::FaceA, a.gap, A.normals[size_t(a.face)], a.face, 0};
 }

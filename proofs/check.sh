@@ -10,7 +10,14 @@
 cd "$(dirname "$0")" || exit 2
 failed=0
 for lemma in *.smt2; do
-    proof=$(z3 -T:60 "$lemma" 2>&1 | head -1)
+    answers=$(z3 -T:60 "$lemma" 2>&1) || failed=1
+    proof=$(printf '%s\n' "$answers" | head -1)
+    # Именованный запрос печатает «имя expected sat/unsat» перед ответом.
+    printf '%s\n' "$answers" | awk '
+        pending { if ($0 != expected) { print label ": " $0; bad = 1 }; pending = 0; next }
+        / expected (sat|unsat)$/ { label = $0; expected = $NF; pending = 1 }
+        END { exit (bad || pending) }
+    ' || failed=1
     last=$(grep -n '^(assert' "$lemma" | tail -1 | cut -d: -f1)
     premises=$(sed "${last}d" "$lemma" | z3 -T:60 -in 2>&1 | head -1)
     printf 'лемма  %-44s вывод: %-6s посылки: %s\n' "$lemma" "$proof" "$premises"

@@ -69,9 +69,11 @@ int sectorEnd(const Body& wedge, Vector3 outward) {
     return -1;
 }
 
+} // namespace
+
 // Соседние клинья построены из одного профиля: конец предыдущего и начало следующего
 // содержат одни и те же точки around(point, seam). Отмечаем только подтверждённую пару.
-void markSectorEnds(std::vector<Body>& pieces, size_t first, int segments) {
+void CompoundBodyBuilder::markSectorEnds(std::vector<Body>& pieces, size_t first, int segments) {
     struct Ends { int begin = -1, end = -1; };
     std::vector<Ends> ends(static_cast<size_t>(segments));
     for (int seam = 0; seam < segments; ++seam) {
@@ -86,13 +88,11 @@ void markSectorEnds(std::vector<Body>& pieces, size_t first, int segments) {
         if (ends[i].begin < 0 && ends[i].end < 0) continue;
         Body& piece = pieces[first + i];
         auto hull = std::make_shared<ConvexHull>(*piece.shape->hull());
-        if (ends[i].begin >= 0) hull->markInternalFace(ends[i].begin);
-        if (ends[i].end >= 0) hull->markInternalFace(ends[i].end);
+        if (ends[i].begin >= 0) hull->faces_[size_t(ends[i].begin)].internal = true;
+        if (ends[i].end >= 0) hull->faces_[size_t(ends[i].end)].internal = true;
         piece.shape = std::move(hull);
     }
 }
-
-} // namespace
 
 Body CompoundBodyBuilder::compound(const std::vector<Body>& pieces) {
     Body body;

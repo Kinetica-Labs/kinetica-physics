@@ -47,9 +47,13 @@ DynamicTree PairFinder::tree(Real h) const { return reachTree(bodies_, speedsOf(
 // Кандидаты — пары тел, чьи бруски досягаемости за время h пересеклись; отбирает их дерево брусков.
 // Идут по возрастанию номеров: порядок пар не должен зависеть от формы дерева.
 StepArray<std::pair<int, int>> PairFinder::candidates(Real h, const StepArray<Real>& fastest) const {
-    StepArray<Real> path(bodies_.size()); // путь досягаемости тела — тот же, что в reachBounds
-    for (size_t i = 0; i < bodies_.size(); ++i) path[i] = (fastest[i] + gravity_.length() * h) * h + kContactDistance;
-    if (const std::vector<std::pair<int, int>>* kept = remembered ? remembered->valid(bodies_, path) : nullptr) return {kept->begin(), kept->end()};
+    StepArray<Real> path;
+    if (remembered) {
+        path.resize(bodies_.size());
+        const Real gravitySpeed = gravity_.length() * h;
+        for (size_t i = 0; i < path.size(); ++i) path[i] = (fastest[i] + gravitySpeed) * h + kContactDistance;
+        if (const auto* kept = remembered->valid(bodies_, path)) return {kept->begin(), kept->end()};
+    }
     const DynamicTree tree = reachTree(bodies_, fastest, gravity_, h, remembered ? CandidateMemory::kSlack : Real(0));
     StepArray<std::pair<int, int>> candidates;
     tree.queryPairs([&](int a, int b) { candidates.emplace_back(std::min(a, b), std::max(a, b)); });

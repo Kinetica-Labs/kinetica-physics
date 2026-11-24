@@ -87,6 +87,7 @@ try {
     if (@(Compare-Object $expected $changed).Count) { throw "Different source changes; see source-differences.txt" }
     $parity=foreach ($mode in '0','1') {
         $env:KP_COUPLED_FRICTION=$mode
+        $engine=if ($mode -eq '1') {'kinetica-shared8-coupled'} else {'kinetica-shared8-sequential'}
         $hashes=@{}
         foreach ($v in $builds.Keys) {
             $p=$exe[$v].grip
@@ -97,7 +98,7 @@ try {
             $rows=@($lines | ConvertFrom-Csv)
             $failed=@($rows | Where-Object {$_.pass -eq '0'}).Count
             if ($rows.Count -ne 36 -or $status -ne [int]($failed -ne 0) -or
-                @($rows | Where-Object {$_.complete -ne '1' -or $_.engine -ne 'kinetica-shared8'}).Count) { throw "Incomplete sweep: $file" }
+                @($rows | Where-Object {$_.complete -ne '1' -or $_.engine -ne $engine}).Count) { throw "Incomplete sweep: $file" }
             $hashes[$v]=(Get-FileHash $file).Hash
             [pscustomobject]@{coupled=$mode;variant=$v;rows=$rows.Count;pass=$rows.Count-$failed;sha256=$hashes[$v]}
         }
@@ -118,7 +119,7 @@ try {
                     $lines=@(& $p shared8)
                     if ($LASTEXITCODE -ne 0 -or $lines.Count -ne 2) { throw "Grip timer failed: $i,$v" }
                     $r=$lines | ConvertFrom-Csv
-                    if ($r.engine -ne 'kinetica-shared8' -or $r.frames -ne '360') { throw 'Wrong grip workload' }
+                    if ($r.engine -ne 'kinetica-shared8-coupled' -or $r.frames -ne '360') { throw 'Wrong grip workload' }
                     $us=[double]$r.us_per_frame; $frames=[int]$r.frames
                     if ($null -eq $drift) {$drift=$r.end_drift_mm}
                     if ($drift -ne $r.end_drift_mm) { throw 'Timed grip drift changed' }

@@ -8,14 +8,13 @@ CardanJoint::CardanJoint(int a_, const Body& bodyA, int b_, const Body& bodyB, V
     // Оси сочленения в мире: x — вал, y — крестовина (её составляющая вдоль вала отброшена).
     const Vector3 x = (1 / axis.length()) * axis;
     const Vector3 across = crossAxis - crossAxis.dot(x) * x;
-    const Vector3 y = (1 / across.length()) * across, z = x.cross(y);
-    // Поворот с осями x, y, z в столбцах: сначала ось x на место, затем вокруг неё до оси y.
+    const Vector3 y = (1 / across.length()) * across;
+    // Сначала совмещаем оси x, затем поворотом вокруг x совмещаем оси y.
     const Quaternion first = turningXTo(x);
     const Vector3 yFirst = first.rotate({0, 1, 0});
     const Real c = yFirst.dot(y), s = yFirst.cross(y).dot(x); // косинус и синус поворота вокруг x
     const Real half = sqrt((1 + c) / 2);
     const Quaternion frame = half > Real(1e-6) ? (Quaternion{half, s / (2 * half) * x.x, s / (2 * half) * x.y, s / (2 * half) * x.z} * first).unit() : (Quaternion{0, x.x, x.y, x.z} * first).unit();
-    (void)z;
     frameA = bodyA.orientation.conjugate() * frame, frameB = bodyB.orientation.conjugate() * frame;
 }
 

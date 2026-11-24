@@ -82,7 +82,7 @@ def records(data, rows_expected, width):
     return rows
 
 
-def validate(name, proc, n, width):
+def validate(name, proc, n, width, coupled):
     if name == "state":
         keys = []
         for line in proc.stdout.splitlines():
@@ -97,7 +97,8 @@ def validate(name, proc, n, width):
     seen = {tuple(r[k] if k in ("order", "scene") else float(r[k]) for k in fields) for r in rs}
     check(seen == expected, "incomplete case grid")
     if name == "shared8":
-        check(all(r["complete"] == "1" and r["engine"] == "kinetica-shared8" for r in rs), "incomplete shared8")
+        engine = "kinetica-shared8-coupled" if coupled else "kinetica-shared8-sequential"
+        check(all(r["complete"] == "1" and r["engine"] == engine for r in rs), "incomplete shared8 or wrong friction mode")
     if name.startswith("oblique"):
         preload = "1920" if name.endswith("settled") else "120"
         check(all(r["preload_steps"] == preload and r["step_complete"] == "1" for r in rs), "incomplete preload")
@@ -132,7 +133,7 @@ def main():
                 try:
                     check(p.returncode == q.returncode, "exit codes differ")
                     for proc in pair:
-                        validate(name, proc, n, width)
+                        validate(name, proc, n, width, coupled)
                     check(p.stdout == q.stdout, "raw stdout differs")
                 except (ValueError, KeyError) as err:
                     error = str(err)
@@ -154,7 +155,7 @@ def main():
                 proc = run(dirs[variant], GRIP, ["shared8"], True, True, raw, f"timing-{block+1:02}-{variant}")
                 check(proc.returncode == 0, "timing program failed")
                 r, = records(proc.stdout, 1, 4)
-                check(r["engine"] == "kinetica-shared8" and r["frames"] == "360", "wrong timing experiment")
+                check(r["engine"] == "kinetica-shared8-coupled" and r["frames"] == "360", "wrong timing experiment")
                 check(float(r["us_per_frame"]) > 0 and float(r["end_drift_mm"]) >= 0, "invalid timing")
                 if drift is None:
                     drift = r["end_drift_mm"]
