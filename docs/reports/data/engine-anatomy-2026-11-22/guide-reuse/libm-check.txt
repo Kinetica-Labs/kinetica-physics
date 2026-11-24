@@ -1,0 +1,2 @@
+libkinetica-physics.a forbidden_symbols 0
+libkinetica-scenes.a forbidden_symbols 0

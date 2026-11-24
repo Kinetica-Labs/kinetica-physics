@@ -1,0 +1,9 @@
+﻿{
+    "complete":  true,
+    "match":  54,
+    "comparisons":  54,
+    "raw_changed_with_coupled":  7,
+    "processes":  4,
+    "frames_per_scene":  600,
+    "threads":  1
+}

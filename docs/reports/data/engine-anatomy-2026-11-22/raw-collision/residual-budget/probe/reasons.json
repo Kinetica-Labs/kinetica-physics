@@ -1,0 +1,18 @@
+{
+  "5": "const auto& s = states[i];         if (isDriven(body)) return false;",
+  "9": "const Real speed = s.v.length() + radius * s.w.length();         if (!(speed <= kBalanceSpeed && h * speed <= Real(1e-10) && s.w.length() <= kBalanceSpeed)) return false;",
+  "20": "if (m.count < 2 || m.count > 4 || m.roundA != 0 || m.roundB != 0 || a.restitution != 0 || b.restitution != 0 ||         !a.shape || !b.shape || !a.shape->hull() || !b.shape->hull() || a.parts || b.parts) return false;",
+  "29": "// \u0411\u043b\u0438\u0437\u043a\u0438\u0439 \u043a\u043e\u043d\u0442\u0430\u043a\u0442 \u043e\u0431\u044f\u0437\u0430\u043d \u0443\u0436\u0435 \u043b\u0435\u0436\u0430\u0442\u044c \u043d\u0430 \u043f\u043e\u0432\u0435\u0440\u0445\u043d\u043e\u0441\u0442\u0438. \u0418\u043d\u0430\u0447\u0435 \u043d\u0443\u0436\u043d\u0430 \u043f\u043e\u0437\u0438\u0446\u0438\u043e\u043d\u043d\u0430\u044f \u043f\u043e\u043f\u0440\u0430\u0432\u043a\u0430.         if (!(abs(point.separation) <= h * kBalanceSpeed)) return false;",
+  "31": "const auto* entry = forces.find({pair.a, pair.b, point.id, pair.partA, pair.partB});         if (entry == forces.end() || !(entry->second.normal >= 0)) return false;",
+  "32": "if (entry == forces.end() || !(entry->second.normal >= 0)) return balanceProbe.reject(31);         for (int j = 0; j < k; ++j) if (m.points[size_t(j)].id == point.id) return false;",
+  "42": "}     if (!(load > 0)) return false;",
+  "49": "if (!(tangent.length() <= roundoff * mu * load && abs(moment) <= roundoff * mu * leverLoad &&           abs(tangent.dot(m.normal)) <= 32 * kEpsilon * tangent.length())) return false;",
+  "57": "const std::vector<std::vector<Real>>& memory, Real h) {     if (memory.size() != joints.size()) return false;",
+  "61": "joints[j].writeBonds(bodies, bodies, rows);         if (rows.size() != memory[j].size()) return false;",
+  "64": "const auto& row = rows[k];             if (row.soft || row.driven || row.oneSided || !(abs(row.error) <= h * kBalanceSpeed)) return false;",
+  "79": "step.rollingResistance != 0 || pairs.empty() || contactMemory.begin() == contactMemory.end() ||         !slowBodies(bodies, initial, h)) return false;",
+  "83": "if (step.directContactRows < 0 || points > size_t(step.directContactRows) ||         points != size_t(contactMemory.end() - contactMemory.begin())) return false;",
+  "86": "applyForces(trial, bodies, gravity, h);     if (!carryGuides(joints, bodies, trial, jointMemory, h)) return false;",
+  "88": "for (const auto& pair : pairs)         if (!carryReaction(pair, bodies, trial, contactMemory, h)) return false;",
+  "89": "if (!carryReaction(pair, bodies, trial, contactMemory, h)) return balanceProbe.reject(88);     if (!slowBodies(bodies, trial, h)) return false;"
+}

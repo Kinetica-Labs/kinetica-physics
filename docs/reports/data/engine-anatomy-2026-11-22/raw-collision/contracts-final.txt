@@ -1,0 +1,1 @@
+failed_rows=0,real_bytes=8

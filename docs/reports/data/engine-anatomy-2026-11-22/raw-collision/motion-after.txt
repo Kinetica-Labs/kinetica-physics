@@ -1,0 +1,1 @@
+scenarios=9 rows=72 failed_rows=0 angular_half_sweep_rad=0.12798541729

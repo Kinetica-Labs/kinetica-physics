@@ -34,7 +34,10 @@ struct Quaternion {
     // 2 arctg(|θ|/2) = |θ| − |θ|³/12 + …. Интегратор им больше не пользуется: при вращении он отстаёт
     // по фазе (docs/DEVELOPMENT.md, «Отображение поворота»). Осталось как дешёвый способ задать
     // поворот в проверках.
-    static Quaternion cayley(Vector3 theta) { return Quaternion{1, 0.5 * theta.x, 0.5 * theta.y, 0.5 * theta.z}.unit(); }
+    static Quaternion cayley(Vector3 theta) {
+        const Vector3 half = Real(0.5) * theta;
+        return Quaternion{1, half.x, half.y, half.z}.unit();
+    }
 };
 
 inline Quaternion operator*(Quaternion a, Quaternion b) {

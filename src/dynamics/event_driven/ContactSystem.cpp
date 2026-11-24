@@ -12,7 +12,14 @@ namespace {
 // как при std::stable_sort, но без обращения к куче. merged — рабочий массив.
 void mergeColumns(StepArray<ContactSystem::Entry>& row, StepArray<ContactSystem::Entry>& merged) {
     size_t second = 1;
-    while (second < row.size() && !(row[second].column < row[second - 1].column)) ++second;
+    bool hasDuplicates = false;
+    for (; second < row.size(); ++second) {
+        const size_t previous = row[second - 1].column, current = row[second].column;
+        if (current < previous) break;
+        if (current == previous) hasDuplicates = true;
+    }
+    // Столбцы уже строго возрастают: порядок готов, складывать нечего. Это верно и для пустой строки.
+    if (second >= row.size() && !hasDuplicates) return;
     merged.clear();
     for (size_t x = 0, y = second; x < second || y < row.size();) {
         const ContactSystem::Entry& entry = y == row.size() || (x < second && !(row[y].column < row[x].column)) ? row[x++] : row[y++];

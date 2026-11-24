@@ -11,6 +11,8 @@
 #include <collision/shapes/Sphere.h>
 #include <collision/shapes/ConvexHull.h>
 #include <dynamics/Integrator.h>
+#include <dynamics/event_driven/ContactSystem.h>
+#include <dynamics/event_driven/ShockPropagation.h>
 #include <world/World.h>
 
 #include <atomic>
@@ -72,6 +74,30 @@ void freeFall() {
 }
 
 // --- Контакты ---------------------------------------------------------------------------------
+
+// Два подвижных тела с обратными массами 1 и 2 кг⁻¹, ещё два неподвижны.
+// По оси x строки J равны (−1,+1), (+1,−1), (0,−1), (0,0). Оракул — J diag(1,2) Jᵀ.
+void contactResponseWithFixedBodies() {
+    std::vector<Body> bodies(4);
+    bodies[0].mass.inverseMass = 1;
+    bodies[1].mass.inverseMass = 2;
+    const StepArray<ContactSystem::Line> lines{
+        {0, 1, {1, 0, 0}, {}, {}}, {1, 0, {1, 0, 0}, {}, {}},
+        {1, 2, {1, 0, 0}, {}, {}}, {2, 3, {1, 0, 0}, {}, {}}};
+    const auto matrix = ContactSystem::responseMatrix(bodies, lines);
+    CHECK(matrix.size() == lines.size(), "получено %zu строк вместо %zu", matrix.size(), lines.size());
+    if (matrix.size() != lines.size()) return;
+    CHECK(matrix[3].empty(), "связь неподвижных тел получила %zu столбцов отклика", matrix[3].size());
+    const Real expected[3][3] = {{3, -3, -2}, {-3, 3, 2}, {-2, 2, 2}};
+    for (size_t i = 0; i < 3; ++i) {
+        const auto& row = matrix[i];
+        CHECK(row.size() == 3, "в строке %zu получено %zu столбцов вместо трёх", i, row.size());
+        if (row.size() != 3) continue;
+        for (size_t j = 0; j < 3; ++j)
+            CHECK(row[j].column == j && row[j].value == expected[i][j], "A[%zu,%zu]: столбец %zu, отклик %g, ожидалось %g",
+                  i, j, row[j].column, double(row[j].value), double(expected[i][j]));
+    }
+}
 
 Body solid(std::shared_ptr<const ConvexShape> shape, MassProperties mass, Vector3 position, Real friction = 0.5, Real restitution = 0) {
     Body body;
@@ -452,6 +478,24 @@ void pendulumKeepsPeriodAndEnergy() {
 }
 
 // Шарнир, ползун и жёсткое сочленение с неподвижным телом.
+// Один буфер проходит через подвижное и неподвижное сочленения, затем используется ещё раз.
+void jointRowsReuseStorage() {
+    World world;
+    const auto base = world.addBody(Body{});
+    const auto body = world.addBody(Body::box({1, 1, 1}, 1));
+    const auto& slider = addSlider(world, base, body, {}, {1, 0, 0});
+    std::vector<Bond> rows(9);
+    const auto capacity = rows.capacity();
+    slider.writeBonds(world.bodies(), world.bodies(), rows);
+    CHECK(rows.size() == 5, "slider replaces old rows");
+    auto fixed = world.bodies();
+    fixed[static_cast<std::size_t>(body)] = Body{};
+    slider.writeBonds(fixed, fixed, rows);
+    CHECK(rows.empty(), "two static bodies leave no rows");
+    slider.writeBonds(world.bodies(), world.bodies(), rows);
+    CHECK(rows.size() == 5 && rows.capacity() == capacity, "reuse the same capacity");
+}
+
 void jointsLeaveOnlyTheirFreedoms() {
     {
         World world;
@@ -1545,12 +1589,53 @@ void contactLevelsKeepAnswer() {
     CHECK(differing == 0, "при четырёх потоках расходятся %zu чисел состояния из %zu", differing, one.size());
 }
 
+// Нижний куб отрывается от пола и догоняет верхний. Единственный импульс — внутренний, вне центра.
+static void supportPairBalances() {
+    CHECK(World{}.shockPropagation, "default support pass");
+    std::vector<Body> bodies{Body{}, Body::box({.5,.5,.5},1,{0,.5,0}), Body::box({.5,.5,.5},1,{0,1.5,0})};
+    bodies[1].linearMomentum.y = 2;
+    ContactRows state(bodies, nullptr, {}, 0, nullptr);
+    state.holdTime = Real(1) / 60;
+    state.sum.assign(2, 0);
+    for (int i = 0; i < 2; ++i) {
+        ContactRows::Row row{};
+        row.key = {i, i+1, 0};
+        row.point = {Real(i)*.2, Real(i), 0};
+        row.normal = {0,1,0};
+        row.normalMass = ContactRows::effectiveMass(bodies[i], bodies[i+1], row.point, row.normal);
+        row.touching = true;
+        state.rows.push_back(row);
+        ContactRows::Pair pair{};
+        pair.a = i; pair.b = i+1; pair.first = size_t(i); pair.last = size_t(i+1); pair.normal = row.normal;
+        state.pairs.push_back(pair);
+    }
+    const StepArray<Real> goals(2, 0);
+    ShockPropagation solver(state);
+    solver.pass(goals);
+    CHECK_NEAR(state.sum[1], 0, 0); // без тяжести нет слоя опор
+    state.up = {0,1,0};
+    solver.pass({0, ContactRows::kIdle});
+    CHECK_NEAR(state.sum[1], 0, 0); // выключенная строка
+    const Real e0 = state.kineticEnergy();
+    solver.pass(goals);
+    CHECK_NEAR(state.sum[0], 0, 0);
+    CHECK(state.sum[1] > 0 && bodies[1].linearMomentum.y < 2, "both bodies receive the impulse");
+    const Vector3 p = bodies[1].linearMomentum + bodies[2].linearMomentum;
+    const Vector3 l = bodies[1].position.cross(bodies[1].linearMomentum) + bodies[1].angularMomentum
+                    + bodies[2].position.cross(bodies[2].linearMomentum) + bodies[2].angularMomentum;
+    CHECK_NEAR((p - Vector3{0,2,0}).length(), 0, 1e-12);
+    CHECK_NEAR(l.length(), 0, 1e-12);
+    CHECK(state.kineticEnergy() <= e0, "passive support added kinetic energy");
+}
+
 void dynamicsTests() {
+    supportPairBalances();
     contactLevelsKeepAnswer();
     stepMemoryScopeReturnsEarly();
     dampingDecaysAndDoesNotHold();
     freeRotationConserves();
     freeFall();
+    contactResponseWithFixedBodies();
     bounceHeight();
     slope();
     thinPlate();
@@ -1566,6 +1651,7 @@ void dynamicsTests() {
     stepHasNoEndlessEvents();
     cubeRestsOnWiderCylinder();
     pendulumKeepsPeriodAndEnergy();
+    jointRowsReuseStorage();
     jointsLeaveOnlyTheirFreedoms();
     chainsHold();
     drivesMoveTheirFreedom();

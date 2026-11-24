@@ -1,0 +1,10 @@
+{
+  "CMAKE_CXX_COMPILER": "C:/Users/sshuser/CODE/kinetica-physics/tools/llvm-mingw-20261117-ucrt-x86_64/bin/clang++.exe",
+  "CMAKE_MAKE_PROGRAM": "C:\\Users\\sshuser\\CODE\\kinetica-physics\\tools\\llvm-mingw-20261117-ucrt-x86_64\\bin/mingw32-make.exe",
+  "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+  "CMAKE_CXX_FLAGS": "",
+  "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O3 -DNDEBUG -g -gcodeview",
+  "CMAKE_EXE_LINKER_FLAGS": "",
+  "CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO": "",
+  "KP_VIEWER": "OFF"
+}

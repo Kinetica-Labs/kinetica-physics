@@ -1,8 +1,8 @@
 // Наш движок на общих сценах (common.h).
 //
-//   compare-ours [realtime ПОДШАГОВ [sleep] | exact]     по умолчанию realtime 8; sleep — со сном островов, как в окне
+//   compare-ours [realtime ПОДШАГОВ | exact] [sleep] [--shock-on|--shock-off]
 //   KP_THREADS=1 — число потоков пула: Box3D в сравнении считает одним потоком
-#include "common.h"
+#include "stress/Stress1000.h"
 #include <physics.h>
 #include <math/WorkerPool.h>
 
@@ -13,13 +13,27 @@ using namespace kp;
 int main(int argc, char** argv) {
     const std::string mode = argc > 1 ? argv[1] : "realtime";
     const int substeps = argc > 2 ? std::atoi(argv[2]) : 8;
-    const bool sleep = argc > 3 && std::string(argv[3]) == "sleep";
+    bool sleep = false, support = World::kDefaultShockPropagation;
+    for (int i = mode == "exact" ? 2 : 3; i < argc; ++i) {
+        const std::string option = argv[i];
+        if (option == "sleep") sleep = true;
+        else if (option == "--shock-on") support = true;
+        else if (option == "--shock-off") support = false;
+        else { std::fprintf(stderr, "unknown option: %s\n", argv[i]); return 2; }
+    }
     if (const char* threads = std::getenv("KP_THREADS")) WorkerPool::shared().resize(std::atoi(threads));
     const std::string engine = mode == "exact" ? "kinetica exact" : "kinetica realtime " + std::to_string(substeps) + (sleep ? " sleep" : "");
-    compare(engine, [&](const SceneSpec& s, const Play& play) {
+    const bool stressRun = stress::requested();
+    if (stressRun) stress::require(mode == "realtime" && substeps == 1 && !sleep, "stress requires realtime 1, sleep off");
+    stress::compareOrStress(engine, [&](const SceneSpec& s, const Play& play) {
         World world;
         world.realtime = mode == "realtime";
+        world.shockPropagation = support;
         world.soft.substeps = substeps;
+        if (stressRun) {
+            world.soft.contactUpdates = 1;
+            world.soft.coupledFriction = world.soft.reuseEquilibrium = true;
+        }
         world.maxSegments = 64;
         world.sleeping = sleep, world.sleepSpeed = Real(0.05); // порог окна, как у Box3D
         for (const BoxSpec& b : s.boxes) {
@@ -33,7 +47,10 @@ int main(int argc, char** argv) {
             if (j.weld) addWeld(world, BodyId(j.a), BodyId(j.b), at);
             else addHinge(world, BodyId(j.a), BodyId(j.b), at, {0, 0, 1});
         }
-        play([&](double dt) { world.step(Real(dt)); }, [&] {
+        play([&](double dt) {
+            world.step(Real(dt));
+            if (stressRun) stress::require(!world.report().stalled && world.report().unfinished == 0, "unfinished Kinetica step");
+        }, [&] {
             std::vector<State> st;
             for (size_t i = 0; i < world.bodies().size(); ++i) {
                 const Body& b = world.bodies()[i];

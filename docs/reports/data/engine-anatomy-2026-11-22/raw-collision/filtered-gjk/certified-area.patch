@@ -1,0 +1,72 @@
+--- a/src/collision/narrowphase/Gjk.cpp
++++ b/src/collision/narrowphase/Gjk.cpp
+@@ -8,2 +8,5 @@
+ 
++#ifdef KP_GJK_FILTER_TRACE
++#include <cstdio>
++#endif
+ namespace kp {
+@@ -42,6 +45,39 @@
+     const Real t = -a.dot(ab) / ab.dot(ab);
+     wb = t <= 0 ? 0 : t >= 1 ? 1 : t;
+     wa = 1 - wb;
++}
++
++// Границы прямой ошибки минора в м⁴ для binary64, round-to-nearest, без
++// переполнения/потери относительной точности при underflow. Для одного члена
++// разложения через исходные координаты до 10 округлений. 8 epsilon = 16u
++// покрывает gamma_10 и округление самой суммы абсолютных произведений.
++Vector3 magnitudes(Vector3 x) { return {abs(x.x), abs(x.y), abs(x.z)}; }
++
++Vector3 crossPermanent(Vector3 x, Vector3 y) {
++    x = magnitudes(x);
++    y = magnitudes(y);
++    return {x.y*y.z + x.z*y.y, x.z*y.x + x.x*y.z, x.x*y.y + x.y*y.x};
++}
++
++// Для вершины с противолежащим ребром pq исходный минор — определитель
++// скалярных произведений ab,ac с p,q (до знака). У ориентированной площади
++// того же минора две пары сомножителей векторного произведения.
++Real filteredMinor(Real gram, Vector3 p, Vector3 q, Vector3 ab, Vector3 ac, Vector3 bc,
++                   Vector3 first, Vector3 second) {
++    const Vector3 lab = magnitudes(ab), lac = magnitudes(ac);
++    const Vector3 lp = magnitudes(p), lq = magnitudes(q);
++    const Real bound = (8 * kEpsilon) * (lab.dot(lp) * lac.dot(lq) + lab.dot(lq) * lac.dot(lp));
++    if (!std::isnormal(bound) || abs(gram) > bound) return gram;
++
++    const Vector3 shortEdge = bc.lengthSquare() < ac.lengthSquare() ? bc : ac;
++    const Real area = first.cross(second).dot(ab.cross(shortEdge));
++    const Real areaBound = (8 * kEpsilon) * crossPermanent(first, second).dot(crossPermanent(ab, shortEdge));
++    const bool useArea = std::isnormal(areaBound) && abs(area) > areaBound;
++#ifdef KP_GJK_FILTER_TRACE
++    std::fprintf(stderr, "minor,%s,%.17g,%.17g,%.17g,%.17g\n", useArea ? "area" : "unresolved",
++                 double(gram), double(bound), double(area), double(areaBound));
++#endif
++    return useArea ? area : gram;
+ }
+ 
+ // Ближайшая к началу координат точка треугольника abc: веса вершин.
+@@ -53,19 +89,20 @@
+     if (d1 <= 0 && d2 <= 0) return void((wa = 1, wb = 0, wc = 0)); // область вершины a
+     const Real d3 = -ab.dot(b), d4 = -ac.dot(b);
+     if (d3 >= 0 && d4 <= d3) return void((wa = 0, wb = 1, wc = 0)); // вершина b
+-    const Real vc = d1 * d4 - d3 * d2;
++    const Vector3 bc = c - b;
++    const Real vc = filteredMinor(d1 * d4 - d3 * d2, a, b, ab, ac, bc, a, ab);
+     if (vc <= 0 && d1 >= 0 && d3 <= 0) { // ребро ab
+         wb = d1 / (d1 - d3);
+         return void((wa = 1 - wb, wc = 0));
+     }
+     const Real d5 = -ab.dot(c), d6 = -ac.dot(c);
+     if (d6 >= 0 && d5 <= d6) return void((wa = 0, wb = 0, wc = 1)); // вершина c
+-    const Real vb = d5 * d2 - d1 * d6;
++    const Real vb = filteredMinor(d5 * d2 - d1 * d6, c, a, ab, ac, bc, ac, a);
+     if (vb <= 0 && d2 >= 0 && d6 <= 0) { // ребро ac
+         wc = d2 / (d2 - d6);
+         return void((wa = 1 - wc, wb = 0));
+     }
+-    const Real va = d3 * d6 - d5 * d4;
++    const Real va = filteredMinor(d3 * d6 - d5 * d4, b, c, ab, ac, bc, b, bc);
+     if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) { // ребро bc
+         wc = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+         return void((wa = 0, wb = 1 - wc));

@@ -1,0 +1,24 @@
+Linux 6.18.58.1-microsoft-standard-WSL2 x86_64 GNU/Linux
+mode=--sources
+shared8, one engine thread, sleep off, force per public update
+reported loaded frames=360; process-wide counters cover 810 frames (27 fresh worlds x 15 preload + 15 loaded each)
+whole process, including initialization, warmups, teardown and the timing harness
+cache and branch events are simulated; ignore instrumented us_per_frame
+scratch build directory: /tmp/kp-cg-build.aH87SH
+cmake version 4.2.3
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+x86_64-linux-gnu-gcc-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+Copyright (C) 2025 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+x86_64-linux-gnu-g++-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+Copyright (C) 2025 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+rp_precision=double
+/mnt/c/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/build/optin-source revision unavailable
+/mnt/c/Users/sshuser/CODE/kinetica-physics/box3d revision unavailable
+/mnt/c/Users/sshuser/CODE/kinetica-physics/rp3d revision unavailable

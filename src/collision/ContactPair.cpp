@@ -30,8 +30,7 @@ Real maxPointSpeed(const Body& body) {
     // |L| √Σ (ρₖ / Iₖ)². У вытянутого тела быстрое вращение возможно только вокруг длинной оси, а
     // от неё точки близко: у стержня эта оценка на порядок точнее первой.
     const ConvexShape& shape = *body.shape;
-    const auto extent = [&](Vector3 axis) { return std::max(axis.dot(shape.support(axis)), -axis.dot(shape.support(-1 * axis))) + shape.radius; };
-    const Vector3 e{extent({1, 0, 0}), extent({0, 1, 0}), extent({0, 0, 1})};
+    const Vector3 e = shape.coreExtents() + Vector3{shape.radius, shape.radius, shape.radius};
     const Real x = sqrt(e.y * e.y + e.z * e.z) * inverse.x, y = sqrt(e.x * e.x + e.z * e.z) * inverse.y, z = sqrt(e.x * e.x + e.y * e.y) * inverse.z;
     const Real axial = momentum * sqrt(x * x + y * y + z * z);
     return moving + std::min(round, axial);

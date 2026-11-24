@@ -1,0 +1,15 @@
+{
+  "utc_start": "2026-11-22T18:38:05.468685+00:00",
+  "host": "DESKTOP-N3RC7NA",
+  "os": "Windows-10-10.0.19045-SP0",
+  "cpu": "Intel64 Family 6 Model 63 Stepping 2, GenuineIntel",
+  "affinity": 256,
+  "threads": 1,
+  "seed": 20261122,
+  "design": "all 24 permutations once per scene; scenes alternate first position in successive blocks",
+  "grip": "shared8, 1/480 s x 8, mu=.5, squeeze=10 N/jaw, load=10 N; 15 preload, 15 loaded frames x 24 fixtures, 3 warmups",
+  "pyramid": "BENCH=7, 140 dynamic cubes; 60 frames at 60 Hz, realtime 8, sleep off, coupled off, time resolution 10 us/frame",
+  "decision": "per-scene median of paired time ratios <= .98 and at least 18/24 faster than stock on BOTH scenes, equal physical rows; a 4x explanation requires a ratio near .25",
+  "state_note": "full-precision state hashes are for 27 standard scenes at 60 frames; shared8 output uses the study's printed precision",
+  "utc_end": "2026-11-22T18:39:03.819991+00:00"
+}

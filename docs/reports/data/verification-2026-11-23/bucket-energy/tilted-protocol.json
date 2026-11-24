@@ -1,0 +1,61 @@
+{
+  "before": {
+    "viewer/ContactOverlay.h": "23cf4cf5078f185d9201b0b9847cdebf4ae88326c03c395c08ffbe6817e7e056",
+    "validation/studies/anatomy/tilted_overlay.cpp": "bf9fce2ad8890035af6f7c19598045b32ba25a6e941d25276778f2127543db6c"
+  },
+  "after": {
+    "viewer/ContactOverlay.h": "e14eacf1b3531add6a2d34d804c1caa18c894a8a3fcc6585ec0d7fabc48f52b9",
+    "examples/scenes/BucketRim.h": "e603da971a0c91a7d807fd04400187bcc4e947de2e68cfc6ce404e2cf3527a4a",
+    "validation/studies/anatomy/tilted_overlay.cpp": "f04f382e1bb5a8699560ebe500ea9795063e822b214204cb06c6eb5776b39d6f"
+  },
+  "video_sha256": "a1d8ce2635aa8562cb0bd0c49d93edee514bfb71ea4e0a0b70f09eb98b1afc12",
+  "video_analysis_sha256": "ce7799be7c6edde25367e29c828da4cba865259fd14f50e38bbda3624029c478",
+  "core_sha256": {
+    "src/dynamics/time_stepping/SoftStep.cpp": "3f22b64e219b436feedf322f381c357c074b6134907dab749ea40c629f2578b8",
+    "src/dynamics/time_stepping/EquilibriumStep.cpp": "720bc5ded0e8edf2f745a817e2c259f3a46d65de5b5e65f5e13c3d5cbf64e074",
+    "src/dynamics/time_stepping/IslandNormals.cpp": "d7cda17eefd303c5f4053e2b1c309bc02b1e4c4cd95be0c555b6bc91f9a6e191"
+  },
+  "playable_binary_sha256": "1a9deb4e1c97628a9b4d4673817e0add8813695555354761b80c17a464827387",
+  "matched_columns": [
+    "frame",
+    "tilt_deg",
+    "travel_m",
+    "surface_speed_m_s",
+    "kinetic_J",
+    "potential_J",
+    "raw_points",
+    "raw_change"
+  ],
+  "matched_rows": 601,
+  "windows": {
+    "computer": "DESKTOP-N3RC7NA",
+    "compiler": "llvm-mingw clang 23.1.6",
+    "opt": "-std=c++17 -O3 -DNDEBUG -march=haswell -ffp-contract=off -flto",
+    "real": "double",
+    "threads": 1,
+    "dt_s": "1/60",
+    "substeps": 8,
+    "contact_updates": 4,
+    "sleep": false,
+    "linear_and_angular_damping": 0,
+    "rolling_resistance": 0,
+    "shock_propagation": false
+  },
+  "release": {
+    "initial_tilt_deg": 16,
+    "top_offset_x_m": 0.02,
+    "vertical_clearance_from_contact_band_m": 1e-05,
+    "lower_settle_s": 4,
+    "frames_sampled": [
+      2820,
+      3420
+    ]
+  },
+  "criteria": {
+    "visible_normal_endpoint_change_m": 0.001,
+    "maximum_surface_position_change_m": 1e-06,
+    "maximum_surface_speed_m_s": 1e-05,
+    "maximum_one_frame_energy_gain_J": 1e-08,
+    "display_pose_tolerance_per_body_m": 1e-07
+  }
+}

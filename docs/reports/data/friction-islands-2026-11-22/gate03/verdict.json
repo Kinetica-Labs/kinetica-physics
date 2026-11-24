@@ -1,0 +1,103 @@
+{
+  "reference": "disks",
+  "runs": [
+    {
+      "build": "baseline",
+      "compared_to": null,
+      "sha256": {
+        "study-grip-limit": "e90104581472399c24ebdde63a786bf455cdd2f1879be26d109e548096cb947c",
+        "study-slip-to-roll": "72de61a0d257bb1995e7ee25299884cc0fc28f9d1a29aef4cfa350a7581eb4cd",
+        "study-groove-friction": "80ce2280ca83d3697a93e5f9059582ccffb28828ea09b46ed2a216b988f3d889",
+        "study-oblique-grip": "390b46f2255efc297ca3311936e8094763545c77924d589d9ecc7f5267b9e607"
+      },
+      "grip_pass": 31,
+      "roll_pass": 8,
+      "max_speed_error_m_s": 1.470000510206404e-11,
+      "max_balance_error_Ns": 1.96912972039e-12,
+      "max_hold_mm_both_orders": 1.44327341292,
+      "groove_pass": 24,
+      "groove_max_error_m_s": 0.00229591836736,
+      "groove-holdout_pass": 18,
+      "groove-holdout_max_error_m_s": 0.00334043971885,
+      "islands_pass": true,
+      "islands_max_difference_mm": 0.0,
+      "islands_max_reaction_error_Ns": 3.3333058535589544e-13,
+      "oblique_pass": 12,
+      "oblique_max": {
+        "pole_m_s": 0.015624999996498386,
+        "relative_m_s": 0.015624999996495855,
+        "jaw_m_s": 0.000983868455188258,
+        "normal_Ns": 1.1534634358767448e-10
+      },
+      "oblique_pole_pass": 12,
+      "decision": "baseline",
+      "reasons": []
+    },
+    {
+      "build": "disks",
+      "compared_to": "baseline",
+      "sha256": {
+        "study-grip-limit": "d282ae98fd57712d1d5730b487fb3e475b3d4f51023d0ccd940398a422ba0495",
+        "study-slip-to-roll": "c7b0b2638ababb7b4f68b5aa85413f205a06816e2e2fb1ffb2c68f1e03a317c8",
+        "study-groove-friction": "8fee36abef223fce0de6fb5381b400b627fe475ae841363d3707b163bbb98148",
+        "study-oblique-grip": "11fd113358f87f60b3df0bdda5474810d5fecfb38accdbe7f0a58ed07481112c"
+      },
+      "grip_pass": 33,
+      "roll_pass": 8,
+      "max_speed_error_m_s": 1.470000510206404e-11,
+      "max_balance_error_Ns": 1.49186218934e-16,
+      "max_hold_mm_both_orders": 0.0434027825447,
+      "groove_pass": 32,
+      "groove_max_error_m_s": 3.386999986032535e-10,
+      "groove-holdout_pass": 32,
+      "groove-holdout_max_error_m_s": 7.645999996336306e-10,
+      "islands_pass": true,
+      "islands_max_difference_mm": 0.0,
+      "islands_max_reaction_error_Ns": 3.3333058535589544e-13,
+      "oblique_pass": 48,
+      "oblique_max": {
+        "pole_m_s": 2.884303406656958e-10,
+        "relative_m_s": 2.884303406656958e-10,
+        "jaw_m_s": 1.2181767810014452e-16,
+        "normal_Ns": 1.1534634358767448e-10
+      },
+      "oblique_pole_pass": 48,
+      "decision": "keep",
+      "reasons": []
+    },
+    {
+      "build": "cache",
+      "compared_to": "disks",
+      "sha256": {
+        "study-grip-limit": "f28cf1670122d64400dd8288db6c37efbcb67a1aa067f736cef23b308b6254eb",
+        "study-slip-to-roll": "8f5fcd3cea69c3656a6c9041a85f383a3ffdea85ea64adf887fcf82b48557639",
+        "study-groove-friction": "00217c9fda12526cf72b4686cbc1bc9d63074718e74fdfe8814cb48d7839c79e",
+        "study-oblique-grip": "faa056bbbe0320b629d1ddfe2f5319fd9311414609d975dd17c44177a534a88c"
+      },
+      "grip_pass": 33,
+      "roll_pass": 8,
+      "max_speed_error_m_s": 1.470000510206404e-11,
+      "max_balance_error_Ns": 1.49186218934e-16,
+      "max_hold_mm_both_orders": 0.0434027825447,
+      "groove_pass": 32,
+      "groove_max_error_m_s": 3.386999986032535e-10,
+      "groove-holdout_pass": 32,
+      "groove-holdout_max_error_m_s": 7.645999996336306e-10,
+      "islands_pass": true,
+      "islands_max_difference_mm": 0.0,
+      "islands_max_reaction_error_Ns": 3.3333058535589544e-13,
+      "oblique_pass": 48,
+      "oblique_max": {
+        "pole_m_s": 2.884303406656958e-10,
+        "relative_m_s": 2.884303406656958e-10,
+        "jaw_m_s": 1.2181767810014452e-16,
+        "normal_Ns": 1.1534634358767448e-10
+      },
+      "oblique_pole_pass": 48,
+      "decision": "reject",
+      "reasons": [
+        "no resolved trajectory improvement"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+﻿{
+    "host":  "DESKTOP-N3RC7NA",
+    "cpu":  "Intel(R) Xeon(R) CPU E5-2690 v3 @ 2.60GHz",
+    "compiler":  "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+    "affinity":  256,
+    "threads":  1,
+    "frames":  120,
+    "dt":  "1/60",
+    "calls_per_frame":  8,
+    "sleep":  false,
+    "friction":  0.5,
+    "restitution":  0,
+    "rows":  {
+                 "bullet":  {
+                                "sha256":  "03BF7CC0D62FB2936F65BAAFCD769006BCDCD1DBBCE8445F13BEE275A37B2290",
+                                "argv":  "",
+                                "flags":  [
+                                              "-O3",
+                                              "-DNDEBUG",
+                                              "-std=c++17",
+                                              "-march=haswell",
+                                              "-ffp-contract=off",
+                                              "-g",
+                                              "-gcodeview",
+                                              "-DBT_USE_DOUBLE_PRECISION",
+                                              "-IC:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223/build/anatomy-thirdparty/bullet/src",
+                                              "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/validation/engines/stress/bullet.cpp",
+                                              "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22/bullet-double-lab/lib/libBulletDynamics.a",
+                                              "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22/bullet-double-lab/lib/libBulletCollision.a",
+                                              "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22/bullet-double-lab/lib/libLinearMath.a",
+                                              "-Wl,--pdb=C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/bullet.pdb",
+                                              "-o",
+                                              "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/bullet.exe"
+                                          ],
+                                "libraries":  {
+                                                  "libBulletCollision.a":  "BFD717018035B79DE8B7804BA477008D4D43495CBD27D0E68028BEC20EB4EBBF",
+                                                  "libBulletDynamics.a":  "05D33D4DD785B88B6B6E51C6F978F17868E10B336C9274875824E75A2252D000",
+                                                  "libLinearMath.a":  "DD905882E4D63C44AC9056E9D1AF3969EC26265F04103F979E3DBE52AE2E058C"
+                                              }
+                            },
+                 "jolt":  {
+                              "sha256":  "D4749A46726BA6EEFFEFD2BFCA28460BA00EA71CF4EB7E7DD3045822BAE25DE8",
+                              "argv":  "",
+                              "flags":  [
+                                            "-O3",
+                                            "-DNDEBUG",
+                                            "-std=c++17",
+                                            "-march=haswell",
+                                            "-ffp-contract=off",
+                                            "-g",
+                                            "-gcodeview",
+                                            "-fno-rtti",
+                                            "-fno-exceptions",
+                                            "-ffp-contract=on",
+                                            "-mavx2",
+                                            "-mbmi",
+                                            "-mpopcnt",
+                                            "-mlzcnt",
+                                            "-mf16c",
+                                            "-mfma",
+                                            "-mfpmath=sse",
+                                            "-DJPH_OBJECT_LAYER_BITS=16",
+                                            "-DJPH_OBJECT_STREAM",
+                                            "-DJPH_USE_AVX",
+                                            "-DJPH_USE_AVX2",
+                                            "-DJPH_USE_CPU_COMPUTE",
+                                            "-DJPH_USE_DX12",
+                                            "-DJPH_USE_F16C",
+                                            "-DJPH_USE_FMADD",
+                                            "-DJPH_USE_LZCNT",
+                                            "-DJPH_USE_SSE4_1",
+                                            "-DJPH_USE_SSE4_2",
+                                            "-DJPH_USE_TZCNT",
+                                            "-IC:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223/build/anatomy-thirdparty/jolt",
+                                            "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/validation/engines/stress/jolt.cpp",
+                                            "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22/jolt-build/libJolt.a",
+                                            "-Wl,--pdb=C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/jolt.pdb",
+                                            "-o",
+                                            "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/jolt.exe"
+                                        ],
+                              "libraries":  {
+                                                "libJolt.a":  "33F12A584D5130EF18EB48AB2C1B5CC87E77A1F69543C2F1BCB1FCA8ADD6072B"
+                                            }
+                          },
+                 "kinetica":  {
+                                  "sha256":  "4DCEB94AF27C28C4DC7AFD18D6E33E49862F1262C0B13D2FAF2282BB34102081",
+                                  "argv":  "realtime 1",
+                                  "flags":  [
+                                                "-O3",
+                                                "-DNDEBUG",
+                                                "-std=c++17",
+                                                "-march=haswell",
+                                                "-ffp-contract=off",
+                                                "-g",
+                                                "-gcodeview",
+                                                "-flto",
+                                                "-IC:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\bucket-energy-and-equilibrium-nov23/source/include",
+                                                "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/validation/engines/ours.cpp",
+                                                "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\bucket-energy-and-equilibrium-nov23/build/src/libkinetica-physics.a",
+                                                "-Wl,--pdb=C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/kinetica.pdb",
+                                                "-o",
+                                                "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/kinetica.exe"
+                                            ],
+                                  "libraries":  {
+                                                    "libkinetica-physics.a":  "347743DD4D32D820A90D6813FD3213EBF7D23FAF0C7048EA600E7910DE199917"
+                                                }
+                              },
+                 "rp3d":  {
+                              "sha256":  "5E5894C98908722F6221DC1173899E6A513D5B73172A184BAE6148403D135706",
+                              "argv":  "1",
+                              "flags":  [
+                                            "-O3",
+                                            "-DNDEBUG",
+                                            "-std=c++17",
+                                            "-march=haswell",
+                                            "-ffp-contract=off",
+                                            "-g",
+                                            "-gcodeview",
+                                            "-DIS_RP3D_DOUBLE_PRECISION_ENABLED",
+                                            "-IC:/Users/sshuser/CODE/kinetica-physics/rp3d/include",
+                                            "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/validation/engines/rp3d.cpp",
+                                            "C:/Users/sshuser/CODE/kinetica-physics/build-rp3d-double/libreactphysics3d.a",
+                                            "-Wl,--pdb=C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/rp3d.pdb",
+                                            "-o",
+                                            "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/rp3d.exe"
+                                        ],
+                              "libraries":  {
+                                                "libreactphysics3d.a":  "1F563EFCF9F0ED0F502A8B88C9F1CF233198227109CCC3191A6570036C68D100"
+                                            }
+                          },
+                 "box3d":  {
+                               "sha256":  "54A268E6240823025BD59755143B4280A8D7953AB825585A1998B69564C2FAB1",
+                               "argv":  "1",
+                               "flags":  [
+                                             "-O3",
+                                             "-DNDEBUG",
+                                             "-std=c++17",
+                                             "-march=haswell",
+                                             "-ffp-contract=off",
+                                             "-g",
+                                             "-gcodeview",
+                                             "-IC:/Users/sshuser/CODE/kinetica-physics/box3d/include",
+                                             "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/validation/engines/box3d.cpp",
+                                             "C:/Users/sshuser/CODE/kinetica-physics/build-box3d/src/libbox3d.a",
+                                             "-Wl,--pdb=C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/box3d.pdb",
+                                             "-o",
+                                             "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\pyramid1000-nov24-v2/box3d.exe"
+                                         ],
+                               "libraries":  {
+                                                 "libbox3d.a":  "7C532E75113D7290451D80BA4A8A77361A4646F24C59295AE82CC3B46ECBF340"
+                                             }
+                           }
+             },
+    "sources":  {
+                    "core/EquilibriumStep.cpp":  "720BC5DED0E8EDF2F745A817E2C259F3A46D65DE5B5E65F5E13C3D5CBF64E074",
+                    "validation\\engines\\box3d.cpp":  "D70B0B2E55DA9F6937C4650005456E31F7A0B63CE9D67C1CDC610C1A2F4A785B",
+                    "validation\\engines\\stress\\bullet.cpp":  "847379CE90976BA98CB59C2407FE2C91EA15D8F25E0DA6DD756941BF5B68D69C",
+                    "validation\\engines\\rp3d.cpp":  "BC638CE48D75C4812D33345F7D35661C5C40F597A919A2C1DF11BFF484D28553",
+                    "core/SoftStep.cpp":  "3F22B64E219B436FEEDF322F381C357C074B6134907DAB749EA40C629F2578B8",
+                    "validation\\engines\\RpWindowsAllocator.h":  "8E22DCF1FF3CCCB3CB4BBB3ACDA67DC01BABB29B9DF000F3E3E24655FD9D06F1",
+                    "validation\\engines\\stress\\StressReadings.h":  "788E4C6132803AD0CEF5B91271FDBE59EFC3B6DD402B2F0F3B2F08AD5A7C4BB5",
+                    "core/IslandNormals.cpp":  "D7CDA17EEFD303C5F4053E2B1C309BC02B1E4C4CD95BE0C555B6BC91F9A6E191",
+                    "validation\\engines\\ours.cpp":  "BBBBBC834C239B19C24F20DA3F06AEAE885C05D77AC63773ADA481B15ED25AB4",
+                    "validation\\engines\\stress\\Stress1000.h":  "83CEF38FDFC8BC95F7969B18874B443879A9C4FE28539309C8BEB30494E72733",
+                    "validation\\engines\\common.h":  "8A7CAA8020D2834ADB149E0EAA82FBA9BF8CD50C74A7115F8B7A55A987AF1578",
+                    "validation\\engines\\stress\\jolt.cpp":  "E14F5E0E8E8919F12B22C507D1F6B2CB63366E29118590A7010F67ACF8443CA0"
+                }
+}

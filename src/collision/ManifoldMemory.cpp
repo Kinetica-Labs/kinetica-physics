@@ -47,9 +47,17 @@ const ManifoldMemory::Entry* ManifoldMemory::valid(const std::array<int, 4>& key
 // Точка лежащего тела идёт с ним; её зазор — расстояние до плоскости опорной грани вдоль нормали
 // площадки (от A к B), а точка на грани — её проекция на эту плоскость (HullVsHullAlgorithm).
 ContactPair ManifoldMemory::carried(const Entry& entry, const Body& a, const Body& b, Real reach) {
+    ContactPair pair;
+    carryInto(entry, a, b, reach, pair);
+    return pair;
+}
+
+void ManifoldMemory::carryInto(const Entry& entry, const Body& a, const Body& b, Real reach, ContactPair& pair) {
     const Transform poseA = a.pose(), poseB = b.pose();
     const Transform &face = entry.faceOnB ? poseB : poseA, &lying = entry.faceOnB ? poseA : poseB;
-    ContactPair pair;
+    pair.manifold.points.clear();
+    pair.manifold.count = 0;
+    pair.manifold.roundA = pair.manifold.roundB = 0;
     pair.reach = reach, pair.manifold.faceOnB = entry.faceOnB;
     const Vector3 n = pair.manifold.normal = face.direction(entry.normal), onFace = face.point(entry.onFace);
     Real least = std::numeric_limits<Real>::infinity();
@@ -60,7 +68,6 @@ ContactPair ManifoldMemory::carried(const Entry& entry, const Body& a, const Bod
         least = std::min(least, separation);
     }
     pair.distance = std::max(Real(0), least);
-    return pair;
 }
 
 // Записи, оставшиеся на своих местах, не копируются: в покое состав памяти не меняется вовсе. Иначе

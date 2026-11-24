@@ -1,0 +1,21 @@
+﻿Test project C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/tuning-islands-v1/component-src/build
+    Start 1: unit-tests
+1/8 Test #1: unit-tests .......................   Passed   17.01 sec
+    Start 2: floating-box
+2/8 Test #2: floating-box .....................   Passed    0.03 sec
+    Start 3: gear-train
+3/8 Test #3: gear-train .......................   Passed    0.03 sec
+    Start 4: grip-limit-exact
+4/8 Test #4: grip-limit-exact .................   Passed    0.51 sec
+    Start 5: grip-limit-realtime32
+5/8 Test #5: grip-limit-realtime32 ............   Passed    1.32 sec
+    Start 6: grip-order-balance
+6/8 Test #6: grip-order-balance ...............   Passed    0.08 sec
+    Start 7: grip-island-independence
+7/8 Test #7: grip-island-independence .........   Passed    0.05 sec
+    Start 8: slip-to-roll
+8/8 Test #8: slip-to-roll .....................   Passed    0.03 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =  19.08 sec

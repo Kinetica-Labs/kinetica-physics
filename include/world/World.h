@@ -5,6 +5,9 @@
 #include <joints/CardanJoint.h>
 #include <joints/CylindricalJoint.h>
 #include <joints/FixedJoint.h>
+#include <joints/GearJoint.h>
+#include <joints/DistanceJoint.h>
+#include <joints/RackAndPinionJoint.h>
 #include <joints/HingeJoint.h>
 #include <joints/JointSet.h>
 #include <joints/PathJoint.h>
@@ -32,16 +35,19 @@ class StepObserver {
 public:
     virtual ~StepObserver() = default;
     virtual void after(StepStage stage, const World& world) = 0;
+    // Память тёплого старта после последнего решённого подшага. Касательная сила в мировых
+    // осях действует на тело b. Для импульса всего кадра требуется учесть каждый подшаг и удар.
+    static const ContactForces& cachedContactForces(const World& world);
 };
 
 class World {
 public:
     Vector3 gravity{0, Real(-9.81), 0}; // м/с²
     StepObserver* observer = nullptr;
-    // Проход «ударной волны» в решателе контактов (ContactSolver::solveRestingContacts). Гасит
-    // остаток скольжения в стопках с большим отношением масс, но нарушает сохранение импульса;
-    // выключен по умолчанию и нужен для сравнения.
-    bool shockPropagation = false;
+    // Проход по опорам исправляет остаточное сближение свыше геометрического допуска.
+    // Две подвижные стороны получают равные противоположные импульсы в точке контакта.
+    static constexpr bool kDefaultShockPropagation = true;
+    bool shockPropagation = kDefaultShockPropagation;
     // Наибольшее число отрезков в одном шаге; ноль — без предела. Шаг, которому отрезков не
     // хватило, кончается раньше dt (Report::unfinished): мир в нём отстаёт от часов, зато окно
     // с живой сценой не замирает на шаге с сотней событий.
@@ -93,8 +99,8 @@ public:
         int asleep = 0; // сколько тел спит после шага
     };
     const Report& report() const { return report_; }
-
 private:
+    friend const ContactForces& StepObserver::cachedContactForces(const World&);
     bool quiet(Real dt) const;
     std::vector<Body> bodies_;
     JointSet joints_;
@@ -109,10 +115,20 @@ private:
     IslandSleep sleep_;
 };
 
+inline const ContactForces& StepObserver::cachedContactForces(const World& world) { return world.contactForces_; }
+
 // Сочленения по общей точке и оси в мире, при нынешних позах тел; упругая привязь точки pointA тела a
 // к точке pointB тела b (точки — в мире). Удобства поверх World::addJoint.
 inline BallAndSocketJoint& addBallJoint(World& world, BodyId a, BodyId b, Vector3 anchor) { return world.addJoint<BallAndSocketJoint>(a, b, anchor); }
 inline HingeJoint& addHinge(World& world, BodyId a, BodyId b, Vector3 anchor, Vector3 axis) { return world.addJoint<HingeJoint>(a, b, anchor, axis); }
+inline GearJoint& addGear(World& world, BodyId a, BodyId b, Vector3 shaft, int teethA, int teethB) { return world.addJoint<GearJoint>(a, b, shaft, teethA, teethB); }
+inline DistanceJoint& addDistance(World& world, BodyId a, Vector3 pointA, BodyId b, Vector3 pointB) {
+    return world.addJoint<DistanceJoint>(a, b, pointA, pointB);
+}
+inline RackAndPinionJoint& addRackAndPinion(World& world, BodyId rack, BodyId pinion, Vector3 pivot,
+                                          Vector3 shaft, Vector3 travel, Real pitchRadius) {
+    return world.addJoint<RackAndPinionJoint>(rack, pinion, pivot, shaft, travel, pitchRadius);
+}
 inline SliderJoint& addSlider(World& world, BodyId a, BodyId b, Vector3 anchor, Vector3 axis) { return world.addJoint<SliderJoint>(a, b, anchor, axis); }
 // Точка anchor тела b идёт по кривой через точки through, закреплённой в теле a (PathJoint).
 inline PathJoint& addPathJoint(World& world, BodyId a, BodyId b, Vector3 anchor, const std::vector<Vector3>& through, bool closed = false) {

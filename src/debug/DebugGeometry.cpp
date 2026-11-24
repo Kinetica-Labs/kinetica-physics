@@ -94,7 +94,7 @@ DebugGeometry& DebugGeometry::add(const DynamicTree& tree) {
     return *this;
 }
 
-DebugGeometry debugGeometry(const World& world, bool withTree) {
+DebugGeometry debugBodyGeometry(const World& world, bool withTree) {
     DebugGeometry geometry;
     if (withTree) geometry.add(PairFinder(world.bodies(), world.gravity).tree(0));
     for (const Body& body : world.bodies()) {
@@ -105,14 +105,28 @@ DebugGeometry debugGeometry(const World& world, bool withTree) {
     }
     // Кривые сочленений по траектории — ломаной, шестнадцать звеньев на отрезок сплайна.
     for (size_t j = 0; j < world.joints().size(); ++j) {
+        if (const auto* rod = dynamic_cast<const DistanceJoint*>(&world.joints()[j])) {
+            const auto from = world.bodies()[size_t(rod->a)].pose().point(rod->anchorA);
+            const auto to = world.bodies()[size_t(rod->b)].pose().point(rod->anchorB);
+            geometry.lines.push_back({from, to, DebugKind::Shape});
+        }
         const PathJoint* rail = dynamic_cast<const PathJoint*>(&world.joints()[j]);
         if (!rail) continue;
         const Transform seat = world.bodies()[size_t(rail->a)].pose();
         for (int k = 0; k < 16 * int(rail->path().span()); ++k)
             geometry.lines.push_back({seat.point(rail->path().point(Real(k) / 16)), seat.point(rail->path().point(Real(k + 1) / 16)), DebugKind::StaticShape});
     }
+    return geometry;
+}
+
+void DebugGeometry::addContactMarkers(const World& world) {
     for (const ContactPair& pair : PairFinder(world.bodies(), world.gravity).pairs(0))
-        if (pair.inContact()) geometry.add(pair.manifold);
+        if (pair.inContact()) add(pair.manifold);
+}
+
+DebugGeometry debugGeometry(const World& world, bool withTree) {
+    DebugGeometry geometry = debugBodyGeometry(world, withTree);
+    geometry.addContactMarkers(world);
     return geometry;
 }
 

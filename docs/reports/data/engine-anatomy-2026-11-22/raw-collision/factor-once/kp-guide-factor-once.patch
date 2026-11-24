@@ -1,0 +1,212 @@
+--- a/include/math/ProfileMatrix.h
++++ b/include/math/ProfileMatrix.h
+@@ -29,9 +29,10 @@
+     }
+     // Элемент строки i в столбце j, first[i] <= j <= i.
+     Real& at(int i, int j) { return values[start[size_t(i)] + size_t(j - first[size_t(i)])]; }
++    Real at(int i, int j) const { return values[start[size_t(i)] + size_t(j - first[size_t(i)])]; }
+ };
+ 
+-// a — матрица (портится: в ней остаётся множитель L), b — правая часть, на выходе решение.
++// Разложение на месте: в a остаётся нижний множитель L, в skipped — маска пропущенных строк.
+ //
+ // Матрица может быть вырожденной: строка, которая линейно выражается через предыдущие, даёт
+ // нулевой ведущий элемент. Такая строка пропускается, её неизвестная полагается равной нулю.
+@@ -39,9 +40,8 @@
+ // точками можно распределить по-разному при тех же скоростях, и здесь выбирается распределение
+ // без лишней точки. Ведущий элемент считается нулевым, если он меньше dependent от исходного
+ // диагонального.
+-template <class Vector> void solveCholesky(ProfileMatrix& a, Vector& b, Real dependent = Real(1e-14)) {
++template <class Mask> void factorCholesky(ProfileMatrix& a, Mask& skipped, Real dependent = Real(1e-14)) {
+     const int n = a.size();
+-    thread_local std::vector<char> skipped; // рабочий массив потока: решение не выделяет память
+     skipped.assign(size_t(n), 0);
+     for (int i = 0; i < n; ++i) { // строка i множителя L
+         const int from = a.first[size_t(i)];
+@@ -66,6 +66,11 @@
+         }
+         a.at(i, i) = sqrt(diagonal);
+     }
++}
++
++// Две подстановки для новой правой части b; фактор и решения других правых частей независимы.
++template <class Mask, class Vector> void solveFactored(const ProfileMatrix& a, const Mask& skipped, Vector& b) {
++    const int n = a.size();
+     for (int i = 0; i < n; ++i) { // L y = b
+         for (int k = a.first[size_t(i)]; k < i; ++k) b[size_t(i)] -= a.at(i, k) * b[size_t(k)];
+         b[size_t(i)] = skipped[size_t(i)] ? Real(0) : b[size_t(i)] / a.at(i, i);
+@@ -76,4 +81,25 @@
+     }
+ }
+ 
++// Однократное решение: исходный вызов по-прежнему оставляет в a множитель L.
++template <class Vector> void solveCholesky(ProfileMatrix& a, Vector& b, Real dependent = Real(1e-14)) {
++    thread_local std::vector<char> skipped;
++    factorCholesky(a, skipped, dependent);
++    solveFactored(a, skipped, b);
++}
++
++// Разложение одной матрицы для нескольких правых частей.
++class ProfileCholesky {
++public:
++    void compute(const ProfileMatrix& a) {
++        lower_ = a;
++        factorCholesky(lower_, skipped_);
++    }
++    template <class Vector> void solve(Vector& b) const { solveFactored(lower_, skipped_, b); }
++
++private:
++    ProfileMatrix lower_;
++    StepArray<char> skipped_;
++};
++
+ } // namespace kp
+--- a/include/dynamics/time_stepping/DirectJoints.h
++++ b/include/dynamics/time_stepping/DirectJoints.h
+@@ -17,6 +17,7 @@
+ class DirectJoints {
+ public:
+     const ProfileMatrix& response() const { return response_; }
++    const ProfileCholesky& factor() const { return factor_; }
+     const std::vector<Bond>& rows() const { return bonds_; }
+     Real* accumulated(size_t i) const { return impulses_[i]; }
+     void clear();
+@@ -25,11 +26,13 @@
+     // Матрица отклика по нынешним скоростным свойствам тел; после неё связи не добавляются.
+     void assemble(const StepArray<SolverBody>& states);
+     // Для тех же строк в том же порядке при тех же массах и позах тел.
+-    void copyResponseFrom(const DirectJoints& source) { response_ = source.response_; }
++    void copyResponseFrom(const DirectJoints& source) { response_ = source.response_; factor_ = source.factor_; }
+     void warmStart(StepArray<SolverBody>& states) const;
+     // correction — доля нарушения положения, которую связь убирает за время h: скорость вдоль связи
+     // после решения равна −correction · нарушение / h. Ноль — чистая скорость.
+-    void solve(StepArray<SolverBody>& states, Real correction, Real h);
++    void solve(StepArray<SolverBody>& states, Real correction, Real h) { solve(states, correction, h, factor_); }
++    // В острове номера тел могут отличаться; строки и значения матрицы должны совпадать.
++    void solve(StepArray<SolverBody>& states, Real correction, Real h, const ProfileCholesky& factor);
+ 
+ private:
+     void push(size_t row, StepArray<SolverBody>& states, Real impulse) const;
+@@ -37,6 +40,7 @@
+     std::vector<Bond> bonds_;
+     StepArray<Real*> impulses_;
+     ProfileMatrix response_;
++    ProfileCholesky factor_;
+ };
+ 
+ } // namespace kp
+--- a/include/dynamics/time_stepping/CoupledFriction.h
++++ b/include/dynamics/time_stepping/CoupledFriction.h
+@@ -10,7 +10,10 @@
+ class CoupledFriction {
+ public:
+     CoupledFriction(LocalContact first, LocalContact second) : pair_{first, second} {}
+-    bool solve(StepArray<SolverBody>& states, DirectJoints& guides, Real h, Real rollingArm);
++    bool solve(StepArray<SolverBody>& states, DirectJoints& guides, Real h, Real rollingArm) {
++        return solve(states, guides, h, rollingArm, guides.factor());
++    }
++    bool solve(StepArray<SolverBody>& states, DirectJoints& guides, Real h, Real rollingArm, const ProfileCholesky& guideFactor);
+ 
+ private:
+     std::array<Bond, 4> tangentRows() const;
+--- a/src/dynamics/time_stepping/DirectJoints.cpp
++++ b/src/dynamics/time_stepping/DirectJoints.cpp
+@@ -7,7 +7,7 @@
+ 
+ void DirectJoints::clear() {
+     bonds_.clear(), impulses_.clear();
+-    response_ = {};
++    response_ = {}, factor_ = {};
+ }
+ 
+ void DirectJoints::add(const Bond& bond, Real* impulse) { bonds_.push_back(bond), impulses_.push_back(impulse); }
+@@ -37,6 +37,7 @@
+             if (body != bond.a || bond.a != bond.b) onBody[size_t(body)].push_back(int(i));
+         }
+     }
++    factor_.compute(response_);
+ }
+ 
+ void DirectJoints::push(size_t row, StepArray<SolverBody>& states, Real impulse) const {
+@@ -50,7 +51,7 @@
+     for (size_t i = 0; i < bonds_.size(); ++i) push(i, states, *impulses_[i]);
+ }
+ 
+-void DirectJoints::solve(StepArray<SolverBody>& states, Real correction, Real h) {
++void DirectJoints::solve(StepArray<SolverBody>& states, Real correction, Real h, const ProfileCholesky& factor) {
+     if (bonds_.empty()) return;
+     StepArray<Real> change(bonds_.size());
+     for (size_t i = 0; i < bonds_.size(); ++i) {
+@@ -59,8 +60,7 @@
+         // Привод с неограниченной силой — та же связь, только скорость вдоль неё не ноль, а заданная.
+         change[i] = -(bond.linear.dot(b.v - a.v) + bond.angularB.dot(b.w) - bond.angularA.dot(a.w) + (bond.driven ? -bond.speed : correction * bond.error / h));
+     }
+-    ProfileMatrix factor = response_;
+-    solveCholesky(factor, change);
++    factor.solve(change);
+     for (size_t i = 0; i < bonds_.size(); ++i) *impulses_[i] += change[i], push(i, states, change[i]);
+ }
+ 
+--- a/src/dynamics/time_stepping/CoupledFriction.cpp
++++ b/src/dynamics/time_stepping/CoupledFriction.cpp
+@@ -39,7 +39,7 @@
+ // Исключаем направляющие B из системы контактных касательных T:
+ // W = A_TT − A_TB A_BB⁺ A_BT, A = J M⁻¹ Jᵀ. Скорость привода входит только в правую часть.
+ SlipSystem projectedSystem(const StepArray<SolverBody>& states, const DirectJoints& guides,
+-                           const std::array<Bond, 4>& tangents) {
++                           const std::array<Bond, 4>& tangents, const ProfileCholesky& guideFactor) {
+     SlipSystem result;
+     const auto& bonds = guides.rows();
+     StepArray<GuideRhs> raw(bonds.size());
+@@ -57,8 +57,7 @@
+     for (size_t k = 0; k < bonds.size(); ++k)
+         raw[k].values[4] = velocity(bonds[k], states) - (bonds[k].driven ? bonds[k].speed : Real(0));
+     auto solved = raw;
+-    auto factor = guides.response();
+-    solveCholesky(factor, solved);
++    guideFactor.solve(solved);
+     for (size_t k = 0; k < bonds.size(); ++k) for (size_t i = 0; i < 4; ++i) {
+         for (size_t j = 0; j < 4; ++j) result.response[i][j] -= raw[k].values[i] * solved[k].values[j];
+         result.slip[i] -= raw[k].values[i] * solved[k].values[4];
+@@ -148,7 +147,7 @@
+     return rows;
+ }
+ 
+-bool CoupledFriction::solve(StepArray<SolverBody>& states, DirectJoints& guides, Real h, Real rollingArm) {
++bool CoupledFriction::solve(StepArray<SolverBody>& states, DirectJoints& guides, Real h, Real rollingArm, const ProfileCholesky& guideFactor) {
+     Radii radius{}, load{}, lever{};
+     Four warm{};
+     for (size_t i = 0; i < 2; ++i) {
+@@ -162,14 +161,14 @@
+         auto& [c, a, b] = pair_[i];
+         c.friction_.solveTwist(states[size_t(a)], states[size_t(b)], c.frame(), lever[i]);
+     }
+-    const auto impulse = frictionImpulse(projectedSystem(states, guides, tangentRows()), warm, radius);
++    const auto impulse = frictionImpulse(projectedSystem(states, guides, tangentRows(), guideFactor), warm, radius);
+     for (size_t i = 0; i < 2; ++i) {
+         auto& [c, a, b] = pair_[i];
+         auto &sa = states[size_t(a)], &sb = states[size_t(b)];
+         c.friction_.setTangent(sa, sb, c.frame(), {impulse[2*i], impulse[2*i+1]}, load[i]);
+         c.friction_.rolling_.solve(sa, sb, c.tangent1_, c.tangent2_, rollingArm, load[i]);
+     }
+-    guides.solve(states, 0, h);
++    guides.solve(states, 0, h, guideFactor);
+     return true;
+ }
+ }
+--- a/src/dynamics/time_stepping/FrictionIslands.cpp
++++ b/src/dynamics/time_stepping/FrictionIslands.cpp
+@@ -104,9 +104,10 @@
+         guides.add(row, locked.accumulated(k));
+     }
+     // partition перебирает строки по порядку. Если взяты все, меняются только номера тел.
+-    if (island.guides.size() == locked.rows().size()) guides.copyResponseFrom(locked);
+-    else guides.assemble(bodies.local);
+-    if (!CoupledFriction(first, second).solve(bodies.local, guides, h, rollingArm)) return false;
++    const bool allRows = island.guides.size() == locked.rows().size();
++    if (!allRows) guides.assemble(bodies.local);
++    const ProfileCholesky& factor = allRows ? locked.factor() : guides.factor();
++    if (!CoupledFriction(first, second).solve(bodies.local, guides, h, rollingArm, factor)) return false;
+     bodies.commit();
+     return true;
+ }

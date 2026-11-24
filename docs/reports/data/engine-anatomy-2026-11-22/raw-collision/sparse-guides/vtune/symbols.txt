@@ -1,0 +1,857 @@
+﻿140001000 T WinMainCRTStartup
+140001020 t __tmainCRTStartup
+1400013b0 T mainCRTStartup
+1400013d0 T atexit
+1400013e0 t __mingw_SEH_signal_dispatcher
+140001430 t safe_flush
+140001440 t __mingw_invalidParameterHandler
+140001450 t cpp_unhandled_exception_filter
+140001470 T main
+1400021a0 t (anonymous namespace)::traceThreshold(grip::Load, bool, bool)
+1400026f0 t int grip::checkIslandIndependence<main::$_1>(main::$_1, std::initializer_list<grip::Neighbour>)
+140002c10 t bool grip::sweep<main::$_2>(char const*, main::$_2)
+140003780 t bool grip::sweep<main::$_3>(char const*, main::$_3)
+140004320 t bool grip::sweep<main::$_4>(char const*, main::$_4)
+140004ec0 t bool grip::sweep<main::$_5>(char const*, main::$_5)
+140005a60 t (anonymous namespace)::Rig::Rig(int, grip::Load, bool, bool)
+140006100 t (anonymous namespace)::Rig::addBox(grip::Box, double)
+140006370 t grip::Result grip::measure<(anonymous namespace)::Rig>((anonymous namespace)::Rig&, grip::Load, int)
+1400069e0 T grip::header()
+140006a20 T __clang_call_terminate
+140006a30 T kp::Body::~Body()
+140006ae0 T kp::World::~World()
+140006d20 T kp::Body* std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>::__emplace_back_slow_path[abi:nqe230106]<kp::Body const&>(kp::Body const&)
+140006f80 T std::__1::__split_buffer<kp::Body, std::__1::allocator<kp::Body>, std::__1::__split_buffer_pointer_layout>::~__split_buffer[abi:nqe230106]()
+140006fb0 T std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>::__throw_length_error[abi:nqe230106]()
+140006fd0 T std::__1::__throw_length_error[abi:nqe230106](char const*)
+140007020 T std::length_error::length_error[abi:nqe230106](char const*)
+140007050 T std::__throw_bad_array_new_length[abi:nqe230106]()
+140007090 T void std::__1::__uninitialized_allocator_relocate[abi:nqe230106]<std::__1::allocator<kp::Body>, kp::Body*>(std::__1::allocator<kp::Body>&, kp::Body*, kp::Body*, kp::Body*)
+140007300 T std::__1::_AllocatorDestroyRangeReverse<std::__1::allocator<kp::Body>, kp::Body*>::operator()[abi:nqe230106]() const
+1400073e0 T std::__1::__split_buffer<kp::Body, std::__1::allocator<kp::Body>, std::__1::__split_buffer_pointer_layout>::clear[abi:nqe230106]()
+1400074d0 T kp::Body::box(kp::Vector3, double, kp::Vector3)
+140007730 T kp::ConvexHull::~ConvexHull()
+1400077c0 T std::__1::__shared_ptr_emplace[abi:nqe230106]<kp::ConvexHull, std::__1::allocator<kp::ConvexHull>>::~__shared_ptr_emplace()
+1400077e0 T std::__1::__shared_ptr_emplace[abi:nqe230106]<kp::ConvexHull, std::__1::allocator<kp::ConvexHull>>::__on_zero_shared()
+140007870 T std::__1::__shared_ptr_emplace[abi:nqe230106]<kp::ConvexHull, std::__1::allocator<kp::ConvexHull>>::__on_zero_shared_weak()
+140007880 T kp::SliderJoint& kp::World::addJoint<kp::SliderJoint, kp::Vector3&, kp::Vector3&>(kp::BodyId, kp::BodyId, kp::Vector3&, kp::Vector3&)
+140007ad0 T std::__1::unique_ptr<kp::Joint, std::__1::default_delete<kp::Joint>>& std::__1::vector<std::__1::unique_ptr<kp::Joint, std::__1::default_delete<kp::Joint>>, std::__1::allocator<std::__1::unique_ptr<kp::Joint, std::__1::default_delete<kp::Joint>>>>::emplace_back[abi:nqe230106]<std::__1::unique_ptr<kp::Joint, std::__1::default_delete<kp::Joint>>>(std::__1::unique_ptr<kp::Joint, std::__1::default_delete<kp::Joint>>&&)::'lambda0'()::operator()[abi:nqe230106]() const
+140007bc0 T std::__1::vector<std::__1::unique_ptr<kp::Joint, std::__1::default_delete<kp::Joint>>, std::__1::allocator<std::__1::unique_ptr<kp::Joint, std::__1::default_delete<kp::Joint>>>>::__throw_length_error[abi:nqe230106]()
+140007be0 T std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>::clear[abi:nqe230106]()
+140007cd0 T grip::addNeighbour(kp::World&, kp::BodyId, grip::Neighbour)
+1400085f0 T kp::FixedJoint& kp::World::addJoint<kp::FixedJoint, kp::Vector3&>(kp::BodyId, kp::BodyId, kp::Vector3&)
+1400087b0 T kp::ConvexHull::ConvexHull(std::__1::vector<kp::Vector3, std::__1::allocator<kp::Vector3>>, std::__1::vector<std::__1::vector<int, std::__1::allocator<int>>, std::__1::allocator<std::__1::vector<int, std::__1::allocator<int>>>> const&)
+1400087b0 T kp::ConvexHull::ConvexHull(std::__1::vector<kp::Vector3, std::__1::allocator<kp::Vector3>>, std::__1::vector<std::__1::vector<int, std::__1::allocator<int>>, std::__1::allocator<std::__1::vector<int, std::__1::allocator<int>>>> const&)
+140009090 T kp::ConvexHull::box(kp::Vector3)
+140009a00 T kp::ConvexHull::support(kp::Vector3) const
+140009ad0 T kp::ConvexHull::faceFlat(kp::Transform const&, int) const
+140009e00 T kp::ConvexHull::flatTowards(kp::Transform const&, kp::Vector3) const
+14000a0d0 T kp::ConvexHull::outlineOver(kp::Transform const&, kp::Flat const&) const
+14000a660 T std::__1::map<std::__1::pair<int, int>, int, std::__1::less<std::__1::pair<int, int>>, std::__1::allocator<std::__1::pair<std::__1::pair<int, int> const, int>>>::~map[abi:nqe230106]()
+14000a690 T std::__1::vector<kp::ConvexHull::Face, std::__1::allocator<kp::ConvexHull::Face>>::~vector[abi:nqe230106]()
+14000a6f0 T std::__1::vector<std::__1::vector<int, std::__1::allocator<int>>, std::__1::allocator<std::__1::vector<int, std::__1::allocator<int>>>>::~vector[abi:nqe230106]()
+14000a750 T kp::ConvexHull::~ConvexHull()
+14000a7e0 T kp::ConvexHull::boundingRadius() const
+14000a7f0 T kp::ConvexHull::hull() const
+14000a800 T std::__1::__tree<std::__1::__value_type<std::__1::pair<int, int>, int>, std::__1::__map_value_compare<std::__1::pair<int, int>, std::__1::pair<std::__1::pair<int, int> const, int>, std::__1::less<std::__1::pair<int, int>>>, std::__1::allocator<std::__1::pair<std::__1::pair<int, int> const, int>>>::__tree_deleter::operator()[abi:nqe230106](std::__1::__tree_node<std::__1::__value_type<std::__1::pair<int, int>, int>, void*>*)
+14000a850 T kp::ConvexHull::Face* std::__1::vector<kp::ConvexHull::Face, std::__1::allocator<kp::ConvexHull::Face>>::__emplace_back_slow_path[abi:nqe230106]<kp::ConvexHull::Face>(kp::ConvexHull::Face&&)
+14000aa10 T std::__1::vector<kp::ConvexHull::Face, std::__1::allocator<kp::ConvexHull::Face>>::__throw_length_error[abi:nqe230106]()
+14000aa30 T std::__1::vector<int, std::__1::allocator<int>>::__throw_length_error[abi:nqe230106]()
+14000aa50 T std::__1::__throw_out_of_range[abi:nqe230106](char const*)
+14000aaa0 T std::out_of_range::out_of_range[abi:nqe230106](char const*)
+14000aad0 T kp::ConvexHull::Edge& std::__1::vector<kp::ConvexHull::Edge, std::__1::allocator<kp::ConvexHull::Edge>>::emplace_back[abi:nqe230106]<kp::ConvexHull::Edge>(kp::ConvexHull::Edge&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14000abc0 T std::__1::vector<kp::ConvexHull::Edge, std::__1::allocator<kp::ConvexHull::Edge>>::__throw_length_error[abi:nqe230106]()
+14000abe0 T kp::Vector3& std::__1::vector<kp::Vector3, std::__1::allocator<kp::Vector3>>::emplace_back[abi:nqe230106]<kp::Vector3>(kp::Vector3&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14000ace0 T std::__1::vector<kp::Vector3, std::__1::allocator<kp::Vector3>>::__throw_length_error[abi:nqe230106]()
+14000ad00 T std::__1::__exception_guard_exceptions<std::__1::vector<std::__1::vector<int, std::__1::allocator<int>>, std::__1::allocator<std::__1::vector<int, std::__1::allocator<int>>>>::__destroy_vector>::~__exception_guard_exceptions[abi:nqe230106]()
+14000ad70 T std::__1::vector<int, std::__1::allocator<int>>* std::__1::__uninitialized_allocator_copy_impl[abi:nqe230106]<std::__1::allocator<std::__1::vector<int, std::__1::allocator<int>>>, std::__1::vector<int, std::__1::allocator<int>> const*, std::__1::vector<int, std::__1::allocator<int>> const*, std::__1::vector<int, std::__1::allocator<int>>*>(std::__1::allocator<std::__1::vector<int, std::__1::allocator<int>>>&, std::__1::vector<int, std::__1::allocator<int>> const*, std::__1::vector<int, std::__1::allocator<int>> const*, std::__1::vector<int, std::__1::allocator<int>>*)
+14000ae80 T std::__1::__exception_guard_exceptions<std::__1::_AllocatorDestroyRangeReverse<std::__1::allocator<std::__1::vector<int, std::__1::allocator<int>>>, std::__1::vector<int, std::__1::allocator<int>>*>>::~__exception_guard_exceptions[abi:nqe230106]()
+14000aed0 T kp::Vector3& std::__1::vector<kp::Vector3, kp::StepAllocator<kp::Vector3>>::emplace_back[abi:nqe230106]<kp::Vector3>(kp::Vector3&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14000afd0 T std::__1::vector<kp::Vector3, kp::StepAllocator<kp::Vector3>>::__throw_length_error[abi:nqe230106]()
+14000aff0 T void std::__1::vector<kp::Vector3, kp::StepAllocator<kp::Vector3>>::__assign_with_size[abi:nqe230106]<std::__1::_ClassicAlgPolicy, kp::Vector3 const*, kp::Vector3 const*>(kp::Vector3 const*, kp::Vector3 const*, long long)
+14000b130 T kp::WorkerPool::shared()
+14000b1c0 t __dtor__ZZN2kp10WorkerPool6sharedEvE4pool
+14000b1d0 T kp::WorkerPool::WorkerPool(int)
+14000b1d0 T kp::WorkerPool::WorkerPool(int)
+14000b220 T kp::WorkerPool::resize(int)
+14000b330 T kp::WorkerPool::~WorkerPool()
+14000b330 T kp::WorkerPool::~WorkerPool()
+14000b410 T kp::WorkerPool::stop()
+14000b4a0 T kp::WorkerPool::work()
+14000b5d0 T kp::WorkerPool::drain()
+14000b630 T kp::WorkerPool::run(unsigned long long, std::__1::function<void (unsigned long long)> const&)
+14000b7b0 t std::__1::thread& std::__1::vector<std::__1::thread, std::__1::allocator<std::__1::thread>>::emplace_back[abi:nqe230106]<kp::WorkerPool::resize(int)::$_0>(kp::WorkerPool::resize(int)::$_0&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14000b9e0 t void std::__1::allocator_traits<std::__1::allocator<std::__1::thread>>::construct[abi:nqe230106]<std::__1::thread, kp::WorkerPool::resize(int)::$_0, 0>(std::__1::allocator<std::__1::thread>&, std::__1::thread*, kp::WorkerPool::resize(int)::$_0&&)
+14000baa0 t void* std::__1::__thread_proxy[abi:nqe230106]<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct>>, kp::WorkerPool::resize(int)::$_0>>(void*)
+14000bb20 t std::__1::unique_ptr<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct>>, kp::WorkerPool::resize(int)::$_0>, std::__1::default_delete<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct>>, kp::WorkerPool::resize(int)::$_0>>>::~unique_ptr[abi:nqe230106]()
+14000bb70 T std::__1::vector<std::__1::thread, std::__1::allocator<std::__1::thread>>::~vector[abi:nqe230106]()
+14000bbc0 T std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct>>::~unique_ptr[abi:nqe230106]()
+14000bbf0 T std::__1::__split_buffer<std::__1::thread, std::__1::allocator<std::__1::thread>, std::__1::__split_buffer_pointer_layout>::~__split_buffer[abi:nqe230106]()
+14000bc50 T std::__1::vector<std::__1::thread, std::__1::allocator<std::__1::thread>>::__throw_length_error[abi:nqe230106]()
+14000bc70 T std::__1::__throw_bad_function_call[abi:nqe230106]()
+14000bcb0 T kp::Joint::turningXTo(kp::Vector3)
+14000bd40 T kp::Joint::Joint(int, kp::Body const&, int, kp::Body const&, kp::Vector3, kp::Vector3)
+14000c1e0 T kp::Joint::bonds(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&) const
+14000c230 T kp::Joint::writeBonds(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const
+14000cbb0 t kp::(anonymous namespace)::freeSpinUp(kp::Body const&)
+14000cdd0 T kp::Joint::travelLine(kp::Joint::Motion const&, int) const
+14000cf90 T kp::Joint::travelLine(kp::Joint::Motion const&, kp::Vector3) const
+14000d1e0 T kp::Joint::turnLine(kp::Joint::Motion const&, int) const
+14000d4b0 T kp::Joint::lockTravel(kp::Joint::Motion const&, int, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const
+14000d8a0 T kp::Joint::lockAllTurns(kp::Joint::Motion const&, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const
+14000e030 T kp::Joint::lockTurnsAcrossAxis(kp::Joint::Motion const&, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const
+14000ea60 T kp::Body::pose() const
+14000ec60 T kp::Body::angularVelocity() const
+14000ee30 T kp::Joint::~Joint()
+14000ee40 T kp::Joint::~Joint()
+14000ee50 T kp::Joint::collides() const
+14000ee60 T kp::Joint::pushes() const
+14000ee70 T kp::Joint::applyDrive(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, double) const
+14000ee80 T kp::Joint::singleFreedom() const
+14000ee90 T kp::Bond& std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>::emplace_back[abi:nqe230106]<kp::Bond>(kp::Bond&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14000efa0 T std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>::__throw_length_error[abi:nqe230106]()
+14000efc0 T kp::Bond& std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>::emplace_back[abi:nqe230106]<kp::Bond const&>(kp::Bond const&)::'lambda0'()::operator()[abi:nqe230106]() const
+14000f0d0 T kp::World::quiet(double) const
+14000f2f0 T kp::World::step(double)
+14000fa30 t std::__1::__function::__func<kp::World::step(double)::$_0, void (kp::StepStage)>::~__func()
+14000fa40 t std::__1::__function::__func<kp::World::step(double)::$_0, void (kp::StepStage)>::__clone[abi:nqe230106]() const
+14000fa70 t std::__1::__function::__func<kp::World::step(double)::$_0, void (kp::StepStage)>::__clone[abi:nqe230106](std::__1::__function::__base<void (kp::StepStage)>*) const
+14000fa90 t std::__1::__function::__func<kp::World::step(double)::$_0, void (kp::StepStage)>::destroy[abi:nqe230106]()
+14000faa0 t std::__1::__function::__func<kp::World::step(double)::$_0, void (kp::StepStage)>::destroy_deallocate[abi:nqe230106]()
+14000fab0 t std::__1::__function::__func<kp::World::step(double)::$_0, void (kp::StepStage)>::operator()[abi:nqe230106](kp::StepStage&&)
+14000fad0 t std::__1::__function::__func<kp::World::step(double)::$_0, void (kp::StepStage)>::target[abi:nqe230106](std::type_info const&) const
+14000fb20 t std::__1::__function::__func<kp::World::step(double)::$_0, void (kp::StepStage)>::target_type[abi:nqe230106]() const
+14000fb30 T kp::ExactStep::~ExactStep()
+14000fb90 T std::__1::__function::__base<void (kp::StepStage)>::~__base()
+14000fba0 T std::__1::__function::__value_func<void (kp::StepStage)>::swap[abi:nqe230106](std::__1::__function::__value_func<void (kp::StepStage)>&)
+14000fca0 T kp::FixedJoint::build(kp::Joint::Motion const&, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const
+14000fd00 T kp::FixedJoint::~FixedJoint()
+14000fd10 T kp::FixedJoint::clone() const
+14000fd80 T kp::SliderJoint::coordinate(kp::Body const&, kp::Body const&) const
+1400101f0 T kp::SliderJoint::applyDrive(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, double) const
+1400106e0 T kp::SliderJoint::build(kp::Joint::Motion const&, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const
+140010770 T kp::SliderJoint::~SliderJoint()
+140010780 T kp::SliderJoint::clone() const
+140010840 T kp::SingleFreedomJoint::pushes() const
+140010880 T kp::SingleFreedomJoint::singleFreedom() const
+140010890 T kp::SliderJoint::angular() const
+1400108a0 T __do_global_dtors
+1400108e0 T __do_global_ctors
+140010950 T __main
+1400109e0 T _matherr
+1400109f0 T _pei386_runtime_relocator
+140010d00 t __write_memory
+140010ec0 t __report_error
+140010f20 T _setargv
+140010f30 t __guard_check_icall_dummy
+140010f40 T __mingw_setusermatherr
+140010f50 T _fpreset
+140010f50 T fpreset
+140010f70 T __getmainargs
+140010fe0 T __p___initenv
+140010ff0 T _amsg_exit
+140011020 T printf
+140011080 t __cxx_global_var_init
+140011300 t kp::(anonymous namespace)::Reserve::~Reserve()
+1400114b0 T kp::StepMemory::StepMemory()
+1400114b0 T kp::StepMemory::StepMemory()
+140011590 T kp::StepMemory::~StepMemory()
+140011590 T kp::StepMemory::~StepMemory()
+1400117e0 T kp::StepMemory::take(unsigned long long)
+140011b00 T kp::StepMemory::Scope::Scope()
+140011b00 T kp::StepMemory::Scope::Scope()
+140011bc0 T kp::StepMemory::Scope::~Scope()
+140011bc0 T kp::StepMemory::Scope::~Scope()
+140011d80 T kp::StepMemory::held()
+140011e70 T kp::StepMemory::serve()
+140011ed0 T kp::StepMemory::give(void*)
+140011ee0 t kp::(anonymous namespace)::Reserve*& std::__1::vector<kp::(anonymous namespace)::Reserve*, std::__1::allocator<kp::(anonymous namespace)::Reserve*>>::emplace_back[abi:nqe230106]<kp::(anonymous namespace)::Reserve*>(kp::(anonymous namespace)::Reserve*&&)::'lambda0'()::operator()[abi:nqe230106]() const
+140011fd0 t std::__1::vector<kp::(anonymous namespace)::Reserve*, std::__1::allocator<kp::(anonymous namespace)::Reserve*>>::__throw_length_error[abi:nqe230106]()
+140011ff0 T char*& std::__1::vector<char*, std::__1::allocator<char*>>::emplace_back[abi:nqe230106]<char*>(char*&&)::'lambda0'()::operator()[abi:nqe230106]() const
+1400120e0 T std::__1::vector<char*, std::__1::allocator<char*>>::__throw_length_error[abi:nqe230106]()
+140012100 T unsigned long long& std::__1::vector<unsigned long long, std::__1::allocator<unsigned long long>>::emplace_back[abi:nqe230106]<unsigned long long const&>(unsigned long long const&)::'lambda0'()::operator()[abi:nqe230106]() const
+1400121f0 T std::__1::vector<unsigned long long, std::__1::allocator<unsigned long long>>::__throw_length_error[abi:nqe230106]()
+140012210 T kp::ConvexShape::flatTowards(kp::Transform const&, kp::Vector3) const
+140012220 T kp::ConvexShape::outlineOver(kp::Transform const&, kp::Flat const&) const
+1400122a0 T kp::ConvexShape::rollingRadius(kp::Transform const&, kp::Vector3) const
+1400122b0 T kp::ConvexShape::tubeTowards(kp::Transform const&, kp::Vector3) const
+1400122c0 T kp::ConvexShape::~ConvexShape()
+1400122d0 T kp::ConvexShape::~ConvexShape()
+1400122e0 T kp::ConvexShape::hull() const
+1400122f0 T kp::IslandSleep::track(unsigned long long)
+140012440 T kp::IslandSleep::count() const
+1400124f0 T kp::IslandSleep::wakeIsland(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, int)
+1400125a0 T kp::IslandSleep::wake(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, unsigned long long)
+140012670 T kp::IslandSleep::wakeNearDriven(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, double)
+140012a00 T kp::IslandSleep::wakeTouched(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, kp::JointSet const&, kp::Vector3, double, bool)
+140013190 T kp::IslandSleep::restingLongEnough(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, double, double, double)
+1400133f0 T kp::IslandSleep::putToSleep(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<int, std::__1::allocator<int>> const&, std::__1::vector<char, std::__1::allocator<char>> const&)
+1400135a0 T kp::IslandSleep::settle(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, kp::JointSet const&, kp::Vector3, double, double, double)
+140013c60 T std::__1::vector<kp::MassProperties, std::__1::allocator<kp::MassProperties>>::resize[abi:nqe230106](unsigned long long)
+140013d90 T std::__1::vector<double, std::__1::allocator<double>>::resize[abi:nqe230106](unsigned long long, double const&)
+140013f90 T std::__1::vector<int, std::__1::allocator<int>>::resize[abi:nqe230106](unsigned long long, int const&)
+140014190 T std::__1::vector<char, std::__1::allocator<char>>::__throw_length_error[abi:nqe230106]()
+1400141b0 T std::__1::vector<kp::MassProperties, std::__1::allocator<kp::MassProperties>>::__throw_length_error[abi:nqe230106]()
+1400141d0 T std::__1::vector<double, std::__1::allocator<double>>::__throw_length_error[abi:nqe230106]()
+1400141f0 T kp::ExactStep::run(double)
+140014670 T kp::ExactStep::advance(double)
+140014ce0 T kp::ExactStep::resolveImpacts(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&)
+140015140 T kp::ExactStep::contacts(double) const
+1400151a0 T kp::ExactStep::limitTurn(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, double&, kp::ExactStep::Forces&, kp::ExactStep::Cut&)
+140015570 T kp::ExactStep::forcesWithin(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, double&)
+140015620 T kp::ExactStep::cutAtEvents(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, double, double&, kp::ExactStep::Forces&, kp::ExactStep::Cut&, kp::SlidingStop&)
+140015930 T kp::ExactStep::move(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::ExactStep::Forces const&, double)
+140016200 T kp::ExactStep::up() const
+140016270 T kp::ExactStep::restBounceSpeed() const
+1400162b0 T kp::ExactStep::computeForces(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, double)
+140016730 T kp::ExactStep::forcesPass(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, double, int, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&, kp::ExactStep::Forces&)
+1400172f0 T kp::ExactStep::shakeBonds(kp::ExactStep::BondShake&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, kp::ExactStep::Forces&, int, double) const
+140017f20 T kp::ExactStep::middleOf(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, kp::ExactStep::Forces const&, double)
+140018010 T kp::ExactStep::shakeDiverged(kp::ExactStep::BondShake&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, kp::ExactStep::Forces const&, int, double)
+1400183b0 T std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>::~vector[abi:nqe230106]()
+1400183e0 T std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>::~vector[abi:nqe230106]()
+140018440 T kp::ExactStep::Forces::~Forces()
+140018480 T kp::integratePosition(kp::Body&, double)
+1400189a0 T kp::ExactStep::BondShake::~BondShake()
+140018a00 T kp::Body::operator=(kp::Body const&)
+140018bb0 T std::__1::vector<double, kp::StepAllocator<double>>::resize[abi:nqe230106](unsigned long long, double const&)
+140018da0 T std::__1::vector<kp::Rate, kp::StepAllocator<kp::Rate>>::__throw_length_error[abi:nqe230106]()
+140018dc0 T kp::carryDriven(kp::Body&, double)
+140018ff0 T kp::midpointTurn(kp::Vector3, kp::Vector3, double)
+1400198b0 T kp::ContactRows::~ContactRows()
+140019a00 T void std::__1::vector<double, kp::StepAllocator<double>>::__assign_with_size[abi:nqe230106]<std::__1::_ClassicAlgPolicy, double const*, double const*>(double const*, double const*, long long)
+140019b20 T std::__1::vector<double, kp::StepAllocator<double>>::__throw_length_error[abi:nqe230106]()
+140019b40 T void std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>::__init_with_size[abi:nqe230106]<kp::Body const*, kp::Body const*>(kp::Body const*, kp::Body const*, unsigned long long)
+140019d10 T std::__1::__exception_guard_exceptions<std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>::__destroy_vector>::~__exception_guard_exceptions[abi:nqe230106]()
+140019d50 T std::__1::pair<int, int>& std::__1::vector<std::__1::pair<int, int>, kp::StepAllocator<std::__1::pair<int, int>>>::emplace_back[abi:nqe230106]<std::__1::pair<int, int>>(std::__1::pair<int, int>&&)::'lambda0'()::operator()[abi:nqe230106]() const
+140019e30 T std::__1::vector<std::__1::pair<int, int>, kp::StepAllocator<std::__1::pair<int, int>>>::__throw_length_error[abi:nqe230106]()
+140019e50 T void std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>::__assign_with_size[abi:nqe230106]<std::__1::_ClassicAlgPolicy, kp::Body const*, kp::Body const*>(kp::Body const*, kp::Body const*, long long)
+14001a350 T kp::Vector3& std::__1::vector<kp::Vector3, kp::StepAllocator<kp::Vector3>>::emplace_back[abi:nqe230106]<kp::Vector3 const&>(kp::Vector3 const&)::'lambda0'()::operator()[abi:nqe230106]() const
+14001a450 T kp::PairFinder::tree(double) const
+14001a550 t kp::(anonymous namespace)::speedsOf(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, double)
+14001a670 t kp::(anonymous namespace)::Reaches::Reaches(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&, kp::Vector3, double, double)
+14001b190 t kp::(anonymous namespace)::Reaches::~Reaches()
+14001b1d0 T kp::PairFinder::candidates(double, std::__1::vector<double, kp::StepAllocator<double>> const&) const
+14001b830 T kp::PairFinder::listed(int, int, int, int) const
+14001b920 T kp::PairFinder::part(kp::Body const&, kp::Body const&, std::__1::array<int, 4ull> const&, double, kp::PairFinder::Found&) const
+14001be60 T kp::PairFinder::between(int, int, double, double) const
+14001cbc0 T kp::PairFinder::pairs(double) const
+14001cc10 T kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const
+14001d4f0 t kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const::$_0::operator()(unsigned long long) const
+14001d6b0 T kp::PairFinder::pairs(double, kp::JointSet const&) const
+14001d700 T kp::PairFinder::collect(double, kp::JointSet const&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const
+14001d980 t std::__1::__function::__func<kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const::$_0, void (unsigned long long)>::~__func()
+14001d990 t std::__1::__function::__func<kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const::$_0, void (unsigned long long)>::__clone[abi:nqe230106]() const
+14001d9d0 t std::__1::__function::__func<kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const::$_0, void (unsigned long long)>::__clone[abi:nqe230106](std::__1::__function::__base<void (unsigned long long)>*) const
+14001da00 t std::__1::__function::__func<kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const::$_0, void (unsigned long long)>::destroy[abi:nqe230106]()
+14001da10 t std::__1::__function::__func<kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const::$_0, void (unsigned long long)>::destroy_deallocate[abi:nqe230106]()
+14001da20 t std::__1::__function::__func<kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const::$_0, void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)
+14001da30 t std::__1::__function::__func<kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const::$_0, void (unsigned long long)>::target[abi:nqe230106](std::type_info const&) const
+14001da80 t std::__1::__function::__func<kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const::$_0, void (unsigned long long)>::target_type[abi:nqe230106]() const
+14001da90 T kp::PairFinder::Found::Found(kp::PairFinder::Found const&)
+14001dc10 T kp::Body::part(int) const
+14001df30 T kp::PairFinder::Found::~Found()
+14001dfb0 T std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>::reserve[abi:nqe230106](unsigned long long)
+14001e0a0 T std::__1::vector<kp::PairFinder::Found, kp::StepAllocator<kp::PairFinder::Found>>::~vector[abi:nqe230106]()
+14001e160 T std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>::erase[abi:nqe230106](std::__1::__wrap_iter<kp::ContactPair const*>, std::__1::__wrap_iter<kp::ContactPair const*>)
+14001e340 T std::__1::vector<kp::Bounds, kp::StepAllocator<kp::Bounds>>::__throw_length_error[abi:nqe230106]()
+14001e360 T std::__1::vector<kp::DynamicTree::Node, std::__1::allocator<kp::DynamicTree::Node>>::__throw_length_error[abi:nqe230106]()
+14001e380 T std::__1::vector<kp::PairFinder::Found::Pair, kp::StepAllocator<kp::PairFinder::Found::Pair>>::~vector[abi:nqe230106]()
+14001e3e0 T std::__1::__exception_guard_exceptions<std::__1::vector<kp::PairFinder::Found::Pair, kp::StepAllocator<kp::PairFinder::Found::Pair>>::__destroy_vector>::~__exception_guard_exceptions[abi:nqe230106]()
+14001e460 T std::__1::vector<kp::PairFinder::Found::Pair, kp::StepAllocator<kp::PairFinder::Found::Pair>>::__throw_length_error[abi:nqe230106]()
+14001e480 T kp::PairFinder::Found::Pair* std::__1::__uninitialized_allocator_copy_impl[abi:nqe230106]<kp::StepAllocator<kp::PairFinder::Found::Pair>, kp::PairFinder::Found::Pair const*, kp::PairFinder::Found::Pair const*, kp::PairFinder::Found::Pair*>(kp::StepAllocator<kp::PairFinder::Found::Pair>&, kp::PairFinder::Found::Pair const*, kp::PairFinder::Found::Pair const*, kp::PairFinder::Found::Pair*)
+14001e650 T std::__1::__exception_guard_exceptions<std::__1::_AllocatorDestroyRangeReverse<kp::StepAllocator<kp::PairFinder::Found::Pair>, kp::PairFinder::Found::Pair*>>::~__exception_guard_exceptions[abi:nqe230106]()
+14001e6b0 T std::__1::vector<kp::ManifoldMemory::Entry, kp::StepAllocator<kp::ManifoldMemory::Entry>>::__throw_length_error[abi:nqe230106]()
+14001e6d0 T void std::__1::__introsort[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::pair<int, int>*, false>(std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::__less<void, void>&, std::__1::iterator_traits<std::__1::pair<int, int>*>::difference_type, bool)
+14001eb70 T bool std::__1::__sort3[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::pair<int, int>*, 0>(std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::__less<void, void>&)
+14001ec60 T void std::__1::__sort5[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::pair<int, int>*, 0>(std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::__less<void, void>&)
+14001edb0 T std::__1::pair<int, int>* std::__1::__partition_with_equals_on_left[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::pair<int, int>*, std::__1::__less<void, void>&>(std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::__less<void, void>&)
+14001eec0 T std::__1::pair<std::__1::pair<int, int>*, bool> std::__1::__partition_with_equals_on_right[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::pair<int, int>*, std::__1::__less<void, void>&>(std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::__less<void, void>&)
+14001efd0 T bool std::__1::__insertion_sort_incomplete[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::pair<int, int>*>(std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::__less<void, void>&)
+14001f1f0 T void std::__1::__sift_down[abi:nqe230106]<std::__1::_ClassicAlgPolicy, false, std::__1::__less<void, void>&, std::__1::pair<int, int>*>(std::__1::pair<int, int>*, std::__1::__less<void, void>&, std::__1::iterator_traits<std::__1::pair<int, int>*>::difference_type, std::__1::iterator_traits<std::__1::pair<int, int>*>::difference_type)
+14001f300 T void std::__1::__sort_heap[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::pair<int, int>*>(std::__1::pair<int, int>*, std::__1::pair<int, int>*, std::__1::__less<void, void>&)
+14001f470 T void std::__1::__if_likely_else[abi:nqe230106]<kp::PairFinder::Found::Pair& std::__1::vector<kp::PairFinder::Found::Pair, kp::StepAllocator<kp::PairFinder::Found::Pair>>::emplace_back[abi:nqe230106]<kp::PairFinder::Found::Pair>(kp::PairFinder::Found::Pair&&)::'lambda'(), kp::PairFinder::Found::Pair& std::__1::vector<kp::PairFinder::Found::Pair, kp::StepAllocator<kp::PairFinder::Found::Pair>>::emplace_back[abi:nqe230106]<kp::PairFinder::Found::Pair>(kp::PairFinder::Found::Pair&&)::'lambda0'()>(bool, kp::PairFinder::Found::Pair& std::__1::vector<kp::PairFinder::Found::Pair, kp::StepAllocator<kp::PairFinder::Found::Pair>>::emplace_back[abi:nqe230106]<kp::PairFinder::Found::Pair>(kp::PairFinder::Found::Pair&&)::'lambda'(), kp::PairFinder::Found::Pair& std::__1::vector<kp::PairFinder::Found::Pair, kp::StepAllocator<kp::PairFinder::Found::Pair>>::emplace_back[abi:nqe230106]<kp::PairFinder::Found::Pair>(kp::PairFinder::Found::Pair&&)::'lambda0'())
+14001f600 T kp::PairFinder::Found::Pair* std::__1::vector<kp::PairFinder::Found::Pair, kp::StepAllocator<kp::PairFinder::Found::Pair>>::__emplace_back_slow_path[abi:nqe230106]<kp::PairFinder::Found::Pair>(kp::PairFinder::Found::Pair&&)
+14001f860 T std::__1::__split_buffer<kp::PairFinder::Found::Pair, kp::StepAllocator<kp::PairFinder::Found::Pair>, std::__1::__split_buffer_pointer_layout>::~__split_buffer[abi:nqe230106]()
+14001f8c0 T void std::__1::__uninitialized_allocator_relocate[abi:nqe230106]<kp::StepAllocator<kp::PairFinder::Found::Pair>, kp::PairFinder::Found::Pair*>(kp::StepAllocator<kp::PairFinder::Found::Pair>&, kp::PairFinder::Found::Pair*, kp::PairFinder::Found::Pair*, kp::PairFinder::Found::Pair*)
+14001fac0 T kp::ManifoldMemory::Entry& std::__1::vector<kp::ManifoldMemory::Entry, kp::StepAllocator<kp::ManifoldMemory::Entry>>::emplace_back[abi:nqe230106]<kp::ManifoldMemory::Entry const&>(kp::ManifoldMemory::Entry const&)::'lambda0'()::operator()[abi:nqe230106]() const
+14001fbd0 T std::__1::vector<kp::PairFinder::Found, kp::StepAllocator<kp::PairFinder::Found>>::__throw_length_error[abi:nqe230106]()
+14001fbf0 T std::__1::vector<kp::PairFinder::Found, kp::StepAllocator<kp::PairFinder::Found>>::__destroy_vector::operator()[abi:nqe230106]()
+14001fcc0 T std::__1::__function::__base<void (unsigned long long)>::~__base()
+14001fcd0 T std::__1::vector<kp::ManifoldMemory::Entry const*, kp::StepAllocator<kp::ManifoldMemory::Entry const*>>::__throw_length_error[abi:nqe230106]()
+14001fcf0 T std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>::__throw_length_error[abi:nqe230106]()
+14001fd10 T std::__1::__split_buffer<kp::ContactPair, std::__1::allocator<kp::ContactPair>, std::__1::__split_buffer_pointer_layout>::~__split_buffer[abi:nqe230106]()
+14001fd70 T void std::__1::__uninitialized_allocator_relocate[abi:nqe230106]<std::__1::allocator<kp::ContactPair>, kp::ContactPair*>(std::__1::allocator<kp::ContactPair>&, kp::ContactPair*, kp::ContactPair*, kp::ContactPair*)
+14001ff60 T std::__1::__exception_guard_exceptions<std::__1::_AllocatorDestroyRangeReverse<std::__1::allocator<kp::ContactPair>, kp::ContactPair*>>::~__exception_guard_exceptions[abi:nqe230106]()
+14001ffc0 T kp::ContactPair* std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>::__emplace_back_slow_path[abi:nqe230106]<kp::ContactPair const&>(kp::ContactPair const&)
+140020220 T kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const
+1400243d0 t kp::(anonymous namespace)::JointRows::build(kp::JointSet const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&, bool)
+1400247a0 t kp::(anonymous namespace)::JointRows::~JointRows()
+1400247f0 t kp::(anonymous namespace)::Moving::~Moving()
+140024850 t std::__1::vector<kp::(anonymous namespace)::Moving::Pose, kp::StepAllocator<kp::(anonymous namespace)::Moving::Pose>>::__throw_length_error[abi:nqe230106]()
+140024870 t std::__1::__function::__func<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(kp::ContactPair const&), kp::SoftContact (kp::ContactPair const&)>::~__func()
+140024880 t std::__1::__function::__func<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(kp::ContactPair const&), kp::SoftContact (kp::ContactPair const&)>::__clone[abi:nqe230106]() const
+1400248b0 t std::__1::__function::__func<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(kp::ContactPair const&), kp::SoftContact (kp::ContactPair const&)>::__clone[abi:nqe230106](std::__1::__function::__base<kp::SoftContact (kp::ContactPair const&)>*) const
+1400248d0 t std::__1::__function::__func<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(kp::ContactPair const&), kp::SoftContact (kp::ContactPair const&)>::destroy[abi:nqe230106]()
+1400248e0 t std::__1::__function::__func<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(kp::ContactPair const&), kp::SoftContact (kp::ContactPair const&)>::destroy_deallocate[abi:nqe230106]()
+1400248f0 t std::__1::__function::__func<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(kp::ContactPair const&), kp::SoftContact (kp::ContactPair const&)>::operator()[abi:nqe230106](kp::ContactPair const&)
+1400249a0 t std::__1::__function::__func<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(kp::ContactPair const&), kp::SoftContact (kp::ContactPair const&)>::target[abi:nqe230106](std::type_info const&) const
+1400249f0 t std::__1::__function::__func<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(kp::ContactPair const&), kp::SoftContact (kp::ContactPair const&)>::target_type[abi:nqe230106]() const
+140024a00 t kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long)::operator()(unsigned long long) const
+1400254a0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::~__func()
+1400254b0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::__clone[abi:nqe230106]() const
+1400254e0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::__clone[abi:nqe230106](std::__1::__function::__base<void (unsigned long long)>*) const
+140025500 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::destroy[abi:nqe230106]()
+140025510 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::destroy_deallocate[abi:nqe230106]()
+140025520 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)
+140025580 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::target[abi:nqe230106](std::type_info const&) const
+1400255d0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::target_type[abi:nqe230106]() const
+1400255e0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::~__func()
+1400255f0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::__clone[abi:nqe230106]() const
+140025620 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::__clone[abi:nqe230106](std::__1::__function::__base<void (unsigned long long)>*) const
+140025640 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::destroy[abi:nqe230106]()
+140025650 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::destroy_deallocate[abi:nqe230106]()
+140025660 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)
+1400257f0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::target[abi:nqe230106](std::type_info const&) const
+140025840 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::target_type[abi:nqe230106]() const
+140025850 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::~__func()
+140025860 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::__clone[abi:nqe230106]() const
+140025890 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::__clone[abi:nqe230106](std::__1::__function::__base<void (unsigned long long)>*) const
+1400258b0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::destroy[abi:nqe230106]()
+1400258c0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::destroy_deallocate[abi:nqe230106]()
+1400258d0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)
+140025960 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::target[abi:nqe230106](std::type_info const&) const
+1400259b0 t std::__1::__function::__func<void kp::(anonymous namespace)::eachOf<kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long)>(unsigned long long, kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double)::'lambda0'(unsigned long long) const&)::'lambda'(unsigned long long), void (unsigned long long)>::target_type[abi:nqe230106]() const
+1400259c0 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_0, void (unsigned long long)>::~__func()
+1400259d0 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_0, void (unsigned long long)>::__clone[abi:nqe230106]() const
+140025a00 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_0, void (unsigned long long)>::__clone[abi:nqe230106](std::__1::__function::__base<void (unsigned long long)>*) const
+140025a20 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_0, void (unsigned long long)>::destroy[abi:nqe230106]()
+140025a30 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_0, void (unsigned long long)>::destroy_deallocate[abi:nqe230106]()
+140025a40 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_0, void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)
+140025a60 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_0, void (unsigned long long)>::target[abi:nqe230106](std::type_info const&) const
+140025ab0 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_0, void (unsigned long long)>::target_type[abi:nqe230106]() const
+140025ac0 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_1, void (unsigned long long)>::~__func()
+140025ad0 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_1, void (unsigned long long)>::__clone[abi:nqe230106]() const
+140025b10 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_1, void (unsigned long long)>::__clone[abi:nqe230106](std::__1::__function::__base<void (unsigned long long)>*) const
+140025b30 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_1, void (unsigned long long)>::destroy[abi:nqe230106]()
+140025b40 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_1, void (unsigned long long)>::destroy_deallocate[abi:nqe230106]()
+140025b50 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_1, void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)
+140025b80 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_1, void (unsigned long long)>::target[abi:nqe230106](std::type_info const&) const
+140025bd0 t std::__1::__function::__func<kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const::$_1, void (unsigned long long)>::target_type[abi:nqe230106]() const
+140025be0 T std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>::resize[abi:nqe230106](unsigned long long)
+140025d80 T kp::IslandNormals::~IslandNormals()
+140025df0 T kp::PairReach::~PairReach()
+140025e80 T kp::MissedContacts::~MissedContacts()
+140025f60 T std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>::~vector[abi:nqe230106]()
+140025fd0 T kp::inverseInertiaInWorld(kp::Body const&)
+140026470 T std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>::__throw_length_error[abi:nqe230106]()
+140026490 T std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>::reserve[abi:nqe230106](unsigned long long)
+140026600 T kp::ContactForces::of(kp::ContactId const&, std::__1::pair<kp::ContactId, kp::ContactForce> const*) const
+140026710 T std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>::__throw_length_error[abi:nqe230106]()
+140026730 T std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>::__throw_length_error[abi:nqe230106]()
+140026750 T kp::SoftContact* std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>::__emplace_back_slow_path[abi:nqe230106]<kp::SoftContact>(kp::SoftContact&&)
+140026950 T unsigned long long& std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>::emplace_back[abi:nqe230106]<unsigned long long const&>(unsigned long long const&)::'lambda0'()::operator()[abi:nqe230106]() const
+140026a30 T std::__1::vector<double, std::__1::allocator<double>>::assign[abi:nqe230106](unsigned long long, double const&)
+140026c70 T std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>>::__throw_length_error[abi:nqe230106]()
+140026c90 T std::__1::__function::__base<kp::SoftContact (kp::ContactPair const&)>::~__base()
+140026ca0 T std::__1::vector<char, kp::StepAllocator<char>>::__throw_length_error[abi:nqe230106]()
+140026cc0 T std::__1::vector<kp::IslandNormals::Island, kp::StepAllocator<kp::IslandNormals::Island>>::clear[abi:nqe230106]()
+140026d50 T std::__1::vector<kp::Body, kp::StepAllocator<kp::Body>>::clear[abi:nqe230106]()
+140026e40 T kp::DirectJoints::~DirectJoints()
+140026f20 T std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>::__throw_length_error[abi:nqe230106]()
+140026f40 T kp::SingleFreedomJoint::limitGap(kp::Body const&, kp::Body const&) const
+140027000 T kp::SingleFreedomJoint::limitGapAt(double) const
+1400270a0 T kp::SingleFreedomJoint::addFreedomBonds(kp::Joint::Motion const&, kp::Bond const&, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const
+140027130 T kp::SingleFreedomJoint::addFreedomBonds(kp::Bond const&, double, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const
+140027540 T ___chkstk_ms
+140027570 T fprintf
+1400275c0 T vfprintf
+140027600 T __guard_dispatch_icall_dummy
+140027610 T __local_stdio_printf_options
+140027620 T __mingw_cxa_atexit
+1400276c0 T __mingw_cxa_thread_atexit
+140027780 t tls_atexit_callback
+140027840 t tls_callback
+140027940 T __cxa_thread_atexit
+140027950 T kp::OverlapSeparation::deepen(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const
+140027eb0 T kp::OverlapSeparation::separate(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&)
+140028430 T kp::OverlapSeparation::keepMomenta(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, std::__1::vector<kp::Vector3, kp::StepAllocator<kp::Vector3>> const&)
+140029450 T kp::OverlapSeparation::freeGroups(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&) const
+140029950 T std::__1::__exception_guard_exceptions<std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>::__destroy_vector>::~__exception_guard_exceptions[abi:nqe230106]()
+1400299d0 T kp::ContactPair* std::__1::__uninitialized_allocator_copy_impl[abi:nqe230106]<std::__1::allocator<kp::ContactPair>, kp::ContactPair const*, kp::ContactPair const*, kp::ContactPair*>(std::__1::allocator<kp::ContactPair>&, kp::ContactPair const*, kp::ContactPair const*, kp::ContactPair*)
+140029b90 T std::__1::vector<int, kp::StepAllocator<int>>::__throw_length_error[abi:nqe230106]()
+140029bb0 T kp::ContactSolver::ContactSolver(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3, double, kp::ContactForces const*, kp::JointSet const*)
+140029bb0 T kp::ContactSolver::ContactSolver(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3, double, kp::ContactForces const*, kp::JointSet const*)
+14002af60 T kp::ContactSolver::bondImpulses(std::__1::vector<kp::Vector3, kp::StepAllocator<kp::Vector3>>&, std::__1::vector<kp::Vector3, kp::StepAllocator<kp::Vector3>>&) const
+14002b1a0 T kp::ContactSolver::solve(std::__1::vector<double, kp::StepAllocator<double>> const&)
+14002b460 T kp::ContactSolver::solveImpacts()
+14002b810 T kp::ContactSolver::reset()
+14002b8b0 T kp::ContactSolver::pressures() const
+14002b990 T kp::ContactSolver::solveOverlap()
+14002bd20 T kp::ContactSolver::solveRestingContacts(double, kp::ContactForces const&, bool)
+14002c710 t kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered& std::__1::vector<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered, kp::StepAllocator<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered>>::emplace_back[abi:nqe230106]<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered>(kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14002c7f0 t std::__1::vector<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered, kp::StepAllocator<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered>>::__throw_length_error[abi:nqe230106]()
+14002c810 t void std::__1::__stable_sort[abi:nqe230106]<std::__1::_ClassicAlgPolicy, kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::$_0&, std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>>(std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>, std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>, kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::$_0&, std::__1::iterator_traits<std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>>::difference_type, std::__1::iterator_traits<std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>>::value_type*, long long)
+14002ca70 t void std::__1::__stable_sort_move[abi:nqe230106]<std::__1::_ClassicAlgPolicy, kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::$_0&, std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>>(std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>, std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>, kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::$_0&, std::__1::iterator_traits<std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>>::difference_type, std::__1::iterator_traits<std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>>::value_type*)
+14002cca0 t void std::__1::__inplace_merge[abi:nqe230106]<std::__1::_ClassicAlgPolicy, kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::$_0&, std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>>(std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>, std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>, std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>, kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::$_0&, std::__1::iterator_traits<std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>>::difference_type, std::__1::iterator_traits<std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>>::difference_type, std::__1::iterator_traits<std::__1::__wrap_iter<kp::(anonymous namespace)::bottomUp(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3)::Ordered*>>::value_type*, long long)
+14002d220 T std::__1::vector<double, kp::StepAllocator<double>>::assign[abi:nqe230106](unsigned long long, double const&)
+14002d460 T std::__1::vector<kp::Vector3, kp::StepAllocator<kp::Vector3>>::assign[abi:nqe230106](unsigned long long, kp::Vector3 const&)
+14002d6f0 T kp::ContactSystem::~ContactSystem()
+14002d800 T kp::ContactForces::operator[](kp::ContactId const&)
+14002d9b0 T kp::ContactPair const*& std::__1::vector<kp::ContactPair const*, kp::StepAllocator<kp::ContactPair const*>>::emplace_back[abi:nqe230106]<kp::ContactPair const* const&>(kp::ContactPair const* const&)::'lambda0'()::operator()[abi:nqe230106]() const
+14002da90 T std::__1::vector<kp::ContactPair const*, kp::StepAllocator<kp::ContactPair const*>>::__throw_length_error[abi:nqe230106]()
+14002dab0 T std::__1::pair<kp::ContactId, kp::ContactForce>& std::__1::vector<std::__1::pair<kp::ContactId, kp::ContactForce>, std::__1::allocator<std::__1::pair<kp::ContactId, kp::ContactForce>>>::emplace_back[abi:nqe230106]<std::__1::pair<kp::ContactId, kp::ContactForce>>(std::__1::pair<kp::ContactId, kp::ContactForce>&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14002dbc0 T std::__1::vector<std::__1::pair<kp::ContactId, kp::ContactForce>, std::__1::allocator<std::__1::pair<kp::ContactId, kp::ContactForce>>>::__throw_length_error[abi:nqe230106]()
+14002dbe0 T std::__1::vector<kp::ContactRows::Row, kp::StepAllocator<kp::ContactRows::Row>>::__throw_length_error[abi:nqe230106]()
+14002dc00 T kp::ContactRows::Pair& std::__1::vector<kp::ContactRows::Pair, kp::StepAllocator<kp::ContactRows::Pair>>::emplace_back[abi:nqe230106]<kp::ContactRows::Pair>(kp::ContactRows::Pair&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14002dd10 T std::__1::vector<kp::ContactRows::Pair, kp::StepAllocator<kp::ContactRows::Pair>>::__throw_length_error[abi:nqe230106]()
+14002dd30 T double& std::__1::vector<double, kp::StepAllocator<double>>::emplace_back[abi:nqe230106]<double>(double&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14002de10 T kp::EventSearch::contactTurn(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, std::__1::vector<kp::Rate, kp::StepAllocator<kp::Rate>> const&, double) const
+14002def0 t kp::EventSearch::contactTurn(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, std::__1::vector<kp::Rate, kp::StepAllocator<kp::Rate>> const&, double) const::$_0::operator()(int) const
+14002e240 T kp::EventSearch::earliestImpact(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, std::__1::vector<kp::Rate, kp::StepAllocator<kp::Rate>> const&, double) const
+14002e2d0 T kp::EventSearch::impactOf(kp::ContactPair const&, kp::Rate const&, kp::Rate const&, double, double) const
+1400326c0 t kp::EventSearch::impactOf(kp::ContactPair const&, kp::Rate const&, kp::Rate const&, double, double) const::$_0::operator()(kp::Body const&, kp::Rate const&) const
+140032970 t kp::(anonymous namespace)::motionBounds(kp::Body const&, kp::Vector3, kp::Vector3, double)
+140033120 t kp::EventSearch::impactOf(kp::ContactPair const&, kp::Rate const&, kp::Rate const&, double, double) const::$_1::operator()(double) const
+140033a10 T kp::EventSearch::earliestLimit(std::__1::vector<kp::Rate, kp::StepAllocator<kp::Rate>> const&, double) const
+1400343b0 t kp::EventSearch::earliestLimit(std::__1::vector<kp::Rate, kp::StepAllocator<kp::Rate>> const&, double) const::$_0::operator()(double) const
+140034d30 t double kp::(anonymous namespace)::nextPointContact<kp::EventSearch::impactOf(kp::ContactPair const&, kp::Rate const&, kp::Rate const&, double, double) const::$_1 const&>(kp::ContactPair const&, kp::Body const&, kp::Body const&, kp::EventSearch::impactOf(kp::ContactPair const&, kp::Rate const&, kp::Rate const&, double, double) const::$_1 const&, double, double)::'lambda'(double)::operator()(double) const
+140035160 t kp::(anonymous namespace)::anchorOf(kp::Body const&, kp::Body const&)
+140035d30 t double kp::(anonymous namespace)::crossingStart<kp::EventSearch::impactOf(kp::ContactPair const&, kp::Rate const&, kp::Rate const&, double, double) const::$_1 const&>(kp::Body const&, kp::Body const&, kp::EventSearch::impactOf(kp::ContactPair const&, kp::Rate const&, kp::Rate const&, double, double) const::$_1 const&, kp::(anonymous namespace)::MotionBounds const&, kp::(anonymous namespace)::MotionBounds const&, double, double, double)::'lambda'(kp::Body const&, kp::Body const&, kp::(anonymous namespace)::Anchor const&)::operator()(kp::Body const&, kp::Body const&, kp::(anonymous namespace)::Anchor const&) const
+140035f90 t double kp::(anonymous namespace)::crossingStart<kp::EventSearch::impactOf(kp::ContactPair const&, kp::Rate const&, kp::Rate const&, double, double) const::$_3 const&>(kp::Body const&, kp::Body const&, kp::EventSearch::impactOf(kp::ContactPair const&, kp::Rate const&, kp::Rate const&, double, double) const::$_3 const&, kp::(anonymous namespace)::MotionBounds const&, kp::(anonymous namespace)::MotionBounds const&, double, double, double)::'lambda'(kp::Body const&, kp::Body const&, kp::(anonymous namespace)::Anchor const&)::operator()(kp::Body const&, kp::Body const&, kp::(anonymous namespace)::Anchor const&) const
+1400361f0 T std::__1::pair<kp::Body, kp::Body>::~pair()
+140036320 T kp::Quaternion::fromRotationVector(kp::Vector3)
+140036540 T kp::Quaternion::fromAxes(kp::Vector3, kp::Vector3, kp::Vector3)
+1400367a0 T kp::SlidingStopSearch::settle(kp::SlidingStop)
+140036800 T kp::SlidingStopSearch::slidingStop(double, std::__1::vector<std::__1::pair<int, int>, kp::StepAllocator<std::__1::pair<int, int>>> const&) const
+140036bc0 T kp::ContactRows::effectiveMass(kp::Body const&, kp::Body const&, kp::Vector3, kp::Vector3)
+1400370c0 T kp::ContactRows::setDrift(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&)
+140037cf0 t kp::(anonymous namespace)::geometricAcceleration(kp::Body const&, kp::Vector3, kp::Vector3)
+1400380f0 T kp::ContactRows::relativeSpeed(kp::ContactRows::Row const&, kp::Vector3) const
+140038370 T kp::ContactRows::applyLine(kp::ContactSystem::Line const&, double)
+140038480 T kp::ContactRows::apply(kp::ContactRows::Row const&, kp::Vector3)
+140038610 T kp::ContactRows::kineticEnergy() const
+140038720 T kp::ContactRows::normalLine(kp::ContactRows::Row const&) const
+140038840 T kp::ContactRows::frictionLine(kp::ContactRows::Pair const&, int) const
+1400389c0 T kp::ContactRows::speed(kp::ContactSystem::Line const&) const
+140038b10 T kp::ContactRows::driveCap(unsigned long long) const
+140038b60 T kp::forcedSpeedGain(kp::Body const&, double)
+140038c70 T kp::maxPointSpeed(kp::Body const&)
+140039240 T kp::overlapDepth(kp::Body const&, kp::Body const&)
+140039270 T kp::separationOf(kp::Body const&, kp::Body const&)
+140039800 T kp::gapAlong(kp::Body const&, kp::Body const&, kp::Vector3)
+140039ce0 T kp::examinePair(kp::Body const&, kp::Body const&, kp::Vector3, double, double)
+140039fd0 T kp::examinePairWithin(kp::Body const&, kp::Body const&, double, double)
+14003a560 T kp::examinePair(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, int, int, kp::Vector3, double, double)
+14003a5e0 T kp::TransformedHull::TransformedHull(kp::ConvexHull const&, kp::Transform const&)
+14003aab0 T kp::TransformedHull::~TransformedHull()
+14003aaf0 T kp::DynamicTree::insert(kp::Bounds const&, int)
+14003b1e0 T kp::DynamicTree::replaceChild(int, int, int)
+14003b210 T kp::DynamicTree::refit(int)
+14003b2b0 T kp::DynamicTree::balanced(int)
+14003b310 T kp::DynamicTree::raised(int, int, int)
+14003b4c0 T kp::DynamicTree::Node& std::__1::vector<kp::DynamicTree::Node, std::__1::allocator<kp::DynamicTree::Node>>::emplace_back[abi:nqe230106]<kp::DynamicTree::Node>(kp::DynamicTree::Node&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14003b5f0 T kp::CandidateMemory::valid(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&) const
+14003b8f0 T kp::CandidateMemory::replace(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&, std::__1::vector<std::__1::pair<int, int>, kp::StepAllocator<std::__1::pair<int, int>>> const&)
+14003ba10 T std::__1::vector<kp::CandidateMemory::Origin, std::__1::allocator<kp::CandidateMemory::Origin>>::resize[abi:nqe230106](unsigned long long)
+14003bbc0 T std::__1::vector<kp::CandidateMemory::Origin, std::__1::allocator<kp::CandidateMemory::Origin>>::__throw_length_error[abi:nqe230106]()
+14003bbe0 T void std::__1::vector<std::__1::pair<int, int>, std::__1::allocator<std::__1::pair<int, int>>>::__assign_with_size[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__wrap_iter<std::__1::pair<int, int> const*>, std::__1::__wrap_iter<std::__1::pair<int, int> const*>>(std::__1::__wrap_iter<std::__1::pair<int, int> const*>, std::__1::__wrap_iter<std::__1::pair<int, int> const*>, long long)
+14003bfe0 T std::__1::vector<std::__1::pair<int, int>, std::__1::allocator<std::__1::pair<int, int>>>::__throw_length_error[abi:nqe230106]()
+14003c000 T kp::ManifoldMemory::entryOf(kp::ContactPair const&, kp::Body const&, kp::Body const&)
+14003c8b0 t kp::(anonymous namespace)::apartOf(kp::Body const&, kp::Body const&)
+14003caf0 T kp::ManifoldMemory::valid(std::__1::array<int, 4ull> const&, kp::Body const&, kp::Body const&, double) const
+14003cd60 T kp::ManifoldMemory::carried(kp::ManifoldMemory::Entry const&, kp::Body const&, kp::Body const&, double)
+14003d4f0 T kp::ManifoldMemory::replace(std::__1::vector<kp::ManifoldMemory::Entry const*, kp::StepAllocator<kp::ManifoldMemory::Entry const*>> const&)
+14003d6d0 T kp::operator*(kp::Quaternion, kp::Quaternion)
+14003d7c0 T std::__1::vector<kp::ManifoldMemory::Entry, std::__1::allocator<kp::ManifoldMemory::Entry>>::__throw_length_error[abi:nqe230106]()
+14003d7e0 T kp::ManifoldMemory::Entry& std::__1::vector<kp::ManifoldMemory::Entry, std::__1::allocator<kp::ManifoldMemory::Entry>>::emplace_back[abi:nqe230106]<kp::ManifoldMemory::Entry const&>(kp::ManifoldMemory::Entry const&)::'lambda0'()::operator()[abi:nqe230106]() const
+14003d8f0 t kp::(anonymous namespace)::LargeBlock::~LargeBlock()
+14003d930 T kp::SoftContact::SoftContact(kp::ContactPair const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, kp::Softness const&, kp::Span<std::__1::pair<kp::ContactId, kp::ContactForce>>, double, bool, bool)
+14003d930 T kp::SoftContact::SoftContact(kp::ContactPair const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, kp::Softness const&, kp::Span<std::__1::pair<kp::ContactId, kp::ContactForce>>, double, bool, bool)
+14003e190 T kp::SoftContact::takePoints(kp::ContactPair const&, kp::Vector3, kp::Vector3, kp::SolverBody const&, kp::SolverBody const&, kp::Span<std::__1::pair<kp::ContactId, kp::ContactForce>>, double, bool)
+14003f770 T kp::SoftContact::aim(kp::BodyMotion const&, kp::BodyMotion const&, kp::Vector3, kp::ClosestPoints const*)
+14003fe00 T kp::SoftContact::follow(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&)
+1400405f0 t kp::SoftContact::follow(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&)::$_0::operator()(kp::Vector3, kp::Vector3, kp::Vector3&, kp::Vector3&) const
+1400408d0 T kp::SoftContact::prefetch(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, unsigned long long, unsigned long long)
+1400409e0 T kp::SoftContact::warmStart(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&) const
+140040b70 T kp::SoftContact::respond(kp::SolverBody const&, kp::SolverBody const&, kp::BlockWork const&) const
+140041aa0 T kp::SoftContact::solveNormals(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double)
+140042250 T kp::SoftContact::setNormalImpulse(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, unsigned long long, double)
+140042320 T kp::SoftContact::matchTrial(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, double)
+1400428b0 T kp::SoftContact::solveFriction(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, double)
+1400429c0 T kp::SoftContact::bounce(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, double)
+140042d20 T kp::SoftContact::remember(kp::ContactForces&, double) const
+140042e70 T kp::SolverBody::push(kp::SolverBody&, kp::SolverBody&, kp::Vector3, kp::Vector3, kp::Vector3)
+1400430c0 T std::__1::vector<kp::Vector3, std::__1::allocator<kp::Vector3>>::resize[abi:nqe230106](unsigned long long)
+140043230 T std::__1::vector<double, std::__1::allocator<double>>::resize[abi:nqe230106](unsigned long long)
+140043360 T kp::solveComplementarity(double const*, double const*, double*, unsigned long long)
+140043740 T std::__1::vector<double, std::__1::allocator<double>>::~vector[abi:nqe230106]()
+140043760 T int& std::__1::vector<int, kp::StepAllocator<int>>::emplace_back[abi:nqe230106]<int const&>(int const&)::'lambda0'()::operator()[abi:nqe230106]() const
+140043840 T kp::solveComplementarity(double const*, double const*, double*, unsigned long long, kp::BlockMemory const&)
+140043c10 T std::__1::vector<unsigned long long, std::__1::allocator<unsigned long long>>::~vector[abi:nqe230106]()
+140043c30 T std::__1::vector<char, std::__1::allocator<char>>::~vector[abi:nqe230106]()
+140043c50 T std::__1::vector<unsigned long long, std::__1::allocator<unsigned long long>>::resize[abi:nqe230106](unsigned long long)
+140043d80 T kp::solveDenseBlock(double const*, unsigned long long, unsigned long long const*, unsigned long long, double*, double*)
+140044330 T std::__1::vector<kp::SoftContact::Point, kp::StepAllocator<kp::SoftContact::Point>>::__throw_length_error[abi:nqe230106]()
+140044350 T kp::SoftContact::Point& std::__1::vector<kp::SoftContact::Point, kp::StepAllocator<kp::SoftContact::Point>>::emplace_back[abi:nqe230106]<kp::SoftContact::Point const&>(kp::SoftContact::Point const&)::'lambda0'()::operator()[abi:nqe230106]() const
+140044460 T kp::MissedContacts::MissedContacts(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>, double, double)
+140044460 T kp::MissedContacts::MissedContacts(std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>, double, double)
+140044830 T kp::MissedContacts::measure(kp::ContactPair const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&)
+1400449b0 t kp::(anonymous namespace)::radiusOf(kp::Body const&, int)
+140044b40 T kp::MissedContacts::adopt(kp::ContactPair const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, bool)
+140044c00 T kp::MissedContacts::find(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, double, std::__1::function<kp::SoftContact (kp::ContactPair const&)> const&)
+1400458b0 T std::__1::vector<kp::ContactPair, kp::StepAllocator<kp::ContactPair>>::~vector[abi:nqe230106]()
+140045910 T unsigned long long& std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>::emplace_back[abi:nqe230106]<unsigned long long>(unsigned long long&&)::'lambda0'()::operator()[abi:nqe230106]() const
+1400459f0 T kp::ContactPair& std::__1::vector<kp::ContactPair, kp::StepAllocator<kp::ContactPair>>::emplace_back[abi:nqe230106]<kp::ContactPair const&>(kp::ContactPair const&)
+140045b50 T kp::ContactPair* std::__1::vector<kp::ContactPair, kp::StepAllocator<kp::ContactPair>>::__emplace_back_slow_path[abi:nqe230106]<kp::ContactPair const&>(kp::ContactPair const&)
+140045da0 T std::__1::__split_buffer<kp::ContactPair, kp::StepAllocator<kp::ContactPair>, std::__1::__split_buffer_pointer_layout>::~__split_buffer[abi:nqe230106]()
+140045e00 T std::__1::vector<kp::ContactPair, kp::StepAllocator<kp::ContactPair>>::__throw_length_error[abi:nqe230106]()
+140045e20 T void std::__1::__uninitialized_allocator_relocate[abi:nqe230106]<kp::StepAllocator<kp::ContactPair>, kp::ContactPair*>(kp::StepAllocator<kp::ContactPair>&, kp::ContactPair*, kp::ContactPair*, kp::ContactPair*)
+140046010 T std::__1::__exception_guard_exceptions<std::__1::_AllocatorDestroyRangeReverse<kp::StepAllocator<kp::ContactPair>, kp::ContactPair*>>::~__exception_guard_exceptions[abi:nqe230106]()
+140046070 T kp::PairReach::PairReach(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3, double, double)
+140046070 T kp::PairReach::PairReach(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3, double, double)
+140046950 T kp::PairReach::allow(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, double)
+140046b40 T kp::PairReach::exceeded(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, double)
+140046c60 T kp::PairReach::spend()
+140046dc0 T kp::PairReach::discover(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, kp::JointSet const&, double, double)
+140047000 T std::__1::vector<kp::PairReach::Path, kp::StepAllocator<kp::PairReach::Path>>::assign[abi:nqe230106](unsigned long long, kp::PairReach::Path const&)
+140047210 T std::__1::vector<kp::PairReach::Path, kp::StepAllocator<kp::PairReach::Path>>::__throw_length_error[abi:nqe230106]()
+140047230 T std::__1::vector<std::__1::array<int, 4ull>, kp::StepAllocator<std::__1::array<int, 4ull>>>::__throw_length_error[abi:nqe230106]()
+140047250 T std::__1::array<int, 4ull>& std::__1::vector<std::__1::array<int, 4ull>, kp::StepAllocator<std::__1::array<int, 4ull>>>::emplace_back[abi:nqe230106]<std::__1::array<int, 4ull>>(std::__1::array<int, 4ull>&&)::'lambda0'()::operator()[abi:nqe230106]() const
+140047330 T void std::__1::__introsort[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::array<int, 4ull>*, false>(std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&, std::__1::iterator_traits<std::__1::array<int, 4ull>*>::difference_type, bool)
+140047900 T bool std::__1::__sort3[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::array<int, 4ull>*, 0>(std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&)
+140047b70 T void std::__1::__sort5[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::array<int, 4ull>*, 0>(std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&)
+140047e90 T std::__1::array<int, 4ull>* std::__1::__partition_with_equals_on_left[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&>(std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&)
+1400480e0 T std::__1::pair<std::__1::array<int, 4ull>*, bool> std::__1::__partition_with_equals_on_right[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&>(std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&)
+140048310 T bool std::__1::__insertion_sort_incomplete[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::array<int, 4ull>*>(std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&)
+140048670 T std::__1::array<int, 4ull>* std::__1::__partial_sort_impl[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*>(std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&)
+140048c00 T void std::__1::__pop_heap[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>, std::__1::array<int, 4ull>*>(std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&, std::__1::iterator_traits<std::__1::array<int, 4ull>*>::difference_type)
+140048dc0 T kp::DirectJoints::clear()
+140048e60 T kp::DirectJoints::add(kp::Bond const&, double*)
+140048f10 T kp::DirectJoints::assemble(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&)
+1400495d0 T kp::DirectJoints::push(unsigned long long, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, double) const
+140049810 T kp::DirectJoints::warmStart(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&) const
+140049880 T kp::DirectJoints::solve(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, double, double) const
+140049b00 T std::__1::vector<std::__1::vector<int, kp::StepAllocator<int>>, kp::StepAllocator<std::__1::vector<int, kp::StepAllocator<int>>>>::resize[abi:nqe230106](unsigned long long)
+140049c90 T kp::ProfileMatrix::addRow(int)
+140049d90 T void kp::factorCholesky<std::__1::vector<char, kp::StepAllocator<char>>>(kp::ProfileMatrix&, std::__1::vector<char, kp::StepAllocator<char>>&, double)
+14004a260 T double*& std::__1::vector<double*, kp::StepAllocator<double*>>::emplace_back[abi:nqe230106]<double* const&>(double* const&)::'lambda0'()::operator()[abi:nqe230106]() const
+14004a340 T std::__1::vector<double*, kp::StepAllocator<double*>>::__throw_length_error[abi:nqe230106]()
+14004a360 T std::__1::vector<std::__1::vector<int, kp::StepAllocator<int>>, kp::StepAllocator<std::__1::vector<int, kp::StepAllocator<int>>>>::__throw_length_error[abi:nqe230106]()
+14004a380 T void kp::solveFactored<std::__1::vector<char, kp::StepAllocator<char>>, std::__1::vector<double, kp::StepAllocator<double>>>(kp::ProfileMatrix const&, std::__1::vector<char, kp::StepAllocator<char>> const&, std::__1::vector<double, kp::StepAllocator<double>>&)
+14004a730 T kp::SoftJoint::SoftJoint(kp::Bond const*, int, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, double*)
+14004a730 T kp::SoftJoint::SoftJoint(kp::Bond const*, int, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, double*)
+14004ae90 T kp::SoftJoint::speed(int, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&) const
+14004af50 T kp::SoftJoint::push(int, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, double) const
+14004b190 T kp::SoftJoint::warmStart(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&) const
+14004b210 T kp::SoftJoint::solve(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, kp::Softness const&, double)
+14004b340 T kp::SoftJoint::solveTogether(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::Softness const&)
+14004b630 T kp::SoftJoint::solveAlone(int, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, kp::Softness const&, double)
+14004b8f0 T kp::ContactLevels::each(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&)
+14004ba00 T kp::ContactLevels::build(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&)
+14004bdc0 T kp::ContactLevels::together(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&) const
+14004bfa0 t std::__1::vector<kp::(anonymous namespace)::Progress, kp::StepAllocator<kp::(anonymous namespace)::Progress>>::__throw_length_error[abi:nqe230106]()
+14004bfc0 t std::__1::__function::__func<kp::ContactLevels::together(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&) const::$_0, void (unsigned long long)>::~__func()
+14004bfd0 t std::__1::__function::__func<kp::ContactLevels::together(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&) const::$_0, void (unsigned long long)>::__clone[abi:nqe230106]() const
+14004c020 t std::__1::__function::__func<kp::ContactLevels::together(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&) const::$_0, void (unsigned long long)>::__clone[abi:nqe230106](std::__1::__function::__base<void (unsigned long long)>*) const
+14004c050 t std::__1::__function::__func<kp::ContactLevels::together(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&) const::$_0, void (unsigned long long)>::destroy[abi:nqe230106]()
+14004c060 t std::__1::__function::__func<kp::ContactLevels::together(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&) const::$_0, void (unsigned long long)>::destroy_deallocate[abi:nqe230106]()
+14004c070 t std::__1::__function::__func<kp::ContactLevels::together(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&) const::$_0, void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)
+14004c230 t std::__1::__function::__func<kp::ContactLevels::together(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&) const::$_0, void (unsigned long long)>::target[abi:nqe230106](std::type_info const&) const
+14004c280 t std::__1::__function::__func<kp::ContactLevels::together(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&) const::$_0, void (unsigned long long)>::target_type[abi:nqe230106]() const
+14004c290 T std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>::assign[abi:nqe230106](unsigned long long, unsigned long long const&)
+14004c4d0 T std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>::resize[abi:nqe230106](unsigned long long)
+14004c5e0 T kp::IslandNormals::choose(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&)
+14004d0b0 t kp::IslandNormals::choose(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&)::$_2::operator()(kp::IslandNormals::Island&, int) const
+14004d4c0 T kp::IslandNormals::excess(kp::SoftContact::NormalRow const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, kp::IslandNormals::Pass const&) const
+14004d6c0 T kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)
+14004d980 T kp::IslandNormals::solveIsland(kp::IslandNormals::Island&, std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::IslandNormals::Pass const&) const
+14004db00 T kp::IslandNormals::solveWorking(kp::IslandNormals::Island&, std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::IslandNormals::Pass const&, int) const
+14004e820 T kp::IslandNormals::extend(kp::IslandNormals::Island&, std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, kp::IslandNormals::Pass const&) const
+14004eb90 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_0, void (unsigned long long)>::~__func()
+14004eba0 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_0, void (unsigned long long)>::__clone[abi:nqe230106]() const
+14004ebf0 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_0, void (unsigned long long)>::__clone[abi:nqe230106](std::__1::__function::__base<void (unsigned long long)>*) const
+14004ec20 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_0, void (unsigned long long)>::destroy[abi:nqe230106]()
+14004ec30 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_0, void (unsigned long long)>::destroy_deallocate[abi:nqe230106]()
+14004ec40 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_0, void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)
+14004ecc0 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_0, void (unsigned long long)>::target[abi:nqe230106](std::type_info const&) const
+14004ed10 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_0, void (unsigned long long)>::target_type[abi:nqe230106]() const
+14004ed20 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_1, void (unsigned long long)>::~__func()
+14004ed30 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_1, void (unsigned long long)>::__clone[abi:nqe230106]() const
+14004ed70 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_1, void (unsigned long long)>::__clone[abi:nqe230106](std::__1::__function::__base<void (unsigned long long)>*) const
+14004eda0 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_1, void (unsigned long long)>::destroy[abi:nqe230106]()
+14004edb0 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_1, void (unsigned long long)>::destroy_deallocate[abi:nqe230106]()
+14004edc0 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_1, void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)
+14004ee40 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_1, void (unsigned long long)>::target[abi:nqe230106](std::type_info const&) const
+14004ee90 t std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_1, void (unsigned long long)>::target_type[abi:nqe230106]() const
+14004eea0 T kp::ActiveSet::~ActiveSet()
+14004eee0 T kp::Body* std::__1::vector<kp::Body, kp::StepAllocator<kp::Body>>::__emplace_back_slow_path[abi:nqe230106]<kp::Body const&>(kp::Body const&)
+14004f140 T std::__1::__split_buffer<kp::Body, kp::StepAllocator<kp::Body>, std::__1::__split_buffer_pointer_layout>::~__split_buffer[abi:nqe230106]()
+14004f170 T std::__1::vector<kp::Body, kp::StepAllocator<kp::Body>>::__throw_length_error[abi:nqe230106]()
+14004f190 T void std::__1::__uninitialized_allocator_relocate[abi:nqe230106]<kp::StepAllocator<kp::Body>, kp::Body*>(kp::StepAllocator<kp::Body>&, kp::Body*, kp::Body*, kp::Body*)
+14004f400 T std::__1::_AllocatorDestroyRangeReverse<kp::StepAllocator<kp::Body>, kp::Body*>::operator()[abi:nqe230106]() const
+14004f4e0 T std::__1::__split_buffer<kp::Body, kp::StepAllocator<kp::Body>, std::__1::__split_buffer_pointer_layout>::clear[abi:nqe230106]()
+14004f5d0 T kp::IslandNormals::Island* std::__1::vector<kp::IslandNormals::Island, kp::StepAllocator<kp::IslandNormals::Island>>::__emplace_back_slow_path[abi:nqe230106]<>()
+14004f720 T std::__1::__split_buffer<kp::IslandNormals::Island, kp::StepAllocator<kp::IslandNormals::Island>, std::__1::__split_buffer_pointer_layout>::~__split_buffer[abi:nqe230106]()
+14004f750 T std::__1::vector<kp::IslandNormals::Island, kp::StepAllocator<kp::IslandNormals::Island>>::__throw_length_error[abi:nqe230106]()
+14004f770 T void std::__1::__uninitialized_allocator_relocate[abi:nqe230106]<kp::StepAllocator<kp::IslandNormals::Island>, kp::IslandNormals::Island*>(kp::StepAllocator<kp::IslandNormals::Island>&, kp::IslandNormals::Island*, kp::IslandNormals::Island*, kp::IslandNormals::Island*)
+14004f8c0 T std::__1::__split_buffer<kp::IslandNormals::Island, kp::StepAllocator<kp::IslandNormals::Island>, std::__1::__split_buffer_pointer_layout>::clear[abi:nqe230106]()
+14004f960 T std::__1::vector<kp::IslandNormals::Row, kp::StepAllocator<kp::IslandNormals::Row>>::__throw_length_error[abi:nqe230106]()
+14004f980 T kp::ContactSystem::Line& std::__1::vector<kp::ContactSystem::Line, kp::StepAllocator<kp::ContactSystem::Line>>::emplace_back[abi:nqe230106]<kp::ContactSystem::Line>(kp::ContactSystem::Line&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14004faa0 T std::__1::vector<kp::ContactSystem::Line, kp::StepAllocator<kp::ContactSystem::Line>>::__throw_length_error[abi:nqe230106]()
+14004fac0 T double& std::__1::vector<double, kp::StepAllocator<double>>::emplace_back[abi:nqe230106]<double const&>(double const&)::'lambda0'()::operator()[abi:nqe230106]() const
+14004fba0 T char& std::__1::vector<char, kp::StepAllocator<char>>::emplace_back[abi:nqe230106]<char>(char&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14004fc70 T std::__1::pair<double, unsigned long long>& std::__1::vector<std::__1::pair<double, unsigned long long>, kp::StepAllocator<std::__1::pair<double, unsigned long long>>>::emplace_back[abi:nqe230106]<std::__1::pair<double, unsigned long long>>(std::__1::pair<double, unsigned long long>&&)::'lambda0'()::operator()[abi:nqe230106]() const
+14004fd50 T std::__1::vector<std::__1::pair<double, unsigned long long>, kp::StepAllocator<std::__1::pair<double, unsigned long long>>>::__throw_length_error[abi:nqe230106]()
+14004fd70 T void std::__1::__introsort[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::pair<double, unsigned long long>*, false>(std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::__less<void, void>&, std::__1::iterator_traits<std::__1::pair<double, unsigned long long>*>::difference_type, bool)
+1400502a0 T bool std::__1::__sort3[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::pair<double, unsigned long long>*, 0>(std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::__less<void, void>&)
+1400503e0 T void std::__1::__sort5[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::pair<double, unsigned long long>*, 0>(std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::__less<void, void>&)
+1400505d0 T std::__1::pair<double, unsigned long long>* std::__1::__partition_with_equals_on_left[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::pair<double, unsigned long long>*, std::__1::__less<void, void>&>(std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::__less<void, void>&)
+140050700 T std::__1::pair<std::__1::pair<double, unsigned long long>*, bool> std::__1::__partition_with_equals_on_right[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::pair<double, unsigned long long>*, std::__1::__less<void, void>&>(std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::__less<void, void>&)
+140050850 T bool std::__1::__insertion_sort_incomplete[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::pair<double, unsigned long long>*>(std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::__less<void, void>&)
+140050ae0 T void std::__1::__sift_down[abi:nqe230106]<std::__1::_ClassicAlgPolicy, false, std::__1::__less<void, void>&, std::__1::pair<double, unsigned long long>*>(std::__1::pair<double, unsigned long long>*, std::__1::__less<void, void>&, std::__1::iterator_traits<std::__1::pair<double, unsigned long long>*>::difference_type, std::__1::iterator_traits<std::__1::pair<double, unsigned long long>*>::difference_type)
+140050c60 T void std::__1::__pop_heap[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>, std::__1::pair<double, unsigned long long>*>(std::__1::pair<double, unsigned long long>*, std::__1::pair<double, unsigned long long>*, std::__1::__less<void, void>&, std::__1::iterator_traits<std::__1::pair<double, unsigned long long>*>::difference_type)
+140050e00 T kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)
+140051a60 t std::__1::vector<kp::(anonymous namespace)::Island, kp::StepAllocator<kp::(anonymous namespace)::Island>>::~vector[abi:nqe230106]()
+140051ac0 t std::__1::__exception_guard_exceptions<std::__1::vector<kp::(anonymous namespace)::Island, kp::StepAllocator<kp::(anonymous namespace)::Island>>::__destroy_vector>::~__exception_guard_exceptions[abi:nqe230106]()
+140051b30 t std::__1::vector<kp::(anonymous namespace)::Island, kp::StepAllocator<kp::(anonymous namespace)::Island>>::__throw_length_error[abi:nqe230106]()
+140051b50 t std::__1::__function::__func<kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)::$_0, void (unsigned long long)>::~__func()
+140051b60 t std::__1::__function::__func<kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)::$_0, void (unsigned long long)>::__clone[abi:nqe230106]() const
+140051ba0 t std::__1::__function::__func<kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)::$_0, void (unsigned long long)>::__clone[abi:nqe230106](std::__1::__function::__base<void (unsigned long long)>*) const
+140051bc0 t std::__1::__function::__func<kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)::$_0, void (unsigned long long)>::destroy[abi:nqe230106]()
+140051bd0 t std::__1::__function::__func<kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)::$_0, void (unsigned long long)>::destroy_deallocate[abi:nqe230106]()
+140051be0 t std::__1::__function::__func<kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)::$_0, void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)
+140051c20 t std::__1::__function::__func<kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)::$_0, void (unsigned long long)>::target[abi:nqe230106](std::type_info const&) const
+140051c70 t std::__1::__function::__func<kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)::$_0, void (unsigned long long)>::target_type[abi:nqe230106]() const
+140051c80 t __mingw_register_thread_local_exe_atexit_callback
+140051c90 t tls_exe_atexit_callback
+140051cf0 t callback
+140051d20 t _include_tls_used
+140051d30 T kp::JointSet::JointSet(kp::JointSet const&)
+140051d30 T kp::JointSet::JointSet(kp::JointSet const&)
+140051e40 T kp::JointSet::largestError(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&) const
+140051f30 T std::__1::vector<std::__1::unique_ptr<kp::Joint, std::__1::default_delete<kp::Joint>>, std::__1::allocator<std::__1::unique_ptr<kp::Joint, std::__1::default_delete<kp::Joint>>>>::~vector[abi:nqe230106]()
+140051f90 T kp::PairFriction::inverted(std::__1::array<std::__1::array<double, 3ull>, 3ull> const&)
+140052110 T kp::PairFriction::frictionOf(kp::ContactPair const&, unsigned long long, unsigned long long) const
+140052990 T kp::PairFriction::frictionResponse(kp::ContactRows::Pair const&, bool, bool) const
+140053770 T kp::PairFriction::slip(kp::ContactRows::Pair const&) const
+140053a50 T kp::PairFriction::applyFriction(kp::ContactRows::Pair const&, std::__1::array<double, 3ull> const&, bool, bool)
+140053cb0 T kp::PairFriction::frictionImpulse(kp::ContactRows::Pair const&, std::__1::vector<double, kp::StepAllocator<double>> const&, std::__1::array<std::__1::array<double, 3ull>, 3ull> const&) const
+140053f80 T kp::PairFriction::solveFriction(kp::ContactRows::Pair&, std::__1::vector<double, kp::StepAllocator<double>> const&)
+1400540e0 T kp::ContactForces::find(kp::ContactId const&) const
+1400541c0 T kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const
+140054d00 T kp::ContactAssembly::assemble(std::__1::vector<double, kp::StepAllocator<double>> const&)
+1400554f0 T kp::ContactAssembly::addFriction(kp::ContactSystem&, std::__1::vector<double, kp::StepAllocator<double>> const&)
+140055c50 T kp::ContactAssembly::addBonds(kp::ContactSystem&)
+140056330 t kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block& std::__1::vector<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block, kp::StepAllocator<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block>>::emplace_back[abi:nqe230106]<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block>(kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block&&)::'lambda0'()::operator()[abi:nqe230106]() const
+140056410 t std::__1::vector<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block, kp::StepAllocator<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block>>::__throw_length_error[abi:nqe230106]()
+140056430 t void std::__1::__stable_sort[abi:nqe230106]<std::__1::_ClassicAlgPolicy, kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::$_1&, std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>>(std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>, std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>, kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::$_1&, std::__1::iterator_traits<std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>>::difference_type, std::__1::iterator_traits<std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>>::value_type*, long long)
+140056670 t void std::__1::__stable_sort_move[abi:nqe230106]<std::__1::_ClassicAlgPolicy, kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::$_1&, std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>>(std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>, std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>, kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::$_1&, std::__1::iterator_traits<std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>>::difference_type, std::__1::iterator_traits<std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>>::value_type*)
+140056870 t void std::__1::__inplace_merge[abi:nqe230106]<std::__1::_ClassicAlgPolicy, kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::$_1&, std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>>(std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>, std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>, std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>, kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::$_1&, std::__1::iterator_traits<std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>>::difference_type, std::__1::iterator_traits<std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>>::difference_type, std::__1::iterator_traits<std::__1::__wrap_iter<kp::ContactAssembly::eliminationOrder(kp::ContactSystem const&) const::Block*>>::value_type*, long long)
+140056df0 T std::__1::vector<int, kp::StepAllocator<int>>::assign[abi:nqe230106](unsigned long long, int const&)
+140057030 T std::__1::vector<signed char, kp::StepAllocator<signed char>>::__throw_length_error[abi:nqe230106]()
+140057050 T kp::CoupledSolve::startTogether(kp::ContactSystem const&, std::__1::vector<double, kp::StepAllocator<double>> const&, std::__1::vector<double, kp::StepAllocator<double>>&, std::__1::vector<double, kp::StepAllocator<double>>&) const
+1400573b0 T kp::CoupledSolve::unknownsOf(kp::ContactSystem const&) const
+1400575b0 T kp::CoupledSolve::freeTerms(kp::ContactSystem const&, std::__1::vector<char, kp::StepAllocator<char>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&) const
+140057790 T kp::CoupledSolve::releaseSlipping(kp::ContactSystem const&, std::__1::vector<double, kp::StepAllocator<double>> const&)
+1400579a0 T kp::CoupledSolve::releaseDrives(kp::ContactSystem const&, std::__1::vector<char, kp::StepAllocator<char>> const&, std::__1::vector<double, kp::StepAllocator<double>>&, std::__1::vector<double, kp::StepAllocator<double>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&)
+140057ca0 T kp::CoupledSolve::applyTogether(kp::ContactSystem const&, std::__1::vector<double, kp::StepAllocator<double>> const&)
+1400580d0 T kp::CoupledSolve::solveTogether(kp::ContactSystem const&, std::__1::vector<double, kp::StepAllocator<double>> const&)
+140058550 T kp::CoupledSolve::residual(kp::ContactSystem const&, std::__1::vector<double, kp::StepAllocator<double>> const&) const
+1400588b0 T kp::WarmStart::apply(std::__1::vector<double, kp::StepAllocator<double>> const&, kp::ContactForces const&, double)
+140058f80 T kp::ShockPropagation::pass(std::__1::vector<double, kp::StepAllocator<double>> const&)
+140059530 T kp::closestPoints(kp::ConvexShape const&, kp::Transform const&, kp::ConvexShape const&, kp::Transform const&, double)
+140059890 t kp::betweenCores(kp::ConvexShape const&, kp::Transform const&, kp::ConvexShape const&, kp::Transform const&, double)
+14005b390 t kp::(anonymous namespace)::closestOnTriangle(kp::Vector3, kp::Vector3, kp::Vector3, double&, double&, double&)
+14005b740 T kp::ConvexShape::hasPointCore() const
+14005b940 T kp::Cylinder::flatTowards(kp::Transform const&, kp::Vector3) const
+14005bc60 T kp::Cylinder::outlineOver(kp::Transform const&, kp::Flat const&) const
+14005c4c0 T kp::Cylinder::rollingRadius(kp::Transform const&, kp::Vector3) const
+14005c5f0 T kp::Cylinder::tubeTowards(kp::Transform const&, kp::Vector3) const
+14005c760 T kp::Cylinder::~Cylinder()
+14005c770 T kp::Cylinder::support(kp::Vector3) const
+14005c810 T kp::Cylinder::boundingRadius() const
+14005c840 T kp::findSeparatingAxis(kp::TransformedHull const&, kp::TransformedHull const&, double)
+14005c860 t kp::scanAxes(kp::TransformedHull const&, kp::TransformedHull const&, double, double&)
+14005d0e0 T kp::findContactAxis(kp::TransformedHull const&, kp::TransformedHull const&, double, double, kp::SeparatingAxis&)
+14005d140 T kp::findFaceAxis(kp::TransformedHull const&, kp::TransformedHull const&, double)
+14005d2d0 T kp::findSeparatingAxis(kp::ConvexHull const&, kp::Transform const&, kp::ConvexHull const&, kp::Transform const&, double)
+14005d6a0 T kp::outerFaceAxis(kp::TransformedHull const&, kp::TransformedHull const&, kp::SeparatingAxis&)
+14005d930 t kp::(anonymous namespace)::arcSides(kp::TransformedHull const&, kp::TransformedHull const&, double)
+14005dc40 t kp::(anonymous namespace)::faceAxis(kp::TransformedHull const&, kp::TransformedHull const&, double)
+14005e020 T kp::NarrowPhaseAlgorithm::between(kp::ConvexShape const&, kp::ConvexShape const&)
+14005e140 T kp::TrackedShapes::track(kp::Body const&, kp::Body const&)
+14005e270 T kp::TrackedShapes::closest(kp::BodyMotion const&, kp::BodyMotion const&, kp::Vector3) const
+14005e740 T kp::Sphere::~Sphere()
+14005e750 T kp::Sphere::support(kp::Vector3) const
+14005e770 T kp::Sphere::boundingRadius() const
+14005e780 T kp::CentreFriction::prepare(kp::SolverBody const&, kp::SolverBody const&, kp::CentreFriction::Frame const&, kp::CentreFriction::Carried const&)
+14005efa0 T kp::CentreFriction::warmStart(kp::SolverBody&, kp::SolverBody&, kp::CentreFriction::Frame const&) const
+14005f100 T kp::CentreFriction::solveTwist(kp::SolverBody&, kp::SolverBody&, kp::CentreFriction::Frame const&, double)
+14005f1e0 T kp::CentreFriction::setTangent(kp::SolverBody&, kp::SolverBody&, kp::CentreFriction::Frame const&, kp::Vector2, double)
+14005f2f0 T kp::CentreFriction::solve(kp::SolverBody&, kp::SolverBody&, kp::CentreFriction::Frame const&, double, double, double)
+14005f790 T kp::SolverBody::twist(kp::SolverBody&, kp::SolverBody&, kp::Vector3)
+14005f910 T kp::Matrix3x3::column(int) const
+14005f970 T kp::Matrix3x3::inverse() const
+14005fb50 T kp::operator*(kp::Matrix3x3 const&, kp::Matrix3x3 const&)
+14005fd40 T kp::ContactSystem::responseMatrix(kp::Span<kp::Body>, std::__1::vector<kp::ContactSystem::Line, kp::StepAllocator<kp::ContactSystem::Line>> const&)
+140060af0 T std::__1::vector<std::__1::vector<kp::ContactSystem::Entry, kp::StepAllocator<kp::ContactSystem::Entry>>, kp::StepAllocator<std::__1::vector<kp::ContactSystem::Entry, kp::StepAllocator<kp::ContactSystem::Entry>>>>::~vector[abi:nqe230106]()
+140060b50 T std::__1::vector<std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>, kp::StepAllocator<std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>>>::~vector[abi:nqe230106]()
+140060bb0 T std::__1::vector<kp::ContactSystem::Entry, kp::StepAllocator<kp::ContactSystem::Entry>>::__throw_length_error[abi:nqe230106]()
+140060bd0 T void std::__1::vector<kp::ContactSystem::Entry, kp::StepAllocator<kp::ContactSystem::Entry>>::__assign_with_size[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__wrap_iter<kp::ContactSystem::Entry*>, std::__1::__wrap_iter<kp::ContactSystem::Entry*>>(std::__1::__wrap_iter<kp::ContactSystem::Entry*>, std::__1::__wrap_iter<kp::ContactSystem::Entry*>, long long)
+140060d00 T std::__1::__exception_guard_exceptions<std::__1::vector<std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>, kp::StepAllocator<std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>>>::__destroy_vector>::~__exception_guard_exceptions[abi:nqe230106]()
+140060d70 T std::__1::vector<std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>, kp::StepAllocator<std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>>>::__throw_length_error[abi:nqe230106]()
+140060d90 T std::__1::__exception_guard_exceptions<std::__1::vector<std::__1::vector<kp::ContactSystem::Entry, kp::StepAllocator<kp::ContactSystem::Entry>>, kp::StepAllocator<std::__1::vector<kp::ContactSystem::Entry, kp::StepAllocator<kp::ContactSystem::Entry>>>>::__destroy_vector>::~__exception_guard_exceptions[abi:nqe230106]()
+140060e00 T std::__1::vector<std::__1::vector<kp::ContactSystem::Entry, kp::StepAllocator<kp::ContactSystem::Entry>>, kp::StepAllocator<std::__1::vector<kp::ContactSystem::Entry, kp::StepAllocator<kp::ContactSystem::Entry>>>>::__throw_length_error[abi:nqe230106]()
+140060e20 T kp::ActiveSet::solve(std::__1::vector<char, kp::StepAllocator<char>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&, std::__1::vector<double, kp::StepAllocator<double>>&)
+140060fd0 T kp::ActiveSet::oneSided(unsigned long long) const
+140061040 T kp::ActiveSet::permute(std::__1::vector<double, kp::StepAllocator<double>>&)
+140061400 T kp::ActiveSet::descend(std::__1::vector<double, kp::StepAllocator<double>>&)
+1400617e0 T kp::ActiveSet::pressing(unsigned long long)
+140061850 T kp::ActiveSet::solveOn(std::__1::vector<double, kp::StepAllocator<double>>&)
+140062330 T kp::ActiveSet::measure(std::__1::vector<double, kp::StepAllocator<double>> const&)
+140062470 T kp::ActiveSet::solveKept(kp::SetFactor&, std::__1::vector<char, kp::StepAllocator<char>>&, std::__1::vector<double, kp::StepAllocator<double>>&)
+1400626f0 T kp::ActiveSet::descentStart()
+140062880 T kp::ActiveSet::settle(kp::SetFactor&, std::__1::vector<char, kp::StepAllocator<char>>&, std::__1::vector<double, kp::StepAllocator<double>>&, std::__1::vector<double, kp::StepAllocator<double>>&)
+140062c50 T kp::ActiveSet::admit(kp::ActiveSet::Entering&)
+140063030 T kp::ProfileMatrix::~ProfileMatrix()
+140063080 T kp::SetFactor::SetFactor(kp::ContactSystem const&)
+140063230 T kp::ActiveSet::Entering::~Entering()
+140063270 T kp::SetFactor::~SetFactor()
+140063340 T kp::UpdatedCholesky::~UpdatedCholesky()
+1400633a0 T void kp::factorCholesky<std::__1::vector<char, std::__1::allocator<char>>>(kp::ProfileMatrix&, std::__1::vector<char, std::__1::allocator<char>>&, double)
+140063870 T void kp::solveFactored<std::__1::vector<char, std::__1::allocator<char>>, std::__1::vector<double, kp::StepAllocator<double>>>(kp::ProfileMatrix const&, std::__1::vector<char, std::__1::allocator<char>> const&, std::__1::vector<double, kp::StepAllocator<double>>&)
+140063c20 T kp::CoupledFriction::tangentRows() const
+1400641d0 T kp::CoupledFriction::solve(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, double, double)
+1400665e0 t std::__1::vector<kp::(anonymous namespace)::GuideRhs, kp::StepAllocator<kp::(anonymous namespace)::GuideRhs>>::__throw_length_error[abi:nqe230106]()
+140066600 T void kp::solveFactored<std::__1::vector<char, std::__1::allocator<char>>, std::__1::array<double, 4ull>>(kp::ProfileMatrix const&, std::__1::vector<char, std::__1::allocator<char>> const&, std::__1::array<double, 4ull>&)
+140066990 T kp::HullVsHullAlgorithm::clipFaces(kp::ConvexHull const&, kp::Transform const&, kp::ConvexHull const&, kp::Transform const&, double, double, double)
+1400675a0 t kp::HullVsHullAlgorithm::clipFaces(kp::ConvexHull const&, kp::Transform const&, kp::ConvexHull const&, kp::Transform const&, double, double, double)::$_0::operator()(kp::Vector3, kp::Vector3, double, unsigned int) const
+140067880 t kp::(anonymous namespace)::clipAgainstFace(kp::TransformedHull const&, int, kp::TransformedHull const&, double, double, double)
+140068f60 T kp::HullVsHullAlgorithm::collide(kp::ConvexShape const&, kp::Transform const&, kp::ConvexShape const&, kp::Transform const&, kp::ClosestPoints const&, double, double, double) const
+1400690d0 T kp::ContactManifold::add(kp::ContactPoint const&)
+1400691e0 T kp::NarrowPhaseAlgorithm::~NarrowPhaseAlgorithm()
+1400691f0 T kp::HullVsHullAlgorithm::~HullVsHullAlgorithm()
+140069200 T std::__1::enable_if<is_move_constructible<kp::SmallVector<int, 16ull>>::value && is_move_assignable<kp::SmallVector<int, 16ull>>::value, void>::type std::__1::swap[abi:nqe230106]<kp::SmallVector<int, 16ull>>(kp::SmallVector<int, 16ull>&, kp::SmallVector<int, 16ull>&)
+140069400 T kp::HullVsRoundAlgorithm::collide(kp::ConvexShape const&, kp::Transform const&, kp::ConvexShape const&, kp::Transform const&, kp::ClosestPoints const&, double, double, double) const
+140069660 T kp::HullVsRoundAlgorithm::against(kp::ConvexHull const&, kp::Transform const&, kp::ConvexShape const&, kp::Transform const&, kp::ClosestPoints const&, double, double)
+14006a790 T kp::ContactPatch::~ContactPatch()
+14006a7f0 T kp::HullVsRoundAlgorithm::~HullVsRoundAlgorithm()
+14006a800 T kp::RoundVsRoundAlgorithm::collide(kp::ConvexShape const&, kp::Transform const&, kp::ConvexShape const&, kp::Transform const&, kp::ClosestPoints const&, double, double, double) const
+14006b4c0 t kp::(anonymous namespace)::above(kp::Tube const&, kp::Tube const&, kp::Vector3, unsigned int)
+14006b680 T kp::RoundVsRoundAlgorithm::~RoundVsRoundAlgorithm()
+14006b690 T kp::RollingFriction::prepare(kp::SolverBody const&, kp::SolverBody const&, kp::Vector3, kp::Vector3)
+14006bac0 T kp::RollingFriction::warmStart(kp::SolverBody&, kp::SolverBody&, kp::Vector3, kp::Vector3) const
+14006bb50 T kp::RollingFriction::solve(kp::SolverBody&, kp::SolverBody&, kp::Vector3, kp::Vector3, double, double)
+14006bda0 T kp::BodySpaceSolve::solve(std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>> const&, double, std::__1::vector<double, kp::StepAllocator<double>>&) const
+14006c0d0 T kp::BodySpaceSolve::lay(std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>> const&, double, kp::BodySpaceSolve::Layout&) const
+14006c6e0 T kp::BodySpaceSolve::solveFor(std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>> const&, kp::BodySpaceSolve::Layout const&, std::__1::vector<double, kp::StepAllocator<double>>&) const
+14006d100 T kp::BodySpaceSolve::residualOf(std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&) const
+14006d3c0 T kp::BodySpaceSolve::massMatrix(kp::BodySpaceSolve::Layout const&) const
+14006df30 T kp::BodySpaceSolve::rowOf(kp::ContactSystem::Line const&, int, double*)
+14006df80 T kp::BodySpaceSolve::Layout::~Layout()
+14006dfd0 T kp::SetFactor::follow(std::__1::vector<char, kp::StepAllocator<char>> const&)
+14006e230 T kp::SetFactor::compare(std::__1::vector<char, kp::StepAllocator<char>> const&)
+14006e3d0 T kp::SetFactor::remove(unsigned long long)
+14006e4b0 T kp::SetFactor::append(unsigned long long)
+14006e640 T kp::SetFactor::solve(std::__1::vector<double, kp::StepAllocator<double>> const&, std::__1::vector<double, kp::StepAllocator<double>>&)
+14006e810 T std::__1::vector<double, kp::StepAllocator<double>>::resize[abi:nqe230106](unsigned long long)
+14006e920 T kp::ContactCandidate::ordered(kp::SmallVector<kp::ContactCandidate, 16ull> const&, double)
+14006eeb0 T kp::ContactPatch::pointsOf(kp::Flat const&, kp::Outline const&)
+140070b70 T kp::ContactPatch::on(kp::ConvexShape const&, kp::Transform const&, kp::ConvexShape const&, kp::Transform const&, kp::Vector3)
+140071170 T kp::ContactPatch::manifold(bool, double, double) const
+140071880 T kp::ContactPatch::between(kp::ConvexShape const&, kp::Transform const&, kp::ConvexShape const&, kp::Transform const&, kp::ClosestPoints const&, double, double)
+140071c00 T kp::Flat::contains(kp::Vector3) const
+140071e50 T std::__1::__optional_destruct_base<kp::ContactPatch, false>::~__optional_destruct_base[abi:nqe230106]()
+140071eb0 T kp::ContactPatch::Point& std::__1::vector<kp::ContactPatch::Point, kp::StepAllocator<kp::ContactPatch::Point>>::emplace_back[abi:nqe230106]<kp::ContactPatch::Point>(kp::ContactPatch::Point&&)::'lambda0'()::operator()[abi:nqe230106]() const
+140071f90 T std::__1::vector<kp::ContactPatch::Point, kp::StepAllocator<kp::ContactPatch::Point>>::__throw_length_error[abi:nqe230106]()
+140071fb0 T kp::ContactPoint& std::__1::vector<kp::ContactPoint, kp::StepAllocator<kp::ContactPoint>>::emplace_back[abi:nqe230106]<kp::ContactPoint>(kp::ContactPoint&&)::'lambda0'()::operator()[abi:nqe230106]() const
+1400720b0 T std::__1::vector<kp::ContactPoint, kp::StepAllocator<kp::ContactPoint>>::__throw_length_error[abi:nqe230106]()
+1400720d0 T kp::UpdatedCholesky::append(int, std::__1::vector<double, kp::StepAllocator<double>> const&, double, double)
+1400724c0 T kp::UpdatedCholesky::remove(int)
+140072a00 T kp::UpdatedCholesky::solve(std::__1::vector<double, kp::StepAllocator<double>>&) const
+140072dd0 T std::__1::__shared_weak_count::__get_deleter(std::type_info const&) const
+140072de0 T std::logic_error::logic_error(char const*)
+140072df0 T std::length_error::~length_error()
+140072e00 T std::bad_array_new_length::bad_array_new_length()
+140072e10 T std::bad_array_new_length::~bad_array_new_length()
+140072e20 T std::__1::__shared_weak_count::__release_weak()
+140072e30 T std::__1::__shared_weak_count::~__shared_weak_count()
+140072e40 T std::__1::chrono::steady_clock::now()
+140072e50 T std::terminate()
+140072e60 T operator delete(void*)
+140072e70 T operator new(unsigned long long)
+140072e80 T __cxa_allocate_exception
+140072e90 T __cxa_begin_catch
+140072ea0 T __cxa_free_exception
+140072eb0 T __cxa_throw
+140072ec0 T __gxx_personality_seh0
+140072ed0 T _Unwind_Resume
+140072ee0 T __acrt_iob_func
+140072ef0 T __p__commode
+140072f00 T __p__fmode
+140072f10 T _cexit
+140072f20 T _configthreadlocale
+140072f30 T _crt_atexit
+140072f40 T _exit
+140072f50 T _initterm
+140072f60 T _initterm_e
+140072f70 T _set_invalid_parameter_handler
+140072f80 T atoi
+140072f90 T exit
+140072fa0 T fflush
+140072fb0 T fwrite
+140072fc0 T getenv
+140072fd0 T malloc
+140072fe0 T memcmp
+140072ff0 T memcpy
+140073000 T memset
+140073010 T puts
+140073020 T setvbuf
+140073030 T strlen
+140073040 T std::out_of_range::~out_of_range()
+140073050 T memmove
+140073060 T __cxa_guard_acquire
+140073070 T std::__1::thread::hardware_concurrency()
+140073080 T __cxa_guard_release
+140073090 T __cxa_guard_abort
+1400730a0 T std::__1::mutex::lock()
+1400730b0 T std::__1::mutex::unlock()
+1400730c0 T std::__1::condition_variable::notify_all()
+1400730d0 T std::__1::thread::join()
+1400730e0 T std::__1::thread::~thread()
+1400730f0 T std::__1::condition_variable::wait(std::__1::unique_lock<std::__1::mutex>&)
+140073100 T std::__1::condition_variable::notify_one()
+140073110 T std::__1::__thread_struct::__thread_struct()
+140073120 T std::__1::__libcpp_thread_create(void**, void* (*)(void*), void*)
+140073130 T std::__1::__throw_system_error(int, char const*)
+140073140 T std::__1::__thread_local_data()
+140073150 T std::__1::__libcpp_tls_set(long, void*)
+140073160 T std::__1::__thread_struct::~__thread_struct()
+140073170 T std::__1::bad_function_call::~bad_function_call()
+140073180 T __cxa_pure_virtual
+140073190 T strcmp
+1400731d0 T abort
+1400731e0 T __setusermatherr
+1400731f0 T _XcptFilter
+1400731f0 T _seh_filter_exe
+140073200 T _initialize_narrow_environment
+140073210 T _configure_narrow_argv
+140073220 T __p___argc
+140073230 T __p___argv
+140073240 T __p__environ
+140073250 T _set_new_mode
+140073260 T __set_app_type
+140073260 T _set_app_type
+140073270 T __stdio_common_vfprintf
+140073280 T free
+140073290 T std::bad_alloc::bad_alloc()
+1400732a0 T std::bad_alloc::~bad_alloc()
+1400732b0 T memchr
+1400732c0 T _assert
+1400732d0 T calloc
+140073360 T operator new(unsigned long long, std::nothrow_t const&)
+140073370 T sqrt
+140073380 T void std::__1::__sort<std::__1::__less<int, int>&, int*>(int*, int*, std::__1::__less<int, int>&)
+140073390 T std::__1::__libcpp_thread_yield()
+1400733a0 T _register_thread_local_exe_atexit_callback

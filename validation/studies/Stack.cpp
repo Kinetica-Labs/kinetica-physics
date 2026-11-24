@@ -39,7 +39,7 @@ double energy(const World& world) {
 }
 
 // Сцена: плита, на ней кубы с заданными высотами центров и плотностями; frames кадров по 1/60 с.
-bool gShockPropagation = false; // третий аргумент программы: 1 — включить проход ударной волны
+bool gShockPropagation = World::kDefaultShockPropagation; // третий аргумент программы переопределяет режим мира
 
 Outcome run(const std::vector<double>& heights, const std::vector<double>& densities, int frames) {
     World world;
@@ -89,7 +89,7 @@ void print(const char* label, const Outcome& o) {
 
 int main(int argc, char** argv) {
     const int largest = argc > 1 ? std::atoi(argv[1]) : 50, smallest = argc > 2 ? std::atoi(argv[2]) : 0;
-    gShockPropagation = argc > 3 && std::atoi(argv[3]) != 0;
+    if (argc > 3) gShockPropagation = std::atoi(argv[3]) != 0;
     std::printf("Стопка: кубы 0.2 м, каждый отпущен с 1 см над нижним, 10 с\n");
     for (int n : {10, 25, 50, 100, 200}) {
         if (n > largest) break;

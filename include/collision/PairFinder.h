@@ -61,6 +61,7 @@ private:
     StepArray<std::pair<int, int>> candidates(Real h, const StepArray<Real>& fastest) const;
     Found between(int i, int j, Real h, Real reach) const;
     bool listed(int i, int j, int partA, int partB) const;
+    bool carryAll(Real h, const StepArray<Real>& fastest, const StepArray<std::pair<int, int>>& candidates, std::vector<ContactPair>& pairs) const;
     void collect(Real h, std::vector<ContactPair>& pairs) const;
 
     const std::vector<Body>& bodies_;

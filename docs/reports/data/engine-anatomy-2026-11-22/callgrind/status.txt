@@ -1,0 +1,4 @@
+complete kinetica-default
+complete kinetica-coupled
+complete box3d
+complete rp3d

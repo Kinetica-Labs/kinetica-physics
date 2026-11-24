@@ -1,0 +1,35 @@
+{
+  "variants": {
+    "double": {
+      "binary_sha256": "186ad739bfccf1a4f550c6e4a920e031df90e7e602eef398c2294d1d99f32370",
+      "text_sha256": "a9aa63a0f66ad33c92f6eec4c40f6e5ed37fff755655de0c7a0fd581d4f72a7d",
+      "passed": 33,
+      "oracle_sha256": "cd0bf2ef6ec9cfc957f7a37d80b227904df37d343260c4a5a4582ca50e187dd8"
+    },
+    "float": {
+      "binary_sha256": "11814a13e9e573450d29e5eb576f0577c28e221ec736a6392ca55979c0f633d9",
+      "text_sha256": "5c7f43400328d72096907b63b99e1369dcc372fca934f27085dac1d242ae92bc",
+      "passed": 33,
+      "oracle_sha256": "b4a870bf627010b6f34a4c44580cf1305e253b1ddff0dfd8accc810d605770a0"
+    },
+    "reserve10": {
+      "binary_sha256": "8fd0bede7d3afef8295b57814837e36e5987a7eadea8ce85ba6ddaf8ec3ba2f7",
+      "text_sha256": "06d039c44e42f91b7fb6ce4bacabeaa1451182898a33423f553c6470a81b1edb",
+      "passed": 33,
+      "oracle_sha256": "cd0bf2ef6ec9cfc957f7a37d80b227904df37d343260c4a5a4582ca50e187dd8"
+    },
+    "scalar-kernels": {
+      "binary_sha256": "9f39223e2b2988162168662569417ef95dbdebe6440c5c876100ee34f3588e46",
+      "text_sha256": "e1c7b30ee1b1d42efe3d691ce0fe6bb9ce304153279936d01bc6fffb98021284",
+      "passed": 33,
+      "oracle_sha256": "cd0bf2ef6ec9cfc957f7a37d80b227904df37d343260c4a5a4582ca50e187dd8"
+    }
+  },
+  "control_relinked_and_recompiled_text_sha256": "a9aa63a0f66ad33c92f6eec4c40f6e5ed37fff755655de0c7a0fd581d4f72a7d",
+  "affinity": 256,
+  "single_solver_thread": 1,
+  "seed": 20261123,
+  "design": "all 24 orders exactly once; eight public updates per frame; timing excludes all construction, preload and warmups",
+  "reserve10": "Diagnostic only. Reserve the known ten hard scalar joint rows on first insertion in DirectJoints. No arbitrary reserve size in production.",
+  "scalar-kernels": "Disable automatic loop/SLP vectorization ONLY in DirectJoints.cpp and CoupledFriction.cpp; compiler, ABI, libraries and other units stay fixed."
+}

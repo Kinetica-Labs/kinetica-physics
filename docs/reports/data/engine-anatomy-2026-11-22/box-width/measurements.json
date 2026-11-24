@@ -1,0 +1,28 @@
+{
+  "cpu_affinity": "0x100",
+  "comparison_preload_s": 0.25,
+  "library_sha256": {
+    "auto": "7c532e75113d7290451d80ba4a8a77361a4646f24c59295ae82cc3b46ecbf340",
+    "no-intrinsics": "653b90d92eed3e26b54a26ff0ff2c7ae15f931fa680682514ba01ee24af342b2",
+    "historical": "7c532e75113d7290451d80ba4a8a77361a4646f24c59295ae82cc3b46ecbf340"
+  },
+  "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+  "width": {
+    "auto": 8,
+    "historical": 8,
+    "width4": 4,
+    "no-intrinsics": 4
+  },
+  "same_rows_as_auto": {
+    "auto": true,
+    "historical": true,
+    "width4": true,
+    "no-intrinsics": true
+  },
+  "adapter_sha256": {
+    "auto": "26da71c38536ec7affffc7f7755c208ad0409f1abe045b9d899f271f72b438da",
+    "historical": "de62404cdf137c3de3a6a50fd92a03c18be5739f5f3f5563a26caf14bb220642",
+    "width4": "26da71c38536ec7affffc7f7755c208ad0409f1abe045b9d899f271f72b438da",
+    "no-intrinsics": "6dad7199b730c3b32b10b967adafb8e767551960e78ab00b3188e37956451eb2"
+  }
+}

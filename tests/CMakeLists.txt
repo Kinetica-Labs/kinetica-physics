@@ -1,5 +1,5 @@
 # Модульные проверки движка: каждая сверяет одну функцию с известным точным ответом.
-add_executable(unit-tests main.cpp GeometryTests.cpp HullTests.cpp CollisionTests.cpp DynamicsTests.cpp PropertyTests.cpp)
+add_executable(unit-tests main.cpp GeometryTests.cpp HullTests.cpp CollisionTests.cpp DynamicsTests.cpp GearTests.cpp LinkageTests.cpp WheelTests.cpp VehicleTests.cpp PropertyTests.cpp)
 target_link_libraries(unit-tests PRIVATE kinetica-physics)
 target_compile_options(unit-tests PRIVATE -Wall -Wextra)
 add_test(NAME unit-tests COMMAND unit-tests)

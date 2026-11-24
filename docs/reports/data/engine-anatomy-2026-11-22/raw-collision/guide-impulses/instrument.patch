@@ -1,0 +1,55 @@
+--- a/src/dynamics/time_stepping/DirectJoints.cpp
++++ b/src/dynamics/time_stepping/DirectJoints.cpp
+@@ -3,6 +3,8 @@
+ 
+ #include <algorithm>
+ 
++#include <atomic>
++#include <cstdio>
+ namespace kp {
+ 
+ void DirectJoints::clear() {
+@@ -44,7 +46,16 @@
+     factorCholesky(lower_, skipped_);
+ }
+ 
++namespace {
++struct PushCounts {
++    std::atomic<unsigned long long> calls{0}, zeros{0}, tiny{0};
++    ~PushCounts() { std::fprintf(stderr,"push,%llu,%llu,%llu\n",calls.load(),zeros.load(),tiny.load()); }
++} counter;
++}
+ void DirectJoints::push(size_t row, StepArray<SolverBody>& states, Real impulse) const {
++    counter.calls.fetch_add(1,std::memory_order_relaxed);
++    if (impulse==0) counter.zeros.fetch_add(1,std::memory_order_relaxed);
++    else if (abs(impulse)<Real(1e-12)) counter.tiny.fetch_add(1,std::memory_order_relaxed);
+     const Bond& bond = bonds_[row];
+     SolverBody &a = states[size_t(bond.a)], &b = states[size_t(bond.b)];
+     a.v -= (a.inverseMass * impulse) * bond.linear, a.w -= a.spinFrom(impulse * bond.angularA);
+--- a/src/joints/Joint.cpp
++++ b/src/joints/Joint.cpp
+@@ -1,7 +1,14 @@
+ #include <joints/Joint.h>
+ 
++#include <atomic>
++#include <cstdio>
+ namespace kp {
+ namespace {
++struct BondCounts {
++    std::atomic<unsigned long long> builds{0}, rows{0}, drift{0};
++    ~BondCounts() { std::fprintf(stderr,"bonds,%llu,%llu,%llu\n",builds.load(),rows.load(),drift.load()); }
++} bondCounter;
++
+ 
+ Vector3 basis(int k) { return {Real(k == 0), Real(k == 1), Real(k == 2)}; }
+ 
+@@ -50,6 +57,9 @@
+     // поворачивается.
+     m.apart = m.wb.cross(m.wb.cross(m.armB)) + m.spinUpB.cross(m.armB) - m.spinUpA.cross(m.armA) - m.wa.cross(m.pointB - ma.linearVelocity());
+     build(m, result);
++    bondCounter.builds.fetch_add(1,std::memory_order_relaxed);
++    bondCounter.rows.fetch_add(result.size(),std::memory_order_relaxed);
++    for (const auto& row: result) if (row.drift!=0) bondCounter.drift.fetch_add(1,std::memory_order_relaxed);
+ }
+ 
+ Bond Joint::travelLine(const Motion& m, int axis) const { return travelLine(m, m.frameA.rotate(basis(axis))); }

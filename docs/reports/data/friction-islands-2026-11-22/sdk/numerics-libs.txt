@@ -1,0 +1,1 @@
+no-libm: 2/2 using the full symbol list from tests/check_no_libm.sh

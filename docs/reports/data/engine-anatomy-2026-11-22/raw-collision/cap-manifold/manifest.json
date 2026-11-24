@@ -1,0 +1,53 @@
+{
+  "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+  "sdk_files": {
+    "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\accepted-src\\src\\collision\\narrowphase\\ContactPatch.cpp": "dc613246291fb8957edfdf1915577b8d96cad054cd30abb3ccc6bd96b44b8d97",
+    "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\cap-manifold-src\\src\\collision\\narrowphase\\ContactPatch.cpp": "50c4c0d01a0c61d51521a34b7e291b78973875d80a736dd41cec031ff3848a89",
+    "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\accepted-src\\src\\collision\\narrowphase\\Gjk.cpp": "1d6449657b241ffc8700cc2dc2d3b2f90c35fb8b89b3f137ca39732951f8be05",
+    "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\cap-manifold-src\\src\\collision\\narrowphase\\Gjk.cpp": "1d6449657b241ffc8700cc2dc2d3b2f90c35fb8b89b3f137ca39732951f8be05",
+    "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\accepted-build\\src\\libkinetica-physics.a": "15d6a584cb6806085e1802ecababf24004bb4396f389b9ec7cdbeb2b0792705e"
+  },
+  "probe_sha256": "17b26ff40558e08502f2bb24a307019384e37147824daaa34e3480b871234ded",
+  "holdout_sha256": "1096f29c01c42c5e839cd9a0f16cd339b4401d31394cae3823642b6be3633823",
+  "focus_sha256": "897b65ffcc69db33eac8f53d3ca5490b1177da62310c4e20671624cfd61e00b6",
+  "base-focus": {
+    "exit": 1,
+    "sha256": "97a0fc8631031313125cf536c6f441a064f273c735119d4a7ebda274c9b53227",
+    "exe_sha256": "2035768f18f659aefe485a806c90918137d6213b9c32e471fb98bd390dcfc800"
+  },
+  "base-primary": {
+    "exit": 1,
+    "sha256": "e655087e3b7b476ed750faf551e132f1c5910b968fc10b5ec1de772ff664c644",
+    "exe_sha256": "7ab84ef9c07826c107a0763f8ad9448ac5cd1e5228632fcb60500448c915adad"
+  },
+  "base-holdout": {
+    "exit": 1,
+    "sha256": "4aa06f2cf2fdc1e7253a97556c8f0e7ef70e9995a611dbddf4d15fc7c6c76811",
+    "exe_sha256": "93de8d796e1739b06a972cec4c5d4af91e4b633674a4bc03d85e17f7c99b2b74"
+  },
+  "base-contracts": {
+    "exit": 0,
+    "sha256": "4d5a0282b47d7833da7df77abb7ec8470f7f21c9bd8ea45d0aca21febb568d90",
+    "exe_sha256": "245e50eb52039f4f4894cfb72d45b9af3cf944d98f1e20856d2d552766beec9d"
+  },
+  "candidate-focus": {
+    "exit": 0,
+    "sha256": "f94f63d037b0cfa9937733ca780076154161948313354da2a753d303ceca5481",
+    "exe_sha256": "d423a1de7cc0d5bf3a21b6a1b52a0b81b08f9d5511814fced1d4a236d1005827"
+  },
+  "candidate-primary": {
+    "exit": 1,
+    "sha256": "e655087e3b7b476ed750faf551e132f1c5910b968fc10b5ec1de772ff664c644",
+    "exe_sha256": "04d6653c994348194853e0909b1b5eea231335919434c38f86615ed41caa5f54"
+  },
+  "candidate-holdout": {
+    "exit": 1,
+    "sha256": "eb27e7b586118816092c2f7fd1375a739c4439ae598f5fbe64ed3031c8114da8",
+    "exe_sha256": "fc7b4acc5bccb50cb374d86a0ea2611a5b0b7d12041e39b92d3d361d529210ec"
+  },
+  "candidate-contracts": {
+    "exit": 0,
+    "sha256": "4d5a0282b47d7833da7df77abb7ec8470f7f21c9bd8ea45d0aca21febb568d90",
+    "exe_sha256": "20180005e760c703fd4bb8b8348d00f84c95e990d4cd8b94c803ff295080c5f3"
+  }
+}

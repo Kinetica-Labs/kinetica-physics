@@ -1,0 +1,17 @@
+unsat
+projection_equivalence expected unsat
+unsat
+positive_velocity expected unsat
+unsat
+negative_velocity expected unsat
+unsat
+zero_velocity expected unsat
+unsat
+intersection_fold expected unsat
+unsat
+closed_horizon_and_first_contact expected unsat
+unsat
+singleton_in_any_gap expected unsat
+unsat
+five_samples_miss_contact_at_3_over_8 expected sat
+sat

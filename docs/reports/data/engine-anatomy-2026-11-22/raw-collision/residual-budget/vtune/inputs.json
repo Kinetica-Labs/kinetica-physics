@@ -1,0 +1,16 @@
+{
+  "engine_archive_sha256": "49b37513fd0602b75d6ba9a25ac5f52a4c8dd6c117a49c312bea294b4c16ef25",
+  "benchmark_exe_sha256": "64508aa2fd0c608993df7e71e182fbb92603d22ed1e898576cb4dc4ee1cefee0",
+  "oracle_header_sha256": "2efb2a155a7873f442b343af77f06d6f44b42ff55c627c6109d3e94973735d43",
+  "kernel": "VTune software hotspots, ITT resume/pause, 1000 x 15 loaded frames",
+  "timer_performance": "use the corresponding uninstrumented balanced blocks",
+  "solver_threads": 1,
+  "sleep": false,
+  "steps_per_frame": 8,
+  "command": [
+    "C:\\Program Files (x86)\\Intel\\oneAPI\\vtune\\2024.3\\bin64\\vtune.exe",
+    "-collect",
+    "hotspots",
+    "-start-paused"
+  ]
+}

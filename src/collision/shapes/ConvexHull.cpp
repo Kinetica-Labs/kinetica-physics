@@ -11,7 +11,12 @@ namespace kp {
 
 ConvexHull::ConvexHull(std::vector<Vector3> vertices, const std::vector<std::vector<int>>& loops) : vertices_(std::move(vertices)) {
     // Ребро tail -> head встречается в обходе одной грани, а head -> tail — в обходе соседней.
-    for (Vector3 v : vertices_) extent_ = std::max(extent_, v.length());
+    for (Vector3 v : vertices_) {
+        extent_ = std::max(extent_, v.length());
+        coreExtents_.x = std::max(coreExtents_.x, abs(v.x));
+        coreExtents_.y = std::max(coreExtents_.y, abs(v.y));
+        coreExtents_.z = std::max(coreExtents_.z, abs(v.z));
+    }
     std::map<std::pair<int, int>, int> faceOfDirectedEdge;
     for (const std::vector<int>& loop : loops) {
         // Нормаль по Ньюэллу: сумма векторных произведений соседних вершин обхода. Для плоского

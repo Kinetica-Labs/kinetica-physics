@@ -144,9 +144,19 @@ bool settleAxis(SeparatingAxis& axis, const TransformedHull& A, const Transforme
     if (axis.kind == SeparatingAxis::Kind::EdgePair) {
         const SeparatingAxis face = findFaceAxis(A, B, boundary);
         const bool onB = face.kind == SeparatingAxis::Kind::FaceB;
-        if (axis.separation - face.separation <= touching &&
-            clipAgainstFace(onB ? B : A, onB ? face.featureB : face.featureA, onB ? A : B, margin, touching, boundary).size() > 0)
-            axis = face;
+        // Замена оправдана, когда добавляет опору в нескольких точках. При одиночном
+        // касании ребра с вершиной сохраняем точную ось SAT.
+        if (axis.separation - face.separation <= touching) {
+            const auto points = clipAgainstFace(onB ? B : A, onB ? face.featureB : face.featureA, onB ? A : B, margin, touching, boundary);
+            const Real resolution = 64 * kEpsilon * (A.shape.boundingRadius() + B.shape.boundingRadius());
+            for (size_t i = 1; i < points.size(); ++i) {
+                const Vector3 span = (points[i].point - points[0].point).cross(face.normal);
+                if (span.lengthSquare() > resolution * resolution) {
+                    axis = face;
+                    break;
+                }
+            }
+        }
     }
     return true;
 }
@@ -158,8 +168,8 @@ ContactManifold HullVsHullAlgorithm::clipFaces(const ConvexHull& a, const Transf
     // Как и разделяющая ось, работа идёт в осях тела A; в мир переводится ответ.
     const Transform toB = poseA.relative(poseB);
     const TransformedHull A(a, Transform{}), B(b, toB);
-    SeparatingAxis axis = findSeparatingAxis(A, B, boundary);
-    if (axis.separation > margin) return manifold;
+    SeparatingAxis axis;
+    if (!findContactAxis(A, B, margin, boundary, axis)) return manifold;
     if (!settleAxis(axis, A, B, margin, touching, boundary)) return manifold;
     manifold.normal = poseA.direction(axis.normal);
 

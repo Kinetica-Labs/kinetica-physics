@@ -1,0 +1,34 @@
+{
+  "baseline_archive_sha256": "49b37513fd0602b75d6ba9a25ac5f52a4c8dd6c117a49c312bea294b4c16ef25",
+  "input_sha256": {
+    "src/collision/PairFinder.cpp": "2daf6896984c9537abbc8fe4185425dbd288544220df1688dd3092c0e38ec14e",
+    "src/dynamics/time_stepping/IslandNormals.cpp": "d7cda17eefd303c5f4053e2b1c309bc02b1e4c4cd95be0c555b6bc91f9a6e191"
+  },
+  "baseline_source_sha256": {
+    "src/collision/PairFinder.cpp": "a021a523d55b9c4249b6a44dccd416e3f41d7cda703fe01c5b27bd33e0759323",
+    "src/dynamics/time_stepping/IslandNormals.cpp": "0dcd499cc00b079dd66fe65ad2fd463a5a9d237f68f9fd72579a7bd9fd137e90"
+  },
+  "binaries_sha256": {
+    "stock": "e87852abfca6acca4fac6acf95fe5cb0dfda7daa7aa29aa1d01eef0d67b82fc4",
+    "carry": "3591bde1ae12a6c6927e5536433b648db3b4d0813d2dde44a880a1be2ab74342",
+    "normal": "c16b7f5591bcd72f39496473e5a5e4312f517de12b5238c26cfb91b093853f68",
+    "both": "4a38cf8691a214763e0a5789e6fc279ba56423dcb1f429c41125e063c20e3fb8"
+  },
+  "env": {
+    "KP_THREADS": "1",
+    "KP_COUPLED_FRICTION": "1",
+    "KP_GRIP_PROFILE": "0",
+    "KP_GRIP_TIMING": "0"
+  },
+  "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+  "seed": 20261123,
+  "flags": [
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG",
+    "-ffp-contract=off",
+    "-g",
+    "-gcodeview"
+  ],
+  "affinity": "0x100"
+}

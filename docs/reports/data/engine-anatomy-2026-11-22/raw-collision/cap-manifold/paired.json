@@ -1,0 +1,26 @@
+{
+  "primary": {
+    "rows": 1440,
+    "pair_status": {
+      "11": 1412,
+      "00": 28
+    },
+    "changed_measurement_rows": 0
+  },
+  "holdout": {
+    "rows": 1440,
+    "pair_status": {
+      "11": 1406,
+      "00": 26,
+      "01": 8
+    },
+    "changed_measurement_rows": 8
+  },
+  "contracts": {
+    "rows": 14992,
+    "pair_status": {
+      "11": 14992
+    },
+    "changed_measurement_rows": 0
+  }
+}

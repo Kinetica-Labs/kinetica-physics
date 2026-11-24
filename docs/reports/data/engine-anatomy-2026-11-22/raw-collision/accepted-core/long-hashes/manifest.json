@@ -1,0 +1,36 @@
+﻿[
+    {
+        "build":  "raw",
+        "source":  "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\raw-src",
+        "flags":  "-O3 -DNDEBUG -g -gcodeview -ffp-contract=off",
+        "input_driver_sha256":  "59608B91423493328600AB6C8B0F8634F7F638F7FA48B0DAAC14E09C995FA271",
+        "patched_driver_sha256":  "732B6A2B87A8C0CF0D0F5C11015004893FBCAB8E392928578DAFE1A0C0C72999",
+        "executable_sha256":  "0B7C5346040D73777705DFB9B2D3DDBF00DD030460CA3446DDA521CEA83AB54B",
+        "physics_sha256":  "8C385531505F76CFEF928E2589867748C22DD3136DC17C68CD1145404483F58A",
+        "scenes_sha256":  "D6EC7D8FAA63E0427EF79B2CAEE29361E0FB8B6A767E391B7E462F4FFB9E3195",
+        "compiler":  "C:\\Users\\sshuser\\CODE\\kinetica-physics\\tools\\llvm-mingw-20261117-ucrt-x86_64\\bin\\clang++.exe",
+        "compiler_sha256":  "83AC337810727BC8561279D762B7DD82104E9E06E8E56B91C2BE6002C82FE428",
+        "KP_THREADS":  "1",
+        "frames":  600,
+        "dt":  "1/60",
+        "sleep":  "scene default",
+        "warm_start":  "SDK default"
+    },
+    {
+        "build":  "accepted",
+        "source":  "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\accepted-src",
+        "flags":  "-O3 -DNDEBUG -g -gcodeview -ffp-contract=off",
+        "input_driver_sha256":  "59608B91423493328600AB6C8B0F8634F7F638F7FA48B0DAAC14E09C995FA271",
+        "patched_driver_sha256":  "732B6A2B87A8C0CF0D0F5C11015004893FBCAB8E392928578DAFE1A0C0C72999",
+        "executable_sha256":  "451CBB32A03F90738262AEC36F3AE1CC9C4470E0A95674326D971F52F6378DAB",
+        "physics_sha256":  "15D6A584CB6806085E1802ECABABF24004BB4396F389B9EC7CDBEB2B0792705E",
+        "scenes_sha256":  "26248CFA659780BF152C8BF2E4B2982B7EC56787740756A5A11125A9A956ED57",
+        "compiler":  "C:\\Users\\sshuser\\CODE\\kinetica-physics\\tools\\llvm-mingw-20261117-ucrt-x86_64\\bin\\clang++.exe",
+        "compiler_sha256":  "83AC337810727BC8561279D762B7DD82104E9E06E8E56B91C2BE6002C82FE428",
+        "KP_THREADS":  "1",
+        "frames":  600,
+        "dt":  "1/60",
+        "sleep":  "scene default",
+        "warm_start":  "SDK default"
+    }
+]

@@ -1,0 +1,17 @@
+{
+  "source_sha256": {
+    "src\\collision\\narrowphase\\ContactPatch.cpp": "f10c03477f6ee07db94cd885df49d8f9c29a2f1bbd5588434f31e7fc09eb8c00",
+    "tests\\GeometryTests.cpp": "597a0cf83d90d67ac1aa505d9a6a31bf343b7e130ba2bd61fcf234f5ba5fed90",
+    "src\\collision\\narrowphase\\Gjk.cpp": "1d6449657b241ffc8700cc2dc2d3b2f90c35fb8b89b3f137ca39732951f8be05"
+  },
+  "library_sha256": "a4882947d270fa8cfbbfa2260f8ad39248950ead6771068dc40e4649f98ba43b",
+  "red_sha256": "fc1d98e511d68acd2d8cb7e63b04b262f048b9ade1c67767b5e74ccacd22ac8d",
+  "green_sha256": "177679bf3021b11a49d0395cc8cc86573c7751f6c8f98e8fe2961ed292f93739",
+  "final_ctest_sha256": "e9d264fa7a95f9303698bff2fc44d35df2e0ccbe37ca460d0eee827c51c3f1ac",
+  "identical_final_matrices": [
+    "focus",
+    "primary",
+    "holdout",
+    "contracts"
+  ]
+}

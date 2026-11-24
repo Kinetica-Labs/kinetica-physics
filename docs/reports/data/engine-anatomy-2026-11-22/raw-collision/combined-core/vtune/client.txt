@@ -1,0 +1,59 @@
+engine,frames,us_per_frame,end_drift_mm
+kinetica-shared8,15000,256.767767,0.0434027825
+Elapsed Time: 7.871s
+    CPU Time: 7.716s
+        Effective Time: 7.685s
+        Spin Time: 0.031s
+        Overhead Time: 0s
+    Total Thread Count: 24
+    Paused Time: 0s
+
+Top Hotspots
+Function          Module                CPU Time  % of CPU Time(%)
+----------------  --------------------  --------  ----------------
+func@0x180020b2c  ucrtbase.dll            0.918s             11.9%
+func@0x1400117e0  study-grip-limit.exe    0.488s              6.3%
+func@0x180048b50  ucrtbase.dll            0.418s              5.4%
+malloc_base       ucrtbase.dll            0.296s              3.8%
+func@0x1400606f0  study-grip-limit.exe    0.294s              3.8%
+[Others]          N/A                     5.301s             68.7%
+Effective Physical Core Utilization: 14.5% (1.742 out of 12)
+ | The metric value is low, which may signal a poor physical CPU cores
+ | utilization caused by:
+ |     - load imbalance
+ |     - threading runtime overhead
+ |     - contended synchronization
+ |     - thread/process underutilization
+ |     - incorrect affinity that utilizes logical cores instead of physical
+ |       cores
+ | Explore sub-metrics to estimate the efficiency of MPI and OpenMP parallelism
+ | or run the Locks and Waits analysis to identify parallel bottlenecks for
+ | other parallel runtimes.
+ |
+    Effective Logical Core Utilization: 7.6% (1.817 out of 24)
+     | The metric value is low, which may signal a poor logical CPU cores
+     | utilization. Consider improving physical core utilization as the first
+     | step and then look at opportunities to utilize logical cores, which in
+     | some cases can improve processor throughput and overall performance of
+     | multi-threaded applications.
+     |
+Collection and Platform Info
+    Application Command Line: C:\Users\PC\kp-2326667-mwrev8ox\sieve-20261122-100223\engine-anatomy-nov22\combined-core-build\validation\studies\study-grip-limit.exe "shared8" 
+    Operating System: Microsoft Windows 10
+    Computer Name: DESKTOP-N3RC7NA
+    Result Size: 4.4 MB 
+    Collection start time: 16:59:51 22/11/2026 UTC
+    Collection stop time: 16:59:59 22/11/2026 UTC
+    Collector Type: Event-based counting driver,User-mode sampling and tracing
+    CPU
+        Name: Intel(R) Xeon(R) E5/E7 v3 Processor code named Haswell
+        Frequency: 2.600 GHz
+        Logical CPU Count: 24
+        Cache Allocation Technology
+            Level 2 capability: not detected
+            Level 3 capability: not detected
+
+If you want to skip descriptions of detected performance issues in the report,
+enter: vtune -report summary -report-knob show-issues=false -r <my_result_dir>.
+Alternatively, you may view the report in the csv format: vtune -report
+<report_name> -format=csv.

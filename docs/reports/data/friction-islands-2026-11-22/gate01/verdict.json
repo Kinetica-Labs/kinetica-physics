@@ -1,0 +1,51 @@
+{
+  "reference": "component",
+  "runs": [
+    {
+      "build": "baseline",
+      "compared_to": null,
+      "sha256": {
+        "study-grip-limit": "e90104581472399c24ebdde63a786bf455cdd2f1879be26d109e548096cb947c",
+        "study-slip-to-roll": "72de61a0d257bb1995e7ee25299884cc0fc28f9d1a29aef4cfa350a7581eb4cd",
+        "study-groove-friction": "80ce2280ca83d3697a93e5f9059582ccffb28828ea09b46ed2a216b988f3d889"
+      },
+      "grip_pass": 31,
+      "roll_pass": 8,
+      "max_speed_error_m_s": 1.470000510206404e-11,
+      "max_balance_error_Ns": 1.96912972039e-12,
+      "max_hold_mm_both_orders": 1.44327341292,
+      "groove_pass": 24,
+      "groove_max_error_m_s": 0.00229591836736,
+      "groove-holdout_pass": 18,
+      "groove-holdout_max_error_m_s": 0.00334043971885,
+      "islands_pass": true,
+      "islands_max_difference_mm": 0.0,
+      "islands_max_reaction_error_Ns": 3.3333058535589544e-13,
+      "decision": "baseline",
+      "reasons": []
+    },
+    {
+      "build": "component",
+      "compared_to": "baseline",
+      "sha256": {
+        "study-grip-limit": "23b66acc5834f768d312b5e5e540d3d5509a67e71b63e42b3ddac673832df3af",
+        "study-slip-to-roll": "8fa9ab82c62c9e1481f5778eb63a3743c0202fa0bbbceed33e63e9ad52fe9731",
+        "study-groove-friction": "6ad05ea115bf5a51dbb95669c6b918a7bea0ebf58b24cb5ec40cdd0afbe159a6"
+      },
+      "grip_pass": 33,
+      "roll_pass": 8,
+      "max_speed_error_m_s": 1.470000510206404e-11,
+      "max_balance_error_Ns": 1.49186218934e-16,
+      "max_hold_mm_both_orders": 0.0434027825447,
+      "groove_pass": 32,
+      "groove_max_error_m_s": 3.386999986032535e-10,
+      "groove-holdout_pass": 32,
+      "groove-holdout_max_error_m_s": 7.645999996336306e-10,
+      "islands_pass": true,
+      "islands_max_difference_mm": 0.0,
+      "islands_max_reaction_error_Ns": 3.3333058535589544e-13,
+      "decision": "keep",
+      "reasons": []
+    }
+  ]
+}

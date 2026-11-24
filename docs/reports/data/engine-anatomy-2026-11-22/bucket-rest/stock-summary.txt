@@ -1,0 +1,6 @@
+mode=stock threads=1 scalar_bytes=8 substeps=8 contact_updates=4 sleep=0 drag=0
+body,samples,max_com_from_60s_mm,max_turn_from_60s_deg,max_frame_move_mm,max_frame_turn_deg,max_tilt_deg,max_point_speed_bound_m_s,frames_over_0p02_m_s,within_1mm,within_1deg
+1,841,6.61890566639e-14,3.85088278541e-14,9.49095939641e-14,6.50633909239e-15,1.85469514288e-14,3.57241594977e-14,0,1,1
+2,841,4.2504720225e-13,7.68766363709e-14,3.41983367373e-13,5.92634542517e-14,7.60963931731e-14,6.0364052298e-14,0,1,1
+3,841,7.84652784463e-13,7.87406431253e-14,5.0433865526e-13,5.97124831786e-14,8.49492946669e-14,5.83520693634e-14,0,1,1
+complete=1 frames=4500

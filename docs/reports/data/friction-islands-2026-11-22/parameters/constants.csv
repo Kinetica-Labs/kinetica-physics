@@ -1,0 +1,30 @@
+source,line,sha256,text
+box3d/src/types.c,18,8128F144490964A508C5E94ECED7FB3E10D813967BF4F63B764BBFAB4ED21563,def.restitutionThreshold = 1.0f * lengthUnits;
+box3d/src/types.c,21,8128F144490964A508C5E94ECED7FB3E10D813967BF4F63B764BBFAB4ED21563,def.contactSpeed = 3.0f * lengthUnits;
+box3d/src/types.c,22,8128F144490964A508C5E94ECED7FB3E10D813967BF4F63B764BBFAB4ED21563,def.contactHertz = 30.0f;
+box3d/src/types.c,23,8128F144490964A508C5E94ECED7FB3E10D813967BF4F63B764BBFAB4ED21563,def.contactDampingRatio = 10.0f;
+box3d/src/physics_world.c,155,F5DDCE865C5194FC4C9DADAFC650EADDB1CBEE7B0BFA9F6EC87F10925DBCD2F5,"static float b3DefaultFrictionCallback( float frictionA, uint64_t materialA, float frictionB, uint64_t materialB )"
+box3d/src/physics_world.c,158,F5DDCE865C5194FC4C9DADAFC650EADDB1CBEE7B0BFA9F6EC87F10925DBCD2F5,return sqrtf( frictionA * frictionB );
+box3d/src/physics_world.c,341,F5DDCE865C5194FC4C9DADAFC650EADDB1CBEE7B0BFA9F6EC87F10925DBCD2F5,if ( def->frictionCallback == NULL )
+box3d/src/physics_world.c,343,F5DDCE865C5194FC4C9DADAFC650EADDB1CBEE7B0BFA9F6EC87F10925DBCD2F5,world->frictionCallback = b3DefaultFrictionCallback;
+box3d/src/physics_world.c,347,F5DDCE865C5194FC4C9DADAFC650EADDB1CBEE7B0BFA9F6EC87F10925DBCD2F5,world->frictionCallback = def->frictionCallback;
+box3d/src/physics_world.c,2274,F5DDCE865C5194FC4C9DADAFC650EADDB1CBEE7B0BFA9F6EC87F10925DBCD2F5,"void b3World_SetFrictionCallback( b3WorldId worldId, b3FrictionCallback* callback )"
+box3d/src/physics_world.c,2282,F5DDCE865C5194FC4C9DADAFC650EADDB1CBEE7B0BFA9F6EC87F10925DBCD2F5,world->frictionCallback = callback != NULL ? callback : b3DefaultFrictionCallback;
+rp3d/include/reactphysics3d/engine/PhysicsWorld.h,126,4E21FE5E5DF96A94901F7A46C30316A0F2EAA7D956DDFC03B7353A119C1BECB1,persistentContactDistanceThreshold = decimal(0.03);
+rp3d/include/reactphysics3d/engine/PhysicsWorld.h,129,4E21FE5E5DF96A94901F7A46C30316A0F2EAA7D956DDFC03B7353A119C1BECB1,restitutionVelocityThreshold = decimal(0.5);
+rp3d/include/reactphysics3d/engine/PhysicsWorld.h,131,4E21FE5E5DF96A94901F7A46C30316A0F2EAA7D956DDFC03B7353A119C1BECB1,defaultVelocitySolverNbIterations = 6;
+rp3d/include/reactphysics3d/engine/PhysicsWorld.h,132,4E21FE5E5DF96A94901F7A46C30316A0F2EAA7D956DDFC03B7353A119C1BECB1,defaultPositionSolverNbIterations = 3;
+rp3d/include/reactphysics3d/systems/ContactSolverSystem.h,425,1D3DECBA648724A4BF2F59C7339501E5CF6C27CF37C782B9ECEB26F89A8A3D96,return material1.getFrictionCoefficientSqrt() * material2.getFrictionCoefficientSqrt();
+rp3d/src/systems/ContactSolverSystem.cpp,43,B024301874D996421C18E29BF41A4E2E52E3022E48BB0AA9764636738C0CA2D2,const decimal ContactSolverSystem::BETA = decimal(0.2);
+rp3d/src/systems/ContactSolverSystem.cpp,44,B024301874D996421C18E29BF41A4E2E52E3022E48BB0AA9764636738C0CA2D2,const decimal ContactSolverSystem::BETA_SPLIT_IMPULSE = decimal(0.2);
+rp3d/src/systems/ContactSolverSystem.cpp,45,B024301874D996421C18E29BF41A4E2E52E3022E48BB0AA9764636738C0CA2D2,const decimal ContactSolverSystem::SLOP = decimal(0.01);
+rp3d/src/systems/ContactSolverSystem.cpp,56,B024301874D996421C18E29BF41A4E2E52E3022E48BB0AA9764636738C0CA2D2,"mColliderComponents(colliderComponents), mIsSplitImpulseActive(true) {"
+rp3d/src/systems/ContactSolverSystem.cpp,104,B024301874D996421C18E29BF41A4E2E52E3022E48BB0AA9764636738C0CA2D2,warmStart();
+Kinetica/include/dynamics/time_stepping/SoftStep.h,53,F72789B54CDAF9A438FAE02D323F5A52B5F30FCAE07DB045A35A8B86C88195AD,Real contactHertz = 60;
+Kinetica/include/dynamics/time_stepping/SoftStep.h,54,F72789B54CDAF9A438FAE02D323F5A52B5F30FCAE07DB045A35A8B86C88195AD,Real contactDamping = 10; // доля критического затухания
+Kinetica/include/dynamics/time_stepping/SoftStep.h,55,F72789B54CDAF9A438FAE02D323F5A52B5F30FCAE07DB045A35A8B86C88195AD,Real pushSpeed = 3;      // м/с: быстрее перекрытие не выталкивается
+Kinetica/include/dynamics/time_stepping/SoftStep.h,76,F72789B54CDAF9A438FAE02D323F5A52B5F30FCAE07DB045A35A8B86C88195AD,Real edgeSlop = Real(1e-3); // м: запас на совпадающие рёбра и грани (PairFinder::boundary)
+Kinetica/src/dynamics/time_stepping/SoftContact.cpp,83,C296F78F7EFC01E0CE5E1A42D9062F220866C0FE681BD9B3F6481B588CEB55C5,"friction_.coefficient = sqrt(bodyA.friction * bodyB.friction), restitution_ = std::max(bodyA.restitution, bodyB.restitution);"
+Kinetica/src/dynamics/time_stepping/SoftStep.cpp,241,7CF6788B07CD822F23F32576F028AB690E278908FF959B46F264F6E8361D44F6,"normals.solve(contacts, moving.bodies, moving.states, true, h, pushSpeed);"
+Kinetica/src/dynamics/time_stepping/SoftStep.cpp,284,7CF6788B07CD822F23F32576F028AB690E278908FF959B46F264F6E8361D44F6,"const Real hertz = std::min(contactHertz, Real(0.125) / h);"
+Kinetica/src/dynamics/time_stepping/SoftStep.cpp,314,7CF6788B07CD822F23F32576F028AB690E278908FF959B46F264F6E8361D44F6,"if (restSpeed == 0 || std::find(stirred.begin(), stirred.end(), 1) != stirred.end()) normals.solve(contacts, bodies, states, false, h, pushSpeed, restSpeed > 0 ? &stirred : nullptr);"

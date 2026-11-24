@@ -1,0 +1,2 @@
+libc6:amd64	2.43-2ubuntu2
+libc6-dbg:amd64	2.43-2ubuntu2

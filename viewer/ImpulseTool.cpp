@@ -19,7 +19,7 @@ void circle(DebugGeometry& geometry, Vector3 center, Vector3 u, Vector3 v, Real 
 
 // Стрелка из from длиной length вдоль единичного along, с наконечником из четырёх усов.
 void arrow(DebugGeometry& geometry, Vector3 from, Vector3 along, Real length) {
-    const Vector3 tip = from + length * along, side = abs(along.y) < Real(0.9) ? along.cross({0, 1, 0}) : along.cross({1, 0, 0});
+    const Vector3 tip = from + length * along, side = kp::abs(along.y) < Real(0.9) ? along.cross({0, 1, 0}) : along.cross({1, 0, 0});
     const Vector3 u = (1 / side.length()) * side, v = along.cross(u);
     geometry.lines.push_back({from, tip, DebugKind::ClosestPoints});
     for (Vector3 barb : {u, -1 * u, v, -1 * v}) geometry.lines.push_back({tip, tip - (Real(0.2) * length) * along + (Real(0.08) * length) * barb, DebugKind::ClosestPoints});

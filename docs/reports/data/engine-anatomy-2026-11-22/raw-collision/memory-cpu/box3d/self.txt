@@ -1,0 +1,51 @@
+--------------------------------------------------------------------------------
+Profile data file '/tmp/kp-phase-profile.d8p94W/counts/box3d/callgrind.out' (creator: callgrind-3.26.0)
+--------------------------------------------------------------------------------
+I1 cache: 32768 B, 64 B, 8-way associative
+D1 cache: 32768 B, 64 B, 8-way associative
+LL cache: 31457280 B, 64 B, 30-way associative
+Timerange: Basic block 0 - 16717452
+Trigger: Program termination
+Profiled target:  /tmp/kp-phase-profile.d8p94W/counts/bin/box3d shared8 (PID 2693, part 1)
+Events recorded:  Ir Dr Dw I1mr D1mr D1mw ILmr DLmr DLmw Bc Bcm Bi Bim
+Events shown:     Ir
+Event sort order: Ir Dr Dw I1mr D1mr D1mw ILmr DLmr DLmw Bc Bcm Bi Bim
+Thresholds:       95 0 0 0 0 0 0 0 0 0 0 0 0
+Include dirs:     
+User annotated:   
+Auto-annotation:  off
+
+--------------------------------------------------------------------------------
+Ir                  
+--------------------------------------------------------------------------------
+88,933,896 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                   file:function
+--------------------------------------------------------------------------------
+13,835,520 (15.56%)  ???:b3SolvePrismaticJoint [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+10,506,240 (11.81%)  ???:b3PrepareContacts_ConvexW8 [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 7,372,800 ( 8.29%)  ???:b3SolveContacts_ConvexW8 [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 6,592,320 ( 7.41%)  ???:b3FinalizeBodiesTask [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 6,500,160 ( 7.31%)  ???:b3CollideTask [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 6,318,720 ( 7.10%)  ???:b3PushContacts_ConvexW8 [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 6,292,800 ( 7.08%)  ???:b3ExecuteBlock.isra.0 [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 5,083,200 ( 5.72%)  ???:b3Solve [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 2,810,880 ( 3.16%)  ???:b3WarmStartContacts_ConvexW8 [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 2,626,560 ( 2.95%)  ???:b3PreparePrismaticJoint [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 2,534,400 ( 2.85%)  ???:b3WarmStartPrismaticJoint [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 2,341,440 ( 2.63%)  ???:b3World_Step [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 2,125,440 ( 2.39%)  ???:b3ComputeHullAABB [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 1,425,600 ( 1.60%)  ???:b3StackAlloc [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 1,157,760 ( 1.30%)  ???:b3ExecuteMainStage [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 1,094,400 ( 1.23%)  ???:b3StoreImpulses_ConvexW8 [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+ 1,014,288 ( 1.14%)  ???:clock_gettime [/usr/lib/x86_64-linux-gnu/libc.so.6]
+   961,920 ( 1.08%)  ???:b3SolverTask [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+   662,400 ( 0.74%)  ???:b3GetMilliseconds [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+   648,000 ( 0.73%)  ???:b3GetMillisecondsAndReset [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+   648,000 ( 0.73%)  ???:b3StackFree [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+   576,000 ( 0.65%)  ???:0x000000000006dcc0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+   535,680 ( 0.60%)  ???:b3ParallelFor [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+   524,160 ( 0.59%)  ???:b3GetTicks [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+   466,560 ( 0.52%)  ???:b3ComputeFatShapeAABB [/tmp/kp-phase-profile.d8p94W/counts/bin/box3d]
+

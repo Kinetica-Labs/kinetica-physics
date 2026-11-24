@@ -1,0 +1,26 @@
+{
+  "src/dynamics/time_stepping/DirectJoints.cpp": {
+    "before": "f6b0dee8f477c529d90f0b9bba1670302241fbc34afba9e76a80d6317c0185b5",
+    "after": "9aadfe8cd364d7b6d6eceba883e3cd6a4be50696fc1d46623f85db0d2a0914e2"
+  },
+  "src/dynamics/time_stepping/FrictionIslands.cpp": {
+    "before": "199c940eb9e15de1d4a01aa5441fcc0e1ae9f96f4a67ed75fcb97ca3ad92826c",
+    "after": "674fab150c5448a8504718a8d69569c9949cd97e19c8369bb7bf739c6530d97c"
+  },
+  "src/dynamics/time_stepping/CoupledFriction.cpp": {
+    "before": "f04a41ecd462729afc26ce3a8d879038f18e673d2526f4af2760d3abbeea569f",
+    "after": "c11dc67dbcde18a7fd43f2d73ecc97d5f832e35fcd6001557f050287fc4ed9ca"
+  },
+  "include/math/ProfileMatrix.h": {
+    "before": "a828059c812081882f6ca25e5f817c47fbc61e55ae4bcfcb0eca565553c4f57e",
+    "after": "3e9d53db33a303f940809aff9e911583d248631702fcd724f44aaf5d3fd69991"
+  },
+  "include/dynamics/time_stepping/DirectJoints.h": {
+    "before": "987a0c27391a5fd3ed1af56a8223e4969bdba0a41009a109aa23ecb491c40b93",
+    "after": "b7736666123696c84773fbfd1ca419f2adaa0f598b04266f540ccacdde88ed21"
+  },
+  "include/dynamics/time_stepping/CoupledFriction.h": {
+    "before": "cea18fadfeac38dc2eb801d84f4ea67b7c919b0a0bf3e7ea95a9a3bdb4f6079e",
+    "after": "be1f67efe97fc5d36c55175b4926885b8a93b0c5f5010f053b60b1e1f3ffbe02"
+  }
+}

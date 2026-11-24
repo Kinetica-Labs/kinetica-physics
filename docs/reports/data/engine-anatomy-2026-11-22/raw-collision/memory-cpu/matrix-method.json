@@ -1,0 +1,27 @@
+{
+  "affinity": 256,
+  "design": "all 24 permutations, both scenes, original compiler and flags, one thread, strict contraction off",
+  "unchanged_object_rebuild_reproduces_release_text": true,
+  "inputs": {
+    "stock": {
+      "grip": "186ad739bfccf1a4f550c6e4a920e031df90e7e602eef398c2294d1d99f32370",
+      "pyramid": "dc4227e17ac17578a30f2a718f6a2bf7f7881ec2fb59fe00a0ad22242cb04027",
+      "oracle": "cd0bf2ef6ec9cfc957f7a37d80b227904df37d343260c4a5a4582ca50e187dd8"
+    },
+    "flat": {
+      "grip": "8f6f5dfdd04890313f9c571f4d599ecc5b635a953ac8d70b389b9cf654f11874",
+      "pyramid": "dd01185efcdd87da94e8a27d2d8d4dee9683442920290247aac6173a10c6a9f4",
+      "oracle": "cd0bf2ef6ec9cfc957f7a37d80b227904df37d343260c4a5a4582ca50e187dd8"
+    },
+    "reserve": {
+      "grip": "95aa588788ee619ffb9c25fdc658f6182eed57a9867e550c3fdae92c04d85fda",
+      "pyramid": "1a8cea2b3138ddfb4474866f7e1c7c8c7d8f4d5a2716eae4a4a8e8e1ee249893",
+      "oracle": "cd0bf2ef6ec9cfc957f7a37d80b227904df37d343260c4a5a4582ca50e187dd8"
+    },
+    "combined": {
+      "grip": "046403290bdedec3035ff87de2750c3d2849552d797b4f78421f5c90d491e628",
+      "pyramid": "35ccb19e0d6e144fd548a4feae468af88344f5ca0eb2e20947f3a6d89dea243f",
+      "oracle": "cd0bf2ef6ec9cfc957f7a37d80b227904df37d343260c4a5a4582ca50e187dd8"
+    }
+  }
+}

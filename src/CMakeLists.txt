@@ -9,6 +9,7 @@ add_library(kinetica-physics STATIC
   math/UpdatedCholesky.cpp
   math/WorkerPool.cpp
   world/World.cpp
+  world/VehicleConstraint.cpp
   world/IslandSleep.cpp
   world/AreaImpulse.cpp
   collision/ContactPair.cpp
@@ -37,13 +38,17 @@ add_library(kinetica-physics STATIC
   body/PrincipalAxes.cpp
   body/CompoundBodyBuilder.cpp
   dynamics/time_stepping/SoftStep.cpp
+  dynamics/time_stepping/EquilibriumStep.cpp
   dynamics/time_stepping/SoftContact.cpp
   dynamics/time_stepping/IslandNormals.cpp
+  dynamics/time_stepping/SupportNormals.cpp
   dynamics/time_stepping/ContactLevels.cpp
   dynamics/time_stepping/MissedContacts.cpp
   dynamics/time_stepping/PairReach.cpp
   dynamics/time_stepping/RollingFriction.cpp
   dynamics/time_stepping/CentreFriction.cpp
+  dynamics/time_stepping/FrictionIslands.cpp
+  dynamics/time_stepping/CoupledFriction.cpp
   dynamics/time_stepping/TrackedShapes.cpp
   dynamics/time_stepping/SoftJoint.cpp
   dynamics/time_stepping/DirectJoints.cpp
@@ -52,6 +57,10 @@ add_library(kinetica-physics STATIC
   joints/SingleFreedomJoint.cpp
   joints/BallAndSocketJoint.cpp
   joints/HingeJoint.cpp
+  joints/GearJoint.cpp
+  joints/DistanceJoint.cpp
+  joints/RackAndPinionJoint.cpp
+  dynamics/WheelContact.cpp
   joints/SliderJoint.cpp
   joints/Path.cpp
   joints/PathJoint.cpp

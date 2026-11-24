@@ -1,0 +1,5 @@
+phase,completed_frames,public_steps_in_completed_frames,alloc_calls,requested_bytes,free_calls,total_alloc_calls,total_requested_bytes,total_free_calls,complete
+construct,0,0,49,4458104,7,49,4458104,7,1
+preload,15,120,39,11408,22,88,4469512,29,1
+loaded,15,120,0,0,0,88,4469512,29,1
+teardown,0,0,0,0,57,88,4469512,86,1

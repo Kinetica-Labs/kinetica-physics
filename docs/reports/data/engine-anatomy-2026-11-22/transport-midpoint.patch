@@ -1,0 +1,42 @@
+--- a/src/dynamics/time_stepping/SoftStep.cpp
++++ b/src/dynamics/time_stepping/SoftStep.cpp
+@@ -100,6 +100,7 @@
+     std::vector<Body>& bodies;
+     StepArray<SolverBody>& states;
+     StepArray<Pose> origin, before;
++    StepArray<Vector3> startVelocity;
+     StepArray<SolverBody> statesBefore;
+     // Охватывающие радиусы подвижных тел — один раз за шаг: радиус лежит в форме, за указателем, и читать
+     // его у каждого тела каждый подшаг значило ждать память. У неподвижного тела формы может не быть.
+@@ -122,6 +123,12 @@
+         StepArray<Pose> now(bodies.size());
+         for (size_t i = 0; i < bodies.size(); ++i) now[i] = {bodies[i].position, bodies[i].angularMomentum, bodies[i].orientation};
+         return now;
++    }
++    // Начало физического подшага. При повторе пробного сдвига сохраняем ту же начальную скорость.
++    void saveStartVelocity() {
++        startVelocity.resize(states.size());
++        for (size_t i = 0; i < states.size(); ++i)
++            if (states[i].inverseMass > 0) startVelocity[i] = states[i].v;
+     }
+     // Тела сдвигаются с найденными скоростями. Момент импульса при повороте сохраняется, а угловая
+     // скорость пересчитывается по новой ориентации: это и есть гироскопический член.
+@@ -135,7 +142,9 @@
+                 return;
+             }
+             const Vector3 momentum = momentumOf(body, s.w);
+-            body.position += h * s.v;
++            // Опыт: средняя скорость точна при постоянном ускорении. На ударе усреднение
++            // размазывает скачок скорости по подшагу и ослабляет поправку проникновения.
++            body.position += startVelocity.empty() ? h * s.v : (h / 2) * (startVelocity[i] + s.v);
+             body.angularMomentum = momentum;
+             // У тела с неравными моментами инерции угловая скорость меняется вместе с ориентацией,
+             // поэтому поворот идёт со скоростью середины подшага. Со скоростью его начала вытянутое
+@@ -301,6 +310,7 @@
+                       std::any_of(bodies.begin(), bodies.end(), [](const Body& body) { return body.restitution != 0; })};
+     notify(observer, StepStage::Contacts);
+     for (int substep = 0; substep < substeps; ++substep) {
++        if (coupledFriction) moving.saveStartVelocity();
+         applyForces(states, bodies, gravity, h);
+         // Тёплый старт: накопленные импульсы прикладываются к новым скоростям.
+         rows.warmStart(states);

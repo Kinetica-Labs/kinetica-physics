@@ -1,0 +1,1928 @@
+{
+  "cases": 21,
+  "passed": true,
+  "rejected_degenerate": 2,
+  "results": {
+    "between_60Hz_samples": {
+      "axes": 3,
+      "contact": {
+        "hi": "3/250",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "1/125"
+      },
+      "duration": "1",
+      "endpoints": [
+        {
+          "at": "1/125",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-8",
+            "low": "-12",
+            "rate": "-1000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-8",
+            "low": "-12",
+            "rate": "-1000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "3/250",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-8",
+            "low": "-12",
+            "rate": "-1000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-8",
+            "low": "-12",
+            "rate": "-1000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": {
+        "hi": "3/250",
+        "include_hi": false,
+        "include_lo": false,
+        "lo": "1/125"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "1/100",
+        "min_unnormalized_projection_slack": "2"
+      }
+    },
+    "crossing": {
+      "axes": 3,
+      "contact": {
+        "hi": "6",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "2"
+      },
+      "duration": "8",
+      "endpoints": [
+        {
+          "at": "2",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "6",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": {
+        "hi": "6",
+        "include_hi": false,
+        "include_lo": false,
+        "lo": "2"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "4",
+        "min_unnormalized_projection_slack": "2"
+      }
+    },
+    "edge_cross_required": {
+      "axes": 11,
+      "contact": null,
+      "duration": "1",
+      "interior": null,
+      "kind": "miss",
+      "proof": {
+        "constant_separating_axis": {
+          "axis": [
+            0,
+            3,
+            4
+          ],
+          "high": "-1/40",
+          "low": "-761/40",
+          "rate": "0",
+          "source": [
+            "edge_cross",
+            [
+              0,
+              4
+            ],
+            [
+              0,
+              1
+            ]
+          ]
+        }
+      }
+    },
+    "end_inside": {
+      "axes": 3,
+      "contact": {
+        "hi": "2",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "1"
+      },
+      "duration": "2",
+      "endpoints": [
+        {
+          "at": "1",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-1",
+            "low": "-5",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-1",
+            "low": "-5",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "2",
+          "domain_end": true,
+          "domain_start": false,
+          "tight_axes": 0,
+          "time_bound_source": {
+            "domain": "end"
+          },
+          "witness": null
+        }
+      ],
+      "interior": {
+        "hi": "2",
+        "include_hi": true,
+        "include_lo": false,
+        "lo": "1"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "3/2",
+        "min_unnormalized_projection_slack": "1/2"
+      }
+    },
+    "final_boundary": {
+      "axes": 3,
+      "contact": {
+        "hi": "1",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "1"
+      },
+      "duration": "1",
+      "endpoints": [
+        {
+          "at": "1",
+          "domain_end": true,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-1",
+            "low": "-5",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-1",
+            "low": "-5",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "1",
+          "domain_end": true,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "domain": "end"
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-1",
+            "low": "-5",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": null,
+      "kind": "boundary_only",
+      "proof": {
+        "lower_source": {
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "high": "-1",
+          "low": "-5",
+          "rate": "-1",
+          "source": [
+            "face_A",
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ]
+        },
+        "singleton": "1",
+        "upper_source": {
+          "domain": "end"
+        }
+      }
+    },
+    "initial_boundary": {
+      "axes": 3,
+      "contact": {
+        "hi": "0",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "0"
+      },
+      "duration": "1",
+      "endpoints": [
+        {
+          "at": "0",
+          "domain_end": false,
+          "domain_start": true,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "domain": "start"
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "0",
+            "low": "-4",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "0",
+          "domain_end": false,
+          "domain_start": true,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "0",
+            "low": "-4",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "0",
+            "low": "-4",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": null,
+      "kind": "boundary_only",
+      "proof": {
+        "lower_source": {
+          "domain": "start"
+        },
+        "singleton": "0",
+        "upper_source": {
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "high": "0",
+          "low": "-4",
+          "rate": "1",
+          "source": [
+            "face_A",
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ]
+        }
+      }
+    },
+    "instant_boundary": {
+      "axes": 3,
+      "contact": {
+        "hi": "0",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "0"
+      },
+      "duration": "0",
+      "endpoints": [
+        {
+          "at": "0",
+          "domain_end": true,
+          "domain_start": true,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "domain": "start"
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "0",
+            "low": "-4",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "0",
+          "domain_end": true,
+          "domain_start": true,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "domain": "end"
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "0",
+            "low": "-4",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": null,
+      "kind": "boundary_only",
+      "proof": {
+        "lower_source": {
+          "domain": "start"
+        },
+        "singleton": "0",
+        "upper_source": {
+          "domain": "end"
+        }
+      }
+    },
+    "instant_inside": {
+      "axes": 3,
+      "contact": {
+        "hi": "0",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "0"
+      },
+      "duration": "0",
+      "endpoints": [
+        {
+          "at": "0",
+          "domain_end": true,
+          "domain_start": true,
+          "tight_axes": 0,
+          "time_bound_source": {
+            "domain": "start"
+          },
+          "witness": null
+        },
+        {
+          "at": "0",
+          "domain_end": true,
+          "domain_start": true,
+          "tight_axes": 0,
+          "time_bound_source": {
+            "domain": "end"
+          },
+          "witness": null
+        }
+      ],
+      "interior": {
+        "hi": "0",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "0"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "0",
+        "min_unnormalized_projection_slack": "2"
+      }
+    },
+    "permuted_bodies": {
+      "axes": 3,
+      "contact": {
+        "hi": "6",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "2"
+      },
+      "duration": "8",
+      "endpoints": [
+        {
+          "at": "2",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "6",
+            "low": "2",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "6",
+            "low": "2",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "6",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "6",
+            "low": "2",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "6",
+            "low": "2",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": {
+        "hi": "6",
+        "include_hi": false,
+        "include_lo": false,
+        "lo": "2"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "4",
+        "min_unnormalized_projection_slack": "2"
+      }
+    },
+    "scale_1/1000000": {
+      "axes": 3,
+      "contact": {
+        "hi": "6",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "2"
+      },
+      "duration": "8",
+      "endpoints": [
+        {
+          "at": "2",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-1/500000",
+            "low": "-3/500000",
+            "rate": "-1/1000000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-1/500000",
+            "low": "-3/500000",
+            "rate": "-1/1000000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "6",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-1/500000",
+            "low": "-3/500000",
+            "rate": "-1/1000000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-1/500000",
+            "low": "-3/500000",
+            "rate": "-1/1000000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": {
+        "hi": "6",
+        "include_hi": false,
+        "include_lo": false,
+        "lo": "2"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "4",
+        "min_unnormalized_projection_slack": "1/500000"
+      }
+    },
+    "scale_1000000": {
+      "axes": 3,
+      "contact": {
+        "hi": "6",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "2"
+      },
+      "duration": "8",
+      "endpoints": [
+        {
+          "at": "2",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2000000",
+            "low": "-6000000",
+            "rate": "-1000000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2000000",
+            "low": "-6000000",
+            "rate": "-1000000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "6",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2000000",
+            "low": "-6000000",
+            "rate": "-1000000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2000000",
+            "low": "-6000000",
+            "rate": "-1000000",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": {
+        "hi": "6",
+        "include_hi": false,
+        "include_lo": false,
+        "lo": "2"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "4",
+        "min_unnormalized_projection_slack": "2000000"
+      }
+    },
+    "singleton_grazing": {
+      "axes": 3,
+      "contact": {
+        "hi": "2",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "2"
+      },
+      "duration": "8",
+      "endpoints": [
+        {
+          "at": "2",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 2,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "high": "2",
+            "low": "-2",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                4,
+                5
+              ]
+            ]
+          }
+        },
+        {
+          "at": "2",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 2,
+          "time_bound_source": {
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "high": "2",
+            "low": "-2",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                4,
+                5
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "high": "2",
+            "low": "-2",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                4,
+                5
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": null,
+      "kind": "boundary_only",
+      "proof": {
+        "lower_source": {
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "high": "-2",
+          "low": "-6",
+          "rate": "-1",
+          "source": [
+            "face_A",
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ]
+        },
+        "singleton": "2",
+        "upper_source": {
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "high": "2",
+          "low": "-2",
+          "rate": "1",
+          "source": [
+            "face_A",
+            [
+              0,
+              1,
+              4,
+              5
+            ]
+          ]
+        }
+      }
+    },
+    "sliding_edge": {
+      "axes": 3,
+      "contact": {
+        "hi": "6",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "2"
+      },
+      "duration": "8",
+      "endpoints": [
+        {
+          "at": "2",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 3,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "6",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 3,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": null,
+      "kind": "boundary_only",
+      "proof": {
+        "constant_touching_axis": {
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "high": "0",
+          "low": "-4",
+          "rate": "0",
+          "source": [
+            "face_A",
+            [
+              0,
+              1,
+              4,
+              5
+            ]
+          ]
+        }
+      }
+    },
+    "sliding_face": {
+      "axes": 3,
+      "contact": {
+        "hi": "6",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "2"
+      },
+      "duration": "8",
+      "endpoints": [
+        {
+          "at": "2",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 2,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "6",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 2,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "-2",
+            "low": "-6",
+            "rate": "-1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": null,
+      "kind": "boundary_only",
+      "proof": {
+        "constant_touching_axis": {
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "high": "0",
+          "low": "-4",
+          "rate": "0",
+          "source": [
+            "face_A",
+            [
+              0,
+              1,
+              4,
+              5
+            ]
+          ]
+        }
+      }
+    },
+    "start_inside": {
+      "axes": 3,
+      "contact": {
+        "hi": "2",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "0"
+      },
+      "duration": "3",
+      "endpoints": [
+        {
+          "at": "0",
+          "domain_end": false,
+          "domain_start": true,
+          "tight_axes": 0,
+          "time_bound_source": {
+            "domain": "start"
+          },
+          "witness": null
+        },
+        {
+          "at": "2",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "2",
+            "low": "-2",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "2",
+            "low": "-2",
+            "rate": "1",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": {
+        "hi": "2",
+        "include_hi": false,
+        "include_lo": true,
+        "lo": "0"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "1",
+        "min_unnormalized_projection_slack": "1"
+      }
+    },
+    "time_windows_disjoint": {
+      "axes": 3,
+      "contact": null,
+      "duration": "6",
+      "interior": null,
+      "kind": "miss",
+      "proof": {
+        "lower_source": {
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "high": "-2",
+          "low": "-6",
+          "rate": "-1",
+          "source": [
+            "face_A",
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ]
+        },
+        "lower_time": "2",
+        "upper_source": {
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "high": "1",
+          "low": "-3",
+          "rate": "1",
+          "source": [
+            "face_A",
+            [
+              0,
+              1,
+              4,
+              5
+            ]
+          ]
+        },
+        "upper_time": "1"
+      }
+    },
+    "windows_geometry": {
+      "axes": 504,
+      "contact": {
+        "hi": "242403296341333333499371546666667134972666666666649/85885965333333333479933333333333300000000000000000",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "44403020092735705628508500772797559455703245749609/38728052550231841907867078825347700000000000000000"
+      },
+      "duration": "4",
+      "endpoints": [
+        {
+          "at": "44403020092735705628508500772797559455703245749609/38728052550231841907867078825347700000000000000000",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              250570500000000017143899999999999619,
+              219458999999999969302200000000001400,
+              47631000000000014949800000000001283
+            ],
+            "high": "-28728754000000001541645000000000020967839999999997023/100000000000000000",
+            "low": "-14711431552000001267106505599999955831840000000001027/20000000000000000",
+            "rate": "-250570500000000017143899999999999619",
+            "source": [
+              "edge_cross",
+              [
+                8,
+                9
+              ],
+              [
+                0,
+                2
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              250570500000000017143899999999999619,
+              219458999999999969302200000000001400,
+              47631000000000014949800000000001283
+            ],
+            "high": "-28728754000000001541645000000000020967839999999997023/100000000000000000",
+            "low": "-14711431552000001267106505599999955831840000000001027/20000000000000000",
+            "rate": "-250570500000000017143899999999999619",
+            "source": [
+              "edge_cross",
+              [
+                8,
+                9
+              ],
+              [
+                0,
+                2
+              ]
+            ]
+          }
+        },
+        {
+          "at": "242403296341333333499371546666667134972666666666649/85885965333333333479933333333333300000000000000000",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              858859653333333334799333333333333,
+              -66324746666666533910666666666671,
+              -256496559999999962457999999999999
+            ],
+            "high": "-82135518480000001487122709333333077499333333333339/100000000000000000",
+            "low": "-242403296341333333499371546666667134972666666666649/100000000000000000",
+            "rate": "-858859653333333334799333333333333",
+            "source": [
+              "edge_cross",
+              [
+                0,
+                2
+              ],
+              [
+                10,
+                11
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              858859653333333334799333333333333,
+              -66324746666666533910666666666671,
+              -256496559999999962457999999999999
+            ],
+            "high": "-82135518480000001487122709333333077499333333333339/100000000000000000",
+            "low": "-242403296341333333499371546666667134972666666666649/100000000000000000",
+            "rate": "-858859653333333334799333333333333",
+            "source": [
+              "edge_cross",
+              [
+                0,
+                2
+              ],
+              [
+                10,
+                11
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": {
+        "hi": "242403296341333333499371546666667134972666666666649/85885965333333333479933333333333300000000000000000",
+        "include_hi": false,
+        "include_lo": false,
+        "lo": "44403020092735705628508500772797559455703245749609/38728052550231841907867078825347700000000000000000"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "13201403843436581591475815647700861183944444523359170316925232354380321424832560537/6652392357513447143478836592931466699142590829469151782194744976820000000000000000",
+        "min_unnormalized_projection_slack": "54609374999999999/93750000000000000"
+      }
+    },
+    "windows_geometry_swapped": {
+      "axes": 504,
+      "contact": {
+        "hi": "242403296341333333499371546666667134972666666666649/85885965333333333479933333333333300000000000000000",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "44403020092735705628508500772797559455703245749609/38728052550231841907867078825347700000000000000000"
+      },
+      "duration": "4",
+      "endpoints": [
+        {
+          "at": "44403020092735705628508500772797559455703245749609/38728052550231841907867078825347700000000000000000",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              250570500000000017143899999999999619,
+              219458999999999969302200000000001400,
+              47631000000000014949800000000001283
+            ],
+            "high": "14711431552000001267106505599999955831840000000001027/20000000000000000",
+            "low": "28728754000000001541645000000000020967839999999997023/100000000000000000",
+            "rate": "250570500000000017143899999999999619",
+            "source": [
+              "edge_cross",
+              [
+                0,
+                2
+              ],
+              [
+                8,
+                9
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              250570500000000017143899999999999619,
+              219458999999999969302200000000001400,
+              47631000000000014949800000000001283
+            ],
+            "high": "14711431552000001267106505599999955831840000000001027/20000000000000000",
+            "low": "28728754000000001541645000000000020967839999999997023/100000000000000000",
+            "rate": "250570500000000017143899999999999619",
+            "source": [
+              "edge_cross",
+              [
+                0,
+                2
+              ],
+              [
+                8,
+                9
+              ]
+            ]
+          }
+        },
+        {
+          "at": "242403296341333333499371546666667134972666666666649/85885965333333333479933333333333300000000000000000",
+          "domain_end": false,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "axis": [
+              858859653333333334799333333333333,
+              -66324746666666533910666666666671,
+              -256496559999999962457999999999999
+            ],
+            "high": "242403296341333333499371546666667134972666666666649/100000000000000000",
+            "low": "82135518480000001487122709333333077499333333333339/100000000000000000",
+            "rate": "858859653333333334799333333333333",
+            "source": [
+              "edge_cross",
+              [
+                10,
+                11
+              ],
+              [
+                0,
+                2
+              ]
+            ]
+          },
+          "witness": {
+            "axis": [
+              858859653333333334799333333333333,
+              -66324746666666533910666666666671,
+              -256496559999999962457999999999999
+            ],
+            "high": "242403296341333333499371546666667134972666666666649/100000000000000000",
+            "low": "82135518480000001487122709333333077499333333333339/100000000000000000",
+            "rate": "858859653333333334799333333333333",
+            "source": [
+              "edge_cross",
+              [
+                10,
+                11
+              ],
+              [
+                0,
+                2
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": {
+        "hi": "242403296341333333499371546666667134972666666666649/85885965333333333479933333333333300000000000000000",
+        "include_hi": false,
+        "include_lo": false,
+        "lo": "44403020092735705628508500772797559455703245749609/38728052550231841907867078825347700000000000000000"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "13201403843436581591475815647700861183944444523359170316925232354380321424832560537/6652392357513447143478836592931466699142590829469151782194744976820000000000000000",
+        "min_unnormalized_projection_slack": "54609374999999999/93750000000000000"
+      }
+    },
+    "zero_velocity_face": {
+      "axes": 3,
+      "contact": {
+        "hi": "3",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "0"
+      },
+      "duration": "3",
+      "endpoints": [
+        {
+          "at": "0",
+          "domain_end": false,
+          "domain_start": true,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "domain": "start"
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "0",
+            "low": "-4",
+            "rate": "0",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        },
+        {
+          "at": "3",
+          "domain_end": true,
+          "domain_start": false,
+          "tight_axes": 1,
+          "time_bound_source": {
+            "domain": "end"
+          },
+          "witness": {
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "high": "0",
+            "low": "-4",
+            "rate": "0",
+            "source": [
+              "face_A",
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          }
+        }
+      ],
+      "interior": null,
+      "kind": "boundary_only",
+      "proof": {
+        "constant_touching_axis": {
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "high": "0",
+          "low": "-4",
+          "rate": "0",
+          "source": [
+            "face_A",
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ]
+        }
+      }
+    },
+    "zero_velocity_inside": {
+      "axes": 3,
+      "contact": {
+        "hi": "3",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "0"
+      },
+      "duration": "3",
+      "endpoints": [
+        {
+          "at": "0",
+          "domain_end": false,
+          "domain_start": true,
+          "tight_axes": 0,
+          "time_bound_source": {
+            "domain": "start"
+          },
+          "witness": null
+        },
+        {
+          "at": "3",
+          "domain_end": true,
+          "domain_start": false,
+          "tight_axes": 0,
+          "time_bound_source": {
+            "domain": "end"
+          },
+          "witness": null
+        }
+      ],
+      "interior": {
+        "hi": "3",
+        "include_hi": true,
+        "include_lo": true,
+        "lo": "0"
+      },
+      "kind": "interior_overlap",
+      "proof": {
+        "interior_time": "3/2",
+        "min_unnormalized_projection_slack": "2"
+      }
+    },
+    "zero_velocity_miss": {
+      "axes": 3,
+      "contact": null,
+      "duration": "3",
+      "interior": null,
+      "kind": "miss",
+      "proof": {
+        "constant_separating_axis": {
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "high": "-1",
+          "low": "-5",
+          "rate": "0",
+          "source": [
+            "face_A",
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

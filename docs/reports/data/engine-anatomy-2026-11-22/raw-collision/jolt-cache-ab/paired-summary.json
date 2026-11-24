@@ -1,0 +1,39 @@
+{
+  "rows": 36,
+  "changed_observables": 29,
+  "changed_verdicts": 0,
+  "passed_on": 26,
+  "passed_off": 26,
+  "median_abs_delta_drop_mm": 0.00013982049998813306,
+  "max_abs_delta_drop_mm": 0.0034126600000001783,
+  "cache_on_matches_archived_rows": true,
+  "timing": {
+    "paired_blocks": 20,
+    "pair_ratio_median_off_over_on": 1.7435349793918784,
+    "min_pair_ratio": 1.707977415619036,
+    "max_pair_ratio": 1.7868726655012739,
+    "wins_on": 20,
+    "median_us_on": 45.384444450000004,
+    "median_us_off": 79.34902775,
+    "median_pair_saved_fraction": 0.4264525262508251,
+    "median_by_order": {
+      "on/off": 1.7446271584173494,
+      "off/on": 1.7423005030521925
+    },
+    "end_drift_mm": {
+      "on": [
+        2.24092399
+      ],
+      "off": [
+        2.24164808
+      ]
+    },
+    "median_interval_off_over_on_iid_assumption": {
+      "confidence": 0.9586105346679688,
+      "bounds": [
+        1.7411342275343071,
+        1.7583852126099135
+      ]
+    }
+  }
+}

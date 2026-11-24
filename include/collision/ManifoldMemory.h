@@ -50,6 +50,8 @@ public:
     const Entry* valid(const std::array<int, 4>& key, const Body& a, const Body& b, Real reach) const;
     // Площадка записи в нынешних позах тел.
     static ContactPair carried(const Entry& entry, const Body& a, const Body& b, Real reach);
+    // Обновить геометрию в выходной паре. Идентификаторы задаёт нашедший пару.
+    static void carryInto(const Entry& entry, const Body& a, const Body& b, Real reach, ContactPair& pair);
     // Записи следующего обновления, по возрастанию (a, b).
     void replace(const StepArray<const Entry*>& entries);
 

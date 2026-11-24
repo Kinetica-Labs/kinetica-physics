@@ -1,0 +1,14 @@
+kind,name,value,alignment_or_count
+type,Real,8,8
+type,Vector3,24,8
+type,Quaternion,32,8
+type,Matrix3x3,72,8
+type,SolverBody,184,8
+type,Body,376,8
+type,Bond,168,8
+type,SoftContact,712,8
+type,ProfileMatrix,72,8
+type,ContactSystem::Line,80,8
+type,ContactSystem::Entry,16,8
+array,addresses_divisible_by_16,17,33
+array,addresses_divisible_by_16,17,33

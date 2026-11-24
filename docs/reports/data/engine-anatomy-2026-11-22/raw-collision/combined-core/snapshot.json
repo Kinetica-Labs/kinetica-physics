@@ -1,0 +1,16 @@
+{
+  "cap_library": "a4882947d270fa8cfbbfa2260f8ad39248950ead6771068dc40e4649f98ba43b",
+  "solver_files": [
+    "include/dynamics/time_stepping/DirectJoints.h",
+    "include/math/ProfileMatrix.h",
+    "src/dynamics/time_stepping/CoupledFriction.cpp",
+    "src/dynamics/time_stepping/DirectJoints.cpp",
+    "src/dynamics/time_stepping/FrictionIslands.cpp"
+  ],
+  "geometry_files": [
+    "src/collision/narrowphase/ContactPatch.cpp",
+    "tests/GeometryTests.cpp"
+  ],
+  "worktree_tgz": "20a586f3b60dc79b859b9839f00b9d95f682e59fcde6ce667acc3dbbdc33d5de",
+  "script_only": "validation/studies/anatomy/guide_reuse_benchmark.ps1"
+}

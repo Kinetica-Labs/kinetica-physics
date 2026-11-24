@@ -1,0 +1,5 @@
+phase,public_steps,alloc_calls,alloc_aligned_B,free_calls,free_aligned_B,live_aligned_begin_B,live_aligned_peak_B,live_aligned_end_B,engine_begin_B,engine_end_B
+create,0,90,176704,0,0,0,176704,176704,0,176000
+preload,120,12,159200,5,9184,176704,326720,326720,176000,325968
+loaded,120,0,0,0,0,326720,326720,326720,325968,325968
+destroy,0,0,0,97,326720,326720,326720,0,325968,0

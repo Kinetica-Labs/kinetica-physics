@@ -1,0 +1,33 @@
+==2727== Callgrind, a call-graph generating cache profiler
+==2727== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==2727== Using Valgrind-3.26.0 and LibVEX; rerun with -h for copyright info
+==2727== Command: /tmp/kp-contact-anatomy-run1/bin/box3d shared8
+==2727== Parent PID: 1142
+==2727== 
+--2727-- warning: L3 cache found, using its data for the LL simulation.
+--2727-- warning: specified LL cache: line_size 64  assoc 20  total_size 31,457,280
+--2727-- warning: simulated LL cache: line_size 64  assoc 30  total_size 31,457,280
+==2727== For interactive control, run 'callgrind_control -h'.
+==2727== 
+==2727== Events    : Ir Dr Dw I1mr D1mr D1mw ILmr DLmr DLmw Bc Bcm Bi Bim
+==2727== Collected : 204489413 53574710 25066833 7020920 223274 205000 4453 7691 2963 10678127 274710 512794 79328
+==2727== 
+==2727== I   refs:      204,489,413
+==2727== I1  misses:      7,020,920
+==2727== LLi misses:          4,453
+==2727== I1  miss rate:        3.43%
+==2727== LLi miss rate:        0.00%
+==2727== 
+==2727== D   refs:       78,641,543  (53,574,710 rd + 25,066,833 wr)
+==2727== D1  misses:        428,274  (   223,274 rd +    205,000 wr)
+==2727== LLd misses:         10,654  (     7,691 rd +      2,963 wr)
+==2727== D1  miss rate:         0.5% (       0.4%   +        0.8%  )
+==2727== LLd miss rate:         0.0% (       0.0%   +        0.0%  )
+==2727== 
+==2727== LL refs:         7,449,194  ( 7,244,194 rd +    205,000 wr)
+==2727== LL misses:          15,107  (    12,144 rd +      2,963 wr)
+==2727== LL miss rate:          0.0% (       0.0%   +        0.0%  )
+==2727== 
+==2727== Branches:       11,190,921  (10,678,127 cond +    512,794 ind)
+==2727== Mispredicts:       354,038  (   274,710 cond +     79,328 ind)
+==2727== Mispred rate:          3.2% (       2.6%     +       15.5%   )

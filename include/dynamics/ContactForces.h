@@ -62,6 +62,15 @@ public:
         while (last != end() && last->first.samePair(pair)) ++last;
         return {first, size_t(last - first)};
     }
+    // Принятый пробный шаг обновляет доли силы и момента трения всех точек одной площадки.
+    void reviseFriction(const ContactId& pair, Vector3 tangent, Real twist) {
+        auto first = std::lower_bound(entries_.begin(), entries_.end(), pair,
+            [](const Entry& entry, const ContactId& key) { return entry.first.pairBefore(key); });
+        for (auto it = first; it != entries_.end() && it->first.samePair(pair); ++it) {
+            it->second.tangent = tangent;
+            it->second.twist = twist;
+        }
+    }
     const Entry* begin() const { return entries_.data(); }
     const Entry* end() const { return entries_.data() + entries_.size(); }
 

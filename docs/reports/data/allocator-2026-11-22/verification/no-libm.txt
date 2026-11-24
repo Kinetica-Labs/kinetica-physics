@@ -1,0 +1,2 @@
+PASS src/libkinetica-physics.a 1293 symbol lines
+PASS examples/libkinetica-scenes.a 92 symbol lines

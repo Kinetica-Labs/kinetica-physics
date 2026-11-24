@@ -1,0 +1,13 @@
+{
+  "seed": 19730819,
+  "cases": 1024,
+  "rows_entries": [
+    12276,
+    99958
+  ],
+  "bytes": 1252696,
+  "byte_equal": true,
+  "sha256_base": "4a05f279826baf3360b807730508ce567c985d199812a0bf054fab22abe56d77",
+  "sha256_candidate": "4a05f279826baf3360b807730508ce567c985d199812a0bf054fab22abe56d77",
+  "sha256_driver": "f9be9f3a82c86f9503c149437f5f3a1231175ba5e5c38ce3768dc7ecd8a8a85c"
+}

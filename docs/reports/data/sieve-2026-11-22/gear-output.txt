@@ -1,0 +1,2 @@
+exact: A=90.000000 deg, B=-45.000000 deg, max phase error 7.87e-14 rad, max speed error 1.28e-13 rad/s
+realtime: A=90.187500 deg, B=-45.093750 deg, max phase error 4.44e-16 rad, max speed error 3.29e-14 rad/s

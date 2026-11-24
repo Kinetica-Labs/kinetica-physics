@@ -3,18 +3,41 @@
 #include <collision/narrowphase/TransformedHull.h>
 #include <math/StepMemory.h>
 
+#include <algorithm>
+
 namespace kp {
 namespace {
 
 // Лучшая ось среди нормалей граней тела `of`: зазор вдоль нормали грани равен расстоянию от
 // плоскости грани до самой глубокой вершины другого тела.
-void faceAxis(const TransformedHull& of, const TransformedHull& other, Real& separation, int& face) {
-    separation = -std::numeric_limits<Real>::infinity();
+struct FaceChoice {
+    int face;
+    Real gap;
+    Real maximum;
+};
+
+Real axisRoundoff(const TransformedHull& a, const TransformedHull& b) {
+    return 64 * kEpsilon * (a.shape.boundingRadius() + b.shape.boundingRadius() + (a.centre - b.centre).length());
+}
+
+FaceChoice faceAxis(const TransformedHull& of, const TransformedHull& other, Real tie) {
+    SmallVector<Real, 32> gaps;
+    Real maximum = -std::numeric_limits<Real>::infinity();
     for (int i = 0; i < int(of.normals.size()); ++i) {
         const Vector3 n = of.normals[size_t(i)];
         const Real s = n.dot(other.support(-n) - of.pointOnFace(i));
-        if (s > separation) separation = s, face = i;
+        gaps.push_back(s);
+        maximum = std::max(maximum, s);
     }
+    // При равенстве в пределах округления поверхность детали важнее её внутреннего шва.
+    // Сравнение с единым максимумом исключает цепочку попарно «почти равных» зазоров.
+    int first = -1;
+    for (int i = 0; i < int(gaps.size()); ++i) {
+        if (maximum - gaps[size_t(i)] > tie) continue;
+        if (first < 0) first = i;
+        if (!of.shape.isInternalFace(i)) return {i, gaps[size_t(i)], maximum};
+    }
+    return {first, gaps[size_t(first)], maximum};
 }
 
 // Образуют ли два ребра грань разности Минковского. На единичной сфере ребру A соответствует
@@ -50,7 +73,7 @@ StepArray<Real> arcSides(const TransformedHull& of, const TransformedHull& other
 } // namespace
 
 // Оси пар рёбер: лучше оси best — заменяют её.
-static SeparatingAxis bestEdgePair(const TransformedHull& A, const TransformedHull& B, SeparatingAxis best, Real preference) {
+static SeparatingAxis bestEdgePair(const TransformedHull& A, const TransformedHull& B, SeparatingAxis best, Real preference, Real tie, Real& maximum) {
     const size_t facesA = A.normals.size(), facesB = B.normals.size();
     const StepArray<Real> sidesA = arcSides(A, B, -1), sidesB = arcSides(B, A, 1);
     for (int i = 0; i < int(A.shape.edges().size()); ++i) {
@@ -69,25 +92,41 @@ static SeparatingAxis bestEdgePair(const TransformedHull& A, const TransformedHu
             // Ось направляется наружу тела A — от его центра к ребру.
             const Vector3 normal = (axis.dot(tailA - A.centre) < 0 ? -1 / axisLength : 1 / axisLength) * axis;
             const Real s = normal.dot(tailB - tailA);
-            if (s > best.separation + (best.kind == SeparatingAxis::Kind::EdgePair ? 0 : preference))
+            maximum = std::max(maximum, s);
+            if (s > best.separation + (best.kind == SeparatingAxis::Kind::EdgePair ? tie : preference))
                 best = {SeparatingAxis::Kind::EdgePair, s, normal, i, j};
         }
     }
     return best;
 }
 
-static SeparatingAxis bestFaceInA(const TransformedHull& A, const TransformedHull& B, Real preference) {
-    Real separationA, separationB;
-    int faceA = 0, faceB = 0;
-    faceAxis(A, B, separationA, faceA);
-    faceAxis(B, A, separationB, faceB);
-    if (separationB > separationA + preference) return {SeparatingAxis::Kind::FaceB, separationB, -B.normals[size_t(faceB)], 0, faceB};
-    return {SeparatingAxis::Kind::FaceA, separationA, A.normals[size_t(faceA)], faceA, 0};
+static SeparatingAxis bestFaceInA(const TransformedHull& A, const TransformedHull& B, Real preference, Real tie, Real& maximum) {
+    const FaceChoice a = faceAxis(A, B, tie), b = faceAxis(B, A, tie);
+    maximum = std::max(a.maximum, b.maximum);
+    const bool surfaceB = A.shape.isInternalFace(a.face) && !B.shape.isInternalFace(b.face) && b.gap >= a.maximum - tie;
+    if (surfaceB || b.gap > a.gap + preference) return {SeparatingAxis::Kind::FaceB, b.gap, -B.normals[size_t(b.face)], 0, b.face};
+    return {SeparatingAxis::Kind::FaceA, a.gap, A.normals[size_t(a.face)], a.face, 0};
 }
 
-// Оболочки уже в общих осях: ось — в них же. Так отсечение граней строит оболочки один раз на пару.
-SeparatingAxis findSeparatingAxis(const TransformedHull& A, const TransformedHull& B, Real preference) { return bestEdgePair(A, B, bestFaceInA(A, B, preference), preference); }
-SeparatingAxis findFaceAxis(const TransformedHull& A, const TransformedHull& B, Real preference) { return bestFaceInA(A, B, preference); }
+static SeparatingAxis scanAxes(const TransformedHull& A, const TransformedHull& B, Real preference, Real& maximum) {
+    const Real tie = axisRoundoff(A, B);
+    const SeparatingAxis face = bestFaceInA(A, B, preference, tie, maximum);
+    return bestEdgePair(A, B, face, preference, tie, maximum);
+}
+
+SeparatingAxis findSeparatingAxis(const TransformedHull& A, const TransformedHull& B, Real preference) {
+    Real maximum;
+    return scanAxes(A, B, preference, maximum);
+}
+bool findContactAxis(const TransformedHull& A, const TransformedHull& B, Real margin, Real preference, SeparatingAxis& response) {
+    Real maximum;
+    response = scanAxes(A, B, preference, maximum);
+    return maximum <= margin;
+}
+SeparatingAxis findFaceAxis(const TransformedHull& A, const TransformedHull& B, Real preference) {
+    Real maximum;
+    return bestFaceInA(A, B, preference, axisRoundoff(A, B), maximum);
+}
 
 // Работа идёт в осях тела A (см. Transform::relative); в мир переводится только нормаль.
 SeparatingAxis findSeparatingAxis(const ConvexHull& a, const Transform& poseA, const ConvexHull& b, const Transform& poseB, Real preference) {

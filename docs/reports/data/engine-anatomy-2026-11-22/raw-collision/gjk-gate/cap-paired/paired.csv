@@ -1,0 +1,4 @@
+probe,inputs,cap_pass,combined_pass,gained,lost,still_fail,retries
+primary,1440,1412,1436,24,0,4,61
+holdout,1440,1414,1432,18,0,8,35
+contract,14992,14992,14992,0,0,0,152

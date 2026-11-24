@@ -1,0 +1,37 @@
+--- a/validation/engines/grip_jolt.cpp
++++ b/validation/engines/grip_jolt.cpp
+@@ -32,7 +32,7 @@
+ 
+ class Rig {
+ public:
+-    explicit Rig(grip::Load load) {
++    Rig(grip::Load load, bool usePairCache) {
+         // Все три тела динамические и используют один слой. Обе направляющие закреплены в мире.
+         world_.Init(16, 1, 64, 64, layer_, broadFilter_, pairFilter_);
+         world_.SetGravity(Vec3::sZero());
+@@ -40,7 +40,9 @@
+         settings.mNumVelocitySteps = settings.mNumPositionSteps = 1;
+         settings.mConstraintWarmStart = true;
+         settings.mAllowSleeping = false;
++        settings.mUseBodyPairContactCache = usePairCache;
+         world_.SetPhysicsSettings(settings);
++        if (world_.GetPhysicsSettings().mUseBodyPairContactCache != usePairCache) std::abort();
+         left_ = addBox(grip::jawPosition(grip::leftJaw, load.open), load.friction);
+         right_ = addBox(grip::jawPosition(grip::rightJaw, load.open), load.friction);
+         cube_ = addBox(grip::cube, load.friction);
+@@ -114,10 +116,13 @@
+ }
+ 
+ int main(int argc, char** argv) {
+-    if (argc != 2 || std::string_view(argv[1]) != "shared8") return 2;
++    if (argc != 3 || std::string_view(argv[1]) != "shared8") return 2;
++    const std::string_view choice = argv[2];
++    if (choice != "on" && choice != "off") return 2;
++    const bool usePairCache = choice == "on";
+     JoltRuntime runtime;
+     grip::header();
+     // Jolt сохраняет скорости и импульсы в float даже при двойной точности мировых координат.
+     const char* name = sizeof(JPH::Real) == 8 ? "jolt-pos64-shared8" : "jolt-f32-shared8";
+-    return grip::sweep(name, [](grip::Load load) { return Rig(load); }) ? 0 : 1;
++    return grip::sweep(name, [usePairCache](grip::Load load) { return Rig(load, usePairCache); }) ? 0 : 1;
+ }

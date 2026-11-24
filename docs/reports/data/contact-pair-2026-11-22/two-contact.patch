@@ -1,0 +1,203 @@
+--- a/include/dynamics/time_stepping/CentreFriction.h
++++ b/include/dynamics/time_stepping/CentreFriction.h
+@@ -30,6 +30,9 @@
+     Carried carried(const Frame& at) const { return {rub_.x * at.tangent1 + rub_.y * at.tangent2, twistImpulse_}; }
+ 
+ private:
++    friend struct PairStick;
++    void solveTwist(SolverBody& a, SolverBody& b, const Frame& at, Real leverLoad);
++    void setTangent(SolverBody& a, SolverBody& b, const Frame& at, Vector2 rub, Real load);
+     Matrix2x2 tangentMass_; // обратная матрица отклика трения в центре
+     Real twistMass_ = 0;
+     Vector2 rub_; // накопленный импульс трения вдоль двух касательных
+--- a/include/dynamics/time_stepping/SoftContact.h
++++ b/include/dynamics/time_stepping/SoftContact.h
+@@ -80,6 +80,7 @@
+     static void prefetch(const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states, size_t near, size_t far);
+ 
+ private:
++    friend struct PairStick;
+     CentreFriction::Carried takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, Span<ContactForces::Entry> known, Real h, bool fourPoints);
+     // Нынешние нормаль и касательные; found — ближайшие точки форм, найденные заново, или nullptr.
+     void aim(const BodyMotion& a, const BodyMotion& b, Vector3 apart, const ClosestPoints* found);
+--- a/include/dynamics/time_stepping/DirectJoints.h
++++ b/include/dynamics/time_stepping/DirectJoints.h
+@@ -27,6 +27,7 @@
+     void solve(StepArray<SolverBody>& states, Real correction, Real h);
+ 
+ private:
++    friend struct PairStick;
+     void push(size_t row, StepArray<SolverBody>& states, Real impulse) const;
+ 
+     std::vector<Bond> bonds_;
+--- a/src/dynamics/time_stepping/CentreFriction.cpp
++++ b/src/dynamics/time_stepping/CentreFriction.cpp
+@@ -21,17 +21,24 @@
+     rolling_.warmStart(a, b, at.tangent1, at.tangent2);
+ }
+ 
+-void CentreFriction::solve(SolverBody& a, SolverBody& b, const Frame& at, Real load, Real leverLoad, Real rollingArm) {
++void CentreFriction::solveTwist(SolverBody& a, SolverBody& b, const Frame& at, Real leverLoad) {
+     const Real turning = std::max(-coefficient * leverLoad, std::min(coefficient * leverLoad, twistImpulse_ - twistMass_ * at.normal.dot(b.w - a.w)));
+     SolverBody::twist(a, b, (turning - twistImpulse_) * at.normal);
+     twistImpulse_ = turning;
+-    const Vector3 slip = b.v + b.w.cross(at.centreB) - a.v - a.w.cross(at.centreA);
+-    const Real s1 = slip.dot(at.tangent1), s2 = slip.dot(at.tangent2);
+-    Vector2 rub = rub_ - tangentMass_ * Vector2{s1, s2};
++}
++
++void CentreFriction::setTangent(SolverBody& a, SolverBody& b, const Frame& at, Vector2 rub, Real load) {
+     const Real size = rub.length(), limit = coefficient * load;
+     if (size > limit) rub = (limit / size) * rub;
+     SolverBody::push(a, b, at.centreA, at.centreB, (rub.x - rub_.x) * at.tangent1 + (rub.y - rub_.y) * at.tangent2);
+     rub_ = rub;
++}
++
++void CentreFriction::solve(SolverBody& a, SolverBody& b, const Frame& at, Real load, Real leverLoad, Real rollingArm) {
++    solveTwist(a, b, at, leverLoad);
++    const Vector3 slip = b.v + b.w.cross(at.centreB) - a.v - a.w.cross(at.centreA);
++    const Real s1 = slip.dot(at.tangent1), s2 = slip.dot(at.tangent2);
++    setTangent(a, b, at, rub_ - tangentMass_ * Vector2{s1, s2}, load);
+     rolling_.solve(a, b, at.tangent1, at.tangent2, rollingArm, load);
+ }
+ 
+--- a/src/dynamics/time_stepping/SoftStep.cpp
++++ b/src/dynamics/time_stepping/SoftStep.cpp
+@@ -14,6 +14,92 @@
+ #include <limits>
+ 
+ namespace kp {
++// Research build only. Compare a joint-free four-tangent block with the same block including rigid guides.
++struct PairStick {
++    static bool shareMovingBody(const SoftContact& p, const SoftContact& q, const StepArray<SolverBody>& states) {
++        for (int id : {p.a_, p.b_})
++            if ((id == q.a_ || id == q.b_) && states[size_t(id)].inverseMass > 0) return true;
++        return false;
++    }
++
++    static void addTangents(DirectJoints& block, const SoftContact& contact, Vector2& delta) {
++        const auto row = [&](Vector3 t) {
++            return Bond{contact.a_, contact.b_, t, contact.centreA_.cross(t), contact.centreB_.cross(t), 0, 0};
++        };
++        block.add(row(contact.tangent1_), &delta.x);
++        block.add(row(contact.tangent2_), &delta.y);
++    }
++
++#ifdef KP_PAIR_ACTIVE
++    // When one contact reaches the Coulomb limit, its available impulse changes the slip at the other.
++    static void resolveSticking(StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states,
++                                const DirectJoints& guides, const Real normal[2], Vector2 delta[2], Real h) {
++        const auto beyond = [&](int i) {
++            const auto& f = contacts[i].friction_;
++            return (f.rub_ + delta[i]).length() > f.coefficient * normal[i];
++        };
++        const bool firstAtLimit = beyond(0);
++        if (firstAtLimit == beyond(1)) return;
++        const int fixed = firstAtLimit ? 0 : 1, free = 1 - fixed;
++        const auto& contact = contacts[fixed];
++        const auto& friction = contact.friction_;
++        const Vector2 target = friction.rub_ + delta[fixed];
++        const Vector2 limited = (friction.coefficient * normal[fixed] / target.length()) * target - friction.rub_;
++        auto trial = states;
++        SolverBody::push(trial[size_t(contact.a_)], trial[size_t(contact.b_)], contact.centreA_, contact.centreB_,
++                         limited.x * contact.tangent1_ + limited.y * contact.tangent2_);
++        DirectJoints remaining;
++        StepArray<Real> trialReactions(guides.bonds_.size(), 0);
++        for (size_t k = 0; k < guides.bonds_.size(); ++k) remaining.add(guides.bonds_[k], &trialReactions[k]);
++        delta[free] = {};
++        addTangents(remaining, contacts[free], delta[free]);
++        remaining.assemble(trial);
++        remaining.solve(trial, 0, h);
++    }
++#endif
++
++    static bool solve(StepArray<SoftContact>& contacts, StepArray<SolverBody>& states, DirectJoints& guides,
++                      Real h, Real rollingArm) {
++        if (contacts.size() != 2 || !shareMovingBody(contacts[0], contacts[1], states)) return false;
++        Real normal[2]{}, torqueLoad[2]{};
++        for (int i = 0; i < 2; ++i) {
++            for (const auto& p : contacts[i].points_) {
++                normal[i] += p.impulse;
++                torqueLoad[i] += p.lever * p.impulse;
++            }
++            if (contacts[i].friction_.coefficient * normal[i] <= 0) return false;
++        }
++        DirectJoints block;
++#ifdef KP_PAIR_WITH_GUIDES
++        StepArray<Real> trialReactions(guides.bonds_.size(), 0);
++        for (size_t k = 0; k < guides.bonds_.size(); ++k) block.add(guides.bonds_[k], &trialReactions[k]);
++#endif
++        Vector2 delta[2]{};
++        for (int i = 0; i < 2; ++i) {
++            auto& c = contacts[i];
++            c.friction_.solveTwist(states[size_t(c.a_)], states[size_t(c.b_)], c.frame(), torqueLoad[i]);
++            addTangents(block, c, delta[i]);
++        }
++        // Solve J M^-1 J^T delta = -Jv assuming both contacts stick. Apply the feasible total impulse.
++        auto trial = states;
++        block.assemble(trial);
++        block.solve(trial, 0, h);
++#ifdef KP_PAIR_ACTIVE
++        resolveSticking(contacts, states, guides, normal, delta, h);
++#endif
++        for (int i = 0; i < 2; ++i) {
++            auto& c = contacts[i];
++            SolverBody &a = states[size_t(c.a_)], &b = states[size_t(c.b_)];
++            c.friction_.setTangent(a, b, c.frame(), c.friction_.rub_ + delta[i], normal[i]);
++            c.friction_.rolling_.solve(a, b, c.tangent1_, c.tangent2_, rollingArm, normal[i]);
++        }
++#ifdef KP_PAIR_WITH_GUIDES
++        guides.solve(states, 0, h);
++#endif
++        return true;
++    }
++};
++
+ namespace {
+ 
+ // Состояния тел для решателя на начало кадра. У тела без массы отклик нулевой, а скорости — заданные
+@@ -197,11 +283,11 @@
+ 
+ // Начало подшага: сопротивление среды, v ← v / (1 + h c) (Body::linearDamping), тяжесть и приложенные к
+ // телу сила и момент (Body::force, torque): v += h F / m, ω += h I⁻¹ τ с нынешним I⁻¹ в мире.
+-void applyForces(StepArray<SolverBody>& states, const std::vector<Body>& bodies, Vector3 gravity, Real h) {
++void applyForces(StepArray<SolverBody>& states, const std::vector<Body>& bodies, Vector3 gravity, Real h, Real dampingTime) {
+     for (size_t i = 0; i < states.size(); ++i) {
+         if (states[i].inverseMass <= 0) continue;
+-        states[i].v = (1 / (1 + h * bodies[i].linearDamping)) * states[i].v + h * gravity;
+-        states[i].w = (1 / (1 + h * bodies[i].angularDamping)) * states[i].w;
++        states[i].v = (1 / (1 + dampingTime * bodies[i].linearDamping)) * states[i].v + h * gravity;
++        states[i].w = (1 / (1 + dampingTime * bodies[i].angularDamping)) * states[i].w;
+         if (!isForced(bodies[i])) continue;
+         states[i].v += (h * states[i].inverseMass) * bodies[i].force;
+         states[i].w += h * states[i].spinFrom(bodies[i].torque);
+@@ -299,19 +385,27 @@
+                       std::any_of(bodies.begin(), bodies.end(), [](const Body& body) { return body.restitution != 0; })};
+     notify(observer, StepStage::Contacts);
+     for (int substep = 0; substep < substeps; ++substep) {
+-        applyForces(states, bodies, gravity, h);
++#ifdef KP_CENTRED_FORCE
++        applyForces(states, bodies, gravity, h / 2, h);
++#else
++        applyForces(states, bodies, gravity, h, h);
++#endif
+         // Тёплый старт: накопленные импульсы прикладываются к новым скоростям.
+         rows.warmStart(states);
+         normals.levels.each(contacts, states, [&](size_t c) { contacts[c].warmStart(states); });
+         notify(observer, StepStage::WarmStart);
+         rows.solve(states, true, jointCorrection, h, jointSoft, pushSpeed), notify(observer, StepStage::Joints);
+         live.solveAndMove(moving, h, (substeps - substep) * h);
++#ifdef KP_CENTRED_FORCE
++        applyForces(states, bodies, gravity, h / 2, 0);
++#endif
+         rows.build(joints, bodies, states, jointMemory, directJoints);
+         rows.solve(states, false, jointCorrection, h, jointSoft, pushSpeed), notify(observer, StepStage::Joints);
+         const StepArray<char> stirred = moving.stirred(restSpeed);
+         if (restSpeed == 0 || std::find(stirred.begin(), stirred.end(), 1) != stirred.end()) normals.solve(contacts, bodies, states, false, h, pushSpeed, restSpeed > 0 ? &stirred : nullptr);
+         notify(observer, StepStage::Normals);
+-        normals.levels.each(contacts, states, [&](size_t c) { contacts[c].solveFriction(states, rollingResistance); });
++        if (!rows.links.empty() || !PairStick::solve(contacts, states, rows.locked, h, rollingResistance))
++            normals.levels.each(contacts, states, [&](size_t c) { contacts[c].solveFriction(states, rollingResistance); });
+         notify(observer, StepStage::Friction);
+     }
+     finish(bodies, states, contacts, contactMemory, h), notify(observer, StepStage::Memory);

@@ -27,7 +27,7 @@ void World::step(Real dt) {
         manifolds_.tolerance = soft.contactDrift;
         // В тихом кадре контакты ищутся один раз: четыре поиска нужны при ударах, а в покое не меняют ни
         // осадку, ни перекрытие и стоят трети кадра (замер H69).
-        const int updates = quiet(dt) ? 1 : soft.contactUpdates;
+        const int updates = (soft.contactUpdates == 1 || quiet(dt)) ? 1 : soft.contactUpdates;
         part.restSpeed = soft.contactDrift / dt; // тело стоит, если его точка не пройдёт за кадр больше допуска
         part.substeps = std::max(1, soft.substeps / updates);
         for (int update = 0; update < updates; ++update) {
@@ -35,7 +35,7 @@ void World::step(Real dt) {
             finder.boundary = soft.edgeSlop, finder.memory = &manifolds_, finder.remembered = &candidates_;
             finder.collect(dt / updates, joints_, pairs_);
             notify(watch, StepStage::Pairs);
-            part.step(bodies_, pairs_, joints_, gravity, dt / updates, contactForces_, jointImpulses_);
+            part.step(bodies_, pairs_, joints_, gravity, dt / updates, contactForces_, jointImpulses_, shockPropagation);
         }
         report_.segments = part.substeps * updates;
     } else {

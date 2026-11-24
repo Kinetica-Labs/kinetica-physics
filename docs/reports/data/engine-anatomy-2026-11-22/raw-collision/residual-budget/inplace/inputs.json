@@ -1,0 +1,37 @@
+{
+  "baseline_archive_sha256": "49b37513fd0602b75d6ba9a25ac5f52a4c8dd6c117a49c312bea294b4c16ef25",
+  "input_sha256": {
+    "carry": "288c9f6adc7001f3c1748217ff90f7ac907a0fbb1ce5b95f9803b45a1b5d78a8",
+    "normal": "d7cda17eefd303c5f4053e2b1c309bc02b1e4c4cd95be0c555b6bc91f9a6e191",
+    "manifold": "3863780d2d6f4ac97e39bef55c76129d7855db3483bef3c64953f803bd960494",
+    "balance": "902d69505c353f02761d99c05897ebaa1b870a0563827f6b880e61b624df0eac"
+  },
+  "baseline_source_sha256": {
+    "src/collision/PairFinder.cpp": "a021a523d55b9c4249b6a44dccd416e3f41d7cda703fe01c5b27bd33e0759323",
+    "src/dynamics/time_stepping/IslandNormals.cpp": "0dcd499cc00b079dd66fe65ad2fd463a5a9d237f68f9fd72579a7bd9fd137e90",
+    "src/collision/ManifoldMemory.cpp": "d0af4a89a7a6f100afdc59cc8098b13950b1886baafefbac964bfa5a09b59a9c"
+  },
+  "binaries_sha256": {
+    "stock": "e87852abfca6acca4fac6acf95fe5cb0dfda7daa7aa29aa1d01eef0d67b82fc4",
+    "inplace": "a732a8b2b45582ff518bff92ff517dd856d1565274b5f0c21f534255586926dc",
+    "inplace-normal": "4d8348c56be4bcfce40d5e329dae3fb84b6aab84d5442d83d55847bffe85ba36",
+    "balanced": "1c0319a65934c89996ac9e067889d0973ccf9627e5f5bdf3e4f2177d4fe4646e"
+  },
+  "env": {
+    "KP_THREADS": "1",
+    "KP_COUPLED_FRICTION": "1",
+    "KP_GRIP_PROFILE": "0",
+    "KP_GRIP_TIMING": "0"
+  },
+  "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+  "seed": 20261123,
+  "flags": [
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG",
+    "-ffp-contract=off",
+    "-g",
+    "-gcodeview"
+  ],
+  "affinity": "0x100"
+}

@@ -1,0 +1,18 @@
+{
+  "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+  "sdk_archive_sha256": "a4882947d270fa8cfbbfa2260f8ad39248950ead6771068dc40e4649f98ba43b",
+  "pairfinder_original_sha256": "a021a523d55b9c4249b6a44dccd416e3f41d7cda703fe01c5b27bd33e0759323",
+  "pairfinder_instrumented_sha256": "798ea927fe659f987baf0d2f91d85beec3ed63405418b68d1cd48d7bbdd38911",
+  "grip_sha256": "19ed099d9dcaa8bda492c7cf2b7a1500aad50f7be1105dde651de7af8e133cbc",
+  "probe_sha256": "5755ac442f7513c4bbdcbe0e52a6b7aba0233ce4fea0e9ea282fa0515385dfc1",
+  "scope": "one thread, 3 solid boxes + static shapeless slider anchor. PartFinder excluding listed pairs; no_cache is separate. Each world fresh per case and mode. Units integer counts.",
+  "base": {
+    "exe_sha256": "55a0de16ac16e75fe26d78d9efa6dfa1574cf54d5e85379b3f62eded5d3e071b",
+    "csv_sha256": "33e6832ab7ee2e1a7c252a9c7e7c2b89869a50e310802a48d73dff5df7888701"
+  },
+  "counter": {
+    "exe_sha256": "c866dfaf72c3c671aead63e70e671f9fbf323cddd4af6d8c9dc002c05aaf9c6f",
+    "csv_sha256": "928348a0f622bf4a331faf15badbce7f53dc3240e76015e42abb82e1e669ffd4"
+  },
+  "identical_trajectories_frame_count": 180
+}

@@ -1,0 +1,91 @@
+{
+  "environment": {
+    "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+    "target": "x86_64-w64-windows-gnu",
+    "flags": [
+      "-std=c++17",
+      "-O3",
+      "-DNDEBUG",
+      "-ffp-contract=off",
+      "-IC:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\accepted-src\\include"
+    ],
+    "double_digits": 53,
+    "long_double_digits": 64,
+    "long_double_size": 16,
+    "gjk_sha256": "1d6449657b241ffc8700cc2dc2d3b2f90c35fb8b89b3f137ca39732951f8be05",
+    "probe_sha256": "17b26ff40558e08502f2bb24a307019384e37147824daaa34e3480b871234ded",
+    "accepted_library_sha256": "15d6a584cb6806085e1802ecababf24004bb4396f389b9ec7cdbeb2b0792705e"
+  },
+  "results": {
+    "base": {
+      "exit": 1,
+      "passes": 1412,
+      "csv_sha256": "e655087e3b7b476ed750faf551e132f1c5910b968fc10b5ec1de772ff664c644",
+      "source_sha256": "1d6449657b241ffc8700cc2dc2d3b2f90c35fb8b89b3f137ca39732951f8be05",
+      "object_sha256": "b38bf50b9c5387c907c2cd01aa9c7b4f22d560f29ddaac24b583ea9abf897886",
+      "exe_sha256": "ef55f2e8724d6673cdc1ac5b18851809c70f2f7d9128a32a4b10d3274e9b3c7e",
+      "components": {
+        "111": 1412,
+        "110": 26,
+        "010": 2
+      }
+    },
+    "gram": {
+      "exit": 1,
+      "passes": 1413,
+      "csv_sha256": "956cd1f44e99a971f5b22d3df066b33bb8cf7b4bcc7613e9a75268e762423313",
+      "source_sha256": "bcb809a6901f8e6f50c09bfd071bb08d4c8bd0bad2933644ba27ad01f4eaaed5",
+      "object_sha256": "3ee083db3048a5a09b8ca2edd4f7260184afecbd9e1723ce08a9504ad4a5ec4a",
+      "exe_sha256": "01e31920310e45cd66410d58d775066e4ca28eece3d73acd6e1c736dc546287c",
+      "components": {
+        "111": 1413,
+        "110": 22,
+        "010": 5
+      }
+    },
+    "area": {
+      "exit": 1,
+      "passes": 1433,
+      "csv_sha256": "aed17990c93d2c5c20c3008416769169cbfbef415cd47d90e1942d06a6678842",
+      "source_sha256": "5b099d64f6c9db5b62d90d2348fa079037c82f46adbdafeffa554e6f7c28c634",
+      "object_sha256": "49ccd859392cc848b653cc85487100569a451ec5e3d242df93c04f83cb31d537",
+      "exe_sha256": "4a64823648e0196c0e09d535201a1d61fb094c0ce778cdbb5243c13ef154d6cb",
+      "components": {
+        "111": 1433,
+        "011": 3,
+        "110": 4
+      }
+    },
+    "selector": {
+      "passes": 1436,
+      "exit": 1,
+      "source_sha256": "8e14a9acfd896ea73b1fedb23a9fcc0a1e2f3ab2d09519181fa5e40f311fa3b1",
+      "exe_sha256": "46ef70fb901d8b756fd2316fa1d50d984bdde2229057846b98e1f62c0c10744c",
+      "csv_sha256": "a8c92a6fd3164556b0ea11a377851c5aae71201e3d3c60dc9e6670d01bcff251",
+      "trace_sha256": "9714bd815834b5fba3a95c5958b39879aacfd48614563fe881b74234f73645b0"
+    }
+  },
+  "holdout": {
+    "probe_sha256": "1096f29c01c42c5e839cd9a0f16cd339b4401d31394cae3823642b6be3633823",
+    "results": {
+      "base": {
+        "exit": 1,
+        "passes": 1406,
+        "csv_sha256": "4aa06f2cf2fdc1e7253a97556c8f0e7ef70e9995a611dbddf4d15fc7c6c76811",
+        "exe_sha256": "b1d9f26c6062082f120c24770c2d7b6985095b38f3c69de0d51d013762c86a94"
+      },
+      "area": {
+        "exit": 1,
+        "passes": 1421,
+        "csv_sha256": "c2553e7230f1f4a1996fa0115b5f7bc4eb95eee9f8f2b7e2f30f118370aa433f",
+        "exe_sha256": "73ff5a49352428c9dd4f6ff4279fcf637fdecd239bdec239ff67cf5f518b43a7"
+      },
+      "select": {
+        "exit": 1,
+        "passes": 1424,
+        "csv_sha256": "c0355ec127ff9d46f95b00f9a86e44089a188aaf2d186e74cf8473f24041896e",
+        "exe_sha256": "2edeaac045cda4ba4bd99b4184bfd70950d09365574bfee5a52833ad08e786f3"
+      }
+    }
+  }
+}

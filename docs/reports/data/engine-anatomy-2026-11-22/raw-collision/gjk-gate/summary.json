@@ -1,0 +1,108 @@
+{
+  "primitive": [
+    {
+      "probe": "primary",
+      "queries": 1440,
+      "passes": [
+        1412,
+        1436,
+        1436
+      ],
+      "patterns_stock_fullselect_gated": {
+        "111": 1412,
+        "011": 24,
+        "000": 4
+      },
+      "predicate_changes_from_fullselect": {},
+      "retries": 61,
+      "selected_area": 58,
+      "baseline_support_calls": 44182,
+      "repeat_support_calls": 3716,
+      "certificate_support_calls": 30,
+      "gate_total_support_calls": 47928,
+      "always_two_descent_support_calls": 90870,
+      "old_fullselect_extra_support_calls": 5712,
+      "old_fullselect_total_support_calls": 96582,
+      "bounding_radius_calls": 122
+    },
+    {
+      "probe": "holdout",
+      "queries": 1440,
+      "passes": [
+        1406,
+        1424,
+        1424
+      ],
+      "patterns_stock_fullselect_gated": {
+        "111": 1406,
+        "000": 16,
+        "011": 18
+      },
+      "predicate_changes_from_fullselect": {},
+      "retries": 35,
+      "selected_area": 34,
+      "baseline_support_calls": 42252,
+      "repeat_support_calls": 2488,
+      "certificate_support_calls": 10,
+      "gate_total_support_calls": 44750,
+      "always_two_descent_support_calls": 86992,
+      "old_fullselect_extra_support_calls": 5672,
+      "old_fullselect_total_support_calls": 92664,
+      "bounding_radius_calls": 70
+    }
+  ],
+  "contract": {
+    "rows": 14992,
+    "gate_passes": 14992,
+    "stock_passes": 14992,
+    "new_fails": 0,
+    "gates": {
+      "retry": 152,
+      "alternate": 32,
+      "original_shrunk": 112,
+      "alternate_shrunk": 112,
+      "beyond": 0,
+      "overlap": 320,
+      "analytic": 24,
+      "unbounded": 14992,
+      "first_descent_supports": 118564,
+      "second_descent_supports": 6776,
+      "first_certificate_supports": 0,
+      "second_certificate_supports": 0,
+      "first_pointcore_supports": 288,
+      "second_pointcore_supports": 0,
+      "first_bound_calls": 184,
+      "second_bound_calls": 0,
+      "original_resolved": 14672,
+      "alternate_resolved": 152
+    }
+  },
+  "guard_tables_equal": true,
+  "guards": {
+    "rows": 9,
+    "queries": 9,
+    "exit": 0,
+    "failed": 0,
+    "csv_sha256": "aaad96c8ec106724714cebc850869cbb05166f15196dedb37929b5a16c331d58",
+    "counters": {
+      "retry": 0,
+      "alternate": 0,
+      "original_shrunk": 0,
+      "alternate_shrunk": 0,
+      "beyond": 2,
+      "overlap": 1,
+      "analytic": 3,
+      "unbounded": 6,
+      "first_descent_supports": 28,
+      "second_descent_supports": 0,
+      "first_certificate_supports": 0,
+      "second_certificate_supports": 0,
+      "first_pointcore_supports": 36,
+      "second_pointcore_supports": 0,
+      "first_bound_calls": 7,
+      "second_bound_calls": 0,
+      "original_resolved": 6,
+      "alternate_resolved": 0
+    }
+  }
+}

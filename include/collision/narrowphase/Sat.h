@@ -36,6 +36,9 @@ SeparatingAxis findSeparatingAxis(const ConvexHull& a, const Transform& poseA, c
 // То же для оболочек, уже переведённых в общие оси; ось — в этих же осях. Отсечение граней строит
 // оболочки один раз на пару и пользуется ими и здесь, и дальше.
 SeparatingAxis findSeparatingAxis(const TransformedHull& A, const TransformedHull& B, Real preference = kFacePreference);
+// Любая разделяющая ось за пределами margin исключает контакт, включая внутренний стык частей.
+// При успехе response содержит геометрически предпочтительную ось для построения площадки.
+bool findContactAxis(const TransformedHull& A, const TransformedHull& B, Real margin, Real preference, SeparatingAxis& response);
 // Лучшая ось только среди нормалей граней. Нужна контакту почти параллельных граней: точная ось
 // там — пара рёбер, но касаются тела всей площадкой (HullVsHullAlgorithm).
 SeparatingAxis findFaceAxis(const TransformedHull& A, const TransformedHull& B, Real preference = kFacePreference);

@@ -1,0 +1,7 @@
+display_hz,real_seconds,physics_frames,physics_seconds,pass
+30,10,600,10,1
+60,10,600,10,1
+120,10,600,10,1
+144,10,600,10,1
+165,10,600,10,1
+240,10,600,10,1

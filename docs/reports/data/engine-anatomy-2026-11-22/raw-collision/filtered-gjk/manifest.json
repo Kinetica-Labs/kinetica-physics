@@ -1,0 +1,49 @@
+{
+  "environment": {
+    "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+    "sdk": {
+      "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\accepted-src\\src\\collision\\narrowphase\\Gjk.cpp": "1d6449657b241ffc8700cc2dc2d3b2f90c35fb8b89b3f137ca39732951f8be05",
+      "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\accepted-src\\validation\\studies\\anatomy\\primitive_feature_pairs.cpp": "17b26ff40558e08502f2bb24a307019384e37147824daaa34e3480b871234ded",
+      "C:\\Users\\PC\\kp-2326667-mwrev8ox\\sieve-20261122-100223\\engine-anatomy-nov22\\accepted-build\\src\\libkinetica-physics.a": "15d6a584cb6806085e1802ecababf24004bb4396f389b9ec7cdbeb2b0792705e"
+    },
+    "flags": "-std=c++17 -O3 -DNDEBUG -ffp-contract=off"
+  },
+  "results": {
+    "base": {
+      "exit": 1,
+      "bytes_sha256": "e655087e3b7b476ed750faf551e132f1c5910b968fc10b5ec1de772ff664c644",
+      "failures": 28,
+      "branches": {
+        "111": 1412,
+        "110": 26,
+        "010": 2
+      },
+      "exe_sha256": "e49256604dbf469b958552728c910aca55bffae9b79aaa4e02d309f11138c8d0",
+      "gjk_sha256": "1d6449657b241ffc8700cc2dc2d3b2f90c35fb8b89b3f137ca39732951f8be05"
+    },
+    "filter": {
+      "exit": 1,
+      "bytes_sha256": "811906ec2fbe93a8b8df8b400277a2ad6f47612683a21846c693b1e835f4022f",
+      "failures": 28,
+      "branches": {
+        "111": 1412,
+        "110": 26,
+        "010": 2
+      },
+      "exe_sha256": "a616e2c6033a451b436a0878568504e9a04137c761d5ca588fe3b26236857755",
+      "gjk_sha256": "9d75242069d23978624dbf9c1758010841391ad17c53fb132179b180f66578c5"
+    },
+    "trace": {
+      "exit": 1,
+      "bytes_sha256": "811906ec2fbe93a8b8df8b400277a2ad6f47612683a21846c693b1e835f4022f",
+      "failures": 28,
+      "branches": {
+        "111": 1412,
+        "110": 26,
+        "010": 2
+      },
+      "exe_sha256": "18841ebdc82a4fca54d7fdf8d96fb2a636d912610601c7e01d82fd596b3c5c51",
+      "gjk_sha256": "0edefb55fa77566a5dc675785a610781e98337501f7f8b723e9607efd37e7a66"
+    }
+  }
+}

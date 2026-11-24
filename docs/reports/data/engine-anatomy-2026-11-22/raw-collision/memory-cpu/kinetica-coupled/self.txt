@@ -1,0 +1,100 @@
+--------------------------------------------------------------------------------
+Profile data file '/tmp/kp-phase-profile.d8p94W/counts/kinetica-coupled/callgrind.out' (creator: callgrind-3.26.0)
+--------------------------------------------------------------------------------
+I1 cache: 32768 B, 64 B, 8-way associative
+D1 cache: 32768 B, 64 B, 8-way associative
+LL cache: 31457280 B, 64 B, 30-way associative
+Timerange: Basic block 0 - 93126785
+Trigger: Program termination
+Profiled target:  /tmp/kp-phase-profile.d8p94W/counts/bin/kinetica shared8 (PID 2661, part 1)
+Events recorded:  Ir Dr Dw I1mr D1mr D1mw ILmr DLmr DLmw Bc Bcm Bi Bim
+Events shown:     Ir
+Event sort order: Ir Dr Dw I1mr D1mr D1mw ILmr DLmr DLmw Bc Bcm Bi Bim
+Thresholds:       95 0 0 0 0 0 0 0 0 0 0 0 0
+Include dirs:     
+User annotated:   
+Auto-annotation:  off
+
+--------------------------------------------------------------------------------
+Ir                   
+--------------------------------------------------------------------------------
+332,171,544 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                   file:function
+--------------------------------------------------------------------------------
+31,049,280 ( 9.35%)  ???:kp::ContactSystem::responseMatrix(kp::Span<kp::Body>, std::vector<kp::ContactSystem::Line, kp::StepAllocator<kp::ContactSystem::Line> > const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+25,228,800 ( 7.60%)  ???:kp::StepMemory::take(unsigned long) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+24,598,080 ( 7.41%)  ???:kp::DirectJoints::assemble(std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> > const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+15,422,520 ( 4.64%)  ???:kp::CoupledFriction::solve(std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> >&, kp::DirectJoints const&, double, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+15,137,280 ( 4.56%)  ???:kp::ConvexHull::support(kp::Vector3) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+14,454,720 ( 4.35%)  ???:kp::DirectJoints::solve(std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> >&, double, double) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+12,585,600 ( 3.79%)  ???:kp::SoftStep::step(std::vector<kp::Body, std::allocator<kp::Body> >&, std::vector<kp::ContactPair, std::allocator<kp::ContactPair> > const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::vector<std::vector<double, std::allocator<double> >, std::allocator<std::vector<double, std::allocator<double> > > >&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+11,750,400 ( 3.54%)  ???:kp::IslandNormals::solveWorking(kp::IslandNormals::Island&, std::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact> >&, std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> >&, kp::IslandNormals::Pass const&, int) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 8,974,080 ( 2.70%)  ???:kp::UpdatedCholesky::append(int, std::vector<double, kp::StepAllocator<double> > const&, double, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 8,588,160 ( 2.59%)  ???:void kp::factorCholesky<std::vector<char, kp::StepAllocator<char> > >(kp::ProfileMatrix&, std::vector<char, kp::StepAllocator<char> >&, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 7,211,520 ( 2.17%)  ???:double kp::(anonymous namespace)::velocity<kp::(anonymous namespace)::UnitResponse>(kp::Bond const&, kp::(anonymous namespace)::UnitResponse const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 6,863,040 ( 2.07%)  ???:kp::Joint::writeBonds(std::vector<kp::Body, std::allocator<kp::Body> > const&, std::vector<kp::Body, std::allocator<kp::Body> > const&, std::vector<kp::Bond, std::allocator<kp::Bond> >&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 6,583,680 ( 1.98%)  ???:kp::SoftContact::takePoints(kp::ContactPair const&, kp::Vector3, kp::Vector3, kp::SolverBody const&, kp::SolverBody const&, kp::Span<std::pair<kp::ContactId, kp::ContactForce> >, double, bool) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 6,491,520 ( 1.95%)  ???:kp::SetFactor::append(unsigned long) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 6,439,680 ( 1.94%)  ???:kp::Joint::lockAllTurns(kp::Joint::Motion const&, std::vector<kp::Bond, std::allocator<kp::Bond> >&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 5,748,480 ( 1.73%)  ???:kp::SoftContact::follow(std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> > const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 5,529,600 ( 1.66%)  ???:kp::DirectJoints::push(unsigned long, std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> >&, double) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 4,354,560 ( 1.31%)  ???:kp::Joint::lockTravel(kp::Joint::Motion const&, int, std::vector<kp::Bond, std::allocator<kp::Bond> >&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 4,115,520 ( 1.24%)  ???:kp::maxPointSpeed(kp::Body const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 4,040,640 ( 1.22%)  ???:kp::(anonymous namespace)::Moving::advance(double)::{lambda(unsigned long)#1}::operator()(unsigned long) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 3,841,920 ( 1.16%)  ???:kp::solveFrictionIslands(std::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact> >&, std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> >&, kp::DirectJoints const&, std::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint> > const&, kp::ContactLevels&, double, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 3,663,360 ( 1.10%)  ???:kp::ManifoldMemory::carried(kp::ManifoldMemory::Entry const&, kp::Body const&, kp::Body const&, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 3,225,600 ( 0.97%)  ???:kp::SoftContact::setNormalImpulse(std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> >&, unsigned long, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 3,139,200 ( 0.95%)  ???:kp::IslandNormals::choose(std::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact> > const&, std::vector<kp::Body, std::allocator<kp::Body> > const&)::{lambda(kp::IslandNormals::Island&, int)#1}::operator()(kp::IslandNormals::Island&, int) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 3,110,400 ( 0.94%)  ???:kp::SoftContact::warmStart(std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> >&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 2,977,920 ( 0.90%)  ???:kp::DirectJoints::add(kp::Bond const&, double*) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 2,885,760 ( 0.87%)  ???:kp::UpdatedCholesky::solve(std::vector<double, kp::StepAllocator<double> >&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 2,741,760 ( 0.83%)  ???:kp::IslandNormals::choose(std::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact> > const&, std::vector<kp::Body, std::allocator<kp::Body> > const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 2,738,880 ( 0.82%)  ???:kp::(anonymous namespace)::LiveContacts::solveAndMove(kp::(anonymous namespace)::Moving&, double, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 2,689,920 ( 0.81%)  ???:0x00000000001985c0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 2,540,160 ( 0.76%)  ???:kp::inverseInertiaInWorld(kp::Body const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 2,522,880 ( 0.76%)  ???:kp::StepMemory::give(void*) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 2,522,880 ( 0.76%)  ???:kp::(anonymous namespace)::freeSpinUp(kp::Body const&) [clone .part.0] [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 2,494,080 ( 0.75%)  ???:std::vector<double, kp::StepAllocator<double> >::_M_default_append(unsigned long) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 2,370,240 ( 0.71%)  ???:void std::vector<kp::Bond, std::allocator<kp::Bond> >::_M_realloc_append<kp::Bond const&>(kp::Bond const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 2,194,560 ( 0.66%)  ???:kp::SoftContact::remember(kp::ContactForces&, double) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,909,440 ( 0.57%)  ???:__tls_init [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,889,280 ( 0.57%)  ???:kp::CentreFriction::prepare(kp::SolverBody const&, kp::SolverBody const&, kp::CentreFriction::Frame const&, kp::CentreFriction::Carried const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,883,520 ( 0.57%)  ???:kp::(anonymous namespace)::momentumOf(kp::Body const&, kp::Vector3) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,857,600 ( 0.56%)  ???:kp::DirectJoints::warmStart(std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> >&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,825,920 ( 0.55%)  ???:kp::PairReach::PairReach(std::vector<kp::Body, std::allocator<kp::Body> > const&, std::vector<kp::ContactPair, std::allocator<kp::ContactPair> > const&, kp::Vector3, double, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,693,440 ( 0.51%)  ???:kp::Joint::travelLine(kp::Joint::Motion const&, int) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,635,840 ( 0.49%)  ???:kp::IslandNormals::excess(kp::SoftContact::NormalRow const&, std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> > const&, kp::IslandNormals::Pass const&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,575,360 ( 0.47%)  ???:kp::PairFinder::collect(double, std::vector<kp::ContactPair, std::allocator<kp::ContactPair> >&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,543,680 ( 0.46%)  ???:kp::SoftContact::SoftContact(kp::ContactPair const&, std::vector<kp::Body, std::allocator<kp::Body> > const&, std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> > const&, kp::Softness const&, kp::Span<std::pair<kp::ContactId, kp::ContactForce> >, double, bool, bool) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,488,960 ( 0.45%)  ???:void kp::factorCholesky<std::vector<char, std::allocator<char> > >(kp::ProfileMatrix&, std::vector<char, std::allocator<char> >&, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,451,520 ( 0.44%)  ???:double kp::(anonymous namespace)::velocity<std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> > >(kp::Bond const&, std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> > const&) [clone .isra.0] [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,353,600 ( 0.41%)  ???:kp::World::quiet(double) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,342,080 ( 0.40%)  ???:kp::ActiveSet::solve(std::vector<char, kp::StepAllocator<char> > const&, std::vector<double, kp::StepAllocator<double> > const&, std::vector<double, kp::StepAllocator<double> >&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,319,040 ( 0.40%)  ???:kp::CentreFriction::warmStart(kp::SolverBody&, kp::SolverBody&, kp::CentreFriction::Frame const&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,241,280 ( 0.37%)  ???:kp::SetFactor::compare(std::vector<char, kp::StepAllocator<char> > const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,224,000 ( 0.37%)  ???:kp::Quaternion::fromRotationVector(kp::Vector3) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,137,600 ( 0.34%)  ???:kp::MissedContacts::find(std::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact> >&, std::vector<kp::Body, std::allocator<kp::Body> > const&, std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> > const&, double, std::function<kp::SoftContact (kp::ContactPair const&)> const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+ 1,137,600 ( 0.34%)  ???:0x00000000000b2700 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 1,094,400 ( 0.33%)  ???:0x0000000000197bc0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 1,068,480 ( 0.32%)  ???:kp::ManifoldMemory::valid(std::array<int, 4ul> const&, kp::Body const&, kp::Body const&, double) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   999,360 ( 0.30%)  ???:void kp::solveCholesky<std::array<double, 4ul> >(kp::ProfileMatrix&, std::array<double, 4ul>&, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   976,320 ( 0.29%)  ???:kp::CandidateMemory::valid(std::vector<kp::Body, std::allocator<kp::Body> > const&, std::vector<double, kp::StepAllocator<double> > const&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   973,440 ( 0.29%)  ???:kp::RollingFriction::prepare(kp::SolverBody const&, kp::SolverBody const&, kp::Vector3, kp::Vector3) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   956,160 ( 0.29%)  ???:kp::PairFinder::between(int, int, double, double) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   944,640 ( 0.28%)  ???:free [/usr/lib/x86_64-linux-gnu/libc.so.6]
+   944,640 ( 0.28%)  ???:kp::SoftContact::aim(kp::BodyMotion const&, kp::BodyMotion const&, kp::Vector3, kp::ClosestPoints const*) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   938,880 ( 0.28%)  ???:kp::PairReach::allow(std::vector<kp::Body, std::allocator<kp::Body> > const&, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   904,320 ( 0.27%)  ???:kp::PairFinder::part(kp::Body const&, kp::Body const&, std::array<int, 4ul> const&, double, kp::PairFinder::Found&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   898,560 ( 0.27%)  ???:getenv [/usr/lib/x86_64-linux-gnu/libc.so.6]
+   892,800 ( 0.27%)  ???:kp::CentreFriction::setTangent(kp::SolverBody&, kp::SolverBody&, kp::CentreFriction::Frame const&, kp::Vector2, double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   887,040 ( 0.27%)  ???:malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+   832,320 ( 0.25%)  ???:0x00000000000b23e0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+   829,440 ( 0.25%)  ???:kp::(anonymous namespace)::apartOf(kp::Body const&, kp::Body const&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   760,320 ( 0.23%)  ???:kp::CoupledFriction::tangentRows() const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   711,360 ( 0.21%)  ???:kp::IslandNormals::solveIsland(kp::IslandNormals::Island&, std::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact> >&, std::vector<kp::Body, std::allocator<kp::Body> > const&, std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> >&, kp::IslandNormals::Pass const&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   679,680 ( 0.20%)  ???:kp::ActiveSet::descend(std::vector<double, kp::StepAllocator<double> >&) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   676,800 ( 0.20%)  ???:kp::World::step(double) [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+   673,920 ( 0.20%)  ???:kp::IslandNormals::extend(kp::IslandNormals::Island&, std::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact> > const&, std::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody> > const&, kp::IslandNormals::Pass const&) const [/tmp/kp-phase-profile.d8p94W/counts/bin/kinetica]
+

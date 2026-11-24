@@ -69,8 +69,9 @@ void addCircleOverFace(const Flat& flat, const Outline& outline, Add&& add) {
     }
 }
 
-// Пересечения двух окружностей в плоскости круга. Наклон торцов друг к другу здесь мал — иначе они не
-// касались бы площадкой, — поэтому окружность контура берётся без сжатия в эллипс.
+// В плоскости опорного торца проекция наклонного диска помещается в окружность его радиуса.
+// Пересечение окружностей даёт кандидатов. После переноса в плоскость второго диска
+// оставляем только точки внутри его настоящей границы.
 template <class Add>
 void addCircleOverDisc(const Flat& flat, const Outline& outline, Add&& add) {
     const Vector3 between = flat.flatten(outline.centre - flat.centre);
@@ -78,8 +79,11 @@ void addCircleOverDisc(const Flat& flat, const Outline& outline, Add&& add) {
     if (d > kOnBoundary && d < r1 + r2 && d > abs(r1 - r2)) {
         const Real a = (d * d + r1 * r1 - r2 * r2) / (2 * d), h = sqrt(std::max(Real(0), r1 * r1 - a * a));
         const Vector3 along = (1 / d) * between, across = flat.normal.cross(along);
-        add(lifted(flat, outline, flat.centre + a * along + h * across), 0x100u);
-        add(lifted(flat, outline, flat.centre + a * along - h * across), 0x101u);
+        for (int sign : {1, -1}) {
+            const Vector3 p = lifted(flat, outline, flat.centre + a * along + (sign * h) * across);
+            if ((p - outline.centre).length() <= r2 + kOnBoundary)
+                add(p, sign > 0 ? 0x100u : 0x101u);
+        }
     }
 }
 

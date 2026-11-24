@@ -1,0 +1,19 @@
+{
+  "release_sha256": "186ad739bfccf1a4f550c6e4a920e031df90e7e602eef398c2294d1d99f32370",
+  "archive_sha256": "aed6072f1e1e885a988c40de4bcc13a96808a9690fc104897e85c5d4d75996f7",
+  "StepMemory_sha256": "ffed053d1f13d135bfb4559aaa88939e7f389390ab19338aa66d37535fcc6a4c",
+  "heap_origin_calls": 960,
+  "probe_sha256": "73735d54c1fdac4cd1770ff73ca431da8bde2da15efe9dd6412d54c7ab4e66b0",
+  "plain_sha256": "063b0e03cbf7a3cf06ed52f515d817769b92079fb681b7d0c5d6a4cdf196967a",
+  "trace_sha256": "107b32eb6a9d655321a6a70fa572ec528656e91a23fc06133bbe607a7bc60bf4",
+  "flags": [
+    "-O3",
+    "-DNDEBUG",
+    "-g",
+    "-gcodeview",
+    "-ffp-contract=off"
+  ],
+  "worlds": 128,
+  "frames_per_world": 30,
+  "substeps_per_frame": 8
+}

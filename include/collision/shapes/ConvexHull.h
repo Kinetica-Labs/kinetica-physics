@@ -15,6 +15,7 @@ public:
         Vector3 normal;           // единичная, наружу
         Real offset = 0;     // normal · x = offset на грани
         std::vector<int> loop; // вершины против часовой стрелки, если смотреть снаружи
+        bool internal = false; // вся грань закрыта соседней частью того же составного тела
     };
     struct Edge {
         int tail = 0, head = 0; // вершины; направление — как в обходе грани left
@@ -48,11 +49,15 @@ public:
     // брусок, скользящий по полу из треугольников, упирался бы в бок следующей призмы на шве.
     int outerFace = -1;
 
+    bool isInternalFace(int face) const { return faces_[size_t(face)].internal; }
+    void markInternalFace(int face) { faces_[size_t(face)].internal = true; }
     const std::vector<Vector3>& vertices() const { return vertices_; }
     const std::vector<Face>& faces() const { return faces_; }
     const std::vector<Edge>& edges() const { return edges_; }
 
 private:
+    Vector3 coreExtents() const override { return coreExtents_; }
+    Vector3 coreExtents_;
     std::vector<Vector3> vertices_;
     std::vector<Face> faces_;
     std::vector<Edge> edges_;

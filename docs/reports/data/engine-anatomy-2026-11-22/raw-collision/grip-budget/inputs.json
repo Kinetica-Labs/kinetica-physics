@@ -1,0 +1,25 @@
+{
+  "sha256": {
+    "grip-budget.exe": "01ed2b9a0c403156478e39f2de57a273b3844184600f8a537bd01b78eea642d0",
+    "libkinetica-physics.a": "49b37513fd0602b75d6ba9a25ac5f52a4c8dd6c117a49c312bea294b4c16ef25",
+    "budget.cpp": "84f32805291ebbb235b5bc4c9b6af6f2fae94c742ee3b8384c8e8bc0d2f6bcb5",
+    "GripLimit.cpp": "19ed099d9dcaa8bda492c7cf2b7a1500aad50f7be1105dde651de7af8e133cbc",
+    "GripLimit.h": "2efb2a155a7873f442b343af77f06d6f44b42ff55c627c6109d3e94973735d43"
+  },
+  "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+  "flags": [
+    "-O3",
+    "-DNDEBUG",
+    "-g",
+    "-gcodeview",
+    "-ffp-contract=off",
+    "-std=c++17"
+  ],
+  "affinity_mask": "0x100",
+  "solver_threads": 1,
+  "coupled_friction": true,
+  "updates_per_frame": 8,
+  "warm_trials": 3,
+  "measured_trials": 24,
+  "loaded_frames_per_trial": 15
+}

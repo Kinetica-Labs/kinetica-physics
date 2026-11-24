@@ -1,0 +1,96 @@
+cpu_s,pct_process_cpu,address,exact_nm_symbol
+0.482754,6.0650771417397085,0x1400117e0,kp::StepMemory::take(unsigned long long)
+0.356294,4.476297648779725,0x140060ed0,"kp::ContactSystem::responseMatrix(kp::Span<kp::Body>, std::__1::vector<kp::ContactSystem::Line, kp::StepAllocator<kp::ContactSystem::Line>> const&)"
+0.278658,3.5009182029831,0x0,
+0.205101,2.576785250558164,0x140065360,"kp::CoupledFriction::solve(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints&, double, double)"
+0.203761,2.5599501681560892,0x140049a30,"kp::DirectJoints::push(unsigned long long, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, double) const"
+0.187578,2.356635139415211,0x14002222d,
+0.185886,2.3353777070090094,0x140038c00,kp::maxPointSpeed(kp::Body const&)
+0.157059,1.9732098559607931,0x1400492f0,"kp::DirectJoints::assemble(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&)"
+0.154635,1.9427559457050996,0x14004dea0,"kp::IslandNormals::solveWorking(kp::IslandNormals::Island&, std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::IslandNormals::Pass const&, int) const"
+0.12524,1.5734520298774965,0x140042460,"kp::SoftContact::setNormalImpulse(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, unsigned long long, double)"
+0.125098,1.5716680136826497,0x14004a060,"void kp::factorCholesky<std::__1::vector<char, kp::StepAllocator<char>>>(kp::ProfileMatrix&, std::__1::vector<char, kp::StepAllocator<char>>&, double)"
+0.124538,1.5646324568579022,0x140020230,"kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const"
+0.109528,1.3760544069660048,0x14000d4b0,"kp::Joint::lockTravel(kp::Joint::Motion const&, int, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const"
+0.109428,1.374798057533014,0x140009a00,kp::ConvexHull::support(kp::Vector3) const
+0.107114,1.3457261316536104,0x140049ce0,"kp::DirectJoints::solve(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, double, double)"
+0.095344,1.1978538033906103,0x1400243a0,"kp::(anonymous namespace)::JointRows::build(kp::JointSet const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&, bool)"
+0.094507,1.1873381586364784,0x140018bc0,"std::__1::vector<double, kp::StepAllocator<double>>::resize[abi:nqe230106](unsigned long long, double const&)"
+0.093442,1.173958037175128,0x14003e120,"kp::SoftContact::takePoints(kp::ContactPair const&, kp::Vector3, kp::Vector3, kp::SolverBody const&, kp::SolverBody const&, kp::Span<std::__1::pair<kp::ContactId, kp::ContactForce>>, double, bool)"
+0.092361,1.1603768998044992,0x1400511a0,"kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)"
+0.077586,0.9747512710801298,0x140043b30,"int& std::__1::vector<int, kp::StepAllocator<int>>::emplace_back[abi:nqe230106]<int const&>(int const&)::'lambda0'()::operator()[abi:nqe230106]() const"
+0.077452,0.9730677628399222,0x14004a720,"void kp::solveFactored<std::__1::vector<char, kp::StepAllocator<char>>, std::__1::vector<double, kp::StepAllocator<double>>>(kp::ProfileMatrix const&, std::__1::vector<char, kp::StepAllocator<char>> const&, std::__1::vector<double, kp::StepAllocator<double>>&)"
+0.076285,0.9584061649569214,0x14003ccf0,"kp::ManifoldMemory::carried(kp::ManifoldMemory::Entry const&, kp::Body const&, kp::Body const&, double)"
+0.063343,0.7958094213392707,0x140011ed0,kp::StepMemory::give(void*)
+0.062639,0.7869647213310165,0x14002dc90,"double& std::__1::vector<double, kp::StepAllocator<double>>::emplace_back[abi:nqe230106]<double>(double&&)::'lambda0'()::operator()[abi:nqe230106]() const"
+0.062401,0.7839746096804987,0x14004c980,"kp::IslandNormals::choose(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&)"
+0.062166,0.7810221885129707,0x14000efc0,"kp::Bond& std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>::emplace_back[abi:nqe230106]<kp::Bond const&>(kp::Bond const&)::'lambda0'()::operator()[abi:nqe230106]() const"
+0.047795,0.6004722114978837,0x140024a40,kp::(anonymous namespace)::Moving::advance(double)::'lambda'(unsigned long long)::operator()(unsigned long long) const
+0.047755,0.5999696717246874,0x14004ff40,"char& std::__1::vector<char, kp::StepAllocator<char>>::emplace_back[abi:nqe230106]<char>(char&&)::'lambda0'()::operator()[abi:nqe230106]() const"
+0.047654,0.598700758797367,0x14006fb00,"std::__1::vector<double, kp::StepAllocator<double>>::resize[abi:nqe230106](unsigned long long)"
+0.046867,0.5888132887597304,0x140026990,"unsigned long long& std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>::emplace_back[abi:nqe230106]<unsigned long long const&>(unsigned long long const&)::'lambda0'()::operator()[abi:nqe230106]() const"
+0.046786,0.587795645719008,0x14000ec60,kp::Body::angularVelocity() const
+0.046742,0.587242851968492,0x14004a590,"double*& std::__1::vector<double*, kp::StepAllocator<double*>>::emplace_back[abi:nqe230106]<double* const&>(double* const&)::'lambda0'()::operator()[abi:nqe230106]() const"
+0.046728,0.5870669630478733,0x14000d8a0,"kp::Joint::lockAllTurns(kp::Joint::Motion const&, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const"
+0.046696,0.5866649312293164,0x140026010,kp::inverseInertiaInWorld(kp::Body const&)
+0.046576,0.5851573119097275,0x14000cdd0,"kp::Joint::travelLine(kp::Joint::Motion const&, int) const"
+0.046521,0.5844663197215827,0x140063600,"kp::ActiveSet::solveKept(kp::SetFactor&, std::__1::vector<char, kp::StepAllocator<char>>&, std::__1::vector<double, kp::StepAllocator<double>>&)"
+0.045673,0.5738124765298219,0x140040580,"kp::SoftContact::follow(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&)::$_0::operator()(kp::Vector3, kp::Vector3, kp::Vector3&, kp::Vector3&) const"
+0.031946,0.40135338986319474,0x14003d480,"kp::ManifoldMemory::replace(std::__1::vector<kp::ManifoldMemory::Entry const*, kp::StepAllocator<kp::ManifoldMemory::Entry const*>> const&)"
+0.031925,0.40108955648226674,0x140043340,"kp::SoftContact::remember(kp::ContactForces&, double) const"
+0.031885,0.4005870167090703,0x14001d500,"kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const::$_0::operator()(unsigned long long) const"
+0.03187,0.40039856429412185,0x14000cbb0,kp::(anonymous namespace)::freeSpinUp(kp::Body const&)
+0.03186,0.40027292935082276,0x14004f970,"kp::IslandNormals::Island* std::__1::vector<kp::IslandNormals::Island, kp::StepAllocator<kp::IslandNormals::Island>>::__emplace_back_slow_path[abi:nqe230106]<>()"
+0.031852,0.4001724213961835,0x140040970,"kp::SoftContact::warmStart(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&) const"
+0.031828,0.3998708975322658,0x14003f8c0,
+0.031812,0.3996698816229872,0x140063a10,"kp::ActiveSet::settle(kp::SetFactor&, std::__1::vector<char, kp::StepAllocator<char>>&, std::__1::vector<double, kp::StepAllocator<double>>&, std::__1::vector<double, kp::StepAllocator<double>>&)"
+0.031808,0.39961962764566766,0x14000cf90,"kp::Joint::travelLine(kp::Joint::Motion const&, kp::Vector3) const"
+0.031807,0.39960706415133773,0x140067680,"void kp::solveFactored<std::__1::vector<char, std::__1::allocator<char>>, std::__1::array<double, 4ull>>(kp::ProfileMatrix const&, std::__1::vector<char, std::__1::allocator<char>> const&, std::__1::array<double, 4ull>&)"
+0.031789,0.39938092125339936,0x14003fd90,"kp::SoftContact::follow(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&)"
+0.031758,0.3989914529291723,0x140064210,kp::SetFactor::SetFactor(kp::ContactSystem const&)
+0.031748,0.3988658179858732,0x14002d180,"std::__1::vector<double, kp::StepAllocator<double>>::assign[abi:nqe230106](unsigned long long, double const&)"
+0.031354,0.39391580121989006,0x14003d8c0,"kp::SoftContact::SoftContact(kp::ContactPair const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, kp::Softness const&, kp::Span<std::__1::pair<kp::ContactId, kp::ContactForce>>, double, bool, bool)"
+0.030936,0.38866426058998915,0x140047700,"void std::__1::__introsort[abi:nqe230106]<std::__1::_ClassicAlgPolicy, std::__1::__less<void, void>&, std::__1::array<int, 4ull>*, false>(std::__1::array<int, 4ull>*, std::__1::array<int, 4ull>*, std::__1::__less<void, void>&, std::__1::iterator_traits<std::__1::array<int, 4ull>*>::difference_type, bool)"
+0.030837,0.38742047465132834,0x1400122f0,kp::IslandSleep::track(unsigned long long)
+0.03078,0.38670435547452364,0x140011590,kp::StepMemory::~StepMemory()
+0.030776,0.3866541014972041,0x14004fe60,"double& std::__1::vector<double, kp::StepAllocator<double>>::emplace_back[abi:nqe230106]<double const&>(double const&)::'lambda0'()::operator()[abi:nqe230106]() const"
+0.030709,0.3858123473771003,0x140013c60,"std::__1::vector<kp::MassProperties, std::__1::allocator<kp::MassProperties>>::resize[abi:nqe230106](unsigned long long)"
+0.030652,0.3850962282002956,0x14006f7a0,kp::SetFactor::append(unsigned long long)
+0.016012,0.2011666712104637,0x14000f0d0,kp::World::quiet(double) const
+0.015968,0.20061387745994783,0x140062590,"kp::ActiveSet::descend(std::__1::vector<double, kp::StepAllocator<double>>&)"
+0.015953,0.20042542504499922,0x140049c70,"kp::DirectJoints::warmStart(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&) const"
+0.015931,0.2001490281697413,0x14005fdd0,"kp::CentreFriction::warmStart(kp::SolverBody&, kp::SolverBody&, kp::CentreFriction::Frame const&) const"
+0.015919,0.19999826623778238,0x14001dfbf,
+0.015908,0.1998600678001534,0x140063880,kp::ActiveSet::descentStart()
+0.015902,0.19978468683417397,0x14006cd00,"kp::RollingFriction::solve(kp::SolverBody&, kp::SolverBody&, kp::Vector3, kp::Vector3, double, double)"
+0.01589,0.19963392490221513,0x14006f2c0,"kp::SetFactor::follow(std::__1::vector<char, kp::StepAllocator<char>> const&)"
+0.015886,0.19958367092489548,0x14003b580,"kp::CandidateMemory::valid(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&) const"
+0.015881,0.19952085345324594,0x14001cc20,"kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const"
+0.015874,0.1994329089929366,0x14004f530,"void std::__1::__uninitialized_allocator_relocate[abi:nqe230106]<kp::StepAllocator<kp::Body>, kp::Body*>(kp::StepAllocator<kp::Body>&, kp::Body*, kp::Body*, kp::Body*)"
+0.015872,0.1994077820042768,0x14002d760,kp::ContactForces::operator[](kp::ContactId const&)
+0.015871,0.19939521850994688,0x140063de0,kp::ActiveSet::admit(kp::ActiveSet::Entering&)
+0.015861,0.19926958356664784,0x14004f280,"kp::Body* std::__1::vector<kp::Body, kp::StepAllocator<kp::Body>>::__emplace_back_slow_path[abi:nqe230106]<kp::Body const&>(kp::Body const&)"
+0.015861,0.19926958356664784,0x14004efe0,"std::__1::__function::__func<kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)::$_0, void (unsigned long long)>::operator()[abi:nqe230106](unsigned long long&&)"
+0.01586,0.1992570200723179,0x14003c840,"kp::(anonymous namespace)::apartOf(kp::Body const&, kp::Body const&)"
+0.015858,0.19923189308365813,0x140045cdf,
+0.015856,0.19920676609499827,0x140027090,"kp::SingleFreedomJoint::addFreedomBonds(kp::Bond const&, double, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const"
+0.015845,0.19906856765736936,0x14004da60,"kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)"
+0.015844,0.19905600416303942,0x140064db0,kp::CoupledFriction::tangentRows() const
+0.015843,0.19904344066870952,0x14000c230,"kp::Joint::writeBonds(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::Bond, std::__1::allocator<kp::Bond>>&) const"
+0.015835,0.19894293271407024,0x1400362b0,kp::Quaternion::fromRotationVector(kp::Vector3)
+0.015828,0.19885498825376088,0x14004d450,"kp::IslandNormals::choose(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&)::$_2::operator()(kp::IslandNormals::Island&, int) const"
+0.015809,0.1986162818614927,0x140067360,
+0.015752,0.197900162684688,0x14004fd20,"kp::ContactSystem::Line& std::__1::vector<kp::ContactSystem::Line, kp::StepAllocator<kp::ContactSystem::Line>>::emplace_back[abi:nqe230106]<kp::ContactSystem::Line>(kp::ContactSystem::Line&&)::'lambda0'()::operator()[abi:nqe230106]() const"
+0.014989,0.18831421651096933,0x140046440,"kp::PairReach::PairReach(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3, double, double)"
+0.014947,0.1877865497491132,0x140026640,"kp::ContactForces::of(kp::ContactId const&, std::__1::pair<kp::ContactId, kp::ContactForce> const*) const"
+0.014929,0.1875604068511749,0x14000a7e0,kp::ConvexHull::boundingRadius() const
+0.014921,0.18745989889653566,0x14001e490,"kp::PairFinder::Found::Pair* std::__1::__uninitialized_allocator_copy_impl[abi:nqe230106]<kp::StepAllocator<kp::PairFinder::Found::Pair>, kp::PairFinder::Found::Pair const*, kp::PairFinder::Found::Pair const*, kp::PairFinder::Found::Pair*>(kp::StepAllocator<kp::PairFinder::Found::Pair>&, kp::PairFinder::Found::Pair const*, kp::PairFinder::Found::Pair const*, kp::PairFinder::Found::Pair*)"
+0.014916,0.18739708142488615,0x140064530,"void kp::factorCholesky<std::__1::vector<char, std::__1::allocator<char>>>(kp::ProfileMatrix&, std::__1::vector<char, std::__1::allocator<char>>&, double)"
+0.014914,0.1873719544362263,0x14005f5b0,"kp::CentreFriction::prepare(kp::SolverBody const&, kp::SolverBody const&, kp::CentreFriction::Frame const&, kp::CentreFriction::Carried const&)"
+0.01489,0.18707043057230857,0x140049240,"kp::DirectJoints::add(kp::Bond const&, double*)"
+0.014886,0.18702017659498893,0x140068900,"kp::(anonymous namespace)::clipAgainstFace(kp::TransformedHull const&, int, kp::TransformedHull const&, double, double, double)"
+0.014877,0.18690710514601977,0x140052be0,"kp::SolverBody& std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>::emplace_back[abi:nqe230106]<kp::SolverBody const&>(kp::SolverBody const&)::'lambda0'()::operator()[abi:nqe230106]() const"
+0.014871,0.18683172418004035,0x1400101f0,"kp::SliderJoint::applyDrive(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, double) const"
+0.014858,0.18666839875375155,0x140061fb0,"kp::ActiveSet::solve(std::__1::vector<char, kp::StepAllocator<char>> const&, std::__1::vector<double, kp::StepAllocator<double>> const&, std::__1::vector<double, kp::StepAllocator<double>>&)"
+0.014855,0.18663070827076184,0x140046d20,"kp::PairReach::allow(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, double)"
+0.014802,0.18596484307127678,0x14001b1e0,"kp::PairFinder::candidates(double, std::__1::vector<double, kp::StepAllocator<double>> const&) const"

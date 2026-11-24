@@ -1,0 +1,29 @@
+--- a/src/collision/narrowphase/Gjk.cpp
++++ b/src/collision/narrowphase/Gjk.cpp
+@@ -53,19 +53,23 @@
+     if (d1 <= 0 && d2 <= 0) return void((wa = 1, wb = 0, wc = 0)); // область вершины a
+     const Real d3 = -ab.dot(b), d4 = -ac.dot(b);
+     if (d3 >= 0 && d4 <= d3) return void((wa = 0, wb = 1, wc = 0)); // вершина b
+-    const Real vc = d1 * d4 - d3 * d2;
++    // Грамовы миноры вычитают почти равные величины порядка |ab|²|ac|².
++    // Те же знаковые площади найдём через нормаль и короткое ребро.
++    const Vector3 bc = c - b;
++    const Vector3 normal = bc.lengthSquare() < ac.lengthSquare() ? ab.cross(bc) : ab.cross(ac);
++    const Real vc = a.cross(ab).dot(normal);
+     if (vc <= 0 && d1 >= 0 && d3 <= 0) { // ребро ab
+         wb = d1 / (d1 - d3);
+         return void((wa = 1 - wb, wc = 0));
+     }
+     const Real d5 = -ab.dot(c), d6 = -ac.dot(c);
+     if (d6 >= 0 && d5 <= d6) return void((wa = 0, wb = 0, wc = 1)); // вершина c
+-    const Real vb = d5 * d2 - d1 * d6;
++    const Real vb = ac.cross(a).dot(normal);
+     if (vb <= 0 && d2 >= 0 && d6 <= 0) { // ребро ac
+         wc = d2 / (d2 - d6);
+         return void((wa = 1 - wc, wb = 0));
+     }
+-    const Real va = d3 * d6 - d5 * d4;
++    const Real va = b.cross(bc).dot(normal);
+     if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) { // ребро bc
+         wc = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+         return void((wa = 0, wb = 1 - wc));

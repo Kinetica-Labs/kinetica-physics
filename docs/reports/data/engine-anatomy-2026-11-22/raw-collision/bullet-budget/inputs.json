@@ -1,0 +1,45 @@
+{
+  "program_sha256": {
+    "kinetica": "e87852abfca6acca4fac6acf95fe5cb0dfda7daa7aa29aa1d01eef0d67b82fc4",
+    "rp3d": "26be0267fdb92ce901b8e4c8bb08e749a53717491cc96c5ddc4abc5f103b4a46",
+    "box3d": "70c4b9109af734d07bf57cc82259f974f0a9448316edbdba2c4da524cbed4caf",
+    "bullet-f32-i1": "9b9074c93dcaa23794f6ced15af89f236c4b9cf4d2dbc9561c4193cf3b441ff2",
+    "bullet-f32-i2": "9b9074c93dcaa23794f6ced15af89f236c4b9cf4d2dbc9561c4193cf3b441ff2",
+    "bullet-f32-i4": "9b9074c93dcaa23794f6ced15af89f236c4b9cf4d2dbc9561c4193cf3b441ff2",
+    "bullet-f32-i8": "9b9074c93dcaa23794f6ced15af89f236c4b9cf4d2dbc9561c4193cf3b441ff2",
+    "bullet-f32-i10": "9b9074c93dcaa23794f6ced15af89f236c4b9cf4d2dbc9561c4193cf3b441ff2",
+    "bullet-f64-i1": "021836caffee4df824f209909f8de2ce6f1dab811a0c9c60970ce0aa83d9b84c",
+    "bullet-f64-i2": "021836caffee4df824f209909f8de2ce6f1dab811a0c9c60970ce0aa83d9b84c",
+    "bullet-f64-i4": "021836caffee4df824f209909f8de2ce6f1dab811a0c9c60970ce0aa83d9b84c",
+    "bullet-f64-i8": "021836caffee4df824f209909f8de2ce6f1dab811a0c9c60970ce0aa83d9b84c",
+    "bullet-f64-i10": "021836caffee4df824f209909f8de2ce6f1dab811a0c9c60970ce0aa83d9b84c"
+  },
+  "library_sha256": {
+    "f32": {
+      "libBulletDynamics.a": "21a6570bd01209145885a6203cbc064e2c11a33a2c9f98e935ac69aac926656a",
+      "libBulletCollision.a": "00f07448c59b35096cea2415a2bab99388ed5ee61ff8ff49f426de4574077883",
+      "libLinearMath.a": "6aeacf97a1f56a52add5b1f70c4b2232a350ae225eccbe7d4c891a391ada73b3"
+    },
+    "f64": {
+      "libBulletDynamics.a": "05d33d4dd785b88b6b6e51c6f978f17868e10b336c9274875824e75a2252d000",
+      "libBulletCollision.a": "bfd717018035b79de8b7804ba477008d4d43495cbd27d0e68028bec20eb4ebbf",
+      "libLinearMath.a": "dd905882e4d63c44ac9056e9d1af3969ec26265f04103f979e3dbe52ae2e058c"
+    }
+  },
+  "adapter_sha256": "68509dea1629b0b2eb5a909ef37e50284e6f397eced15cc7c16ed615cb0c868f",
+  "oracle_sha256": "2efb2a155a7873f442b343af77f06d6f44b42ff55c627c6109d3e94973735d43",
+  "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+  "steps_per_frame": 8,
+  "sleep": false,
+  "affinity_mask": "0x100",
+  "frames_per_timing": 360,
+  "ordering": "every configuration in every slot twice, one cycle reversed",
+  "bullet_iterations": [
+    1,
+    2,
+    4,
+    8,
+    10
+  ],
+  "seed": 20261123
+}

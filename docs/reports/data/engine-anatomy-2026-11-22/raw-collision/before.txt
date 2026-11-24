@@ -1,0 +1,1 @@
+complete=1 frames=841 matched_transitions=121800 stationary_transitions=121800 at_least_5deg=12576 first_90deg=0 max_deg=78.8992413507

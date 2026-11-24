@@ -1,0 +1,12 @@
+# CMake generated Testfile for 
+# Source directory: C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests
+# Build directory: C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/tests
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.
+add_test(unit-tests "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/tests/unit-tests.exe")
+set_tests_properties(unit-tests PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/CMakeLists.txt;5;add_test;C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/CMakeLists.txt;0;")
+add_test(no-libm "C:/Program Files/Git/bin/bash.exe" "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/check_no_libm.sh" "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/src/libkinetica-physics.a")
+set_tests_properties(no-libm PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/CMakeLists.txt;7;add_test;C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/CMakeLists.txt;0;")
+add_test(no-libm-scenes "C:/Program Files/Git/bin/bash.exe" "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/check_no_libm.sh" "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/examples/libkinetica-scenes.a")
+set_tests_properties(no-libm-scenes PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/CMakeLists.txt;10;add_test;C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/CMakeLists.txt;0;")

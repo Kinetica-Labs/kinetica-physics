@@ -1,0 +1,302 @@
+--- a/include/dynamics/time_stepping/CoupledFriction.h
++++ b/include/dynamics/time_stepping/CoupledFriction.h
+@@ -4,16 +4,13 @@
+ #include <array>
+ 
+ namespace kp {
+-// Номера a и b принадлежат локальному массиву тел, геометрия и накопленное трение — исходному контакту.
+-struct LocalContact { SoftContact& contact; int a, b; };
+-
+ class CoupledFriction {
+ public:
+-    CoupledFriction(LocalContact first, LocalContact second) : pair_{first, second} {}
+-    bool solve(StepArray<SolverBody>& states, DirectJoints& guides, Real h, Real rollingArm);
++    CoupledFriction(SoftContact& first, SoftContact& second) : pair_{&first, &second} {}
++    bool solve(StepArray<SolverBody>& states, const DirectJoints& guides, Real h, Real rollingArm);
+ 
+ private:
+     std::array<Bond, 4> tangentRows() const;
+-    std::array<LocalContact, 2> pair_;
++    std::array<SoftContact*, 2> pair_;
+ };
+ }
+--- a/include/dynamics/time_stepping/DirectJoints.h
++++ b/include/dynamics/time_stepping/DirectJoints.h
+@@ -16,9 +16,6 @@
+ 
+ class DirectJoints {
+ public:
+-    // Для перенумерованных строк той же системы можно взять её готовое разложение.
+-    // Владелец собран при тех же позах и массах и живёт до конца локального решения.
+-    explicit DirectJoints(const DirectJoints* assembled = nullptr) : assembled_(assembled) {}
+     const std::vector<Bond>& rows() const { return bonds_; }
+     Real* accumulated(size_t i) const { return impulses_[i]; }
+     void clear();
+@@ -27,13 +24,12 @@
+     // Матрица отклика по нынешним скоростным свойствам тел; после неё связи не добавляются.
+     void assemble(const StepArray<SolverBody>& states);
+     template <class Vector> void solveResponse(Vector& rhs) const {
+-        const DirectJoints& owner = assembled_ ? *assembled_ : *this;
+-        solveFactored(owner.lower_, owner.skipped_, rhs);
++        solveFactored(lower_, skipped_, rhs);
+     }
+     void warmStart(StepArray<SolverBody>& states) const;
+     // correction — доля нарушения положения, которую связь убирает за время h: скорость вдоль связи
+     // после решения равна −correction · нарушение / h. Ноль — чистая скорость.
+-    void solve(StepArray<SolverBody>& states, Real correction, Real h);
++    void solve(StepArray<SolverBody>& states, Real correction, Real h) const;
+ 
+ private:
+     void push(size_t row, StepArray<SolverBody>& states, Real impulse) const;
+@@ -42,7 +38,7 @@
+     StepArray<Real*> impulses_;
+     ProfileMatrix lower_;
+     StepArray<char> skipped_;
+-    const DirectJoints* assembled_;
++    StepArray<StepArray<int>> onBody_; // временные списки строк по номерам тел мира
+ };
+ 
+ } // namespace kp
+--- a/src/dynamics/time_stepping/CoupledFriction.cpp
++++ b/src/dynamics/time_stepping/CoupledFriction.cpp
+@@ -26,10 +26,31 @@
+     }
+ };
+ 
+-Real velocity(const Bond& row, const StepArray<SolverBody>& states) {
++template<class Velocities> Real velocity(const Bond& row, const Velocities& states) {
+     const auto &a = states[size_t(row.a)], &b = states[size_t(row.b)];
+     return row.linear.dot(b.v - a.v) + row.angularB.dot(b.w) - row.angularA.dot(a.w);
+ }
++
++// Столбец M⁻¹ Jᵀ: единичный импульс меняет скорости двух тел. У остальных отклик нулевой.
++class UnitResponse {
++    struct Motion { Vector3 v, w; };
++public:
++    UnitResponse(const Bond& row, const StepArray<SolverBody>& states) : a_(size_t(row.a)), b_(size_t(row.b)) {
++        const SolverBody &a = states[a_], &b = states[b_];
++        first_.v -= a.inverseMass * row.linear;
++        first_.w -= a.spinFrom(row.angularA);
++        Motion& other = a_ == b_ ? first_ : second_;
++        other.v += b.inverseMass * row.linear;
++        other.w += b.spinFrom(row.angularB);
++    }
++    const Motion& operator[](size_t id) const {
++        if (id == a_) return first_;
++        return id == b_ ? second_ : still_;
++    }
++private:
++    size_t a_, b_;
++    Motion first_, second_, still_;
++};
+ 
+ struct SlipSystem {
+     std::array<Four, 4> response{}; // кг⁻¹
+@@ -43,13 +64,9 @@
+     SlipSystem result;
+     const auto& bonds = guides.rows();
+     StepArray<GuideRhs> raw(bonds.size());
+-    auto probe = states;
+     for (size_t j = 0; j < 4; ++j) {
+-        for (auto& body : probe) { body.v = {}; body.w = {}; }
+         const Bond& t = tangents[j];
+-        auto &a = probe[size_t(t.a)], &b = probe[size_t(t.b)];
+-        a.v -= a.inverseMass * t.linear; a.w -= a.spinFrom(t.angularA);
+-        b.v += b.inverseMass * t.linear; b.w += b.spinFrom(t.angularB);
++        const UnitResponse probe(t, states);
+         for (size_t i = 0; i < 4; ++i) result.response[i][j] = velocity(tangents[i], probe);
+         for (size_t k = 0; k < bonds.size(); ++k) raw[k].values[j] = velocity(bonds[k], probe);
+         result.slip[j] = velocity(t, states);
+@@ -137,34 +154,33 @@
+ std::array<Bond, 4> CoupledFriction::tangentRows() const {
+     std::array<Bond, 4> rows{};
+     for (size_t i = 0; i < 2; ++i) {
+-        const LocalContact& local = pair_[i];
+-        const auto& c = local.contact;
++        const auto& c = *pair_[i];
+         for (size_t k = 0; k < 2; ++k) {
+             const Vector3 t = k == 0 ? c.tangent1_ : c.tangent2_;
+-            rows[2*i+k] = {local.a, local.b, t, c.centreA_.cross(t), c.centreB_.cross(t), 0, 0};
++            rows[2*i+k] = {c.a_, c.b_, t, c.centreA_.cross(t), c.centreB_.cross(t), 0, 0};
+         }
+     }
+     return rows;
+ }
+ 
+-bool CoupledFriction::solve(StepArray<SolverBody>& states, DirectJoints& guides, Real h, Real rollingArm) {
++bool CoupledFriction::solve(StepArray<SolverBody>& states, const DirectJoints& guides, Real h, Real rollingArm) {
+     Radii radius{}, load{}, lever{};
+     Four warm{};
+     for (size_t i = 0; i < 2; ++i) {
+-        const auto& c = pair_[i].contact;
++        const auto& c = *pair_[i];
+         for (const auto& p : c.points_) { load[i] += p.impulse; lever[i] += p.lever * p.impulse; }
+         radius[i] = c.friction_.coefficient * load[i];
+         warm[2*i] = c.friction_.rub_.x; warm[2*i+1] = c.friction_.rub_.y;
+     }
+     if (radius[0] == 0 && radius[1] == 0) return false;
+     for (size_t i = 0; i < 2; ++i) {
+-        auto& [c, a, b] = pair_[i];
+-        c.friction_.solveTwist(states[size_t(a)], states[size_t(b)], c.frame(), lever[i]);
++        auto& c = *pair_[i];
++        c.friction_.solveTwist(states[size_t(c.a_)], states[size_t(c.b_)], c.frame(), lever[i]);
+     }
+     const auto impulse = frictionImpulse(projectedSystem(states, guides, tangentRows()), warm, radius);
+     for (size_t i = 0; i < 2; ++i) {
+-        auto& [c, a, b] = pair_[i];
+-        auto &sa = states[size_t(a)], &sb = states[size_t(b)];
++        auto& c = *pair_[i];
++        auto &sa = states[size_t(c.a_)], &sb = states[size_t(c.b_)];
+         c.friction_.setTangent(sa, sb, c.frame(), {impulse[2*i], impulse[2*i+1]}, load[i]);
+         c.friction_.rolling_.solve(sa, sb, c.tangent1_, c.tangent2_, rollingArm, load[i]);
+     }
+--- a/src/dynamics/time_stepping/DirectJoints.cpp
++++ b/src/dynamics/time_stepping/DirectJoints.cpp
+@@ -9,22 +9,25 @@
+     bonds_.clear(), impulses_.clear();
+     lower_ = {};
+     skipped_.clear();
+-    assembled_ = nullptr;
+ }
+ 
+ void DirectJoints::add(const Bond& bond, Real* impulse) { bonds_.push_back(bond), impulses_.push_back(impulse); }
+ 
+ void DirectJoints::assemble(const StepArray<SolverBody>& states) {
+-    assembled_ = nullptr;
+     if (bonds_.empty()) return;
+     // Связи одного тела: строка i матрицы начинается с самой ранней связи, с которой у неё есть
+     // общее подвижное тело.
+-    StepArray<StepArray<int>> onBody(states.size());
++    onBody_.resize(states.size());
++    // Соседние острова используют один рабочий массив. Очищаем только участников этой системы.
++    for (const Bond& row : bonds_) {
++        onBody_[size_t(row.a)].clear();
++        onBody_[size_t(row.b)].clear();
++    }
+     for (size_t i = 0; i < bonds_.size(); ++i) {
+         const Bond& bond = bonds_[i];
+         int leftmost = int(i);
+         for (int body : {bond.a, bond.b})
+-            if (states[size_t(body)].inverseMass > 0 && !onBody[size_t(body)].empty()) leftmost = std::min(leftmost, onBody[size_t(body)].front());
++            if (states[size_t(body)].inverseMass > 0 && !onBody_[size_t(body)].empty()) leftmost = std::min(leftmost, onBody_[size_t(body)].front());
+         lower_.addRow(leftmost);
+         for (int body : {bond.a, bond.b}) {
+             const SolverBody& state = states[size_t(body)];
+@@ -32,13 +35,13 @@
+             // Единичный импульс вдоль связи i: телу b — плюс, телу a — минус.
+             const Real sign = body == bond.b ? Real(1) : Real(-1);
+             const Vector3 velocity = (sign * state.inverseMass) * bond.linear, spin = sign * state.spinFrom(body == bond.b ? bond.angularB : bond.angularA);
+-            for (int j : onBody[size_t(body)]) {
++            for (int j : onBody_[size_t(body)]) {
+                 const Bond& other = bonds_[size_t(j)];
+                 const bool isB = body == other.b;
+                 lower_.at(int(i), j) += (isB ? Real(1) : Real(-1)) * (other.linear.dot(velocity) + (isB ? other.angularB : other.angularA).dot(spin));
+             }
+             lower_.at(int(i), int(i)) += sign * (bond.linear.dot(velocity) + (body == bond.b ? bond.angularB : bond.angularA).dot(spin));
+-            if (body != bond.a || bond.a != bond.b) onBody[size_t(body)].push_back(int(i));
++            if (body != bond.a || bond.a != bond.b) onBody_[size_t(body)].push_back(int(i));
+         }
+     }
+     factorCholesky(lower_, skipped_);
+@@ -47,15 +50,15 @@
+ void DirectJoints::push(size_t row, StepArray<SolverBody>& states, Real impulse) const {
+     const Bond& bond = bonds_[row];
+     SolverBody &a = states[size_t(bond.a)], &b = states[size_t(bond.b)];
+-    a.v -= (a.inverseMass * impulse) * bond.linear, a.w -= a.spinFrom(impulse * bond.angularA);
+-    b.v += (b.inverseMass * impulse) * bond.linear, b.w += b.spinFrom(impulse * bond.angularB);
++    if (a.inverseMass != 0) a.v -= (a.inverseMass * impulse) * bond.linear, a.w -= a.spinFrom(impulse * bond.angularA);
++    if (b.inverseMass != 0) b.v += (b.inverseMass * impulse) * bond.linear, b.w += b.spinFrom(impulse * bond.angularB);
+ }
+ 
+ void DirectJoints::warmStart(StepArray<SolverBody>& states) const {
+     for (size_t i = 0; i < bonds_.size(); ++i) push(i, states, *impulses_[i]);
+ }
+ 
+-void DirectJoints::solve(StepArray<SolverBody>& states, Real correction, Real h) {
++void DirectJoints::solve(StepArray<SolverBody>& states, Real correction, Real h) const {
+     if (bonds_.empty()) return;
+     StepArray<Real> change(bonds_.size());
+     for (size_t i = 0; i < bonds_.size(); ++i) {
+--- a/src/dynamics/time_stepping/FrictionIslands.cpp
++++ b/src/dynamics/time_stepping/FrictionIslands.cpp
+@@ -60,55 +60,15 @@
+     return islands;
+ }
+ 
+-// Общие неподвижные опоры получают местный номер в каждом острове.
+-// После решения в мир возвращаются только скорости подвижных тел.
+-class LocalBodies {
+-public:
+-    LocalBodies(StepArray<SolverBody>& world, StepArray<int>& slots) : world_(world), slots_(slots) {}
+-    ~LocalBodies() { for (int body : members_) slots_[size_t(body)] = -1; }
+-    int add(int id) {
+-        int& slot = slots_[size_t(id)];
+-        if (slot < 0) {
+-            slot = int(local.size());
+-            local.push_back(world_[size_t(id)]);
+-            members_.push_back(id);
+-        }
+-        return slot;
+-    }
+-    LocalContact contact(SoftContact& c) {
+-        const auto r = c.normalRow(0);
+-        return {c, add(r.a), add(r.b)};
+-    }
+-    void commit() {
+-        for (size_t i = 0; i < local.size(); ++i) {
+-            if (local[i].inverseMass <= 0) continue;
+-            auto& body = world_[size_t(members_[i])];
+-            body.v = local[i].v, body.w = local[i].w;
+-        }
+-    }
+-    StepArray<SolverBody> local;
+-private:
+-    StepArray<SolverBody>& world_;
+-    StepArray<int>& slots_;
+-    StepArray<int> members_;
+-};
+-
+-bool solvePair(const Island& island, StepArray<SoftContact>& contacts, LocalBodies& bodies, const DirectJoints& locked,
+-               Real h, Real rollingArm) {
+-    const auto first = bodies.contact(contacts[island.contacts[0]]);
+-    const auto second = bodies.contact(contacts[island.contacts[1]]);
+-    // partition сохраняет порядок строк. При полном совпадении меняются только номера тел.
+-    const bool allRows = island.guides.size() == locked.rows().size();
+-    DirectJoints guides(allRows ? &locked : nullptr);
+-    for (size_t k : island.guides) {
+-        Bond row = locked.rows()[k];
+-        row.a = bodies.add(row.a), row.b = bodies.add(row.b);
+-        guides.add(row, locked.accumulated(k));
+-    }
+-    if (!allRows) guides.assemble(bodies.local);
+-    if (!CoupledFriction(first, second).solve(bodies.local, guides, h, rollingArm)) return false;
+-    bodies.commit();
+-    return true;
++// Направляющие острова перечислены в порядке мировой матрицы. Если здесь все её строки,
++// готовое разложение уже подходит. Иначе собираем только строки этого острова.
++const DirectJoints& islandGuides(const Island& island, const DirectJoints& locked,
++                                const StepArray<SolverBody>& states, DirectJoints& subset) {
++    if (island.guides.size() == locked.rows().size()) return locked;
++    subset.clear();
++    for (size_t k : island.guides) subset.add(locked.rows()[k], locked.accumulated(k));
++    subset.assemble(states);
++    return subset;
+ }
+ }
+ 
+@@ -117,12 +77,11 @@
+     StepArray<char> solved;
+     if (contacts.size() >= 2) {
+         const auto islands = partition(contacts, states, locked, soft);
+-        StepArray<int> slots;
++        DirectJoints subset;
+         for (const Island& island : islands) {
+             if (!island.coupled()) continue;
+-            if (slots.empty()) slots.assign(states.size(), -1);
+-            LocalBodies local(states, slots);
+-            if (!solvePair(island, contacts, local, locked, h, rollingArm)) continue;
++            CoupledFriction pair(contacts[island.contacts[0]], contacts[island.contacts[1]]);
++            if (!pair.solve(states, islandGuides(island, locked, states, subset), h, rollingArm)) continue;
+             if (solved.empty()) solved.assign(contacts.size(), 0);
+             solved[island.contacts[0]] = solved[island.contacts[1]] = 1;
+         }

@@ -1,0 +1,24 @@
+--- a/include/dynamics/time_stepping/DirectJoints.h
++++ b/include/dynamics/time_stepping/DirectJoints.h
+@@ -24,6 +24,8 @@
+     void add(const Bond& bond, Real* impulse);
+     // Матрица отклика по нынешним скоростным свойствам тел; после неё связи не добавляются.
+     void assemble(const StepArray<SolverBody>& states);
++    // Для тех же строк в том же порядке при тех же массах и позах тел.
++    void copyResponseFrom(const DirectJoints& source) { response_ = source.response_; }
+     void warmStart(StepArray<SolverBody>& states) const;
+     // correction — доля нарушения положения, которую связь убирает за время h: скорость вдоль связи
+     // после решения равна −correction · нарушение / h. Ноль — чистая скорость.
+--- a/src/dynamics/time_stepping/FrictionIslands.cpp
++++ b/src/dynamics/time_stepping/FrictionIslands.cpp
+@@ -103,7 +103,9 @@
+         row.a = bodies.add(row.a), row.b = bodies.add(row.b);
+         guides.add(row, locked.accumulated(k));
+     }
+-    guides.assemble(bodies.local);
++    // partition перебирает строки по порядку. Если взяты все, меняются только номера тел.
++    if (island.guides.size() == locked.rows().size()) guides.copyResponseFrom(locked);
++    else guides.assemble(bodies.local);
+     if (!CoupledFriction(first, second).solve(bodies.local, guides, h, rollingArm)) return false;
+     bodies.commit();
+     return true;

@@ -30,6 +30,9 @@ public:
     Carried carried(const Frame& at) const { return {rub_.x * at.tangent1 + rub_.y * at.tangent2, twistImpulse_}; }
 
 private:
+    friend class CoupledFriction;
+    void solveTwist(SolverBody& a, SolverBody& b, const Frame& at, Real leverLoad);
+    void setTangent(SolverBody& a, SolverBody& b, const Frame& at, Vector2 rub, Real load);
     Matrix2x2 tangentMass_; // обратная матрица отклика трения в центре
     Real twistMass_ = 0;
     Vector2 rub_; // накопленный импульс трения вдоль двух касательных

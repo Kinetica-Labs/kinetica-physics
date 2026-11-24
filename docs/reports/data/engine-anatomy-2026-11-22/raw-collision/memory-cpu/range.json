@@ -1,0 +1,6 @@
+{
+  "base_header_sha256": "2efb2a155a7873f442b343af77f06d6f44b42ff55c627c6109d3e94973735d43",
+  "marked_header_sha256": "8e30823dc06862cb0ca260682b2ebed5ddb57ecc81d2010ec07762fce10d0fde",
+  "workdir": "/tmp/kp-phase-profile.d8p94W",
+  "scope": "main solver thread, only the 360 loaded frames. Counters paused during initialization, preload, warmup and teardown. Memcheck covers the entire process."
+}

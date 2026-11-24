@@ -1,0 +1,7 @@
+{
+  "changed_file": "src/dynamics/time_stepping/IslandNormals.cpp",
+  "before": "f844892bc034022bc1f4e341455b48e66c0b5da7b375bfb99f9f5eaaaa55382b",
+  "after": "0dcd499cc00b079dd66fe65ad2fd463a5a9d237f68f9fd72579a7bd9fd137e90",
+  "only_source_difference": true,
+  "timed_grip_and_pyramid_machine_code_reproduced": true
+}

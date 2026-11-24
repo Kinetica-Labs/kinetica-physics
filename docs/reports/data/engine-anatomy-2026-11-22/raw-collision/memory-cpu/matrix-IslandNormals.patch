@@ -1,0 +1,31 @@
+--- a/src/dynamics/time_stepping/IslandNormals.cpp
++++ b/src/dynamics/time_stepping/IslandNormals.cpp
+@@ -99,10 +99,19 @@
+ // Добавка kProximal (ActiveSet) держит ответ у прежнего: у четырёх точек на грани матрица
+ // вырожденная, и без неё силу между ними можно распределить как угодно.
+ int IslandNormals::solveWorking(Island& island, StepArray<SoftContact>& contacts, StepArray<SolverBody>& states, const Pass& pass, int allowed) const {
++    const size_t total = island.working.size() - size_t(std::count(island.working.begin(), island.working.end(), kOutside));
++    if (total == 0) return 0;
+     ContactSystem system;
++    system.lines.reserve(total);
++    system.rows.reserve(total);
++    system.order.reserve(total);
+     StepArray<size_t> listed;
+     StepArray<Real> impulse, free;
+     StepArray<char> pressing;
++    listed.reserve(total);
++    impulse.reserve(total);
++    free.reserve(total);
++    pressing.reserve(total);
+     for (size_t r = 0; r < island.rows.size(); ++r) {
+         if (island.working[r] == kOutside) continue;
+         const Row& at = island.rows[r];
+@@ -111,8 +120,6 @@
+         listed.push_back(r), impulse.push_back(row.impulse), free.push_back(excess(row, states, pass));
+         pressing.push_back(row.impulse > 0 || island.working[r] == kEntered), island.working[r] = kWorking;
+     }
+-    const size_t total = listed.size();
+-    if (total == 0) return 0;
+     system.matrix = ContactSystem::responseMatrix(island.bodies, system.lines);
+     system.diagonal.assign(total, 0), system.soft.assign(total, 0);
+     for (size_t i = 0; i < total; ++i) {

@@ -1,4 +1,5 @@
 #include "GlRenderer.h"
+#include "../examples/scenes/GearTrain.h"
 
 #include <GLFW/glfw3.h>
 
@@ -129,7 +130,80 @@ void drawFilled(const World& world) {
 
 } // namespace
 
-void render(const DebugGeometry& geometry, const Camera& camera, int left, int width, int height, const World* filled) {
+// Поверхность y = 0 обозначает уровень воды. Куб свободно проходит через неё.
+void drawWaterSurface(const World&) {
+    constexpr double half = 0.34;
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_FALSE);
+    glColor4f(0.12f, 0.62f, 0.82f, 0.38f);
+    glBegin(GL_QUADS);
+    glVertex3d(-half, 0, -half); glVertex3d(-half, 0, half);
+    glVertex3d(half, 0, half);   glVertex3d(half, 0, -half);
+    glEnd();
+    glColor4f(0.27f, 0.72f, 0.86f, 0.55f);
+    glBegin(GL_LINES);
+    for (int i = -4; i <= 4; ++i) {
+        const double p = i * half / 4;
+        glVertex3d(-half, 0, p); glVertex3d(half, 0, p);
+        glVertex3d(p, 0, -half); glVertex3d(p, 0, half);
+    }
+    glEnd();
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
+}
+
+void drawGearMarks(const World& world) {
+    using namespace gear_train;
+    // Риски и указатель фазы поворачиваются вместе с физическим диском.
+    const auto wheel = [&](BodyId id, Real radius, int teeth) {
+        const Transform pose = world.body(id).pose();
+        const auto point = [&](Real r, Real angle) {
+            const SinCos sc = sinCos(angle);
+            const Vector3 p = pose.point({r * sc.cos, halfHeight + Real(0.0002), r * sc.sin});
+            glVertex3d(p.x, p.y, p.z);
+        };
+        for (int k = 0; k < teeth; ++k) {
+            const Real angle = 2 * kPi * k / teeth;
+            point(k == 0 ? 0 : Real(0.86) * radius, angle);
+            point(radius, angle);
+        }
+    };
+    glColor3f(1.0f, 0.87f, 0.40f);
+    glLineWidth(2);
+    glBegin(GL_LINES);
+    wheel(inputDisk, radiusA, teethA);
+    wheel(outputDisk, radiusB, teethB);
+    glEnd();
+}
+
+static void drawWheels(const VehicleConstraint& car, const World& world, VehicleInput input) {
+    static const Cylinder tire(.30, 1), hub(.32, .47);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_NORMALIZE);
+    for (size_t i = 0; i < car.wheelCount(); ++i) {
+        const auto wheel = car.wheel(world, i, input);
+        const Vector3 axle = wheel.axle;
+        const Vector3 pivot = Vector3{0, 1, 0}.cross(axle);
+        glPushMatrix();
+        glTranslated(wheel.centre.x, wheel.centre.y, wheel.centre.z);
+        if (pivot.lengthSquare() > 1e-16)
+            glRotated(std::atan2(pivot.length(), axle.y) * 180 / kPi, pivot.x, pivot.y, pivot.z);
+        glScaled(car.radius(), car.radius(), car.radius());
+        glColor3f(.19f, .22f, .26f);
+        drawShape(tire);
+        glColor3f(.80f, .82f, .84f);
+        drawShape(hub);
+        glPopMatrix();
+    }
+    glDisable(GL_NORMALIZE);
+    glDisable(GL_COLOR_MATERIAL);
+    glDisable(GL_LIGHTING);
+}
+
+void render(const DebugGeometry& geometry, const Camera& camera, int left, int width, int height,
+            const World& world, bool filled, const Scene& scene, VehicleInput drive) {
     glClearColor(0.07f, 0.07f, 0.07f, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(left, 0, width, height);
@@ -143,7 +217,9 @@ void render(const DebugGeometry& geometry, const Camera& camera, int left, int w
     glLoadMatrixd(camera.view().data());
 
     glEnable(GL_DEPTH_TEST);
-    if (filled) drawFilled(*filled);
+    if (filled) drawFilled(world);
+    if (scene.drawReference) scene.drawReference(world);
+    if (scene.vehicle) drawWheels(*scene.vehicle, world, drive);
     glLineWidth(1.5f);
     glBegin(GL_LINES);
     for (const DebugLine& line : geometry.lines) {

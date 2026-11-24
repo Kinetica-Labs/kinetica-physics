@@ -40,15 +40,19 @@ ContactManifold RoundVsRoundAlgorithm::collide(const ConvexShape& a, const Trans
                                                Real touching, Real) const {
     // Две круглые формы с перекрывшимися ядрами здесь не разрешаются.
     if (closest.coresOverlap || closest.distance > margin) return {};
-    // Торец цилиндра — плоский элемент: всё, что на нём лежит, даёт площадку общим способом.
-    const ContactManifold patch = ContactPatch::between(a, poseA, b, poseB, closest, margin, touching);
-    if (patch.count > 0) return patch;
-
+    // У двух совпадающих точечных ядер нормаль выбрана при расчёте свидетелей.
+    // Торец цилиндра в общем случае даёт площадку, в том числе при глубоком перекрытии.
+    const bool points = closest.distance <= -a.radius - b.radius && a.hasPointCore() && b.hasPointCore();
+    if (!points) {
+        const ContactManifold patch = ContactPatch::between(a, poseA, b, poseB, closest, margin, touching);
+        if (patch.count > 0) return patch;
+    }
     ContactManifold single;
     single.normal = closest.normal;
     single.add({closest.onA, closest.onB, closest.distance, 0});
     single.roundA = a.rollingRadius(poseA, closest.normal);
     single.roundB = b.rollingRadius(poseB, -1 * closest.normal);
+    if (points) return single;
 
     // Плоского элемента нет: контакт — ближайшие точки. Две трубки, лежащие вдоль друг друга,
     // касаются по отрезку, и к ближайшим точкам добавляются точки на концах их общего участка.

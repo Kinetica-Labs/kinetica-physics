@@ -1,0 +1,10 @@
+--- a/src/dynamics/time_stepping/DirectJoints.cpp
++++ b/src/dynamics/time_stepping/DirectJoints.cpp
+@@ -45,6 +45,7 @@
+ }
+ 
+ void DirectJoints::push(size_t row, StepArray<SolverBody>& states, Real impulse) const {
++    if (impulse == 0) return;
+     const Bond& bond = bonds_[row];
+     SolverBody &a = states[size_t(bond.a)], &b = states[size_t(bond.b)];
+     a.v -= (a.inverseMass * impulse) * bond.linear, a.w -= a.spinFrom(impulse * bond.angularA);

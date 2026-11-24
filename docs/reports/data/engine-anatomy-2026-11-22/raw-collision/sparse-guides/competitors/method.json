@@ -1,0 +1,29 @@
+{
+    "utc_start":  "2026-11-23T05:49:53.2185682Z",
+    "host_name":  "DESKTOP-N3RC7NA",
+    "os":  "Microsoft Windows NT 10.0.19045.0",
+    "cpu":  "Intel(R) Xeon(R) CPU E5-2690 v3 @ 2.60GHz",
+    "parent_affinity_mask":  256,
+    "worker_threads":  1,
+    "public_steps_per_frame":  8,
+    "timer_hz":  60,
+    "timer_friction":  0.5,
+    "timer_squeeze_per_jaw_N":  10,
+    "timer_load_N":  10,
+    "preload_frames":  15,
+    "timed_frames_per_fixture":  15,
+    "warmup_fixtures":  3,
+    "measured_fixtures_per_process":  24,
+    "physical_time_per_phase_s":  0.25,
+    "timing_blocks":  12,
+    "native_mode":  "shared8",
+    "timing_scope":  "loaded step loop only",
+    "solver_config":  {
+                          "kinetica":  "coupled friction on, one realtime substep and contact update per call",
+                          "rp3d":  "double, one velocity and one position iteration per call",
+                          "box3d":  "one substep per call, native warm start enabled"
+                      },
+    "accuracy":  "abs(path - oracle) in mm; force gate 0.2 N; hold 0.5 mm; slide 2 mm",
+    "ordering":  "all six permutations twice, common block for pairwise ratios",
+    "utc_end":  "2026-11-23T05:49:58.6931307Z"
+}

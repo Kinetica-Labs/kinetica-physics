@@ -1,0 +1,8 @@
+{
+    "exe_sha256":  "186AD739BFCCF1A4F550C6E4A920E031DF90E7E602EEF398C2294D1D99F32370",
+    "frames":  15000,
+    "mode":  "hotspots, software sampling",
+    "scope":  "whole process including creation and preload",
+    "solver_threads":  1,
+    "affinity":  16777215
+}

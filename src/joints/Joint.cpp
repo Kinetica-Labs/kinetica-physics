@@ -26,8 +26,15 @@ Joint::Joint(int a_, const Body& bodyA, int b_, const Body& bodyB, Vector3 ancho
 }
 
 std::vector<Bond> Joint::bonds(const std::vector<Body>& bodies, const std::vector<Body>& moving) const {
+    std::vector<Bond> result;
+    writeBonds(bodies, moving, result);
+    return result;
+}
+
+void Joint::writeBonds(const std::vector<Body>& bodies, const std::vector<Body>& moving, std::vector<Bond>& result) const {
+    result.clear();
     const Body &bodyA = bodies[size_t(a)], &bodyB = bodies[size_t(b)];
-    if (bodyA.isStatic() && bodyB.isStatic()) return {};
+    if (bodyA.isStatic() && bodyB.isStatic()) return;
     const Body &ma = moving[size_t(a)], &mb = moving[size_t(b)];
     Motion m;
     m.bodyA = &bodyA, m.bodyB = &bodyB;
@@ -42,9 +49,7 @@ std::vector<Bond> Joint::bonds(const std::vector<Body>& bodies, const std::vecto
     // Ускорение точки p_b относительно тела a без сил: точка тела b идёт по дуге, тело a под ней
     // поворачивается.
     m.apart = m.wb.cross(m.wb.cross(m.armB)) + m.spinUpB.cross(m.armB) - m.spinUpA.cross(m.armA) - m.wa.cross(m.pointB - ma.linearVelocity());
-    std::vector<Bond> bonds;
-    build(m, bonds);
-    return bonds;
+    build(m, result);
 }
 
 Bond Joint::travelLine(const Motion& m, int axis) const { return travelLine(m, m.frameA.rotate(basis(axis))); }

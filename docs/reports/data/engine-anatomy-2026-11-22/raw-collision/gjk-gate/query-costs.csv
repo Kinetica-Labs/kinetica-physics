@@ -1,0 +1,3 @@
+probe,queries,stock_pass,always_two_pass,gated_pass,retries,selected_area,baseline_support_calls,gate_total_support_calls,old_fullselect_total_support_calls,certificate_support_calls,bounding_radius_calls
+primary,1440,1412,1436,1436,61,58,44182,47928,96582,30,122
+holdout,1440,1406,1424,1424,35,34,42252,44750,92664,10,70

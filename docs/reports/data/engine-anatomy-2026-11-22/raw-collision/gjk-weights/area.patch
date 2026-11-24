@@ -1,0 +1,70 @@
+--- a/src/collision/narrowphase/Gjk.cpp
++++ b/src/collision/narrowphase/Gjk.cpp
+@@ -48,30 +48,43 @@
+ // Разбор областей Вороного вершин, рёбер и грани: Ericson, «Real-Time Collision Detection»,
+ // раздел 5.1.5.
+ void closestOnTriangle(Vector3 a, Vector3 b, Vector3 c, Real& wa, Real& wb, Real& wc) {
+-    const Vector3 ab = b - a, ac = c - a;
+-    const Real d1 = -ab.dot(a), d2 = -ac.dot(a);
+-    if (d1 <= 0 && d2 <= 0) return void((wa = 1, wb = 0, wc = 0)); // область вершины a
+-    const Real d3 = -ab.dot(b), d4 = -ac.dot(b);
+-    if (d3 >= 0 && d4 <= d3) return void((wa = 0, wb = 1, wc = 0)); // вершина b
+-    const Real vc = d1 * d4 - d3 * d2;
+-    if (vc <= 0 && d1 >= 0 && d3 <= 0) { // ребро ab
+-        wb = d1 / (d1 - d3);
+-        return void((wa = 1 - wb, wc = 0));
+-    }
+-    const Real d5 = -ab.dot(c), d6 = -ac.dot(c);
+-    if (d6 >= 0 && d5 <= d6) return void((wa = 0, wb = 0, wc = 1)); // вершина c
+-    const Real vb = d5 * d2 - d1 * d6;
+-    if (vb <= 0 && d2 >= 0 && d6 <= 0) { // ребро ac
+-        wc = d2 / (d2 - d6);
+-        return void((wa = 1 - wc, wb = 0));
+-    }
+-    const Real va = d3 * d6 - d5 * d4;
+-    if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) { // ребро bc
+-        wc = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+-        return void((wa = 0, wb = 1 - wc));
+-    }
+-    const Real sum = va + vb + vc; // внутренность грани
+-    wb = vb / sum, wc = vc / sum, wa = 1 - wb - wc;
++    // Widen before subtracting coordinates; only the published weights round to Real.
++    using Wide = long double;
++    struct Point {
++        Wide x, y, z;
++        Point operator-(Point v) const { return {x-v.x, y-v.y, z-v.z}; }
++        Point cross(Point v) const { return {y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x}; }
++        Wide dot(Point v) const { return x*v.x+y*v.y+z*v.z; }
++    };
++    const Point A{a.x,a.y,a.z}, B{b.x,b.y,b.z}, C{c.x,c.y,c.z};
++    const Point AB=B-A, AC=C-A, BC=C-B;
++    const Wide d1 = -AB.dot(A), d2 = -AC.dot(A);
++    if (d1 <= 0 && d2 <= 0) return void((wa = 1, wb = 0, wc = 0));
++    const Wide d3 = -AB.dot(B), d4 = -AC.dot(B);
++    if (d3 >= 0 && d4 <= d3) return void((wa = 0, wb = 1, wc = 0));
++    const Point normal = BC.dot(BC) < AC.dot(AC) ? AB.cross(BC) : AB.cross(AC);
++    const Wide vc = A.cross(AB).dot(normal);
++    if (vc <= 0 && d1 >= 0 && d3 <= 0) {
++        const Wide sum = d1 - d3;
++        wa = Real(-d3 / sum); wb = Real(d1 / sum); wc = 0;
++        return;
++    }
++    const Wide d5 = -AB.dot(C), d6 = -AC.dot(C);
++    if (d6 >= 0 && d5 <= d6) return void((wa = 0, wb = 0, wc = 1));
++    const Wide vb = AC.cross(A).dot(normal);
++    if (vb <= 0 && d2 >= 0 && d6 <= 0) {
++        const Wide sum = d2 - d6;
++        wa = Real(-d6 / sum); wb = 0; wc = Real(d2 / sum);
++        return;
++    }
++    const Wide va = B.cross(BC).dot(normal);
++    if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) {
++        const Wide sum = (d4 - d3) + (d5 - d6);
++        wa = 0; wb = Real((d5 - d6) / sum); wc = Real((d4 - d3) / sum);
++        return;
++    }
++    const Wide sum = va + vb + vc;
++    wa = Real(va / sum); wb = Real(vb / sum); wc = Real(vc / sum);
+ }
+ 
+ // Обновляет веса симплекса так, чтобы они задавали ближайшую к началу координат точку.

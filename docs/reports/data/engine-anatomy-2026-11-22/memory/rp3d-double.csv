@@ -1,0 +1,5 @@
+phase,scalar_bytes,frames,updates,upstream_allocations,requested_bytes,upstream_frees,released_bytes,end_drift_mm
+construction,8,0,0,1,5242928,0,0,
+preload,8,15,120,0,0,0,0,
+loaded,8,15,120,0,0,0,0,0.279159200395
+destruction,8,0,0,0,0,1,5242928,

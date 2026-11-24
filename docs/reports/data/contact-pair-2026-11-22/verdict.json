@@ -1,0 +1,120 @@
+{
+  "reference": "active",
+  "runs": [
+    {
+      "build": "sequential",
+      "compared_to": null,
+      "sha256": {
+        "study-grip-limit": "e2d187a74218a577397534035273095827a37a1972dc3eb2964fb3d86bb13bf2",
+        "study-slip-to-roll": "2b84841c6ae377f63a5e02ce519d967d2f2b09a03202c767d87b73586f0c0562",
+        "study-groove-friction": "0acbaba0264d360d9052886dc0e5231dd44b99c407d9a847a09a664214eead47"
+      },
+      "grip_pass": 31,
+      "roll_pass": 8,
+      "max_speed_error_m_s": 1.470000510206404e-11,
+      "max_balance_error_Ns": 1.96912972039e-12,
+      "max_hold_mm_both_orders": 1.44327341292,
+      "groove_pass": 24,
+      "groove_max_error_m_s": 0.00229591836736,
+      "groove-holdout_pass": 18,
+      "groove-holdout_max_error_m_s": 0.00334043971885,
+      "decision": "baseline",
+      "reasons": []
+    },
+    {
+      "build": "block",
+      "compared_to": "sequential",
+      "sha256": {
+        "study-grip-limit": "c9b9cd503ce74b2f9e0b6b72a53a54bc747b7468dcbd3ca64e40061ce3b1a1f8",
+        "study-slip-to-roll": "c3f9c026cddb7c33e75d955388e124ae796334c9255585dc7256eecf91b5f3df",
+        "study-groove-friction": "0a28f2c8eeb84fb4e15ff08ec01923fd820d3063b0970e70bcd05226fe949503"
+      },
+      "grip_pass": 31,
+      "roll_pass": 8,
+      "max_speed_error_m_s": 1.470000510206404e-11,
+      "max_balance_error_Ns": 1.49186218934e-16,
+      "max_hold_mm_both_orders": 1.02710932456,
+      "groove_pass": 24,
+      "groove_max_error_m_s": 0.00255987879371,
+      "groove-holdout_pass": 24,
+      "groove-holdout_max_error_m_s": 0.00702817104414,
+      "decision": "reject",
+      "reasons": [
+        "hold drift above 0.5 mm",
+        "groove contact-speed oracle",
+        "groove-holdout contact-speed oracle"
+      ]
+    },
+    {
+      "build": "guides",
+      "compared_to": "sequential",
+      "sha256": {
+        "study-grip-limit": "cd1b15316a92ba6895cd56a2f2114334aa3a8a2dbb7c26eb7f9b2a8247847186",
+        "study-slip-to-roll": "e24aaef06cf05ac61cbd9d18d448902e0fee8d00df33894fe99edd7d5a7b6dd0",
+        "study-groove-friction": "c0fab8031949c628491a0622bb165d00bc25dbddf454f8d73f3b3cc2eb74d3ad"
+      },
+      "grip_pass": 33,
+      "roll_pass": 8,
+      "max_speed_error_m_s": 1.470000510206404e-11,
+      "max_balance_error_Ns": 1.49186218934e-16,
+      "max_hold_mm_both_orders": 0.0434027825447,
+      "groove_pass": 24,
+      "groove_max_error_m_s": 0.00255987879371,
+      "groove-holdout_pass": 24,
+      "groove-holdout_max_error_m_s": 0.00702817104414,
+      "decision": "reject",
+      "reasons": [
+        "groove contact-speed oracle",
+        "groove-holdout contact-speed oracle"
+      ]
+    },
+    {
+      "build": "active",
+      "compared_to": "sequential",
+      "sha256": {
+        "study-grip-limit": "2765392d6a63f2a5aa1c4589e9ff07317dff82df509442cb44f61e84ea2bfb7c",
+        "study-slip-to-roll": "c9cc2dbe43d03e801cb3816512cff11b5661fca788bad90f63de6a46ff7388ab",
+        "study-groove-friction": "3055ea634ec171b47c147b392144683950e4ae2cb672dcf44532843c623f1c16"
+      },
+      "grip_pass": 33,
+      "roll_pass": 8,
+      "max_speed_error_m_s": 1.470000510206404e-11,
+      "max_balance_error_Ns": 1.49186218934e-16,
+      "max_hold_mm_both_orders": 0.0434027825447,
+      "groove_pass": 32,
+      "groove_max_error_m_s": 3.386999986032535e-10,
+      "groove-holdout_pass": 32,
+      "groove-holdout_max_error_m_s": 7.645999996336306e-10,
+      "decision": "keep",
+      "reasons": []
+    },
+    {
+      "build": "centred",
+      "compared_to": "active",
+      "sha256": {
+        "study-grip-limit": "083de978e3e3323a02519742e686bf2df6b0a7b6ea02f3aa1dac3146b0aca91d",
+        "study-slip-to-roll": "a2e727e186be4ef7d3a48e93e6f8ca006c40b0fc23840678a4d3be89f8ff1dc7",
+        "study-groove-friction": "cff02a30b50a7bb759d963fbd2278f70d467b5c425ca408f50c0a727b37d3423"
+      },
+      "grip_pass": 13,
+      "roll_pass": 7,
+      "max_speed_error_m_s": 0.018229148422599997,
+      "max_balance_error_Ns": 3.19004075006e-07,
+      "max_hold_mm_both_orders": 2.56076388403,
+      "groove_pass": 0,
+      "groove_max_error_m_s": 0.033145611713200004,
+      "groove-holdout_pass": 0,
+      "groove-holdout_max_error_m_s": 0.028690879978000003,
+      "decision": "reject",
+      "reasons": [
+        "grip regressions: 24 paths, 22 previously passing",
+        "jaw reaction outside tolerance",
+        "hold drift above 0.5 mm",
+        "impulse balance",
+        "slip-to-roll oracle",
+        "groove contact-speed oracle",
+        "groove-holdout contact-speed oracle"
+      ]
+    }
+  ]
+}

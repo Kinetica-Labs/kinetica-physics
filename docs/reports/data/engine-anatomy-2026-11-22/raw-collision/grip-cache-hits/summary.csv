@@ -1,0 +1,13 @@
+mode,case_name,phase,public_steps,hits,misses,no_cache,hit_pct
+stock,threshold_10N,preload,120,238,2,0,99.16667
+stock,threshold_10N,loaded,120,226,14,0,94.16667
+stock,sliding_12N,preload,120,238,2,0,99.16667
+stock,sliding_12N,loaded,120,28,212,0,11.66667
+stock,open_10N,preload,120,0,0,0,n/a
+stock,open_10N,loaded,120,0,0,0,n/a
+coupled,threshold_10N,preload,120,238,2,0,99.16667
+coupled,threshold_10N,loaded,120,240,0,0,100.0
+coupled,sliding_12N,preload,120,238,2,0,99.16667
+coupled,sliding_12N,loaded,120,30,210,0,12.5
+coupled,open_10N,preload,120,0,0,0,n/a
+coupled,open_10N,loaded,120,0,0,0,n/a

@@ -59,8 +59,8 @@ void drawVerdict(Viewer& viewer) {
     if (!standard) return;
     ImGui::PushTextWrapPos(0);
     if (!viewer.judged) ImGui::TextDisabled("проверка сцены будет в t = %.1f с", standard->checkAt);
-    else if (viewer.verdict.empty()) ImGui::TextColored(kGood, "проверка сцены: как должно");
-    else ImGui::TextColored(kBad, "проверка сцены: %s", viewer.verdict.c_str());
+    else if (viewer.verdict.empty()) ImGui::TextColored(kGood, "в момент %.1f с: в допуске", standard->checkAt);
+    else ImGui::TextColored(kBad, "в момент %.1f с: %s", standard->checkAt, viewer.verdict.c_str());
     if (!viewer.asMeasured()) {
         ImGui::TextDisabled("в окне включены воздух или сон: у прибора с замерами их нет, итог может отличаться");
         if (ImGui::SmallButton("Считать как прибор")) viewer.measure();
@@ -85,7 +85,7 @@ void drawExact(const Viewer& viewer) {
 void drawStatus(Viewer& viewer, const DebugGeometry& all) {
     const auto contactPoints = std::count_if(all.points.begin(), all.points.end(), [](const DebugPoint& point) { return point.kind == DebugKind::ContactPoint; });
     ImGui::Text("время %.2f с, кадр %d", viewer.frame * double(Viewer::kFrame), viewer.frame);
-    ImGui::Text("тел %zu, точек контакта %d", viewer.world.bodies().size(), int(contactPoints));
+    ImGui::Text("тел %zu, показано точек контакта %d", viewer.world.bodies().size(), int(contactPoints));
     ImGui::Text("счёт шага %.2f мс, самый долгий %.2f", viewer.lastStep, viewer.slowestStep);
     if (viewer.world.joints().size() > 0)
         ImGui::Text("разрыв сочленений %.3f мм, наибольший %.3f", 1e3 * double(viewer.world.joints().largestError(viewer.world.bodies())), 1e3 * viewer.worstGap);
@@ -166,6 +166,8 @@ void drawShown(Viewer& viewer) {
     ImGui::Checkbox("неподвижные тела", &viewer.show[int(DebugKind::StaticShape)]);
     ImGui::Checkbox("точки контакта", &viewer.show[int(DebugKind::ContactPoint)]);
     ImGui::Checkbox("нормали контакта", &viewer.show[int(DebugKind::ContactNormal)]);
+    ImGui::Checkbox("пересчёт отметок в покое", &viewer.rawContactMarkers);
+    hint("показывает исходные геометрические контакты даже при изменении позы на величину округления");
     ImGui::Checkbox("дерево поиска пар", &viewer.show[int(DebugKind::TreeNode)]);
     ImGui::Checkbox("номера тел", &viewer.showBodyNumbers);
 }
@@ -175,18 +177,25 @@ void drawSettings(Viewer& viewer) {
     hint("сопротивление среды; 0 — как на Луне. У сцен с точным ответом выключено");
     if (ImGui::Checkbox("сон покоящихся тел", &viewer.sleeping)) viewer.load(viewer.scene);
     hint("сцена начнётся заново");
+    ImGui::Checkbox("проход по опорам (shock propagation)", &viewer.shockPropagation);
+    hint("уменьшает лишнее сближение в опорах; действует со следующего шага");
     ImGui::SeparatorText("быстрый шаг");
-    ImGui::SliderInt("подшагов на кадр", &viewer.substeps, 1, 16);
-    ImGui::SliderInt("поисков контакта", &viewer.contactUpdates, 1, 4);
-    hint("сколько раз за кадр заново ищутся пары и точки контакта");
+    const Scene& scene = scenes()[viewer.scene];
+    if (scene.singleSubstep) {
+        ImGui::Text("%d шагов за кадр, по одному поиску контактов", scene.updatesPerFrame);
+    } else {
+        ImGui::SliderInt("подшагов на кадр", &viewer.substeps, 1, 16);
+        ImGui::SliderInt("поисков контакта", &viewer.contactUpdates, 1, 4);
+        hint("сколько раз за кадр заново ищутся пары и точки контакта");
+    }
     ImGui::SliderFloat("трение качения, мм", &viewer.rollingResistance, 0, 5, "%.1f");
     ImGui::Checkbox("четыре точки на пару", &viewer.world.soft.fourContactPoints);
     hint("иначе в решатель идут все точки площадки");
+    ImGui::Checkbox("совместное трение двух контактов", &viewer.world.soft.coupledFriction);
+    hint("для быстрого шага: совместное решение касательных импульсов в подходящем острове");
     ImGui::SeparatorText("точный шаг");
     ImGui::SliderInt("предел отрезков", &viewer.segmentLimit, 1, 64);
     hint("не больше отрезков на кадр: шаг, которому их не хватило, отстаёт от часов, зато окно не замирает");
-    ImGui::Checkbox("ударная волна", &viewer.shockPropagation);
-    hint("проход shock propagation в решателе контактов");
     ImGui::Text("отрезков шага %d, не больше %d", viewer.world.report().segments, viewer.mostSegments);
     ImGui::Text("проходов решателя %d", viewer.world.report().solverIterations);
     ImGui::Text("сцена отстала от часов на %.3f с", viewer.lag);
@@ -205,6 +214,8 @@ void drawPanel(Viewer& viewer, const DebugGeometry& all, int width, int height) 
     ImGui::Begin("панель", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
     ImGui::PushItemWidth(kFieldWidth);
     drawHeader(viewer);
+    if (scenes()[viewer.scene].vehicle)
+        ImGui::TextWrapped("W / S — вперёд и назад. A / D — руль. Отпустите W и S для торможения.");
     ImGui::Separator();
     drawStatus(viewer, all);
     ImGui::Spacing();

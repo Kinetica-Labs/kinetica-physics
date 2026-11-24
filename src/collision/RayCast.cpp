@@ -23,14 +23,17 @@ bool nearRay(Vector3 origin, Vector3 unit, Real reach, Vector3 centre, Real radi
 bool castOnShape(const ConvexShape& shape, const Transform& pose, Vector3 origin, Vector3 unit, Real reach, RayHit& hit) {
     const Sphere point(0);
     Real t = 0;
+    Vector3 entryNormal = -unit;
     for (int step = 0; step < kMaxRaySteps; ++step) {
         const ClosestPoints closest = closestPoints(point, {origin + t * unit, {}}, shape, pose);
         if (closest.coresOverlap || closest.distance <= kRayTouch) {
-            hit.distance = t, hit.point = origin + t * unit, hit.normal = closest.coresOverlap ? -1 * unit : -1 * closest.normal;
+            hit.distance = t, hit.point = origin + t * unit;
+            hit.normal = closest.coresOverlap || closest.distance <= 64 * kEpsilon * shape.boundingRadius() ? entryNormal : -closest.normal;
             return true;
         }
         const Real approach = closest.normal.dot(unit);
         if (approach <= 0) return false; // луч идёт вдоль плоскости или от неё
+        entryNormal = -closest.normal; // при точном попадании разность ближайших точек уже равна нулю
         t += closest.distance / approach;
         if (t > reach) return false;
     }
@@ -40,13 +43,17 @@ bool castOnShape(const ConvexShape& shape, const Transform& pose, Vector3 origin
 } // namespace
 
 RayHit castRay(const std::vector<Body>& bodies, const Ray& ray) {
+    return castRay(bodies, ray, nullptr);
+}
+
+RayHit castRay(const std::vector<Body>& bodies, const Ray& ray, const Body* excluded) {
     const Vector3 origin = ray.origin, direction = ray.direction;
     Real reach = ray.reach;
     const Vector3 unit = (1 / direction.length()) * direction;
     RayHit nearest;
     for (size_t index = 0; index < bodies.size(); ++index) {
         const Body& body = bodies[index];
-        if (!body.shape || !nearRay(origin, unit, reach, body.position, body.boundingRadius())) continue;
+        if (&body == excluded || !body.shape || !nearRay(origin, unit, reach, body.position, body.boundingRadius())) continue;
         for (int p = 0; p < body.partCount(); ++p) {
             const Body piece = body.part(p);
             const Transform pose = piece.pose();

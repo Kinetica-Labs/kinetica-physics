@@ -1,0 +1,1 @@
+unresolved_prohibited_symbols=0 archives=2 tool=llvm-nm

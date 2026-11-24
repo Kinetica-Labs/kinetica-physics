@@ -1,0 +1,9 @@
+variant,kind,name,sha256
+stock,compiled input or result,SoftStep.cpp,73e82c9839c1019ac5d04567c612c8c8dcaa25a5ad19add9945b4f3ab65a8998
+stock,compiled input or result,libkinetica-physics.a,cbcce1424755ba4d0a0e13ee6bde10554ba1cd64137f9114a8a1547adf9b17ef
+stock,compiled input or result,study-grip-limit.exe,2213c6e2d92b9ce02c29a9ecb8bdaf333faa54b6f765e95d3aeec0aa4bc37b89
+stock,compiled input or result,compare-ours.exe,8c6d7d734c8435fa926f071d58108d9f59458f3faa8e85c613cbcbbc7eba7fbc
+split,compiled input or result,SoftStep.cpp,605b12c5e00395f4c03b3932df53275ececf3cde17460c57a53ceb40cbd91711
+split,compiled input or result,libkinetica-physics.a,e019d5856d55c64df0f9b2565cf32f9f7b3e240002eae6b7e2887b6a449793c0
+split,compiled input or result,study-grip-limit.exe,29334a8f81d889ae6395fed2e03366475771c9d194b3253eaa0065c21adfbdb7
+split,compiled input or result,compare-ours.exe,eef7f6d94b6fd2092e03a9fcb5d986161f7327399706c247249f9896aa8f8fe9

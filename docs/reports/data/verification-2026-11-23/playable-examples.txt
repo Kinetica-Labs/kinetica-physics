@@ -1,0 +1,5 @@
+dry / half / full [N]: 0.000000 / 39.240000 / 78.480000
+draft [m]: 0.100000, rest drift [m]: 3.01e-17
+period [s]: 0.63440492, oracle: 0.63437398
+exact: A=90.000000 deg, B=-45.000000 deg, max phase error 7.87e-14 rad, max speed error 1.28e-13 rad/s
+realtime: A=90.187500 deg, B=-45.093750 deg, max phase error 4.44e-16 rad, max speed error 3.29e-14 rad/s

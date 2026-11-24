@@ -65,7 +65,7 @@ PairFriction::Pair PairFriction::frictionOf(const ContactPair& contact, size_t f
 
 // Матрица отклика трения пары: K[i][j] — на сколько изменится скольжение i от единичного импульса
 // j. Скольжение и импульс — три числа: вдоль двух касательных в центре и вокруг нормали. withA и
-// withB — какие из двух тел подвижны: для прохода ударной волны нижнее считается неподвижным.
+// withB задают вклады тел в матрицу отклика.
 PairFriction::Response PairFriction::frictionResponse(const Pair& pair, bool withA, bool withB) const {
     Response k{};
     const Vector3 tangent[2] = {pair.tangent1, pair.tangent2};

@@ -1,0 +1,5 @@
+phase,frames,new_calls,new_bytes,arena_calls,payload_B,occupied_B,refills,refill_B,peak_B,blocks
+construct,0,178,12696,0,0,0,0,0,0,0
+cold,1,195,127054,1705,174928,206928,1,4194304,29968,1
+preload,14,2464,1719424,23632,2387392,2831360,0,0,25280,1
+loaded,15,2642,1843648,25378,2585896,3062512,0,0,29376,1

@@ -1,0 +1,55 @@
+{
+  "reference": "before",
+  "runs": [
+    {
+      "build": "before",
+      "compared_to": null,
+      "sha256": {
+        "study-grip-limit": "9b1169e790c8be1f0ebe79d4695df850534be8aaa42c35c94a41619a0022f62b",
+        "study-slip-to-roll": "1eee50d4ca3ab1e79bf97716ec33280004571bb7aefa2b7e6c45eb89f00ea8b5"
+      },
+      "grip_pass": 31,
+      "roll_pass": 8,
+      "max_speed_error_m_s": 1.470000510206404e-11,
+      "max_balance_error_Ns": 1.96912972039e-12,
+      "max_hold_mm_both_orders": 1.44327341292,
+      "decision": "baseline",
+      "reasons": []
+    },
+    {
+      "build": "sor125",
+      "compared_to": "before",
+      "sha256": {
+        "study-grip-limit": "92bb63237b691a53d755fa1bd74ef6fad247cbfd88065f9434e27549e2395c55",
+        "study-slip-to-roll": "93ef327228482f4528a6cf7b9c7525636fad1c825f80659b228e815b4c88a825"
+      },
+      "grip_pass": 32,
+      "roll_pass": 6,
+      "max_speed_error_m_s": 0.00250000000002,
+      "max_balance_error_Ns": 2.43077086237e-12,
+      "max_hold_mm_both_orders": 0.513103642489,
+      "decision": "reject",
+      "reasons": [
+        "hold drift above 0.5 mm",
+        "slip-to-roll oracle"
+      ]
+    },
+    {
+      "build": "sor15",
+      "compared_to": "before",
+      "sha256": {
+        "study-grip-limit": "d5bbcf908714bbd2fa0406f772e7672a324b5fa824a64f58429a0f2363abd99c",
+        "study-slip-to-roll": "bd18e8f3ffa5722f6c50434482f890858cb49cd6b0cf001f13904331d54ecace"
+      },
+      "grip_pass": 33,
+      "roll_pass": 6,
+      "max_speed_error_m_s": 0.00500000000002,
+      "max_balance_error_Ns": 1.49186218934e-16,
+      "max_hold_mm_both_orders": 0.0434027825447,
+      "decision": "reject",
+      "reasons": [
+        "slip-to-roll oracle"
+      ]
+    }
+  ]
+}

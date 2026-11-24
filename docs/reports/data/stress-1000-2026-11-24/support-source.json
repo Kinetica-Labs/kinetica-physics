@@ -1,0 +1,37 @@
+{
+  "source_snapshot_sha256": "791cfef521deda89cfa72f04aecab1623ab5f70808aace745b2700271a6050d5",
+  "base_git_commit": "2326667",
+  "dirty_snapshot": true,
+  "host": "DESKTOP-N3RC7NA",
+  "cpu": "Intel Xeon E5-2690 v3",
+  "compiler": "clang 23.1.6, llvm-mingw",
+  "build": "Release -O3 -DNDEBUG -ffp-contract=off",
+  "real": "double",
+  "solver_threads": 1,
+  "gravity_m_s2": 9.81,
+  "broad_rates_hz": [
+    60,
+    120,
+    240
+  ],
+  "broad_realtime_substeps": 8,
+  "broad_event_segment_cap": 64,
+  "selected_sources": {
+    "include/world/World.h": "ff5b323a1e66a1d4277cb6eb6a05557b8136063712784dcc0a7a384caabb8482",
+    "src/dynamics/time_stepping/IslandNormals.cpp": "380b206d950031af81601fe0f100e1f53a19e232a7a6265a1bfcfd08b784cb0d",
+    "src/dynamics/time_stepping/SupportNormals.cpp": "43e5f38c1aab1479e12e1cf5b309d5c5fc3f3cc4e961d28c131266930b33f515",
+    "src/dynamics/SupportGraph.h": "fc86f8c4c8dba792425624d88e0009719e1a031927f0c920637e128a86a50559",
+    "src/dynamics/event_driven/ShockPropagation.cpp": "e6303b5f081fc2fe1bc50db883d2b1bc2e46101e02a09dbc11ba498c9a32b1ad",
+    "src/joints/DistanceJoint.cpp": "ec9903083b6c6874c617e409b04a20a47d5cc5e70bc59d292ae3fad009251de7",
+    "src/joints/RackAndPinionJoint.cpp": "fa2b941f7a60ab39907813b1388f1b36e4c7f2ccee3caca1bf2d956f60a6f06a",
+    "src/dynamics/WheelContact.cpp": "0052b605aa501b7408969adf4da91fb4dccfbaf4996d8039746933ed25524883",
+    "validation/engines/stress/support/PhysicalAccuracy.cpp": "56375059a781a1efcafeae6cd15b85e3c8000223c23dd7c26657e605e16cc787",
+    "tests/LinkageTests.cpp": "8a0d7c4767686fc7bb7460e3f34165f33511f5c24ee63222ec1c75cf01303174",
+    "tests/WheelTests.cpp": "57540ee84487e914d6f9ee65b78d5a0e1aaf4cbeb5a0fe64e8b5bc9718d81ae1",
+    "viewer/Viewer.cpp": "ef8457d0980642b74b528a3ed15bc3af4d519f08b8f0da0356618bb2c53b728e",
+    "viewer/Scenes.cpp": "f9b7828768300c0b1a411a8c14fab21b77bd08a13c5c58035c856d84692b83b7",
+    "viewer/Panel.cpp": "fc768d9a012af0f47d29fe055bdb916ea20b31b67adf69082153de32f14fbf4b",
+    "viewer/main.cpp": "1e3a8a8ed5f5f28b1d9428cc02280baddffe89ce02cb248472bbcac704307000"
+  },
+  "desktop_viewer_sha256": "f8c501cec8b2eed30f0ab71cc6980b626d95d985b67c099b87bb90eff27c5366"
+}

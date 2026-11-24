@@ -1,0 +1,49 @@
+--- a/src/dynamics/event_driven/ContactSystem.cpp
++++ b/src/dynamics/event_driven/ContactSystem.cpp
+@@ -48,22 +48,36 @@
+         const size_t a = size_t(lines[i].a), b = size_t(lines[i].b);
+         matrix[i].reserve((bodies[a].isStatic() ? 0 : count[a]) + (bodies[b].isStatic() ? 0 : count[b]));
+     }
++    // Отклик тела на источник j вычисляется один раз. Затем целая строка i
++    // записывается подряд: её линейное направление, момент и знак постоянны.
++    struct Response { size_t column; Vector3 velocity, spin; };
++    StepArray<Response> responses;
+     for (size_t index = 0; index < bodies.size(); ++index) {
+         const Body& body = bodies[index];
+         if (body.isStatic()) continue;
+-        for (size_t j : onBody[index]) {
+-            // Единичный импульс вдоль линии: тело b получает +linear и +angularB, тело a — −linear
+-            // и −angularA. Отклик тела — изменение его скорости и угловой скорости.
++        const auto& attached = onBody[index];
++        responses.clear();
++        responses.reserve(attached.size());
++        for (size_t j : attached) {
+             const Line& source = lines[j];
+             const bool sourceIsB = source.b == int(index);
+             const Real sign = sourceIsB ? Real(1) : Real(-1);
+-            const Vector3 velocity = (sign * body.mass.inverseMass) * source.linear;
+-            const Vector3 spin = sign * inverseInertiaTimes(body, sourceIsB ? source.angularB : source.angularA);
+-            for (size_t i : onBody[index]) {
+-                const Line& target = lines[i];
+-                const bool targetIsB = target.b == int(index);
+-                const Real change = target.linear.dot(velocity) + (targetIsB ? target.angularB : target.angularA).dot(spin);
+-                matrix[i].push_back({j, targetIsB ? change : -change});
++            responses.push_back({j, (sign * body.mass.inverseMass) * source.linear,
++                                 sign * inverseInertiaTimes(body, sourceIsB ? source.angularB : source.angularA)});
++        }
++        for (size_t at = 0; at < attached.size(); ++at) {
++            const size_t i = attached[at];
++            const bool twice = at + 1 < attached.size() && attached[at + 1] == i;
++            if (twice) ++at;
++            const Line& target = lines[i];
++            const bool targetIsB = target.b == int(index);
++            const Vector3 angular = targetIsB ? target.angularB : target.angularA;
++            auto& row = matrix[i];
++            for (const Response& source : responses) {
++                const Real change = target.linear.dot(source.velocity) + angular.dot(source.spin);
++                const Entry entry{source.column, targetIsB ? change : -change};
++                row.push_back(entry);
++                if (twice) row.push_back(entry);
+             }
+         }
+     }

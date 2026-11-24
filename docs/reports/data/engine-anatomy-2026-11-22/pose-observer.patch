@@ -1,0 +1,75 @@
+--- a/validation/studies/GripLimit.cpp
++++ b/validation/studies/GripLimit.cpp
+@@ -43,6 +43,10 @@
+         world_.body(cube_).force.y = cubeForceY;
+         world_.step(h);
+         return !world_.report().stalled && world_.report().unfinished == 0;
++    }
++    double relativeVy() const {
++        return world_.body(cube_).linearVelocity().y -
++               (world_.body(left_).linearVelocity().y + world_.body(right_).linearVelocity().y) / 2;
+     }
+     kp::Real cubeMomentumY() const { return world_.body(cube_).linearMomentum.y; }
+     kp::World& world() { return world_; } // прибор независимости добавляет тела со своими внешними силами
+@@ -105,6 +109,50 @@
+     return closed ? 0 : 1;
+ }
+ 
++// Две наблюдаемые квадратуры интегрируют скорости уже рассчитанной траектории.
++// Они не подаются назад в геометрию. Положительное направление показаний — вниз.
++int tracePose(grip::Load load, int hz) {
++    Rig rig(1, load, true);
++    const kp::Real h = kp::Real(1) / (hz * 8);
++    const int steps = (hz * 8) / 4;
++    for (int k = 0; k < steps; ++k)
++        if (!rig.advance(h, kp::Real(load.squeeze), 0)) return 1;
++    const double origin = rig.read().relativeY;
++    double trapezoid = 0, rightEndpoint = 0;
++    for (int k = 1; k <= steps; ++k) {
++        const double y0 = rig.read().relativeY, v0 = -rig.relativeVy();
++        const double p0 = rig.cubeMomentumY();
++        if (!rig.advance(h, kp::Real(load.squeeze), -kp::Real(load.down))) return 1;
++        const auto now = rig.read();
++        const double v1 = -rig.relativeVy();
++        const auto jaws = rig.jawImpulses(h);
++        if (!now.valid() || !std::isfinite(v0) || !std::isfinite(v1)) return 1;
++        rightEndpoint += h * v1;
++        trapezoid += (h / 2) * (v0 + v1);
++        const double t = k * h;
++        const double observed = origin - now.relativeY;
++        const double oracle = 0.5 * grip::acceleration(load) * t * t;
++        const double balance = rig.cubeMomentumY() - p0 + load.down * h - (jaws.left + jaws.right);
++        std::printf("%d,%.12g,%.12g,%.12g,%d,%d,%.17g,%.17g,%.17g,%.17g,%.17g,"
++                    "%.17g,%.17g,%.17g,%.17g,%.17g,%.17g\n",
++                    hz, load.friction, load.squeeze, load.down, int(load.open), k, double(h),
++                    1000 * observed, 1000 * rightEndpoint, 1000 * trapezoid, 1000 * oracle,
++                    v0, (y0 - now.relativeY) / h, v1, double(jaws.left), double(jaws.right), balance);
++    }
++    return 0;
++}
++
++int poseQuadrature() {
++    std::puts("hz,mu,jaw_N,load_N,open,microstep,h_s,sdk_drop_mm,right_endpoint_mm,trapezoid_mm,"
++              "oracle_mm,v_start_down_m_s,v_transport_down_m_s,v_end_down_m_s,left_up_Ns,right_up_Ns,balance_Ns");
++    const grip::Load cases[] = {{0.5,10,10}, {0.5,10,-10}, {0.5,10,10.2}, {0.5,10,-10.2},
++                                {0.5,10,12}, {0.5,10,-12}, {0,10,10}, {0.5,10,10,true}};
++    for (int hz : {60,120,240})
++        for (auto load : cases)
++            if (tracePose(load, hz) != 0) return 1;
++    return 0;
++}
++
+ int traceOrder() {
+     std::puts("order,mu,load_N,left_up_Ns,right_up_Ns,balance_error_Ns,"
+               "microstep,time_s,relative_drop_mm,cube_vy_m_s,up_contact_Ns,required_Ns");
+@@ -118,6 +166,10 @@
+ 
+ int main(int argc, char** argv) {
+     const std::string_view mode = argc == 2 ? argv[1] : "";
++    if (mode == "pose-quadrature") {
++        kp::WorkerPool::shared().resize(1);
++        return poseQuadrature();
++    }
+     if (mode == "sensitivity") {
+         kp::WorkerPool::shared().resize(1);
+         grip::sensitivityHeader();

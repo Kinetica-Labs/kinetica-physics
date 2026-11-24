@@ -80,6 +80,7 @@ public:
     static void prefetch(const StepArray<SoftContact>& contacts, const StepArray<SolverBody>& states, size_t near, size_t far);
 
 private:
+    friend class CoupledFriction;
     CentreFriction::Carried takePoints(const ContactPair& pair, Vector3 xA, Vector3 xB, const SolverBody& a, const SolverBody& b, Span<ContactForces::Entry> known, Real h, bool fourPoints);
     // Нынешние нормаль и касательные; found — ближайшие точки форм, найденные заново, или nullptr.
     void aim(const BodyMotion& a, const BodyMotion& b, Vector3 apart, const ClosestPoints* found);

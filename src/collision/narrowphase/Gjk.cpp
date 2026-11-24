@@ -4,6 +4,7 @@
 #include <optional>
 
 #include <algorithm>
+#include <cmath>
 
 namespace kp {
 namespace {
@@ -164,6 +165,36 @@ bool descend(Support&& support, Simplex& simplex, Vector3& v, int& iterations, R
 
 } // namespace
 
+// Для точечных ядер d = |cB − cA| − rA − rB, включая совпадающие центры.
+static ClosestPoints pointCoreGap(const ConvexShape& a, Vector3 ca, const ConvexShape& b, Vector3 cb, Real farther) {
+    Vector3 delta = cb - ca;
+    Real factor = 1;
+    if (!std::isfinite(delta.x) || !std::isfinite(delta.y) || !std::isfinite(delta.z)) {
+        delta = Real(0.5) * cb - Real(0.5) * ca;
+        factor = 2;
+    }
+    const Real scale = std::max({abs(delta.x), abs(delta.y), abs(delta.z)});
+    ClosestPoints result;
+    if (scale == 0) {
+        // Любая единичная нормаль допустима. При разных радиусах обмен тел меняет знак.
+        result.normal = {0, a.radius >= b.radius ? Real(1) : Real(-1), 0};
+        result.distance = -a.radius - b.radius;
+    } else {
+        // Нормируем до возведения в квадрат, даже если scale — субнормальное число.
+        const Vector3 scaled{delta.x / scale, delta.y / scale, delta.z / scale};
+        const Real length = scaled.length();
+        result.normal = (1 / length) * scaled;
+        const Real span = factor * length;
+        result.distance = scale <= std::numeric_limits<Real>::max() / span
+                        ? (scale * span - a.radius) - b.radius
+                        : scale * ((span - a.radius / scale) - b.radius / scale);
+    }
+    result.beyond = result.distance > farther + kBeyondMargin;
+    result.onA = ca + a.radius * result.normal;
+    result.onB = cb - b.radius * result.normal;
+    return result;
+}
+
 // Расстояние между ядрами как они есть; farther — предел расстояния между поверхностями (closestPoints).
 static ClosestPoints betweenCores(const ConvexShape& a, const Transform& poseA, const ConvexShape& b, const Transform& poseB, Real farther) {
     // Вся работа идёт в осях тела A: там числа порядка размеров тел, а не их удалённости от
@@ -183,6 +214,9 @@ static ClosestPoints betweenCores(const ConvexShape& a, const Transform& poseA, 
     simplex.weight[0] = 1;
     simplex.count = 1;
     Vector3 v = simplex.vertex[0].w;
+    const Real squared = v.lengthSquare();
+    if ((squared < std::numeric_limits<Real>::min() || !std::isfinite(squared)) && a.hasPointCore() && b.hasPointCore())
+        return pointCoreGap(a, poseA.position, b, poseB.position, farther);
 
     ClosestPoints result;
     if (!descend(support, simplex, v, result.iterations, farther + a.radius + b.radius + kBeyondMargin, result.beyond)) return result.coresOverlap = true, result;

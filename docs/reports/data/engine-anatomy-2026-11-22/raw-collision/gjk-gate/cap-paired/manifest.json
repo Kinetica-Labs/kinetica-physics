@@ -1,0 +1,64 @@
+{
+  "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+  "archive_sha256": "a4882947d270fa8cfbbfa2260f8ad39248950ead6771068dc40e4649f98ba43b",
+  "sources": {
+    "ContactPatch.cpp": "f10c03477f6ee07db94cd885df49d8f9c29a2f1bbd5588434f31e7fc09eb8c00",
+    "Gjk.cpp": "1d6449657b241ffc8700cc2dc2d3b2f90c35fb8b89b3f137ca39732951f8be05"
+  },
+  "gjk_objects": {
+    "gate.obj": "decaf0fabfe434029c01ab59f8105479aa0351d1d5e19b85e66a165c86a2eb91",
+    "base\\Gjk.obj": "b25ddd7cb466325a0b718b60bbb8d327ccc505611639f739cb31247baf25408f",
+    "area\\Gjk.obj": "ca499c094b9ecf01409058b24054385074ede0aed2246458ae021da876113687"
+  },
+  "preregistration_sha256": "fceaf02d0e9fa5500b5ebd3358f88af5b20d240a4518d74187997372abb7d267",
+  "series": {
+    "primary": {
+      "cap": {
+        "source_sha256": "91538356b1e38206ff3c6c53723fdb1c9895e201256bce797c6aac7cff75c641",
+        "exe_sha256": "f7f769bb58bf6d1a4c6e0dcbf0f737465553f127c92d9d53413bb18bff2be710",
+        "csv_sha256": "e655087e3b7b476ed750faf551e132f1c5910b968fc10b5ec1de772ff664c644",
+        "exit": 1
+      },
+      "combined": {
+        "source_sha256": "91538356b1e38206ff3c6c53723fdb1c9895e201256bce797c6aac7cff75c641",
+        "exe_sha256": "082155e73bc153a7f740710a819ff19e3d4d67124d1a409082add50531be3576",
+        "csv_sha256": "b1c4218bf6c177f5a0d1d14fcedccb76b880fcdde41e60589ac5f840058af6e2",
+        "exit": 1,
+        "queries": 1440,
+        "retry": 61
+      }
+    },
+    "holdout": {
+      "cap": {
+        "source_sha256": "8c836a41428ec7c978dcf666ef9c24b99ed907f73c77e1c3a1632d8c0d06a944",
+        "exe_sha256": "af8568ee1433c1c75c5488f61d4fa9eb7dcd2373a41d3f7b87e8dee2fe236dd4",
+        "csv_sha256": "eb27e7b586118816092c2f7fd1375a739c4439ae598f5fbe64ed3031c8114da8",
+        "exit": 1
+      },
+      "combined": {
+        "source_sha256": "8c836a41428ec7c978dcf666ef9c24b99ed907f73c77e1c3a1632d8c0d06a944",
+        "exe_sha256": "e470b8c5e9596df976b31a6c4e6c49943ad699c771a357702e722f402f81813c",
+        "csv_sha256": "6af119da0419c2058edbb87d815f14d5e5a05f6d17a243a651cbcad16f43aaaf",
+        "exit": 1,
+        "queries": 1440,
+        "retry": 35
+      }
+    },
+    "contract": {
+      "cap": {
+        "source_sha256": "70eb47421cbf4608241f5408e1ae2ddef476e74d9777283695c7c8cf5a062568",
+        "exe_sha256": "b131244d2ca019432d9fe4db00121ad8fc7daa66c9881916dee0922df1f4bff3",
+        "csv_sha256": "4d5a0282b47d7833da7df77abb7ec8470f7f21c9bd8ea45d0aca21febb568d90",
+        "exit": 0
+      },
+      "combined": {
+        "source_sha256": "70eb47421cbf4608241f5408e1ae2ddef476e74d9777283695c7c8cf5a062568",
+        "exe_sha256": "69aa70933d9436ba80e34b4809865e0d05939109279b2cf4f5c48837e171b724",
+        "csv_sha256": "4d5a0282b47d7833da7df77abb7ec8470f7f21c9bd8ea45d0aca21febb568d90",
+        "exit": 0,
+        "queries": 14992,
+        "retry": 152
+      }
+    }
+  }
+}

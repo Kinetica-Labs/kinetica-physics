@@ -1,0 +1,10 @@
+{
+  "binary_sha256": {
+    "kinetica": "e87852abfca6acca4fac6acf95fe5cb0dfda7daa7aa29aa1d01eef0d67b82fc4",
+    "box3d": "70c4b9109af734d07bf57cc82259f974f0a9448316edbdba2c4da524cbed4caf",
+    "rp3d": "26be0267fdb92ce901b8e4c8bb08e749a53717491cc96c5ddc4abc5f103b4a46"
+  },
+  "balanced_orders": 12,
+  "seed": 231123,
+  "single_thread_cpu_mask": 256
+}

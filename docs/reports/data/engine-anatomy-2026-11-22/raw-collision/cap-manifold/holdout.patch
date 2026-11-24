@@ -1,0 +1,29 @@
+--- a/validation/studies/anatomy/primitive_feature_pairs.cpp
++++ b/validation/studies/anatomy/primitive_feature_pairs.cpp
+@@ -84,7 +84,7 @@
+ 
+ Transform place(const Feature& f, bool second, const Transform& frame, double gap) {
+     const Vector3 target = second ? -axis : axis;
+-    const Quaternion twist = Quaternion::fromRotationVector((second ? .73 : -.18) * axis);
++    const Quaternion twist = Quaternion::fromRotationVector((second ? -.52 : .37) * axis);
+     const Quaternion rotation = (frame.orientation * twist * align(f.normal, target)).unit();
+     const Vector3 anchor = frame.point(Vector3{.125, -.25, .375} + (second ? gap : 0.) * axis);
+     return {anchor - rotation.rotate(f.point), rotation};
+@@ -178,7 +178,7 @@
+         {"hull_vertex", brick, unit({2, 3, 4}), brick.half}};
+     cylinderFeatures(features, thin, {"sharp_cap", "sharp_side", "sharp_rim_capward", "sharp_rim_sideward"});
+     cylinderFeatures(features, thick, {"rounded_cap", "rounded_side", "rounded_rim_capward", "rounded_rim_sideward"});
+-    const std::array<Transform, 2> frames{{{}, {{7.25, -3.75, 12.5}, Quaternion{.82, .19, -.31, .42}.unit()}}};
++    const std::array<Transform, 2> frames{{{{-4, 2, 3}, Quaternion{1, -2, 3, 5}.unit()}, {{2, 7, -1}, Quaternion{3, 1, 4, -2}.unit()}}};
+     std::puts("feature_a,feature_b,frame,swap,gap_m,oracle_plane_m,oracle_witness_distance_m,closest_resolved,"
+               "closest_distance_m,closest_surface_error_m,closest_vector_error_m,closest_normal_error,point_count,"
+               "min_contact_gap_m,max_contact_surface_error_m,max_contact_vector_error_m,reported_normal_plane_m,"
+@@ -189,7 +189,7 @@
+             const auto &a = features[i], &b = features[j];
+             const auto pa = place(a, false, frames[k], gap), pb = place(b, true, frames[k], gap);
+             const Vector3 n = frames[k].direction(axis);
+-            const char* frame = k ? "rotated_translated" : "identity";
++            const char* frame = k ? "holdout_B" : "holdout_A";
+             failures += !observe(a, pa, b, pb, n, frame, 0, gap);
+             failures += !observe(b, pb, a, pa, -n, frame, 1, gap);
+             rows += 2;

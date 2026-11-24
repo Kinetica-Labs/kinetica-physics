@@ -1,0 +1,16 @@
+{
+  "sha256": {
+    "stock": "e87852abfca6acca4fac6acf95fe5cb0dfda7daa7aa29aa1d01eef0d67b82fc4",
+    "projected": "3e3217ec14843887a3c2db79854b48e50f8023734af37f8140de66e2f1fe71f5",
+    "momentum": "5534e0f21a81efe75529eb5d95c6c457b584b38c5debb9107fbee2dee9ffdc47"
+  },
+  "host": "DESKTOP-N3RC7NA",
+  "threads": 1,
+  "sleep": false,
+  "coupled_friction": true,
+  "steps_per_frame": 8,
+  "frames": 360,
+  "seed": 20261123,
+  "affinity": "0x100",
+  "blocks": 24
+}

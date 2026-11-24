@@ -1,0 +1,19 @@
+{
+  "rows": 1440,
+  "paired_pass_before_after": {
+    "11": 1412,
+    "00": 28
+  },
+  "table_rows_changed": 11,
+  "original_control_bitwise_unchanged": true,
+  "diagnostic_table_bitwise_equal_to_filter": true,
+  "filter_calls": {
+    "area": 273,
+    "unresolved": 55
+  },
+  "cases_exercising_filter": {
+    "area": 94,
+    "unresolved": 48
+  },
+  "any_uncertified_gram_cases": 142
+}

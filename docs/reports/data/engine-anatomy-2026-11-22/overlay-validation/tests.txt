@@ -1,0 +1,12 @@
+check=first_sample pass=1
+check=raw_tiny_translation pass=1
+check=clear_tiny_translation pass=1
+check=translation pass=1
+check=rotation pass=1
+check=contact_loss pass=1
+motion=translation_m first_refresh_step=33 increment=4.4408920985e-16
+check=accumulated_translation pass=1
+motion=rotation_rad first_refresh_step=65 increment=4.4408920985e-16
+check=accumulated_rotation pass=1
+late_intervals=840 raw_point_changes=0 raw_normal_changes=840 overlay_point_changes=0 overlay_normal_changes=0 max_real_from_60s_m=7.84652784463e-16 max_real_from_60s_deg=7.87406431253e-14 moving_frames=47 moving_mismatches=0 complete=1
+check=rest_overlay pass=1

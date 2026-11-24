@@ -1,0 +1,48 @@
+--- a/src/dynamics/time_stepping/SoftStep.cpp
++++ b/src/dynamics/time_stepping/SoftStep.cpp
+@@ -198,16 +198,29 @@
+     }
+ };
+ 
+-// Начало подшага: сопротивление среды, v ← v / (1 + h c) (Body::linearDamping), тяжесть и приложенные к
+-// телу сила и момент (Body::force, torque): v += h F / m, ω += h I⁻¹ τ с нынешним I⁻¹ в мире.
++// Непрерывное поступательное ускорение, м/с². Сила в центре масс и поле тяжести
++// остаются постоянными в течение одного подшага.
++Vector3 linearAcceleration(const Body& body, Real inverseMass, Vector3 gravity) {
++    return gravity + inverseMass * body.force;
++}
++
+ void applyForces(StepArray<SolverBody>& states, const std::vector<Body>& bodies, Vector3 gravity, Real h) {
+     for (size_t i = 0; i < states.size(); ++i) {
+-        if (states[i].inverseMass <= 0) continue;
+-        states[i].v = (1 / (1 + h * bodies[i].linearDamping)) * states[i].v + h * gravity;
+-        states[i].w = (1 / (1 + h * bodies[i].angularDamping)) * states[i].w;
+-        if (!isForced(bodies[i])) continue;
+-        states[i].v += (h * states[i].inverseMass) * bodies[i].force;
+-        states[i].w += h * states[i].spinFrom(bodies[i].torque);
++        SolverBody& state = states[i];
++        const Body& body = bodies[i];
++        if (state.inverseMass <= 0) continue;
++        state.v = (1 / (1 + h * body.linearDamping)) * state.v + (h / 2) * linearAcceleration(body, state.inverseMass, gravity);
++        state.w = (1 / (1 + h * body.angularDamping)) * state.w;
++        if (isForced(body)) state.w += h * state.spinFrom(body.torque);
++    }
++}
++
++// Вторая половина непрерывного толчка приходится на конец переноса. Затем решатель
++// восстанавливает ограничения скорости в новом положении.
++void finishLinearForces(StepArray<SolverBody>& states, const std::vector<Body>& bodies, Vector3 gravity, Real h) {
++    for (size_t i = 0; i < states.size(); ++i) {
++        SolverBody& state = states[i];
++        if (state.inverseMass > 0) state.v += (h / 2) * linearAcceleration(bodies[i], state.inverseMass, gravity);
+     }
+ }
+ 
+@@ -308,6 +321,7 @@
+         notify(observer, StepStage::WarmStart);
+         rows.solve(states, true, jointCorrection, h, jointSoft, pushSpeed), notify(observer, StepStage::Joints);
+         live.solveAndMove(moving, h, (substeps - substep) * h);
++        finishLinearForces(states, bodies, gravity, h);
+         rows.build(joints, bodies, states, jointMemory, directJoints);
+         rows.solve(states, false, jointCorrection, h, jointSoft, pushSpeed), notify(observer, StepStage::Joints);
+         const StepArray<char> stirred = moving.stirred(restSpeed);

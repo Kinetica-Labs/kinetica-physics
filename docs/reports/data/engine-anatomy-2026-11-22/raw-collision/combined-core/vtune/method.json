@@ -1,0 +1,10 @@
+{
+    "exe_sha256":  "2213C6E2D92B9CE02C29A9ECB8BDAF333FAA54B6F765E95D3AEEC0AA4BC37B89",
+    "cpu_seconds":  7.7159130000000005,
+    "functions":  108,
+    "single_thread":  1,
+    "affinity":  16777215,
+    "measured_frames":  15000,
+    "scope":  "whole process including preload and creation",
+    "build":  "combined-core-build"
+}

@@ -1,0 +1,203 @@
+--- a/include/dynamics/time_stepping/DirectJoints.h
++++ b/include/dynamics/time_stepping/DirectJoints.h
+@@ -16,7 +16,8 @@
+ 
+ class DirectJoints {
+ public:
+-    const ProfileMatrix& response() const { return response_; }
++    // Решение с той же геометрией и другой правой частью: например, отклик на пробный импульс.
++    void solveResponse(StepArray<Real>& rhs) const { solveFactored(factor_, skipped_, rhs); }
+     const std::vector<Bond>& rows() const { return bonds_; }
+     Real* accumulated(size_t i) const { return impulses_[i]; }
+     void clear();
+@@ -34,7 +35,8 @@
+ 
+     std::vector<Bond> bonds_;
+     StepArray<Real*> impulses_;
+-    ProfileMatrix response_;
++    ProfileMatrix factor_;
++    StepArray<char> skipped_;
+ };
+ 
+ } // namespace kp
+--- a/include/math/ProfileMatrix.h
++++ b/include/math/ProfileMatrix.h
+@@ -29,9 +29,10 @@
+     }
+     // Элемент строки i в столбце j, first[i] <= j <= i.
+     Real& at(int i, int j) { return values[start[size_t(i)] + size_t(j - first[size_t(i)])]; }
++    Real at(int i, int j) const { return values[start[size_t(i)] + size_t(j - first[size_t(i)])]; }
+ };
+ 
+-// a — матрица (портится: в ней остаётся множитель L), b — правая часть, на выходе решение.
++// Разложение матрицы на месте. Маска пропущенных строк хранится вместе с множителем L.
+ //
+ // Матрица может быть вырожденной: строка, которая линейно выражается через предыдущие, даёт
+ // нулевой ведущий элемент. Такая строка пропускается, её неизвестная полагается равной нулю.
+@@ -39,9 +40,8 @@
+ // точками можно распределить по-разному при тех же скоростях, и здесь выбирается распределение
+ // без лишней точки. Ведущий элемент считается нулевым, если он меньше dependent от исходного
+ // диагонального.
+-template <class Vector> void solveCholesky(ProfileMatrix& a, Vector& b, Real dependent = Real(1e-14)) {
++template <class Mask> void factorCholesky(ProfileMatrix& a, Mask& skipped, Real dependent = Real(1e-14)) {
+     const int n = a.size();
+-    thread_local std::vector<char> skipped; // рабочий массив потока: решение не выделяет память
+     skipped.assign(size_t(n), 0);
+     for (int i = 0; i < n; ++i) { // строка i множителя L
+         const int from = a.first[size_t(i)];
+@@ -66,6 +66,11 @@
+         }
+         a.at(i, i) = sqrt(diagonal);
+     }
++}
++
++// Две подстановки для новой правой части, используя прежний множитель и те же пропущенные строки.
++template <class Mask, class Vector> void solveFactored(const ProfileMatrix& a, const Mask& skipped, Vector& b) {
++    const int n = a.size();
+     for (int i = 0; i < n; ++i) { // L y = b
+         for (int k = a.first[size_t(i)]; k < i; ++k) b[size_t(i)] -= a.at(i, k) * b[size_t(k)];
+         b[size_t(i)] = skipped[size_t(i)] ? Real(0) : b[size_t(i)] / a.at(i, i);
+@@ -76,4 +81,11 @@
+     }
+ }
+ 
++// Решение за один вызов; в a остаётся нижний треугольный множитель.
++template <class Vector> void solveCholesky(ProfileMatrix& a, Vector& b, Real dependent = Real(1e-14)) {
++    thread_local std::vector<char> skipped;
++    factorCholesky(a, skipped, dependent);
++    solveFactored(a, skipped, b);
++}
++
+ } // namespace kp
+--- a/src/dynamics/time_stepping/CoupledFriction.cpp
++++ b/src/dynamics/time_stepping/CoupledFriction.cpp
+@@ -6,25 +6,6 @@
+ namespace {
+ using Four = std::array<Real, 4>;
+ using Radii = std::array<Real, 2>;
+-
+-// Для одной факторизации направляющих нужны пять правых частей: их текущие скорости
+-// и отклик каждой направляющей на четыре единичных касательных импульса.
+-struct GuideRhs {
+-    std::array<Real, 5> values;
+-    GuideRhs(Real value = 0) { values.fill(value); }
+-    GuideRhs& operator-=(const GuideRhs& other) {
+-        for (size_t i = 0; i < values.size(); ++i) values[i] -= other.values[i];
+-        return *this;
+-    }
+-    friend GuideRhs operator*(Real scale, GuideRhs rhs) {
+-        for (Real& v : rhs.values) v *= scale;
+-        return rhs;
+-    }
+-    friend GuideRhs operator/(GuideRhs rhs, Real scale) {
+-        for (Real& v : rhs.values) v /= scale;
+-        return rhs;
+-    }
+-};
+ 
+ Real velocity(const Bond& row, const StepArray<SolverBody>& states) {
+     const auto &a = states[size_t(row.a)], &b = states[size_t(row.b)];
+@@ -36,33 +17,40 @@
+     Four slip{};                    // м/с при текущем накопленном импульсе
+ };
+ 
++// Одна колонка J M⁻¹ Jᵀ, полученная единичным импульсом вдоль касательной.
++void unitResponse(const Bond& t, StepArray<SolverBody>& probe) {
++    for (auto& body : probe) { body.v = {}; body.w = {}; }
++    auto &a = probe[size_t(t.a)], &b = probe[size_t(t.b)];
++    a.v -= a.inverseMass * t.linear; a.w -= a.spinFrom(t.angularA);
++    b.v += b.inverseMass * t.linear; b.w += b.spinFrom(t.angularB);
++}
++
+ // Исключаем направляющие B из системы контактных касательных T:
+ // W = A_TT − A_TB A_BB⁺ A_BT, A = J M⁻¹ Jᵀ. Скорость привода входит только в правую часть.
+ SlipSystem projectedSystem(const StepArray<SolverBody>& states, const DirectJoints& guides,
+                            const std::array<Bond, 4>& tangents) {
+     SlipSystem result;
+     const auto& bonds = guides.rows();
+-    StepArray<GuideRhs> raw(bonds.size());
++    StepArray<Four> coupling(bonds.size());
+     auto probe = states;
+     for (size_t j = 0; j < 4; ++j) {
+-        for (auto& body : probe) { body.v = {}; body.w = {}; }
+-        const Bond& t = tangents[j];
+-        auto &a = probe[size_t(t.a)], &b = probe[size_t(t.b)];
+-        a.v -= a.inverseMass * t.linear; a.w -= a.spinFrom(t.angularA);
+-        b.v += b.inverseMass * t.linear; b.w += b.spinFrom(t.angularB);
++        unitResponse(tangents[j], probe);
+         for (size_t i = 0; i < 4; ++i) result.response[i][j] = velocity(tangents[i], probe);
+-        for (size_t k = 0; k < bonds.size(); ++k) raw[k].values[j] = velocity(bonds[k], probe);
+-        result.slip[j] = velocity(t, states);
++        for (size_t k = 0; k < bonds.size(); ++k) coupling[k][j] = velocity(bonds[k], probe);
++        result.slip[j] = velocity(tangents[j], states);
++    }
++    StepArray<Real> rhs(bonds.size());
++    for (size_t j = 0; j < 4; ++j) {
++        for (size_t k = 0; k < bonds.size(); ++k) rhs[k] = coupling[k][j];
++        guides.solveResponse(rhs);
++        for (size_t k = 0; k < bonds.size(); ++k) for (size_t i = 0; i < 4; ++i)
++            result.response[i][j] -= coupling[k][i] * rhs[k];
+     }
+     for (size_t k = 0; k < bonds.size(); ++k)
+-        raw[k].values[4] = velocity(bonds[k], states) - (bonds[k].driven ? bonds[k].speed : Real(0));
+-    auto solved = raw;
+-    auto factor = guides.response();
+-    solveCholesky(factor, solved);
+-    for (size_t k = 0; k < bonds.size(); ++k) for (size_t i = 0; i < 4; ++i) {
+-        for (size_t j = 0; j < 4; ++j) result.response[i][j] -= raw[k].values[i] * solved[k].values[j];
+-        result.slip[i] -= raw[k].values[i] * solved[k].values[4];
+-    }
++        rhs[k] = velocity(bonds[k], states) - (bonds[k].driven ? bonds[k].speed : Real(0));
++    guides.solveResponse(rhs);
++    for (size_t k = 0; k < bonds.size(); ++k) for (size_t i = 0; i < 4; ++i)
++        result.slip[i] -= coupling[k][i] * rhs[k];
+     return result;
+ }
+ 
+--- a/src/dynamics/time_stepping/DirectJoints.cpp
++++ b/src/dynamics/time_stepping/DirectJoints.cpp
+@@ -7,7 +7,8 @@
+ 
+ void DirectJoints::clear() {
+     bonds_.clear(), impulses_.clear();
+-    response_ = {};
++    factor_ = {};
++    skipped_.clear();
+ }
+ 
+ void DirectJoints::add(const Bond& bond, Real* impulse) { bonds_.push_back(bond), impulses_.push_back(impulse); }
+@@ -21,7 +22,7 @@
+         int leftmost = int(i);
+         for (int body : {bond.a, bond.b})
+             if (states[size_t(body)].inverseMass > 0 && !onBody[size_t(body)].empty()) leftmost = std::min(leftmost, onBody[size_t(body)].front());
+-        response_.addRow(leftmost);
++        factor_.addRow(leftmost);
+         for (int body : {bond.a, bond.b}) {
+             const SolverBody& state = states[size_t(body)];
+             if (state.inverseMass == 0) continue;
+@@ -31,12 +32,13 @@
+             for (int j : onBody[size_t(body)]) {
+                 const Bond& other = bonds_[size_t(j)];
+                 const bool isB = body == other.b;
+-                response_.at(int(i), j) += (isB ? Real(1) : Real(-1)) * (other.linear.dot(velocity) + (isB ? other.angularB : other.angularA).dot(spin));
++                factor_.at(int(i), j) += (isB ? Real(1) : Real(-1)) * (other.linear.dot(velocity) + (isB ? other.angularB : other.angularA).dot(spin));
+             }
+-            response_.at(int(i), int(i)) += sign * (bond.linear.dot(velocity) + (body == bond.b ? bond.angularB : bond.angularA).dot(spin));
++            factor_.at(int(i), int(i)) += sign * (bond.linear.dot(velocity) + (body == bond.b ? bond.angularB : bond.angularA).dot(spin));
+             if (body != bond.a || bond.a != bond.b) onBody[size_t(body)].push_back(int(i));
+         }
+     }
++    factorCholesky(factor_, skipped_);
+ }
+ 
+ void DirectJoints::push(size_t row, StepArray<SolverBody>& states, Real impulse) const {
+@@ -59,8 +61,7 @@
+         // Привод с неограниченной силой — та же связь, только скорость вдоль неё не ноль, а заданная.
+         change[i] = -(bond.linear.dot(b.v - a.v) + bond.angularB.dot(b.w) - bond.angularA.dot(a.w) + (bond.driven ? -bond.speed : correction * bond.error / h));
+     }
+-    ProfileMatrix factor = response_;
+-    solveCholesky(factor, change);
++    solveResponse(change);
+     for (size_t i = 0; i < bonds_.size(); ++i) *impulses_[i] += change[i], push(i, states, change[i]);
+ }
+ 

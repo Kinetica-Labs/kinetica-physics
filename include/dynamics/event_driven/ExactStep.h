@@ -38,7 +38,7 @@ public:
     ExactStep(std::vector<Body>& bodies, const JointSet& joints, Vector3 gravity, ContactForces& contactForces, ContactSolver::SlidingStop& stopped, Report& report)
         : bodies_(bodies), joints_(joints), gravity_(gravity), contactForces_(contactForces), stopped_(stopped), report_(report), events_(bodies, joints) {}
 
-    bool shockPropagation = false; // ContactSolver::solveRestingContacts
+    bool shockPropagation = true; // ContactSolver::solveRestingContacts
     int maxSegments = 0;           // наибольшее число отрезков; ноль — без предела
     std::function<void(StepStage)> observer;
 

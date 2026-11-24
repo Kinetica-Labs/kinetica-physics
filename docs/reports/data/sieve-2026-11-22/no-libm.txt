@@ -1,0 +1,2 @@
+PASS build/src/libkinetica-physics.a 1293 nm output lines
+PASS build/examples/libkinetica-scenes.a 92 nm output lines

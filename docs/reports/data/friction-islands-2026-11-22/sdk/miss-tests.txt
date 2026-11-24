@@ -1,0 +1,6 @@
+test_fine_step_outcomes (test_case_table.PassThroughTest.test_fine_step_outcomes) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK

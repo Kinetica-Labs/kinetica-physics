@@ -1,0 +1,5 @@
+include/dynamics/time_stepping/DirectJoints.h
+include/math/ProfileMatrix.h
+src/dynamics/time_stepping/CoupledFriction.cpp
+src/dynamics/time_stepping/DirectJoints.cpp
+src/dynamics/time_stepping/FrictionIslands.cpp

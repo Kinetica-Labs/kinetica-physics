@@ -1,0 +1,27 @@
+{
+  "sha256": {
+    "bounds": "5c01d1d6a47f0c7d2e8ace2d3095195b02b23abfbeea828b0824c9ac4533079c",
+    "combined": "908be31274260c06bd92f8c4b52faca360b8c61b73a64dd712bc6de4d0a96105",
+    "resultant": "9378c4d52f4875d47a69add3e2830801358c3fd66f2815aed901f2b28434eeee"
+  },
+  "arguments": {
+    "bounds": [
+      "shared8"
+    ],
+    "combined": [
+      "shared8"
+    ],
+    "resultant": [
+      "shared8"
+    ]
+  },
+  "host": "DESKTOP-N3RC7NA",
+  "threads": 1,
+  "sleep": false,
+  "coupled_friction": true,
+  "steps_per_frame": 8,
+  "frames": 360,
+  "seed": 20261123,
+  "affinity": "0x100",
+  "blocks": 24
+}

@@ -25,3 +25,6 @@ struct StandardScene {
 };
 
 const std::vector<StandardScene>& standardScenes();
+
+// Показательная постановка на кромку штатной сцены с тремя вёдрами.
+kp::World bucketsOnRim();

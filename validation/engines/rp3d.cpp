@@ -5,8 +5,9 @@
 //       build/rp3d/libreactphysics3d.a -lpthread -o build/rp3d/compare-rp3d
 //
 //   compare-rp3d [ИТЕРАЦИЙ]     по умолчанию — умолчание RP3D
-#include "common.h"
+#include "stress/Stress1000.h"
 #include <reactphysics3d/reactphysics3d.h>
+#include "RpWindowsAllocator.h"
 
 #include <cstdlib>
 
@@ -29,8 +30,14 @@ static RigidBody* addBox(PhysicsCommon& common, PhysicsWorld* world, const BoxSp
 
 int main(int argc, char** argv) {
     const int iterations = argc > 1 ? std::atoi(argv[1]) : 0;
-    compare(iterations ? "rp3d " + std::to_string(iterations) : "rp3d", [&](const SceneSpec& s, const Play& play) {
+    if (stress::requested()) stress::require(iterations == 1, "stress requires one velocity and one position iteration per external call");
+    stress::compareOrStress(iterations ? "rp3d " + std::to_string(iterations) : "rp3d", [&](const SceneSpec& s, const Play& play) {
+#ifdef _WIN32
+        RpWindowsAllocator allocator;
+        PhysicsCommon common(&allocator);
+#else
         PhysicsCommon common;
+#endif
         PhysicsWorld::WorldSettings settings;
         settings.gravity = Vector3(0, decimal(-kGravity), 0);
         settings.isSleepingEnabled = false;

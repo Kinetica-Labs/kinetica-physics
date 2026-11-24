@@ -1,0 +1,1 @@
+forbidden_symbols=0 archives=2

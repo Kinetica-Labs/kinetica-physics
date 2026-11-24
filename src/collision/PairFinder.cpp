@@ -31,21 +31,18 @@ StepArray<Real> speedsOf(const std::vector<Body>& bodies, Real h) {
     return fastest;
 }
 
-// Бруски досягаемости тел за время h и дерево из них; у тела без формы бруска нет.
-struct Reaches {
-    StepArray<Bounds> bounds;
+// Лист дерева охватывает досягаемость тела за h. Тела без формы пропускаются.
+DynamicTree reachTree(const std::vector<Body>& bodies, const StepArray<Real>& fastest, Vector3 gravity, Real h, Real slack) {
     DynamicTree tree;
-
-    Reaches(const std::vector<Body>& bodies, const StepArray<Real>& fastest, Vector3 gravity, Real h, Real slack = 0) : bounds(bodies.size()) {
-        tree.reserve(int(bodies.size()));
-        for (int i = 0; i < int(bodies.size()); ++i)
-            if (bodies[size_t(i)].shape) tree.insert(bounds[size_t(i)] = reachBounds(bodies[size_t(i)], fastest[size_t(i)], gravity, h, slack), i);
-    }
-};
+    tree.reserve(int(bodies.size()));
+    for (size_t i = 0; i < bodies.size(); ++i)
+        if (bodies[i].shape) tree.insert(reachBounds(bodies[i], fastest[i], gravity, h, slack), int(i));
+    return tree;
+}
 
 } // namespace
 
-DynamicTree PairFinder::tree(Real h) const { return Reaches(bodies_, speedsOf(bodies_, h), gravity_, h).tree; }
+DynamicTree PairFinder::tree(Real h) const { return reachTree(bodies_, speedsOf(bodies_, h), gravity_, h, 0); }
 
 // Кандидаты — пары тел, чьи бруски досягаемости за время h пересеклись; отбирает их дерево брусков.
 // Идут по возрастанию номеров: порядок пар не должен зависеть от формы дерева.
@@ -53,16 +50,10 @@ StepArray<std::pair<int, int>> PairFinder::candidates(Real h, const StepArray<Re
     StepArray<Real> path(bodies_.size()); // путь досягаемости тела — тот же, что в reachBounds
     for (size_t i = 0; i < bodies_.size(); ++i) path[i] = (fastest[i] + gravity_.length() * h) * h + kContactDistance;
     if (const std::vector<std::pair<int, int>>* kept = remembered ? remembered->valid(bodies_, path) : nullptr) return {kept->begin(), kept->end()};
-    const Reaches reach(bodies_, fastest, gravity_, h, remembered ? CandidateMemory::kSlack : Real(0));
+    const DynamicTree tree = reachTree(bodies_, fastest, gravity_, h, remembered ? CandidateMemory::kSlack : Real(0));
     StepArray<std::pair<int, int>> candidates;
-    for (int i = 0; i < int(bodies_.size()); ++i) {
-        if (!bodies_[size_t(i)].shape) continue;
-        const size_t first = candidates.size();
-        reach.tree.query(reach.bounds[size_t(i)], [&](int j) {
-            if (j > i) candidates.push_back({i, j});
-        });
-        std::sort(candidates.begin() + std::ptrdiff_t(first), candidates.end());
-    }
+    tree.queryPairs([&](int a, int b) { candidates.emplace_back(std::min(a, b), std::max(a, b)); });
+    std::sort(candidates.begin(), candidates.end());
     if (remembered) remembered->replace(bodies_, path, candidates);
     return candidates;
 }
@@ -136,12 +127,35 @@ std::vector<ContactPair> PairFinder::pairs(Real h) const {
     return pairs;
 }
 
+// Для прежних площадок простых тел сразу заполняем выход. При промахе общий поиск
+// заново собирает весь список, поэтому порядок, отбор частей и срок жизни записей те же.
+bool PairFinder::carryAll(Real h, const StepArray<Real>& fastest, const StepArray<std::pair<int, int>>& candidates, std::vector<ContactPair>& pairs) const {
+    if (!memory || known) return false;
+    StepArray<const ManifoldMemory::Entry*> kept;
+    kept.reserve(candidates.size());
+    pairs.clear();
+    for (const auto& [i, j] : candidates) {
+        const Body &a = bodies_[size_t(i)], &b = bodies_[size_t(j)];
+        if (a.parts || b.parts) return false;
+        const Real reach = approachReach(fastest[size_t(i)], fastest[size_t(j)], gravity_, h);
+        const auto* entry = memory->valid({i, j, 0, 0}, a, b, reach);
+        if (!entry) return false;
+        auto& pair = pairs.emplace_back();
+        ManifoldMemory::carryInto(*entry, a, b, reach, pair);
+        pair.a = i, pair.b = j;
+        kept.push_back(entry);
+    }
+    memory->replace(kept);
+    return true;
+}
+
 void PairFinder::collect(Real h, std::vector<ContactPair>& pairs) const {
     constexpr int kParallelParts = 64;
     const StepArray<Real> fastest = speedsOf(bodies_, h);
     int parts = 0;
     for (const Body& body : bodies_) parts += body.shape ? body.partCount() : 0;
     const StepArray<std::pair<int, int>> candidates = this->candidates(h, fastest);
+    if (parts < kParallelParts && carryAll(h, fastest, candidates, pairs)) return;
     StepArray<Found> found(candidates.size());
     const auto examine = [&](size_t k) {
         const auto [i, j] = candidates[k];

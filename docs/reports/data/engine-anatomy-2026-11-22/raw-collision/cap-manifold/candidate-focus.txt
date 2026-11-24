@@ -1,0 +1,12 @@
+rim swap=0 gap=0 points=1 twice_area_m2=0 ok=1
+rim swap=0 gap=5e-05 points=1 twice_area_m2=0 ok=1
+rim swap=1 gap=0 points=1 twice_area_m2=0 ok=1
+rim swap=1 gap=5e-05 points=1 twice_area_m2=0 ok=1
+flat swap=0 gap=0 points=6 twice_area_m2=0.0458272702 ok=1
+flat swap=0 gap=5e-05 points=6 twice_area_m2=0.0458272702 ok=1
+flat swap=1 gap=0 points=6 twice_area_m2=0.0347093433 ok=1
+flat swap=1 gap=5e-05 points=6 twice_area_m2=0.0347093433 ok=1
+thin_lens swap=0 gap=0 points=3 twice_area_m2=1.31170265e-05 ok=1
+thin_lens swap=0 gap=5e-05 points=3 twice_area_m2=1.31170265e-05 ok=1
+thin_lens swap=1 gap=0 points=3 twice_area_m2=1.10632858e-05 ok=1
+thin_lens swap=1 gap=5e-05 points=3 twice_area_m2=1.10632858e-05 ok=1

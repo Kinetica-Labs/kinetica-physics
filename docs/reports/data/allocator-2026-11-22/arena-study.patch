@@ -1,0 +1,139 @@
+--- a/include/joints/Joint.h
++++ b/include/joints/Joint.h
+@@ -49,6 +49,7 @@
+     // Связи при нынешних позах тел bodies; уход связей считается по скоростям тел moving. У
+     // сочленения двух неподвижных (или спящих) тел связей нет: двигать ими некого.
+     std::vector<Bond> bonds(const std::vector<Body>& bodies, const std::vector<Body>& moving) const;
++    void bonds(const std::vector<Body>& bodies, const std::vector<Body>& moving, std::vector<Bond>& result) const;
+ 
+     // Тела сочленения сталкиваются друг с другом. Обычно нет: они соединены вплотную.
+     virtual bool collides() const { return false; }
+--- a/src/joints/Joint.cpp
++++ b/src/joints/Joint.cpp
+@@ -26,8 +26,15 @@
+ }
+ 
+ std::vector<Bond> Joint::bonds(const std::vector<Body>& bodies, const std::vector<Body>& moving) const {
++    std::vector<Bond> result;
++    bonds(bodies, moving, result);
++    return result;
++}
++
++void Joint::bonds(const std::vector<Body>& bodies, const std::vector<Body>& moving, std::vector<Bond>& result) const {
++    result.clear();
+     const Body &bodyA = bodies[size_t(a)], &bodyB = bodies[size_t(b)];
+-    if (bodyA.isStatic() && bodyB.isStatic()) return {};
++    if (bodyA.isStatic() && bodyB.isStatic()) return;
+     const Body &ma = moving[size_t(a)], &mb = moving[size_t(b)];
+     Motion m;
+     m.bodyA = &bodyA, m.bodyB = &bodyB;
+@@ -42,9 +49,7 @@
+     // Ускорение точки p_b относительно тела a без сил: точка тела b идёт по дуге, тело a под ней
+     // поворачивается.
+     m.apart = m.wb.cross(m.wb.cross(m.armB)) + m.spinUpB.cross(m.armB) - m.spinUpA.cross(m.armA) - m.wa.cross(m.pointB - ma.linearVelocity());
+-    std::vector<Bond> bonds;
+-    build(m, bonds);
+-    return bonds;
++    build(m, result);
+ }
+ 
+ Bond Joint::travelLine(const Motion& m, int axis) const { return travelLine(m, m.frameA.rotate(basis(axis))); }
+--- a/src/dynamics/time_stepping/SoftStep.cpp
++++ b/src/dynamics/time_stepping/SoftStep.cpp
+@@ -167,11 +167,13 @@
+ struct JointRows {
+     StepArray<SoftJoint> links;
+     DirectJoints locked;
++    std::vector<Bond> bonds;
+ 
+     void build(const JointSet& joints, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, std::vector<std::vector<Real>>& memory, bool direct) {
+         links.clear(), locked.clear();
++        if (joints.size() != 0) bonds.reserve(6);
+         for (size_t j = 0; j < joints.size(); ++j) {
+-            const std::vector<Bond> bonds = joints[j].bonds(bodies, bodies);
++            joints[j].bonds(bodies, bodies, bonds);
+             if (memory[j].size() != bonds.size()) memory[j].assign(bonds.size(), 0);
+             for (size_t k = 0; k < bonds.size(); ++k) {
+                 const Bond& bond = bonds[k];
+--- a/src/math/StepMemory.cpp
++++ b/src/math/StepMemory.cpp
+@@ -1,4 +1,7 @@
+ #include <math/StepMemory.h>
++#ifdef KP_MEMORY_COUNTERS
++#include "MemoryCounters.h"
++#endif
+ 
+ #include <atomic>
+ #include <cstdlib>
+@@ -28,6 +31,9 @@
+             const size_t size = bytes > kBlock ? bytes : kBlock;
+             blocks.push_back(static_cast<char*>(std::malloc(size))), sizes.push_back(size);
+             if (!blocks.back()) throw std::bad_alloc();
++#ifdef KP_MEMORY_COUNTERS
++            memory_study::refill(size);
++#endif
+         }
+         void* memory = blocks[block] + used;
+         used += bytes;
+@@ -103,8 +109,15 @@
+ 
+ void* StepMemory::take(size_t bytes) {
+     const size_t size = (bytes + kHeader + 15) & ~size_t(15);
++#ifdef KP_FORCE_HEAP
++    constexpr bool stepped = false;
++#else
+     const bool stepped = depth > 0 || (reserve.serving && registry().open.load(std::memory_order_relaxed) > 0);
++#endif
+     char* memory = stepped ? static_cast<char*>(reserve.take(size)) : static_cast<char*>(::operator new(size));
++#ifdef KP_MEMORY_COUNTERS
++    if (stepped) memory_study::issue(bytes, size, reserve.held(), reserve.block + 1);
++#endif
+     memory[0] = stepped ? kFromStep : kFromHeap;
+     return memory + kHeader;
+ }
+--- a/validation/studies/GripLimit.cpp
++++ b/validation/studies/GripLimit.cpp
+@@ -4,6 +4,10 @@
+ #include <world/World.h>
+ #include <cstdlib>
+ #include <string_view>
++#ifdef KP_MEMORY_COUNTERS
++#include "MemoryCounters.h"
++#include <math/StepMemory.h>
++#endif
+ 
+ namespace {
+ class Rig {
+@@ -112,6 +116,32 @@
+ 
+ int main(int argc, char** argv) {
+     const std::string_view mode = argc == 2 ? argv[1] : "";
++#ifdef KP_MEMORY_COUNTERS
++    if (mode == "memory" || mode == "prefill") {
++        kp::WorkerPool::shared().resize(1);
++        std::puts("phase,frames,new_calls,new_bytes,arena_calls,payload_B,occupied_B,refills,refill_B,peak_B,blocks");
++        auto print = [](const char* phase, int frames) {
++            const auto c = memory_study::stop();
++            std::printf("%s,%d,%zu,%zu,%zu,%zu,%zu,%zu,%zu,%zu,%zu\n", phase, frames, c.heapCalls,
++                        c.heapBytes, c.arenaCalls, c.payload, c.occupied, c.refills, c.refillBytes, c.peak, c.blocks);
++        };
++        if (mode == "prefill") {
++            memory_study::start();
++            { kp::StepMemory step; kp::StepMemory::give(kp::StepMemory::take(65536)); }
++            print("preallocation", 0);
++        }
++        memory_study::start();
++        Rig rig(1, {0.5,10,10}, true);
++        print("construct", 0);
++        auto phase = [&](const char* label, int frames, double load) {
++            memory_study::start();
++            for (int i = 0; i < frames; ++i) if (!rig.step(1.0 / 60, 10, load)) return false;
++            print(label, frames);
++            return true;
++        };
++        return phase("cold", 1, 0) && phase("preload", 14, 0) && phase("loaded", 15, 10) ? 0 : 1;
++    }
++#endif
+     if (argc > 2 || (argc == 2 && mode != "exact" && mode != "realtime" && mode != "realtime32" && mode != "shared8" && mode != "trace" && mode != "trace-order")) {
+         std::fputs("study-grip-limit [exact|realtime|realtime32|shared8|trace|trace-order]\n", stderr);
+         return 2;

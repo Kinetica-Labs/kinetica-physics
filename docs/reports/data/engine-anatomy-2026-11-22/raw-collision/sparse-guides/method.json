@@ -1,0 +1,11 @@
+{
+  "utc_start": "2026-11-23T05:48:54.082763+00:00",
+  "utc_end": "2026-11-23T05:49:20.406261+00:00",
+  "affinity_mask": 256,
+  "worker_threads": 1,
+  "host": "DESKTOP-N3RC7NA",
+  "builds": "A combined-core; B sparse guide response",
+  "design": "24 blocks per scene; AB BA BA AB repeated; externally calibrated native release harness",
+  "grip": "shared8, coupled, 10 N squeeze/jaw and load, mu .5, 360 timed frames, h=1/480 s",
+  "pyramid": "BENCH=7 compare-ours realtime 8, 140 cubes, uncoupled, 60 frames per sample"
+}

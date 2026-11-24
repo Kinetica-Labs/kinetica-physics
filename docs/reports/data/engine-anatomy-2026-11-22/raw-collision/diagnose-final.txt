@@ -1,0 +1,2 @@
+order=AB oracle_gap_m=2.3869961061903138e-17 sdk_support_gap_m=-3.903127820947816e-17 tolerance_m=1e-07 pass=1
+order=BA oracle_gap_m=2.3869961061903138e-17 sdk_support_gap_m=-4.5184125538333397e-17 tolerance_m=1e-07 pass=1

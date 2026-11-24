@@ -23,7 +23,8 @@ BASELINE = ROOT / "docs/reports/data/case-table-counts.json"
 HISTORY = ROOT / "docs/reports/case-table-history.jsonl"
 # Мерка и её нарушение в строке прибора; пороги — docs/reports/case-table.md, раздел 2.
 MEASURES = [
-    ("пролёт", lambda r: r["missed"] > 0),
+    # Если основной шаг не увидел удара, мелкий шаг различает пролёт (passed) и геометрический промах (missed).
+    ("пролёт", lambda r: r["passed"] > 0),
     ("перекрытие > 0,02 мм", lambda r: r["overlap_m"] > 2e-5),
     ("энергия > 10⁻⁴", lambda r: r["energy_gain"] > 1e-4),
     ("импульс > 10⁻⁹", lambda r: r["momentum_loss"] > 1e-9),

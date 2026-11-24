@@ -1,7 +1,10 @@
 #include <math/StepMemory.h>
 #include <dynamics/time_stepping/SoftStep.h>
+#include "EquilibriumStep.h"
+#include "StepKinematics.h"
 
 #include <dynamics/time_stepping/IslandNormals.h>
+#include <dynamics/time_stepping/FrictionIslands.h>
 #include <dynamics/time_stepping/DirectJoints.h>
 #include <dynamics/time_stepping/MissedContacts.h>
 #include <dynamics/time_stepping/PairReach.h>
@@ -68,11 +71,7 @@ Real deepestOf(const SoftContact& contact) {
     return depth;
 }
 
-// Момент импульса по угловой скорости: L = R I Rᵀ ω, I — главные моменты тела.
-Vector3 momentumOf(const Body& body, Vector3 w) {
-    const Vector3 inertia{1 / body.mass.inverseInertia.x, 1 / body.mass.inverseInertia.y, 1 / body.mass.inverseInertia.z};
-    return body.orientation.rotate(inertia.scaled(body.orientation.rotateInverse(w)));
-}
+using step_motion::momentumOf;
 
 // job(i) для count независимых заданий: каждое пишет только в своё место, поэтому ответ от числа потоков
 // не зависит. Раздаются пулу кусками — поток читает память подряд; малое число дешевле сделать на месте.
@@ -133,16 +132,7 @@ struct Moving {
                 if (isDriven(body)) carryDriven(body, h), s.moved = body.position - origin[i].position, s.turned = body.orientation * origin[i].orientation.conjugate();
                 return;
             }
-            const Vector3 momentum = momentumOf(body, s.w);
-            body.position += h * s.v;
-            body.angularMomentum = momentum;
-            // У тела с неравными моментами инерции угловая скорость меняется вместе с ориентацией,
-            // поэтому поворот идёт со скоростью середины подшага. Со скоростью его начала вытянутое
-            // тело само раскручивалось вокруг длинной оси: на 2 % за кадр.
-            const Vector3 inverse = body.mass.inverseInertia;
-            const bool round = inverse.x == inverse.y && inverse.y == inverse.z;
-            const Vector3 turn = round ? h * s.w : h * angularVelocityAt(body, (Quaternion::fromRotationVector((h / 2) * s.w) * body.orientation).unit());
-            body.orientation = (Quaternion::fromRotationVector(turn) * body.orientation).unit();
+            step_motion::advancePose(body, s, h);
             s.moved = body.position - origin[i].position, s.turned = body.orientation * origin[i].orientation.conjugate();
             s.w = body.angularVelocity();
             s.inverseInertia = inverseInertiaInWorld(body);
@@ -167,11 +157,13 @@ struct Moving {
 struct JointRows {
     StepArray<SoftJoint> links;
     DirectJoints locked;
+    std::vector<Bond> bonds;
 
     void build(const JointSet& joints, const std::vector<Body>& bodies, const StepArray<SolverBody>& states, std::vector<std::vector<Real>>& memory, bool direct) {
         links.clear(), locked.clear();
+        if (joints.size() != 0) bonds.reserve(6); // три поступательные и три вращательные связи
         for (size_t j = 0; j < joints.size(); ++j) {
-            const std::vector<Bond> bonds = joints[j].bonds(bodies, bodies);
+            joints[j].writeBonds(bodies, bodies, bonds);
             if (memory[j].size() != bonds.size()) memory[j].assign(bonds.size(), 0);
             for (size_t k = 0; k < bonds.size(); ++k) {
                 const Bond& bond = bonds[k];
@@ -195,19 +187,6 @@ struct JointRows {
     }
 };
 
-// Начало подшага: сопротивление среды, v ← v / (1 + h c) (Body::linearDamping), тяжесть и приложенные к
-// телу сила и момент (Body::force, torque): v += h F / m, ω += h I⁻¹ τ с нынешним I⁻¹ в мире.
-void applyForces(StepArray<SolverBody>& states, const std::vector<Body>& bodies, Vector3 gravity, Real h) {
-    for (size_t i = 0; i < states.size(); ++i) {
-        if (states[i].inverseMass <= 0) continue;
-        states[i].v = (1 / (1 + h * bodies[i].linearDamping)) * states[i].v + h * gravity;
-        states[i].w = (1 / (1 + h * bodies[i].angularDamping)) * states[i].w;
-        if (!isForced(bodies[i])) continue;
-        states[i].v += (h * states[i].inverseMass) * bodies[i].force;
-        states[i].w += h * states[i].spinFrom(bodies[i].torque);
-    }
-}
-
 constexpr int kRechecks = 3; // сколько раз подшаг повторяет сдвиг, найдя пропущенные контакты
 
 // Контакты шага и то, что пополняет их по ходу: пропущенные точки пар списка (MissedContacts) и
@@ -221,6 +200,8 @@ struct LiveContacts {
     const JointSet& joints;
     Real pushSpeed, bounceSpeed, boundary;
     const StageObserver& observer;
+    Vector3 gravity;
+    bool supports;
     bool bounces; // есть ли тело с отскоком: без него проход отскока по контактам не нужен
 
     // true — какое-то тело выходит за досягаемость списка пар, и нашлись новые пары с точками контакта.
@@ -249,6 +230,7 @@ struct LiveContacts {
             impact(moving, h), notify(observer, StepStage::Normals);
             for (int k = 0; k < kRechecks && discover(moving, h, remaining); ++k) impact(moving, h);
             notify(observer, StepStage::Recheck);
+            if (supports) normals.solveSupports(contacts, moving.bodies, moving.states, gravity, h);
             missed.forget(), moving.advance(h);
             StepArray<Real> depth(contacts.size()); // глубина до пересчёта: её записывает общий проход ниже
             eachOf(contacts.size(), [&](size_t c) { SoftContact::prefetch(contacts, moving.states, c + SoftContact::kNear, c + SoftContact::kFar), depth[c] = deepestOf(contacts[c]), contacts[c].follow(moving.states); });
@@ -277,14 +259,14 @@ void finish(std::vector<Body>& bodies, const StepArray<SolverBody>& states, cons
 } // namespace
 
 void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& pairs, const JointSet& joints, Vector3 gravity, Real dt, ContactForces& contactMemory,
-                    std::vector<std::vector<Real>>& jointMemory) const {
+                    std::vector<std::vector<Real>>& jointMemory, bool shockPropagation) const {
     const Real h = dt / substeps;
     const Real hertz = std::min(contactHertz, Real(0.125) / h);
     const Softness soft = Softness::make(hertz, contactDamping, h), staticSoft = Softness::make(2 * hertz, contactDamping / 2, h);
     const Softness jointSoft = Softness::make(std::min(jointHertz, Real(0.25) / h), jointDamping, h);
-
     for (const Joint& joint : joints) joint.applyDrive(bodies, dt);
     StepArray<SolverBody> states = solverBodiesOf(bodies);
+    if (reuseEquilibrium && advanceIfBalanced(*this, bodies, pairs, joints, gravity, h, contactMemory, jointMemory, states)) return;
     const ContactMaker maker{bodies, states, soft, staticSoft, h, fourContactPoints};
     StepArray<size_t> owner;
     StepArray<SoftContact> contacts = maker.all(pairs, contactMemory, owner);
@@ -295,11 +277,11 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
     JointRows rows;
     rows.build(joints, bodies, states, jointMemory, directJoints);
     IslandNormals normals(directContactRows, soft.biasRate, directIterations);
-    LiveContacts live{contacts, normals, missed, reach, maker, joints, pushSpeed, bounceSpeed, edgeSlop, observer,
+    LiveContacts live{contacts, normals, missed, reach, maker, joints, pushSpeed, bounceSpeed, edgeSlop, observer, gravity, shockPropagation,
                       std::any_of(bodies.begin(), bodies.end(), [](const Body& body) { return body.restitution != 0; })};
     notify(observer, StepStage::Contacts);
     for (int substep = 0; substep < substeps; ++substep) {
-        applyForces(states, bodies, gravity, h);
+        step_motion::applyForces(states, bodies, gravity, h);
         // Тёплый старт: накопленные импульсы прикладываются к новым скоростям.
         rows.warmStart(states);
         normals.levels.each(contacts, states, [&](size_t c) { contacts[c].warmStart(states); });
@@ -311,7 +293,8 @@ void SoftStep::step(std::vector<Body>& bodies, const std::vector<ContactPair>& p
         const StepArray<char> stirred = moving.stirred(restSpeed);
         if (restSpeed == 0 || std::find(stirred.begin(), stirred.end(), 1) != stirred.end()) normals.solve(contacts, bodies, states, false, h, pushSpeed, restSpeed > 0 ? &stirred : nullptr);
         notify(observer, StepStage::Normals);
-        normals.levels.each(contacts, states, [&](size_t c) { contacts[c].solveFriction(states, rollingResistance); });
+        if (coupledFriction) solveFrictionIslands(contacts, states, rows.locked, rows.links, normals.levels, h, rollingResistance);
+        else normals.levels.each(contacts, states, [&](size_t c) { contacts[c].solveFriction(states, rollingResistance); });
         notify(observer, StepStage::Friction);
     }
     finish(bodies, states, contacts, contactMemory, h), notify(observer, StepStage::Memory);

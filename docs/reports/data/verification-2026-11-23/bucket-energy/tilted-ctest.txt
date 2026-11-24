@@ -1,0 +1,24 @@
+9/24 Test: grip-equilibrium-transitions
+Test Passed.
+14/24 Test: viewer-rest-overlay
+check=first_sample pass=1
+check=raw_tiny_translation pass=1
+check=raw_does_not_replace_held_patch pass=1
+check=clear_tiny_translation pass=1
+check=translation pass=1
+check=rotation pass=1
+check=contact_loss pass=1
+motion=translation_m first_refresh_step=17 increment=6.25e-09
+check=accumulated_translation pass=1
+motion=rotation_surface_m first_refresh_step=17 increment=6.25e-09
+check=accumulated_rotation pass=1
+check=independent_pairs pass=1
+check=grazing_release_and_return pass=1
+late_intervals=840 raw_point_changes=0 raw_normal_changes=0 overlay_point_changes=0 overlay_normal_changes=0 max_real_from_60s_m=1.64618590905e-13 max_real_from_60s_deg=1.6004729739e-13 moving_frames=46 full_raw_differences=25 moving_contacts=61 moving_pair_failures=0 isolated_scene_failures=0 complete=1
+check=rest_overlay pass=1
+Test Passed.
+15/24 Test: viewer-tilted-overlay
+intervals=600 raw_changes=526 shown_changes=0 max_travel_m=7.53580826422e-09 max_speed_m_s=4.70866932944e-09 max_frame_gain_J=7.41451344766e-11 held=1 released=1
+Test Passed.
+16/24 Test: viewer-playback-clock
+Test Passed.

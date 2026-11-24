@@ -1,0 +1,147 @@
+[  2%] Building CXX object src/CMakeFiles/kinetica-physics.dir/math/UpdatedCholesky.cpp.obj
+[  2%] Building CXX object src/CMakeFiles/kinetica-physics.dir/math/StepMemory.cpp.obj
+[  2%] Building CXX object src/CMakeFiles/kinetica-physics.dir/math/Matrix3x3.cpp.obj
+[  4%] Building CXX object src/CMakeFiles/kinetica-physics.dir/math/Quaternion.cpp.obj
+[  7%] Building CXX object src/CMakeFiles/kinetica-physics.dir/math/WorkerPool.cpp.obj
+[  7%] Building CXX object src/CMakeFiles/kinetica-physics.dir/world/World.cpp.obj
+[  9%] Building CXX object src/CMakeFiles/kinetica-physics.dir/world/IslandSleep.cpp.obj
+[  9%] Building CXX object src/CMakeFiles/kinetica-physics.dir/world/AreaImpulse.cpp.obj
+[ 11%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/ContactPair.cpp.obj
+[ 11%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/ManifoldMemory.cpp.obj
+[ 14%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/CandidateMemory.cpp.obj
+[ 14%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/PairFinder.cpp.obj
+[ 16%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/RayCast.cpp.obj
+[ 16%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/broadphase/DynamicTree.cpp.obj
+[ 19%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/ContactSolver.cpp.obj
+[ 21%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/ContactRows.cpp.obj
+[ 21%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/PairFriction.cpp.obj
+[ 23%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/ContactAssembly.cpp.obj
+[ 23%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/CoupledSolve.cpp.obj
+[ 26%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/SlidingStopSearch.cpp.obj
+[ 26%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/WarmStart.cpp.obj
+[ 28%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/ShockPropagation.cpp.obj
+[ 28%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/ContactSystem.cpp.obj
+[ 30%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/ActiveSet.cpp.obj
+[ 30%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/SetFactor.cpp.obj
+[ 33%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/BodySpaceSolve.cpp.obj
+[ 33%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/ExactStep.cpp.obj
+[ 35%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/EventSearch.cpp.obj
+[ 38%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/event_driven/OverlapSeparation.cpp.obj
+[ 38%] Building CXX object src/CMakeFiles/kinetica-physics.dir/body/Body.cpp.obj
+[ 40%] Building CXX object src/CMakeFiles/kinetica-physics.dir/body/MassFrame.cpp.obj
+[ 40%] Building CXX object src/CMakeFiles/kinetica-physics.dir/body/PrincipalAxes.cpp.obj
+[ 42%] Building CXX object src/CMakeFiles/kinetica-physics.dir/body/CompoundBodyBuilder.cpp.obj
+[ 42%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/SoftStep.cpp.obj
+[ 45%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/SoftContact.cpp.obj
+[ 45%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/IslandNormals.cpp.obj
+[ 47%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/ContactLevels.cpp.obj
+[ 47%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/MissedContacts.cpp.obj
+[ 50%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/PairReach.cpp.obj
+[ 50%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/RollingFriction.cpp.obj
+[ 52%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/CentreFriction.cpp.obj
+[ 54%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/FrictionIslands.cpp.obj
+[ 54%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/CoupledFriction.cpp.obj
+[ 57%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/TrackedShapes.cpp.obj
+[ 57%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/SoftJoint.cpp.obj
+[ 59%] Building CXX object src/CMakeFiles/kinetica-physics.dir/dynamics/time_stepping/DirectJoints.cpp.obj
+[ 59%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/Joint.cpp.obj
+[ 61%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/JointSet.cpp.obj
+[ 61%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/SingleFreedomJoint.cpp.obj
+[ 64%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/BallAndSocketJoint.cpp.obj
+[ 64%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/HingeJoint.cpp.obj
+[ 66%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/GearJoint.cpp.obj
+[ 66%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/SliderJoint.cpp.obj
+[ 69%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/Path.cpp.obj
+[ 71%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/PathJoint.cpp.obj
+[ 71%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/CylindricalJoint.cpp.obj
+[ 73%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/FixedJoint.cpp.obj
+[ 73%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/CardanJoint.cpp.obj
+[ 76%] Building CXX object src/CMakeFiles/kinetica-physics.dir/joints/TetherJoint.cpp.obj
+[ 76%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/shapes/ConvexShape.cpp.obj
+[ 78%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/shapes/ConvexHull.cpp.obj
+[ 78%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/shapes/Capsule.cpp.obj
+[ 80%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/shapes/Cylinder.cpp.obj
+[ 80%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/shapes/QuickHull.cpp.obj
+[ 83%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/narrowphase/Gjk.cpp.obj
+[ 83%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/narrowphase/Sat.cpp.obj
+[ 85%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/narrowphase/NarrowPhaseAlgorithm.cpp.obj
+[ 85%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/narrowphase/HullVsHullAlgorithm.cpp.obj
+[ 88%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/narrowphase/HullVsRoundAlgorithm.cpp.obj
+[ 90%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/narrowphase/RoundVsRoundAlgorithm.cpp.obj
+[ 90%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/narrowphase/ContactPatch.cpp.obj
+[ 92%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/narrowphase/ContactCandidate.cpp.obj
+[ 92%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/shapes/ConvexDecomposition.cpp.obj
+[ 95%] Building CXX object src/CMakeFiles/kinetica-physics.dir/collision/shapes/Meshes.cpp.obj
+[ 95%] Building CXX object src/CMakeFiles/kinetica-physics.dir/debug/DebugGeometry.cpp.obj
+[ 97%] Linking CXX static library libkinetica-physics.a
+[ 97%] Built target kinetica-physics
+[100%] Building CXX object validation/studies/CMakeFiles/study-grip-limit.dir/GripLimit.cpp.obj
+[100%] Linking CXX executable study-grip-limit.exe
+[100%] Built target study-grip-limit
+[ 97%] Built target kinetica-physics
+[ 97%] Building CXX object validation/studies/CMakeFiles/study-oblique-grip.dir/ObliqueGrip.cpp.obj
+[100%] Linking CXX executable study-oblique-grip.exe
+[100%] Built target study-oblique-grip
+[ 97%] Built target kinetica-physics
+[100%] Building CXX object validation/studies/CMakeFiles/study-groove-friction.dir/GrooveFriction.cpp.obj
+[100%] Linking CXX executable study-groove-friction.exe
+[100%] Built target study-groove-friction
+[ 95%] Built target kinetica-physics
+[ 95%] Building CXX object examples/CMakeFiles/kinetica-scenes.dir/scenes/StandardScenes.cpp.obj
+[ 97%] Building CXX object examples/CMakeFiles/kinetica-scenes.dir/scenes/ExactScenes.cpp.obj
+[ 97%] Linking CXX static library libkinetica-scenes.a
+[ 97%] Built target kinetica-scenes
+[100%] Building CXX object validation/studies/CMakeFiles/study-state-hash.dir/StateHash.cpp.obj
+[100%] Linking CXX executable study-state-hash.exe
+[100%] Built target study-state-hash
+[ 97%] Built target kinetica-physics
+[ 97%] Building CXX object validation/engines/CMakeFiles/compare-ours.dir/ours.cpp.obj
+[100%] Linking CXX executable compare-ours.exe
+[100%] Built target compare-ours
+[ 89%] Built target kinetica-physics
+[ 89%] Building CXX object tests/CMakeFiles/unit-tests.dir/GeometryTests.cpp.obj
+[ 91%] Building CXX object tests/CMakeFiles/unit-tests.dir/HullTests.cpp.obj
+[ 93%] Building CXX object tests/CMakeFiles/unit-tests.dir/main.cpp.obj
+[ 93%] Building CXX object tests/CMakeFiles/unit-tests.dir/CollisionTests.cpp.obj
+[ 95%] Building CXX object tests/CMakeFiles/unit-tests.dir/DynamicsTests.cpp.obj
+[ 95%] Building CXX object tests/CMakeFiles/unit-tests.dir/GearTests.cpp.obj
+[ 97%] Building CXX object tests/CMakeFiles/unit-tests.dir/PropertyTests.cpp.obj
+[100%] Linking CXX executable unit-tests.exe
+[100%] Built target unit-tests
+[ 97%] Built target kinetica-physics
+[100%] Building CXX object examples/CMakeFiles/FloatingBox.dir/05_world/FloatingBox.cpp.obj
+[100%] Linking CXX executable FloatingBox.exe
+[100%] Built target FloatingBox
+[ 97%] Built target kinetica-physics
+[100%] Building CXX object examples/CMakeFiles/GearTrain.dir/05_world/GearTrain.cpp.obj
+[100%] Linking CXX executable GearTrain.exe
+[100%] Built target GearTrain
+[ 97%] Built target kinetica-physics
+[100%] Building CXX object validation/studies/CMakeFiles/study-slip-to-roll.dir/SlipToRoll.cpp.obj
+[100%] Linking CXX executable study-slip-to-roll.exe
+[100%] Built target study-slip-to-roll
+[ 95%] Built target kinetica-physics
+[ 97%] Built target kinetica-scenes
+[ 97%] Building CXX object validation/studies/CMakeFiles/study-rest-overlay.dir/anatomy/rest_overlay.cpp.obj
+[100%] Linking CXX executable study-rest-overlay.exe
+[100%] Built target study-rest-overlay
+[  0%] Building CXX object validation/studies/CMakeFiles/study-playback-clock.dir/anatomy/playback_clock.cpp.obj
+[100%] Linking CXX executable study-playback-clock.exe
+[100%] Built target study-playback-clock
+[ 97%] Built target kinetica-physics
+[100%] Building CXX object validation/studies/CMakeFiles/study-hull-events.dir/anatomy/hull_event_sweep.cpp.obj
+[100%] Linking CXX executable study-hull-events.exe
+[100%] Built target study-hull-events
+[ 95%] Built target kinetica-physics
+[ 97%] Building CXX object validation/studies/CMakeFiles/study-hull-motion.dir/anatomy/hull_motion_events.cpp.obj
+[100%] Linking CXX executable study-hull-motion.exe
+[100%] Built target study-hull-motion
+[ 97%] Built target kinetica-physics
+[ 97%] Building CXX object validation/studies/CMakeFiles/study-collision-contract.dir/anatomy/collision_contract.cpp.obj
+[100%] Linking CXX executable study-collision-contract.exe
+[100%] Built target study-collision-contract
+[ 95%] Built target kinetica-physics
+[ 97%] Built target kinetica-scenes
+[100%] Building CXX object validation/studies/CMakeFiles/study-bucket-pairs.dir/anatomy/bucket_pair_trace.cpp.obj
+[100%] Linking CXX executable study-bucket-pairs.exe
+[100%] Built target study-bucket-pairs

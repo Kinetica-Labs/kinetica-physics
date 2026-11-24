@@ -1,0 +1,9 @@
+{
+    "exe_sha256":  "2FFA5B0C09B3715390487BD1275A1ADBF65F08CF456B6B1D92CFA53699231D87",
+    "mode":  "hotspots software sampling",
+    "scope":  "entire process includes world creation and preload",
+    "measured_frames":  15000,
+    "solver_threads":  1,
+    "affinity":  16777215,
+    "vtune":  "C:\\Program Files (x86)\\Intel\\oneAPI\\vtune\\2024.3\\bin64\\vtune.exe"
+}

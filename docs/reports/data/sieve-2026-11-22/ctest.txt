@@ -1,0 +1,19 @@
+Test project C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/build
+    Start 1: unit-tests
+1/7 Test #1: unit-tests .......................   Passed   16.70 sec
+    Start 4: floating-box
+2/7 Test #4: floating-box .....................   Passed    0.15 sec
+    Start 5: gear-train
+3/7 Test #5: gear-train .......................   Passed    0.03 sec
+    Start 6: grip-limit-exact
+4/7 Test #6: grip-limit-exact .................   Passed    0.61 sec
+    Start 7: grip-limit-realtime32
+5/7 Test #7: grip-limit-realtime32 ............   Passed    1.04 sec
+    Start 8: grip-order-balance
+6/7 Test #8: grip-order-balance ...............   Passed    0.09 sec
+    Start 9: slip-to-roll
+7/7 Test #9: slip-to-roll .....................   Passed    0.12 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  18.99 sec

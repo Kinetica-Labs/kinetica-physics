@@ -1,0 +1,1 @@
+vtune: Error: Unable to run event-based sampling collection. To ensure analysis requirements. disable the Hyper-V feature or upgrade your system to support Architectural Performance Monitoring. Analysis results may be impacted because Hyper-V mode can consume system resources.

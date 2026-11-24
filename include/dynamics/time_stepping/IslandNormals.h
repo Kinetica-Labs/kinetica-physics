@@ -37,6 +37,8 @@ public:
     // moving — по телам: решаются только контакты и островки, где движется хоть одно тело; nullptr — все.
     void solve(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed,
                const StepArray<char>* moving = nullptr);
+    // Заканчивает только попарное решение больших островков. Жёсткая совместная реакция уже найдена.
+    void solveSupports(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, Vector3 gravity, Real h) const;
     // Уровни зависимости контактов шага: ими же идут проходы тёплого старта и трения (SoftStep).
     ContactLevels levels;
 
@@ -54,6 +56,7 @@ private:
         StepArray<int> members;   // номера тел мира
         StepArray<Body> bodies;     // их масса, инерция и нынешняя ориентация — всё, что берёт решатель
         StepArray<char> working;  // по rows: рабочий набор
+        int localBody(int body, const std::vector<Body>& world, StepArray<int>& place);
     };
     struct Pass {
         bool withBias;
@@ -69,7 +72,9 @@ private:
 
     int rowLimit_, iterations_;
     Real biasRate_;
-    StepArray<char> direct_; // по контактам; пусто — ещё не выбрано
+    enum class Method : char { Together, Pairwise, Layered };
+    StepArray<Method> methods_; // по контактам, одно решение на весь остров
+    bool hasLayers_ = false;
     StepArray<Island> islands_;
 };
 

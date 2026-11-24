@@ -1,0 +1,16 @@
+{
+  "format": "Linux x86-64 ELF, WSL2 on the Windows benchmark host",
+  "frames": 360,
+  "steps_per_frame": 8,
+  "threads": 1,
+  "sleep": false,
+  "coupled_friction": true,
+  "scope": "Only the 24 intervals of 15 loaded frames, including the two steady clock reads",
+  "unmarked_header_sha256": "2efb2a155a7873f442b343af77f06d6f44b42ff55c627c6109d3e94973735d43",
+  "marked_header_sha256": "8e30823dc06862cb0ca260682b2ebed5ddb57ecc81d2010ec07762fce10d0fde",
+  "source_sha256": {
+    "src/dynamics/time_stepping/SoftStep.cpp": "86cf0ebcc2ef354c5bde57b402bf328f178f2c9f695c1b0aa78b10c167602977",
+    "src/collision/ContactPair.cpp": "ed6aa428b8cb702c63d8d34e2c09b680f29cfab42450e6fdd823e48ced2db303",
+    "src/world/World.cpp": "a4451486fd0a7a04ddd1f7f117a1765c2b7c67a8c24db453c59902af4b900bcf"
+  }
+}

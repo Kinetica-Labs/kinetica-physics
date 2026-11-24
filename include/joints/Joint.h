@@ -49,6 +49,8 @@ public:
     // Связи при нынешних позах тел bodies; уход связей считается по скоростям тел moving. У
     // сочленения двух неподвижных (или спящих) тел связей нет: двигать ими некого.
     std::vector<Bond> bonds(const std::vector<Body>& bodies, const std::vector<Body>& moving) const;
+    // Перезаписывает result, сохраняя его запас для следующего сочленения.
+    void writeBonds(const std::vector<Body>& bodies, const std::vector<Body>& moving, std::vector<Bond>& result) const;
 
     // Тела сочленения сталкиваются друг с другом. Обычно нет: они соединены вплотную.
     virtual bool collides() const { return false; }

@@ -1,0 +1,1341 @@
+
+Matrix3x3.cpp.obj:
+
+Quaternion.cpp.obj:
+         U sqrt
+
+StepMemory.cpp.obj:
+         U _Unwind_Resume
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZNSt3__15mutex4lockEv
+         U _ZNSt3__15mutex6unlockEv
+         U _ZNSt9bad_allocC1Ev
+         U _ZNSt9bad_allocD1Ev
+         U _ZSt9terminatev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_begin_catch
+         U __cxa_free_exception
+         U __cxa_guard_abort
+         U __cxa_guard_acquire
+         U __cxa_guard_release
+         U __cxa_thread_atexit
+         U __cxa_throw
+         U __dso_handle
+         U __gxx_personality_seh0
+         U _tls_index
+         U free
+         U getenv
+         U malloc
+         U memcpy
+         U memset
+         U strcmp
+
+UpdatedCholesky.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_thread_atexit
+         U __cxa_throw
+         U __dso_handle
+         U __gxx_personality_seh0
+         U _tls_index
+         U memcpy
+         U memset
+         U sqrt
+
+WorkerPool.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory5serveEv
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZNSt3__115__thread_structC1Ev
+         U _ZNSt3__115__thread_structD1Ev
+         U _ZNSt3__116__libcpp_tls_setElPv
+         U _ZNSt3__117bad_function_callD1Ev
+         U _ZNSt3__118condition_variable10notify_allEv
+         U _ZNSt3__118condition_variable10notify_oneEv
+         U _ZNSt3__118condition_variable4waitERNS_11unique_lockINS_5mutexEEE
+         U _ZNSt3__119__thread_local_dataEv
+         U _ZNSt3__120__throw_system_errorEiPKc
+         U _ZNSt3__122__libcpp_thread_createEPPvPFS0_S0_ES0_
+         U _ZNSt3__15mutex4lockEv
+         U _ZNSt3__15mutex6unlockEv
+         U _ZNSt3__16thread20hardware_concurrencyEv
+         U _ZNSt3__16thread4joinEv
+         U _ZNSt3__16threadD1Ev
+         U _ZSt9terminatev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVNSt3__117bad_function_callE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_begin_catch
+         U __cxa_free_exception
+         U __cxa_guard_abort
+         U __cxa_guard_acquire
+         U __cxa_guard_release
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U atexit
+
+World.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemoryC1Ev
+         U _ZN2kp10StepMemoryD1Ev
+         U _ZN2kp11IslandSleep11wakeTouchedERNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEERKNS_8JointSetENS_7Vector3Edb
+         U _ZN2kp11IslandSleep5trackEy
+         U _ZN2kp11IslandSleep6settleERNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEERKNS_8JointSetENS_7Vector3Eddd
+         U _ZN2kp9ExactStep3runEd
+         U _ZNK2kp10PairFinder7collectEdRKNS_8JointSetERNSt3__16vectorINS_11ContactPairENS4_9allocatorIS6_EEEE
+         U _ZNK2kp11IslandSleep5countEv
+         U _ZNK2kp8SoftStep4stepERNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEERKNS2_INS_11ContactPairENS4_IS8_EEEERKNS_8JointSetENS_7Vector3EdRNS_13ContactForcesERNS2_INS2_IdNS4_IdEEEENS4_ISK_EEEE
+         U _ZSt9terminatev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U _Znwy
+         U __cxa_begin_catch
+         U __gxx_personality_seh0
+         U strcmp
+
+IslandSleep.cpp.obj:
+         U _Unwind_Resume
+         U _ZNK2kp10PairFinder5pairsEd
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+
+AreaImpulse.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp11IslandSleep4wakeERNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEEy
+         U _ZN2kp13closestPointsERKNS_11ConvexShapeERKNS_9TransformES2_S5_d
+         U _ZNK2kp11ConvexShape11flatTowardsERKNS_9TransformENS_7Vector3E
+         U _ZNK2kp11ConvexShape11outlineOverERKNS_9TransformERKNS_4FlatE
+         U _ZNK2kp11ConvexShape11tubeTowardsERKNS_9TransformENS_7Vector3E
+         U _ZNK2kp11ConvexShape13rollingRadiusERKNS_9TransformENS_7Vector3E
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U __gxx_personality_seh0
+         U memcpy
+
+ContactPair.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp13closestPointsERKNS_11ConvexShapeERKNS_9TransformES2_S5_d
+         U _ZN2kp13outerFaceAxisERKNS_15TransformedHullES2_RNS_14SeparatingAxisE
+         U _ZN2kp18findSeparatingAxisERKNS_10ConvexHullERKNS_9TransformES2_S5_d
+         U _ZN2kp20NarrowPhaseAlgorithm7betweenERKNS_11ConvexShapeES3_
+         U _ZdlPv
+         U _Znwy
+         U __gxx_personality_seh0
+         U memcpy
+
+ManifoldMemory.cpp.obj:
+         U _Unwind_Resume
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+CandidateMemory.cpp.obj:
+         U _Unwind_Resume
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+PairFinder.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp10WorkerPool3runEyRKNSt3__18functionIFvyEEE
+         U _ZN2kp10WorkerPool6sharedEv
+         U _ZN2kp11DynamicTree6insertERKNS_6BoundsEi
+         U _ZN2kp13maxPointSpeedERKNS_4BodyE
+         U _ZN2kp14ManifoldMemory7carriedERKNS0_5EntryERKNS_4BodyES6_d
+         U _ZN2kp14ManifoldMemory7entryOfERKNS_11ContactPairERKNS_4BodyES6_
+         U _ZN2kp14ManifoldMemory7replaceERKNSt3__16vectorIPKNS0_5EntryENS_13StepAllocatorIS5_EEEE
+         U _ZN2kp15CandidateMemory7replaceERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEERKNS2_IdNS_13StepAllocatorIdEEEERKNS2_INS1_4pairIiiEENS9_ISF_EEEE
+         U _ZN2kp15forcedSpeedGainERKNS_4BodyEd
+         U _ZN2kp17examinePairWithinERKNS_4BodyES2_dd
+         U _ZNK2kp14ManifoldMemory5validERKNSt3__15arrayIiLy4EEERKNS_4BodyES8_d
+         U _ZNK2kp15CandidateMemory5validERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEERKNS2_IdNS_13StepAllocatorIdEEEE
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memmove
+         U memset
+         U strcmp
+
+RayCast.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp13closestPointsERKNS_11ConvexShapeERKNS_9TransformES2_S5_d
+         U _ZNK2kp11ConvexShape11flatTowardsERKNS_9TransformENS_7Vector3E
+         U _ZNK2kp11ConvexShape11outlineOverERKNS_9TransformERKNS_4FlatE
+         U _ZNK2kp11ConvexShape11tubeTowardsERKNS_9TransformENS_7Vector3E
+         U _ZNK2kp11ConvexShape13rollingRadiusERKNS_9TransformENS_7Vector3E
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U __gxx_personality_seh0
+         U memcpy
+
+DynamicTree.cpp.obj:
+         U _Unwind_Resume
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+ContactSolver.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp11ContactRows13effectiveMassERKNS_4BodyES3_NS_7Vector3ES4_
+         U _ZN2kp11ContactRows8setDriftERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEE
+         U _ZN2kp12CoupledSolve13solveTogetherERKNS_13ContactSystemERKNSt3__16vectorIdNS_13StepAllocatorIdEEEE
+         U _ZN2kp12PairFriction13solveFrictionERNS_11ContactRows4PairERKNSt3__16vectorIdNS_13StepAllocatorIdEEEE
+         U _ZN2kp15ContactAssembly8assembleERKNSt3__16vectorIdNS_13StepAllocatorIdEEEE
+         U _ZN2kp16ShockPropagation4passERKNSt3__16vectorIdNS_13StepAllocatorIdEEEE
+         U _ZN2kp9WarmStart5applyERKNSt3__16vectorIdNS_13StepAllocatorIdEEEERKNS_13ContactForcesEd
+         U _ZNK2kp11ContactRows5speedERKNS_13ContactSystem4LineE
+         U _ZNK2kp12CoupledSolve8residualERKNS_13ContactSystemERKNSt3__16vectorIdNS_13StepAllocatorIdEEEE
+         U _ZNK2kp12PairFriction10frictionOfERKNS_11ContactPairEyy
+         U _ZNK2kp5Joint5bondsERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEES8_
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZSt7nothrow
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U _ZnwyRKSt9nothrow_t
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memmove
+         U memset
+
+ContactRows.cpp.obj:
+         U _ZNK2kp5Joint5bondsERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEES8_
+         U _ZdlPv
+
+PairFriction.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memset
+         U sqrt
+
+ContactAssembly.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp13ContactSystem14responseMatrixENS_4SpanINS_4BodyEEERKNSt3__16vectorINS0_4LineENS_13StepAllocatorIS6_EEEE
+         U _ZNK2kp11ContactRows10normalLineERKNS0_3RowE
+         U _ZNK2kp11ContactRows12frictionLineERKNS0_4PairEi
+         U _ZNK2kp11ContactRows13relativeSpeedERKNS0_3RowENS_7Vector3E
+         U _ZNK2kp11ContactRows5speedERKNS_13ContactSystem4LineE
+         U _ZNK2kp11ContactRows8driveCapEy
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZSt7nothrow
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _ZnwyRKSt9nothrow_t
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memmove
+         U memset
+
+CoupledSolve.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp11ContactRows5applyERKNS0_3RowENS_7Vector3E
+         U _ZN2kp11ContactRows9applyLineERKNS_13ContactSystem4LineEd
+         U _ZN2kp12PairFriction13applyFrictionERKNS_11ContactRows4PairERKNSt3__15arrayIdLy3EEEbb
+         U _ZN2kp9ActiveSet5solveERKNSt3__16vectorIcNS_13StepAllocatorIcEEEERKNS2_IdNS3_IdEEEERS9_
+         U _ZNK2kp11ContactRows13relativeSpeedERKNS0_3RowENS_7Vector3E
+         U _ZNK2kp11ContactRows5speedERKNS_13ContactSystem4LineE
+         U _ZNK2kp11ContactRows8driveCapEy
+         U _ZNK2kp12PairFriction4slipERKNS_11ContactRows4PairE
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memset
+
+SlidingStopSearch.cpp.obj:
+         U _ZNK2kp12PairFriction4slipERKNS_11ContactRows4PairE
+
+WarmStart.cpp.obj:
+         U _ZN2kp11ContactRows5applyERKNS0_3RowENS_7Vector3E
+         U _ZN2kp12PairFriction13applyFrictionERKNS_11ContactRows4PairERKNSt3__15arrayIdLy3EEEbb
+         U _ZNK2kp11ContactRows13kineticEnergyEv
+         U _ZNK2kp11ContactRows13relativeSpeedERKNS0_3RowENS_7Vector3E
+         U _ZNK2kp12PairFriction4slipERKNS_11ContactRows4PairE
+
+ShockPropagation.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp11ContactRows13effectiveMassERKNS_4BodyES3_NS_7Vector3ES4_
+         U _ZN2kp12PairFriction13applyFrictionERKNS_11ContactRows4PairERKNSt3__15arrayIdLy3EEEbb
+         U _ZN2kp12PairFriction8invertedERKNSt3__15arrayINS2_IdLy3EEELy3EEE
+         U _ZNK2kp11ContactRows13relativeSpeedERKNS0_3RowENS_7Vector3E
+         U _ZNK2kp12PairFriction15frictionImpulseERKNS_11ContactRows4PairERKNSt3__16vectorIdNS_13StepAllocatorIdEEEERKNS5_5arrayINSC_IdLy3EEELy3EEE
+         U _ZNK2kp12PairFriction16frictionResponseERKNS_11ContactRows4PairEbb
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U __gxx_personality_seh0
+
+ContactSystem.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memmove
+         U memset
+
+ActiveSet.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp10StepMemory5ScopeC1Ev
+         U _ZN2kp10StepMemory5ScopeD1Ev
+         U _ZN2kp9SetFactor5solveERKNSt3__16vectorIdNS_13StepAllocatorIdEEEERS5_
+         U _ZN2kp9SetFactor6followERKNSt3__16vectorIcNS_13StepAllocatorIcEEEE
+         U _ZNK2kp14BodySpaceSolve5solveERKNSt3__16vectorIyNS_13StepAllocatorIyEEEEdRNS2_IdNS3_IdEEEE
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_thread_atexit
+         U __cxa_throw
+         U __dso_handle
+         U __gxx_personality_seh0
+         U _tls_index
+         U memcpy
+         U memmove
+         U memset
+         U sqrt
+
+SetFactor.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp15UpdatedCholesky6appendEiRKNSt3__16vectorIdNS_13StepAllocatorIdEEEEdd
+         U _ZN2kp15UpdatedCholesky6removeEi
+         U _ZNK2kp15UpdatedCholesky5solveERNSt3__16vectorIdNS_13StepAllocatorIdEEEE
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memmove
+         U memset
+
+BodySpaceSolve.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_thread_atexit
+         U __cxa_throw
+         U __dso_handle
+         U __gxx_personality_seh0
+         U _tls_index
+         U memcpy
+         U memmove
+         U memset
+         U sqrt
+
+ExactStep.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10Quaternion18fromRotationVectorENS_7Vector3E
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp11ContactRows8setDriftERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEE
+         U _ZN2kp13ContactSolver12solveImpactsEv
+         U _ZN2kp13ContactSolver20solveRestingContactsEdRKNS_13ContactForcesEb
+         U _ZN2kp13ContactSolverC1ERNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEERKNS2_INS_11ContactPairENS4_IS8_EEEENS_7Vector3EdPKNS_13ContactForcesEPKNS_8JointSetE
+         U _ZN2kp17OverlapSeparation8separateERKNSt3__16vectorINS_11ContactPairENS1_9allocatorIS3_EEEE
+         U _ZN2kp17SlidingStopSearch6settleENS_11SlidingStopE
+         U _ZNK2kp10PairFinder5pairsEdRKNS_8JointSetE
+         U _ZNK2kp11EventSearch11contactTurnERKNSt3__16vectorINS_11ContactPairENS1_9allocatorIS3_EEEERKNS2_INS_4RateENS_13StepAllocatorIS9_EEEEd
+         U _ZNK2kp11EventSearch13earliestLimitERKNSt3__16vectorINS_4RateENS_13StepAllocatorIS3_EEEEd
+         U _ZNK2kp11EventSearch14earliestImpactERKNSt3__16vectorINS_11ContactPairENS1_9allocatorIS3_EEEERKNS2_INS_4RateENS_13StepAllocatorIS9_EEEEd
+         U _ZNK2kp13ContactSolver12bondImpulsesERNSt3__16vectorINS_7Vector3ENS_13StepAllocatorIS3_EEEES7_
+         U _ZNK2kp13ContactSolver9pressuresEv
+         U _ZNK2kp17SlidingStopSearch11slidingStopEdRKNSt3__16vectorINS1_4pairIiiEENS_13StepAllocatorIS4_EEEE
+         U _ZNK2kp5Joint5bondsERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEES8_
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memmove
+         U memset
+
+EventSearch.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10Quaternion18fromRotationVectorENS_7Vector3E
+         U _ZN2kp12separationOfERKNS_4BodyES2_
+         U _ZN2kp13closestPointsERKNS_11ConvexShapeERKNS_9TransformES2_S5_d
+         U _ZN2kp13maxPointSpeedERKNS_4BodyE
+         U _ZN2kp8gapAlongERKNS_4BodyES2_NS_7Vector3E
+         U _ZNK2kp18SingleFreedomJoint8limitGapERKNS_4BodyES3_
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZTVN2kp8CylinderE
+         U ___chkstk_ms
+         U __gxx_personality_seh0
+         U memcpy
+         U sqrt
+
+OverlapSeparation.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10Quaternion18fromRotationVectorENS_7Vector3E
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp12PairFriction8invertedERKNSt3__15arrayINS2_IdLy3EEELy3EEE
+         U _ZN2kp12separationOfERKNS_4BodyES2_
+         U _ZN2kp13ContactSolver12solveOverlapEv
+         U _ZN2kp13ContactSolverC1ERNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEERKNS2_INS_11ContactPairENS4_IS8_EEEENS_7Vector3EdPKNS_13ContactForcesEPKNS_8JointSetE
+         U _ZNK2kp8JointSet12largestErrorERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEE
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+
+Body.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10ConvexHull10fromPointsERKNSt3__16vectorINS_7Vector3ENS1_9allocatorIS3_EEEEd
+         U _ZN2kp10ConvexHullC1ENSt3__16vectorINS_7Vector3ENS1_9allocatorIS3_EEEERKNS2_INS2_IiNS4_IiEEEENS4_IS8_EEEE
+         U _ZN2kp9MassFrame2ofERKNS_10ConvexHullEd
+         U _ZNKSt3__119__shared_weak_count13__get_deleterERKSt9type_info
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZNSt3__119__shared_weak_countD2Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVN10__cxxabiv121__vmi_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+MassFrame.cpp.obj:
+         U _ZN2kp13PrincipalAxes2ofEPA3_d
+
+PrincipalAxes.cpp.obj:
+         U sqrt
+
+CompoundBodyBuilder.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10ConvexHull10fromPointsERKNSt3__16vectorINS_7Vector3ENS1_9allocatorIS3_EEEEd
+         U _ZN2kp11DynamicTree6insertERKNS_6BoundsEi
+         U _ZN2kp11convexPartsERKNS_12TriangleMeshERKNS_19DecompositionLimitsE
+         U _ZN2kp13PrincipalAxes2ofEPA3_d
+         U _ZN2kp4Body4hullERKNSt3__16vectorINS_7Vector3ENS1_9allocatorIS3_EEEEdS3_
+         U _ZN2kp9MassFrame2ofERKNS_10ConvexHullEd
+         U _ZNK2kp11ConvexShape11flatTowardsERKNS_9TransformENS_7Vector3E
+         U _ZNK2kp11ConvexShape11outlineOverERKNS_9TransformERKNS_4FlatE
+         U _ZNK2kp11ConvexShape11tubeTowardsERKNS_9TransformENS_7Vector3E
+         U _ZNK2kp11ConvexShape13rollingRadiusERKNS_9TransformENS_7Vector3E
+         U _ZNKSt3__119__shared_weak_count13__get_deleterERKSt9type_info
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZNSt3__119__shared_weak_countD2Ev
+         U _ZSt9terminatev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVN10__cxxabiv121__vmi_class_type_infoE
+         U _ZTVN2kp10ConvexHullE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_begin_catch
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+
+SoftStep.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10Quaternion18fromRotationVectorENS_7Vector3E
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp10WorkerPool3runEyRKNSt3__18functionIFvyEEE
+         U _ZN2kp10WorkerPool6sharedEv
+         U _ZN2kp11SoftContact10matchTrialERKNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEEd
+         U _ZN2kp11SoftContact13solveFrictionERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEEd
+         U _ZN2kp11SoftContact6bounceERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEEd
+         U _ZN2kp11SoftContact6followERKNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEE
+         U _ZN2kp11SoftContact8prefetchERKNSt3__16vectorIS0_NS_13StepAllocatorIS0_EEEERKNS2_INS_10SolverBodyENS3_IS8_EEEEyy
+         U _ZN2kp11SoftContactC1ERKNS_11ContactPairERKNSt3__16vectorINS_4BodyENS4_9allocatorIS6_EEEERKNS5_INS_10SolverBodyENS_13StepAllocatorISC_EEEERKNS_8SoftnessENS_4SpanINS4_4pairINS_9ContactIdENS_12ContactForceEEEEEdbb
+         U _ZN2kp12DirectJoints3addERKNS_4BondEPd
+         U _ZN2kp12DirectJoints5clearEv
+         U _ZN2kp12DirectJoints5solveERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEEdd
+         U _ZN2kp12DirectJoints8assembleERKNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEE
+         U _ZN2kp13ContactLevels4eachERKNSt3__16vectorINS_11SoftContactENS_13StepAllocatorIS3_EEEERKNS2_INS_10SolverBodyENS4_IS9_EEEERKNS1_8functionIFvyEEE
+         U _ZN2kp13IslandNormals5solveERNSt3__16vectorINS_11SoftContactENS_13StepAllocatorIS3_EEEERKNS2_INS_4BodyENS1_9allocatorIS8_EEEERNS2_INS_10SolverBodyENS4_ISE_EEEEbddPKNS2_IcNS4_IcEEEE
+         U _ZN2kp14MissedContacts4findERNSt3__16vectorINS_11SoftContactENS_13StepAllocatorIS3_EEEERKNS2_INS_4BodyENS1_9allocatorIS8_EEEERKNS2_INS_10SolverBodyENS4_ISE_EEEEdRKNS1_8functionIFS3_RKNS_11ContactPairEEEE
+         U _ZN2kp14MissedContacts5adoptERKNS_11ContactPairERKNSt3__16vectorINS_4BodyENS4_9allocatorIS6_EEEEb
+         U _ZN2kp14MissedContactsC1ERKNSt3__16vectorINS_11ContactPairENS1_9allocatorIS3_EEEERKNS2_INS_4BodyENS4_IS9_EEEENS2_IyNS_13StepAllocatorIyEEEEdd
+         U _ZN2kp20solveFrictionIslandsERNSt3__16vectorINS_11SoftContactENS_13StepAllocatorIS2_EEEERNS1_INS_10SolverBodyENS3_IS7_EEEERKNS_12DirectJointsERKNS1_INS_9SoftJointENS3_ISE_EEEERNS_13ContactLevelsEdd
+         U _ZN2kp9PairReach5spendEv
+         U _ZN2kp9PairReach8discoverERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEERKNS_8JointSetEdd
+         U _ZN2kp9PairReach8exceededERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEEd
+         U _ZN2kp9PairReachC1ERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEERKNS2_INS_11ContactPairENS4_IS9_EEEENS_7Vector3Edd
+         U _ZN2kp9SoftJoint5solveERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEEbdRKNS_8SoftnessEd
+         U _ZN2kp9SoftJointC1EPKNS_4BondEiRKNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS6_EEEEPd
+         U _ZNK2kp11SoftContact8rememberERNS_13ContactForcesEd
+         U _ZNK2kp11SoftContact9warmStartERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEE
+         U _ZNK2kp12DirectJoints9warmStartERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEE
+         U _ZNK2kp5Joint10writeBondsERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEES8_RNS2_INS_4BondENS4_IS9_EEEE
+         U _ZNK2kp9SoftJoint9warmStartERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEE
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memchr
+         U memcpy
+         U memmove
+         U memset
+         U strcmp
+
+SoftContact.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp13TrackedShapes5trackERKNS_4BodyES3_
+         U _ZN2kp14CentreFriction5solveERNS_10SolverBodyES2_RKNS0_5FrameEddd
+         U _ZN2kp14CentreFriction7prepareERKNS_10SolverBodyES3_RKNS0_5FrameERKNS0_7CarriedE
+         U _ZNK2kp13TrackedShapes7closestERKNS_10BodyMotionES3_NS_7Vector3E
+         U _ZNK2kp14CentreFriction9warmStartERNS_10SolverBodyES2_RKNS0_5FrameE
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZNSt3__16__sortIRNS_6__lessIiiEEPiEEvT0_S5_T_
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_thread_atexit
+         U __cxa_throw
+         U __dso_handle
+         U __gxx_personality_seh0
+         U _tls_index
+         U memcpy
+         U memset
+         U sqrt
+
+IslandNormals.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp10WorkerPool3runEyRKNSt3__18functionIFvyEEE
+         U _ZN2kp10WorkerPool6sharedEv
+         U _ZN2kp11SoftContact12solveNormalsERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEEbdd
+         U _ZN2kp11SoftContact16setNormalImpulseERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEEyd
+         U _ZN2kp13ContactLevels4eachERKNSt3__16vectorINS_11SoftContactENS_13StepAllocatorIS3_EEEERKNS2_INS_10SolverBodyENS4_IS9_EEEERKNS1_8functionIFvyEEE
+         U _ZN2kp13ContactSystem14responseMatrixENS_4SpanINS_4BodyEEERKNSt3__16vectorINS0_4LineENS_13StepAllocatorIS6_EEEE
+         U _ZN2kp9ActiveSet5solveERKNSt3__16vectorIcNS_13StepAllocatorIcEEEERKNS2_IdNS3_IdEEEERS9_
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZSt9terminatev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_begin_catch
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+         U strcmp
+
+ContactLevels.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp10WorkerPool3runEyRKNSt3__18functionIFvyEEE
+         U _ZN2kp10WorkerPool6sharedEv
+         U _ZN2kp11SoftContact8prefetchERKNSt3__16vectorIS0_NS_13StepAllocatorIS0_EEEERKNS2_INS_10SolverBodyENS3_IS8_EEEEyy
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt3__117bad_function_callD1Ev
+         U _ZNSt3__121__libcpp_thread_yieldEv
+         U _ZSt9terminatev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVNSt3__117bad_function_callE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_begin_catch
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memmove
+         U memset
+         U strcmp
+
+MissedContacts.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp11examinePairERKNS_4BodyES2_NS_7Vector3Edd
+         U _ZN2kp8gapAlongERKNS_4BodyES2_NS_7Vector3E
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt3__117bad_function_callD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVNSt3__117bad_function_callE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+
+PairReach.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp13maxPointSpeedERKNS_4BodyE
+         U _ZNK2kp10PairFinder5pairsEdRKNS_8JointSetE
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+
+RollingFriction.cpp.obj:
+
+CentreFriction.cpp.obj:
+         U _ZN2kp15RollingFriction5solveERNS_10SolverBodyES2_NS_7Vector3ES3_dd
+         U _ZN2kp15RollingFriction7prepareERKNS_10SolverBodyES3_NS_7Vector3ES4_
+         U _ZNK2kp15RollingFriction9warmStartERNS_10SolverBodyES2_NS_7Vector3ES3_
+
+FrictionIslands.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp11SoftContact13solveFrictionERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEEd
+         U _ZN2kp12DirectJoints3addERKNS_4BondEPd
+         U _ZN2kp12DirectJoints8assembleERKNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEE
+         U _ZN2kp13ContactLevels4eachERKNSt3__16vectorINS_11SoftContactENS_13StepAllocatorIS3_EEEERKNS2_INS_10SolverBodyENS4_IS9_EEEERKNS1_8functionIFvyEEE
+         U _ZN2kp15CoupledFriction5solveERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEERNS_12DirectJointsEdd
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+         U strcmp
+
+CoupledFriction.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp12DirectJoints5solveERNSt3__16vectorINS_10SolverBodyENS_13StepAllocatorIS3_EEEEdd
+         U _ZN2kp14CentreFriction10setTangentERNS_10SolverBodyES2_RKNS0_5FrameENS_7Vector2Ed
+         U _ZN2kp14CentreFriction10solveTwistERNS_10SolverBodyES2_RKNS0_5FrameEd
+         U _ZN2kp15RollingFriction5solveERNS_10SolverBodyES2_NS_7Vector3ES3_dd
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_thread_atexit
+         U __cxa_throw
+         U __dso_handle
+         U __gxx_personality_seh0
+         U _tls_index
+         U memcpy
+         U memmove
+         U memset
+         U sqrt
+
+TrackedShapes.cpp.obj:
+         U _ZN2kp13closestPointsERKNS_11ConvexShapeERKNS_9TransformES2_S5_d
+         U _ZNK2kp11ConvexShape11flatTowardsERKNS_9TransformENS_7Vector3E
+         U _ZNK2kp11ConvexShape11outlineOverERKNS_9TransformERKNS_4FlatE
+         U _ZNK2kp11ConvexShape11tubeTowardsERKNS_9TransformENS_7Vector3E
+         U _ZNK2kp11ConvexShape13rollingRadiusERKNS_9TransformENS_7Vector3E
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+
+SoftJoint.cpp.obj:
+         U _ZNK2kp9Matrix3x37inverseEv
+         U memcpy
+
+DirectJoints.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+         U sqrt
+
+Joint.cpp.obj:
+         U _Unwind_Resume
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_pure_virtual
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+JointSet.cpp.obj:
+         U _Unwind_Resume
+         U _ZNK2kp5Joint5bondsERKNSt3__16vectorINS_4BodyENS1_9allocatorIS3_EEEES8_
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+SingleFreedomJoint.cpp.obj:
+         U _Unwind_Resume
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+BallAndSocketJoint.cpp.obj:
+         U _ZNK2kp5Joint10lockTravelERKNS0_6MotionEiRNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U _Znwy
+
+HingeJoint.cpp.obj:
+         U _ZNK2kp18SingleFreedomJoint15addFreedomBondsERKNS_5Joint6MotionERKNS_4BondERNSt3__16vectorIS5_NS8_9allocatorIS5_EEEE
+         U _ZNK2kp5Joint10lockTravelERKNS0_6MotionEiRNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZNK2kp5Joint19lockTurnsAcrossAxisERKNS0_6MotionERNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZNK2kp5Joint8turnLineERKNS0_6MotionEi
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U _Znwy
+
+GearJoint.cpp.obj:
+         U _Unwind_Resume
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt16invalid_argumentD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZTVSt16invalid_argument
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+SliderJoint.cpp.obj:
+         U _ZNK2kp18SingleFreedomJoint15addFreedomBondsERKNS_5Joint6MotionERKNS_4BondERNSt3__16vectorIS5_NS8_9allocatorIS5_EEEE
+         U _ZNK2kp5Joint10lockTravelERKNS0_6MotionEiRNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZNK2kp5Joint10travelLineERKNS0_6MotionEi
+         U _ZNK2kp5Joint12lockAllTurnsERKNS0_6MotionERNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U _Znwy
+
+Path.cpp.obj:
+         U _Unwind_Resume
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+         U sqrt
+
+PathJoint.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10Quaternion8fromAxesENS_7Vector3ES1_S1_
+         U _ZN2kp4PathC1ENSt3__16vectorINS_7Vector3ENS1_9allocatorIS3_EEEEb
+         U _ZN2kp5JointC2EiRKNS_4BodyEiS3_NS_7Vector3ES4_
+         U _ZNK2kp18SingleFreedomJoint15addFreedomBondsERKNS_4BondEdRNSt3__16vectorIS1_NS4_9allocatorIS1_EEEE
+         U _ZNK2kp4Path13turningChangeEd
+         U _ZNK2kp4Path5pointEd
+         U _ZNK2kp4Path6lengthEd
+         U _ZNK2kp4Path6normalEd
+         U _ZNK2kp4Path7closestENS_7Vector3E
+         U _ZNK2kp4Path7tangentEd
+         U _ZNK2kp4Path7turningEd
+         U _ZNK2kp4Path9curvatureEd
+         U _ZNK2kp5Joint10travelLineERKNS0_6MotionENS_7Vector3E
+         U _ZNK2kp5Joint12lockAllTurnsERKNS0_6MotionERNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZNKSt3__119__shared_weak_count13__get_deleterERKSt9type_info
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZNSt3__119__shared_weak_countD2Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVN10__cxxabiv121__vmi_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+CylindricalJoint.cpp.obj:
+         U _ZNK2kp5Joint10lockTravelERKNS0_6MotionEiRNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZNK2kp5Joint19lockTurnsAcrossAxisERKNS0_6MotionERNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U _Znwy
+
+FixedJoint.cpp.obj:
+         U _ZNK2kp5Joint10lockTravelERKNS0_6MotionEiRNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZNK2kp5Joint12lockAllTurnsERKNS0_6MotionERNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U _Znwy
+
+CardanJoint.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp5Joint10turningXToENS_7Vector3E
+         U _ZNK2kp5Joint10lockTravelERKNS0_6MotionEiRNSt3__16vectorINS_4BondENS4_9allocatorIS6_EEEE
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U sqrt
+
+TetherJoint.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp5JointC2EiRKNS_4BodyEiS3_NS_7Vector3ES4_
+         U _ZNK2kp5Joint10travelLineERKNS0_6MotionEi
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+ConvexShape.cpp.obj:
+         U _ZN2kp10StepMemory4takeEy
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U __cxa_pure_virtual
+
+ConvexHull.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZNK2kp11ConvexShape11tubeTowardsERKNS_9TransformENS_7Vector3E
+         U _ZNK2kp11ConvexShape13rollingRadiusERKNS_9TransformENS_7Vector3E
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt12out_of_rangeD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZSt9terminatev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZTVSt12out_of_range
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_begin_catch
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memmove
+
+Capsule.cpp.obj:
+         U _ZN2kp10StepMemory4takeEy
+         U _ZNK2kp11ConvexShape11flatTowardsERKNS_9TransformENS_7Vector3E
+         U _ZNK2kp11ConvexShape13rollingRadiusERKNS_9TransformENS_7Vector3E
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+
+Cylinder.cpp.obj:
+         U _ZN2kp10StepMemory4takeEy
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+
+QuickHull.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10ConvexHullC1ENSt3__16vectorINS_7Vector3ENS1_9allocatorIS3_EEEERKNS2_INS2_IiNS4_IiEEEENS4_IS8_EEEE
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt12out_of_rangeD1Ev
+         U _ZNSt16invalid_argumentD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZSt9terminatev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZTVSt12out_of_range
+         U _ZTVSt16invalid_argument
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_begin_catch
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+
+Gjk.cpp.obj:
+         U _ZTVN2kp8CylinderE
+         U memset
+
+Sat.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+
+NarrowPhaseAlgorithm.cpp.obj:
+         U _ZTVN2kp19HullVsHullAlgorithmE
+         U _ZTVN2kp20HullVsRoundAlgorithmE
+         U _ZTVN2kp21RoundVsRoundAlgorithmE
+         U __cxa_guard_acquire
+         U __cxa_guard_release
+
+HullVsHullAlgorithm.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp12findFaceAxisERKNS_15TransformedHullES2_d
+         U _ZN2kp13outerFaceAxisERKNS_15TransformedHullES2_RNS_14SeparatingAxisE
+         U _ZN2kp15findContactAxisERKNS_15TransformedHullES2_ddRNS_14SeparatingAxisE
+         U _ZN2kp16ContactCandidate7orderedERKNS_11SmallVectorIS0_Ly16EEEd
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U _Znwy
+         U ___chkstk_ms
+         U __gxx_personality_seh0
+         U memcpy
+
+HullVsRoundAlgorithm.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp12ContactPatch7betweenERKNS_11ConvexShapeERKNS_9TransformES3_S6_RKNS_13ClosestPointsEdd
+         U _ZN2kp12ContactPatch8pointsOfERKNS_4FlatERKNS_7OutlineE
+         U _ZNK2kp10ConvexHull8faceFlatERKNS_9TransformEi
+         U _ZNK2kp12ContactPatch8manifoldEbdd
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U _Znwy
+         U __gxx_personality_seh0
+         U memcpy
+
+RoundVsRoundAlgorithm.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp12ContactPatch7betweenERKNS_11ConvexShapeERKNS_9TransformES3_S6_RKNS_13ClosestPointsEdd
+         U _ZN2kp16ContactCandidate7orderedERKNS_11SmallVectorIS0_Ly16EEEd
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZdlPv
+         U _Znwy
+         U __gxx_personality_seh0
+         U memcpy
+
+ContactPatch.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10StepMemory4giveEPv
+         U _ZN2kp10StepMemory4takeEy
+         U _ZN2kp16ContactCandidate7orderedERKNS_11SmallVectorIS0_Ly16EEEd
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memmove
+         U sqrt
+
+ContactCandidate.cpp.obj:
+         U _Unwind_Resume
+         U _ZdlPv
+         U _Znwy
+         U __gxx_personality_seh0
+         U memcpy
+
+ConvexDecomposition.cpp.obj:
+         U _Unwind_Resume
+         U _ZN2kp10ConvexHull10fromPointsERKNSt3__16vectorINS_7Vector3ENS1_9allocatorIS3_EEEEd
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZNSt3__16__sortIRNS_6__lessIddEEPdEEvT0_S5_T_
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVN2kp10ConvexHullE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_begin_catch
+         U __cxa_end_catch
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memmove
+         U memset
+         U sqrt
+
+Meshes.cpp.obj:
+         U _Unwind_Resume
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U memset
+
+DebugGeometry.cpp.obj:
+         U _Unwind_Resume
+         U _ZNK2kp10PairFinder4treeEd
+         U _ZNK2kp10PairFinder5pairsEd
+         U _ZNK2kp4Path5pointEd
+         U _ZNSt11logic_errorC2EPKc
+         U _ZNSt12length_errorD1Ev
+         U _ZNSt20bad_array_new_lengthC1Ev
+         U _ZNSt20bad_array_new_lengthD1Ev
+         U _ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6appendEPKcy
+         U _ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6insertEyPKcy
+         U _ZNSt3__119__shared_weak_count14__release_weakEv
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U _ZTVN2kp10ConvexHullE
+         U _ZTVN2kp7CapsuleE
+         U _ZTVN2kp8CylinderE
+         U _ZTVN2kp9PathJointE
+         U _ZTVSt12length_error
+         U _ZdlPv
+         U _Znwy
+         U __cxa_allocate_exception
+         U __cxa_free_exception
+         U __cxa_throw
+         U __gxx_personality_seh0
+         U memcpy
+         U snprintf
+         U strlen

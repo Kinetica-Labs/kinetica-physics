@@ -1,0 +1,3 @@
+scene,external_steps,cache_hits,primary_rebuilds,uncached_builds,candidate_pairs_on_builds,box3d_awake_contact_observations,box3d_recycled,box3d_recycled_percent,box3d_pairs_ms,box3d_collide_ms,box3d_solver_ms
+pyramid1000,960,0,960,636,5075086,5681439,5329488,93.8052489870964,0.9980766656040144,4.56810166433333,5.512789165608337
+rain1000,960,658,302,0,48100,698700,694300,99.37025905252612,0.04224416686363482,0.5506649987579996,2.330380832450007

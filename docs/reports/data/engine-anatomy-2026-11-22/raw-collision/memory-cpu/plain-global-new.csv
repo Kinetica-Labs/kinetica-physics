@@ -1,0 +1,5 @@
+solver,phase,scalar_bytes,completed_frames,public_steps_in_completed_frames,global_new_calls,global_new_requested_B,complete
+coupled,construction,8,0,0,178,13056,1
+coupled,preload,8,15,120,979,762632,1
+coupled,loaded,8,15,120,960,758400,1
+coupled,destruction,8,0,0,0,0,1

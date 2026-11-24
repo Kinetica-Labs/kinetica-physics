@@ -1,0 +1,5 @@
+binary,input,press_x,press_y,held_shift5_m,final_shift5_m,others_over_5cm
+stress-support-viewer-fixed,ordinary,911,506,1.5223,1.6641,44
+stress-support-viewer-fixed,batched,911,506,0.0,0.0,0
+stress-support-viewer-input,ordinary,911,506,1.5057,1.5468,44
+stress-support-viewer-input,batched,911,506,1.5192,1.7026,44

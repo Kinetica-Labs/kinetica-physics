@@ -1,0 +1,37 @@
+{
+  "sha256": {
+    "control": "e87852abfca6acca4fac6acf95fe5cb0dfda7daa7aa29aa1d01eef0d67b82fc4",
+    "kinetica": "908be31274260c06bd92f8c4b52faca360b8c61b73a64dd712bc6de4d0a96105",
+    "rp3d": "26be0267fdb92ce901b8e4c8bb08e749a53717491cc96c5ddc4abc5f103b4a46",
+    "box3d": "70c4b9109af734d07bf57cc82259f974f0a9448316edbdba2c4da524cbed4caf",
+    "bullet-f64": "021836caffee4df824f209909f8de2ce6f1dab811a0c9c60970ce0aa83d9b84c"
+  },
+  "arguments": {
+    "control": [
+      "shared8"
+    ],
+    "kinetica": [
+      "shared8"
+    ],
+    "rp3d": [
+      "shared8"
+    ],
+    "box3d": [
+      "shared8"
+    ],
+    "bullet-f64": [
+      "shared8",
+      "8"
+    ]
+  },
+  "host": "DESKTOP-N3RC7NA",
+  "threads": 1,
+  "sleep": false,
+  "coupled_friction": true,
+  "steps_per_frame": 8,
+  "frames": 360,
+  "seed": 2026112307,
+  "independent_order_per_block": true,
+  "affinity": "0x100",
+  "blocks": 40
+}

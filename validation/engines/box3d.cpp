@@ -6,7 +6,7 @@
 //       build/box3d/src/libbox3d.a -lpthread -o build/box3d/compare-box3d
 //
 //   compare-box3d [ПОДШАГОВ [ГЦ_КОНТАКТА ГЦ_СОЧЛЕНЕНИЙ]]     по умолчанию 4 подшага, 30 и 60 Гц, как в Box3D
-#include "common.h"
+#include "stress/Stress1000.h"
 #include <box3d/box3d.h>
 
 #include <cstdlib>
@@ -34,12 +34,15 @@ int main(int argc, char** argv) {
     const float contactHertz = argc > 3 ? float(std::atof(argv[2])) : b3DefaultWorldDef().contactHertz;
     const float jointHertz = argc > 3 ? float(std::atof(argv[3])) : b3DefaultWeldJointDef().base.constraintHertz;
     const std::string stiffness = argc > 3 ? " " + std::string(argv[2]) + "/" + argv[3] + " Гц" : "";
-    compare("box3d " + std::to_string(substeps) + stiffness, [&](const SceneSpec& s, const Play& play) {
+    const bool stressRun = stress::requested();
+    if (stressRun) stress::require(substeps == 1, "stress requires one substep per external call");
+    stress::compareOrStress("box3d " + std::to_string(substeps) + stiffness, [&](const SceneSpec& s, const Play& play) {
         b3WorldDef wd = b3DefaultWorldDef();
         wd.contactHertz = contactHertz;
         wd.gravity = {0, -float(kGravity), 0};
         wd.enableSleep = false;
         const b3WorldId world = b3CreateWorld(&wd);
+        if (stressRun) b3World_EnableWarmStarting(world, true);
         std::vector<b3BodyId> ids;
         for (const BoxSpec& b : s.boxes) {
             b3BodyDef bd = b3DefaultBodyDef();
@@ -50,6 +53,7 @@ int main(int argc, char** argv) {
             b3ShapeDef sd = b3DefaultShapeDef();
             sd.density = float(b.density == 0 ? 1000 : b.density);
             sd.baseMaterial.friction = 0.5f;
+            if (stressRun) sd.baseMaterial.restitution = 0;
             b3BoxHull box = b3MakeBoxHull(float(b.half.x), float(b.half.y), float(b.half.z));
             b3CreateHullShape(id, &sd, &box.base);
             ids.push_back(id);

@@ -117,7 +117,7 @@ Body floorByName(const std::string& name) {
 int main(int argc, char** argv) {
     const int rate = argc > 1 ? std::atoi(argv[1]) : 60;
     const Real friction = argc > 2 ? Real(std::atof(argv[2])) : Real(0.5); // второй аргумент — коэффициент трения
-    const bool shockPropagation = argc > 3 && std::atoi(argv[3]) != 0;       // третий — проход ударной волны
+    const bool shockPropagation = argc > 3 ? std::atoi(argv[3]) != 0 : World::kDefaultShockPropagation;
     const std::string shape = argc > 4 ? argv[4] : "cube";  // четвёртый — тело: см. bodyByName
     const std::string floorKind = argc > 5 ? argv[5] : "plate"; // пятый — опора: plate — плита, disc — торец цилиндра, prism — многогранная призма
     std::vector<Sample> samples;

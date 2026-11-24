@@ -1,0 +1,12 @@
+{
+  "release_sha256": "186ad739bfccf1a4f550c6e4a920e031df90e7e602eef398c2294d1d99f32370",
+  "source_hashes": {
+    "dynamics/time_stepping/CoupledFriction": "be095cc7594ccc85664d3de6c62eabfe36c7435bff4e7b774e7fa8f57a16aa22",
+    "dynamics/time_stepping/DirectJoints": "d1884fbccff7fe8d71dba6bf6417953c2540da26b7239b361c0cf930f5170d56",
+    "dynamics/time_stepping/SoftStep": "73e82c9839c1019ac5d04567c612c8c8dcaa25a5ad19add9945b4f3ab65a8998",
+    "math/StepMemory": "ffed053d1f13d135bfb4559aaa88939e7f389390ab19338aa66d37535fcc6a4c"
+  },
+  "compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)",
+  "direct_rsp_memory_operands": "Static instructions with an explicit effective address based on rsp, excluding LEA and padding. Implicit push/pop/call/ret and rbp are excluded.",
+  "arithmetic": "SSE/AVX floating point add/sub/mul/div/sqrt/min/max/fmadd. Data moves and shuffles excluded. Counts are static, not event durations."
+}

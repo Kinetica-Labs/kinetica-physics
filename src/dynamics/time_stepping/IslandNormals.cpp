@@ -18,6 +18,22 @@ constexpr size_t kParallelRows = 256;       // меньше точек деше�
 
 } // namespace
 
+int IslandNormals::Island::localBody(int body, const std::vector<Body>& world, StepArray<int>& place) {
+    const Body& source = world[size_t(body)];
+    if (!source.isStatic() && place[size_t(body)] >= 0) return place[size_t(body)];
+    if (source.isStatic())
+        for (size_t k = 0; k < members.size(); ++k)
+            if (members[k] == body) return int(k);
+    Body slim;
+    slim.mass = source.mass;
+    slim.orientation = source.orientation;
+    const int index = int(members.size());
+    members.push_back(body);
+    bodies.push_back(slim);
+    if (!source.isStatic()) place[size_t(body)] = index;
+    return index;
+}
+
 // Островки — объединением тел, связанных контактами; неподвижное тело островков не связывает и
 // получает место в каждом островке, которого касается.
 void IslandNormals::choose(const StepArray<SoftContact>& contacts, const std::vector<Body>& bodies) {
@@ -33,26 +49,26 @@ void IslandNormals::choose(const StepArray<SoftContact>& contacts, const std::ve
         if (!bodies[size_t(row.a)].isStatic() && !bodies[size_t(row.b)].isStatic()) root[size_t(std::max(find(row.a), find(row.b)))] = std::min(find(row.a), find(row.b));
     }
     for (const SoftContact& contact : contacts) count[size_t(top(contact.normalRow(0)))] += int(contact.pointCount());
-    const auto seat = [&](Island& island, int body) {
-        const Body& source = bodies[size_t(body)];
-        if (!source.isStatic() && place[size_t(body)] >= 0) return place[size_t(body)];
-        for (size_t k = 0; source.isStatic() && k < island.members.size(); ++k)
-            if (island.members[k] == body) return int(k);
-        Body slim;
-        slim.mass = source.mass, slim.orientation = source.orientation;
-        island.members.push_back(body), island.bodies.push_back(slim);
-        return source.isStatic() ? int(island.members.size()) - 1 : place[size_t(body)] = int(island.members.size()) - 1;
-    };
-    direct_.assign(contacts.size(), 0), islands_.clear();
+    StepArray<size_t> freedoms(bodies.size(), 0);
+    for (size_t i = 0; i < bodies.size(); ++i)
+        if (!bodies[i].isStatic()) freedoms[size_t(find(int(i)))] += 6;
+    methods_.assign(contacts.size(), Method::Together), islands_.clear();
+    hasLayers_ = false;
     for (size_t c = 0; c < contacts.size(); ++c) {
         const SoftContact::NormalRow row = contacts[c].normalRow(0);
         const size_t leader = size_t(top(row));
-        if (count[leader] > rowLimit_) continue;
+        if (count[leader] > rowLimit_) {
+            // Сотни точек на нескольких составных телах дают мало независимых реакций.
+            // Обход по слоям нужен при большом числе степеней свободы самого острова.
+            const bool large = freedoms[leader] > size_t(std::max(0, rowLimit_));
+            methods_[c] = large ? Method::Layered : Method::Pairwise;
+            hasLayers_ |= large;
+            continue;
+        }
         if (islandOf[leader] < 0) islandOf[leader] = int(islands_.size()), islands_.emplace_back();
         Island& island = islands_[size_t(islandOf[leader])];
-        const int a = seat(island, row.a), b = seat(island, row.b);
+        const int a = island.localBody(row.a, bodies, place), b = island.localBody(row.b, bodies, place);
         for (size_t k = 0; k < contacts[c].pointCount(); ++k) island.rows.push_back({c, k, a, b});
-        direct_[c] = 1;
     }
     for (Island& island : islands_) island.working.assign(island.rows.size(), kOutside);
 }
@@ -69,10 +85,10 @@ Real IslandNormals::excess(const SoftContact::NormalRow& row, const StepArray<So
 // заданиями пула потоков, и ответ от числа потоков не зависит.
 void IslandNormals::solve(StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, bool withBias, Real h, Real pushSpeed,
                           const StepArray<char>* moving) {
-    if (direct_.size() != contacts.size()) choose(contacts, bodies);
+    if (methods_.size() != contacts.size()) choose(contacts, bodies);
     const auto stirs = [&](int body) { return !moving || (*moving)[size_t(body)]; };
     levels.each(contacts, states, [&](size_t c) {
-        if (!direct_[c] && (stirs(contacts[c].normalRow(0).a) || stirs(contacts[c].normalRow(0).b))) contacts[c].solveNormals(states, withBias, h, pushSpeed);
+        if (methods_[c] != Method::Together && (stirs(contacts[c].normalRow(0).a) || stirs(contacts[c].normalRow(0).b))) contacts[c].solveNormals(states, withBias, h, pushSpeed);
     });
     const Pass pass{withBias, h, pushSpeed};
     size_t rows = 0;
@@ -87,6 +103,14 @@ void IslandNormals::solve(StepArray<SoftContact>& contacts, const std::vector<Bo
 // Рабочий набор расширяется, пока вне его есть нарушенные точки. На выходе это решение полной
 // задачи: у точки вне набора λ = 0 и v_n ≥ цель, у точек набора дополнительность даёт ActiveSet.
 void IslandNormals::solveIsland(Island& island, StepArray<SoftContact>& contacts, const std::vector<Body>& bodies, StepArray<SolverBody>& states, const Pass& pass) const {
+    // Импульсы уже приложены. При дополнительности текущих скоростей поправка равна нулю.
+    constexpr Real speedTolerance = Real(1e-10); // м/с для точек под нагрузкой
+    const bool balanced = std::all_of(island.rows.begin(), island.rows.end(), [&](const Row& at) {
+        const auto row = contacts[at.contact].normalRow(at.point);
+        const Real residual = excess(row, states, pass);
+        return row.impulse > 0 ? abs(residual) <= speedTolerance : row.impulse == 0 && residual >= -kViolated;
+    });
+    if (balanced) return;
     for (size_t k = 0; k < island.members.size(); ++k) island.bodies[k].orientation = bodies[size_t(island.members[k])].orientation;
     for (size_t r = 0; r < island.rows.size(); ++r) island.working[r] = contacts[island.rows[r].contact].normalRow(island.rows[r].point).impulse > 0 ? kWorking : kOutside;
     // Предел — на всё решение островка: каждому расширению набора достаётся его остаток.
@@ -99,10 +123,19 @@ void IslandNormals::solveIsland(Island& island, StepArray<SoftContact>& contacts
 // Добавка kProximal (ActiveSet) держит ответ у прежнего: у четырёх точек на грани матрица
 // вырожденная, и без неё силу между ними можно распределить как угодно.
 int IslandNormals::solveWorking(Island& island, StepArray<SoftContact>& contacts, StepArray<SolverBody>& states, const Pass& pass, int allowed) const {
+    const size_t total = island.working.size() - size_t(std::count(island.working.begin(), island.working.end(), kOutside));
+    if (total == 0) return 0;
     ContactSystem system;
+    system.lines.reserve(total);
+    system.rows.reserve(total);
+    system.order.reserve(total);
     StepArray<size_t> listed;
     StepArray<Real> impulse, free;
     StepArray<char> pressing;
+    listed.reserve(total);
+    impulse.reserve(total);
+    free.reserve(total);
+    pressing.reserve(total);
     for (size_t r = 0; r < island.rows.size(); ++r) {
         if (island.working[r] == kOutside) continue;
         const Row& at = island.rows[r];
@@ -111,8 +144,6 @@ int IslandNormals::solveWorking(Island& island, StepArray<SoftContact>& contacts
         listed.push_back(r), impulse.push_back(row.impulse), free.push_back(excess(row, states, pass));
         pressing.push_back(row.impulse > 0 || island.working[r] == kEntered), island.working[r] = kWorking;
     }
-    const size_t total = listed.size();
-    if (total == 0) return 0;
     system.matrix = ContactSystem::responseMatrix(island.bodies, system.lines);
     system.diagonal.assign(total, 0), system.soft.assign(total, 0);
     for (size_t i = 0; i < total; ++i) {

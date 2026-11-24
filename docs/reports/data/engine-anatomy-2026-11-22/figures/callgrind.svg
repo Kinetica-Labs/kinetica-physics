@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="864pt" height="421.92pt" viewBox="0 0 864 421.92" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 421.92 
+L 864 421.92 
+L 864 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 190.08 341.7552 
+L 372.102472 341.7552 
+L 372.102472 143.4528 
+L 190.08 143.4528 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 190.08 158.32548 
+L 297.637919 158.32548 
+L 297.637919 178.15572 
+L 190.08 178.15572 
+z
+" clip-path="url(#p74ef50f373)" style="fill: #007277"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 190.08 207.90108 
+L 324.911461 207.90108 
+L 324.911461 227.73132 
+L 190.08 227.73132 
+z
+" clip-path="url(#p74ef50f373)" style="fill: #955508"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 190.08 257.47668 
+L 222.364202 257.47668 
+L 222.364202 277.30692 
+L 190.08 277.30692 
+z
+" clip-path="url(#p74ef50f373)" style="fill: #68429a"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 190.08 307.05228 
+L 234.461266 307.05228 
+L 234.461266 326.88252 
+L 190.08 326.88252 
+z
+" clip-path="url(#p74ef50f373)" style="fill: #285799"/>
+   </g>
+   <g id="matplotlib.axis_1"/>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_1"/>
+     <g id="text_1">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #506275" x="186.58" y="172.124975" transform="rotate(-0 186.58 172.124975)">Kinetica, базовый режим</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_2"/>
+     <g id="text_2">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #506275" x="186.58" y="221.615419" transform="rotate(-0 186.58 221.615419)">Kinetica, связанное трение</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_3"/>
+     <g id="text_3">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #506275" x="186.58" y="271.191019" transform="rotate(-0 186.58 271.191019)">Box3D</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_4"/>
+     <g id="text_4">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #506275" x="186.58" y="320.766619" transform="rotate(-0 186.58 320.766619)">RP3D</text>
+     </g>
+    </g>
+   </g>
+   <g id="line2d_5">
+    <path d="M 190.08 341.7552 
+L 190.08 143.4528 
+" clip-path="url(#p74ef50f373)" style="fill: none; stroke: #dce3e8; stroke-linecap: square"/>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="302.637919" y="170.724037" transform="rotate(-0 302.637919 170.724037)">681,3</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="329.911461" y="220.299637" transform="rotate(-0 329.911461 220.299637)">854,0</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="227.364202" y="269.875238" transform="rotate(-0 227.364202 269.875238)">204,5</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="239.461266" y="319.450837" transform="rotate(-0 239.461266 319.450837)">281,1</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172a3b" transform="translate(190.08 123.135206)">Инструкции</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172a3b" transform="translate(190.08 135.4528)">млн за процесс</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_7">
+    <path d="M 423.068764 341.7552 
+L 605.091236 341.7552 
+L 605.091236 143.4528 
+L 423.068764 143.4528 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 423.068764 158.32548 
+L 546.905492 158.32548 
+L 546.905492 178.15572 
+L 423.068764 178.15572 
+z
+" clip-path="url(#p8014cf29b3)" style="fill: #007277"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 423.068764 207.90108 
+L 557.900225 207.90108 
+L 557.900225 227.73132 
+L 423.068764 227.73132 
+z
+" clip-path="url(#p8014cf29b3)" style="fill: #955508"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 423.068764 257.47668 
+L 465.590353 257.47668 
+L 465.590353 277.30692 
+L 423.068764 277.30692 
+z
+" clip-path="url(#p8014cf29b3)" style="fill: #68429a"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 423.068764 307.05228 
+L 525.320124 307.05228 
+L 525.320124 326.88252 
+L 423.068764 326.88252 
+z
+" clip-path="url(#p8014cf29b3)" style="fill: #285799"/>
+   </g>
+   <g id="matplotlib.axis_3"/>
+   <g id="matplotlib.axis_4">
+    <g id="ytick_5">
+     <g id="line2d_6"/>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_7"/>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_8"/>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_9"/>
+    </g>
+   </g>
+   <g id="line2d_10">
+    <path d="M 423.068764 341.7552 
+L 423.068764 143.4528 
+" clip-path="url(#p8014cf29b3)" style="fill: none; stroke: #dce3e8; stroke-linecap: square"/>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="551.905492" y="170.724037" transform="rotate(-0 551.905492 170.724037)">1,59</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="562.900225" y="220.299637" transform="rotate(-0 562.900225 220.299637)">1,73</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="470.590353" y="269.875238" transform="rotate(-0 470.590353 269.875238)">0,54</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="530.320124" y="319.450837" transform="rotate(-0 530.320124 319.450837)">1,31</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172a3b" transform="translate(423.068764 122.910394)">Промахи L1D</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172a3b" transform="translate(423.068764 135.4528)">% обращений к данным</text>
+   </g>
+  </g>
+  <g id="axes_3">
+   <g id="patch_12">
+    <path d="M 656.057528 341.7552 
+L 838.08 341.7552 
+L 838.08 143.4528 
+L 656.057528 143.4528 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 656.057528 158.32548 
+L 779.261531 158.32548 
+L 779.261531 178.15572 
+L 656.057528 178.15572 
+z
+" clip-path="url(#pfe715b086f)" style="fill: #007277"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 656.057528 207.90108 
+L 790.888989 207.90108 
+L 790.888989 227.73132 
+L 656.057528 227.73132 
+z
+" clip-path="url(#pfe715b086f)" style="fill: #955508"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 656.057528 257.47668 
+L 696.460373 257.47668 
+L 696.460373 277.30692 
+L 656.057528 277.30692 
+z
+" clip-path="url(#pfe715b086f)" style="fill: #68429a"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 656.057528 307.05228 
+L 724.345868 307.05228 
+L 724.345868 326.88252 
+L 656.057528 326.88252 
+z
+" clip-path="url(#pfe715b086f)" style="fill: #285799"/>
+   </g>
+   <g id="matplotlib.axis_5"/>
+   <g id="matplotlib.axis_6">
+    <g id="ytick_9">
+     <g id="line2d_11"/>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_12"/>
+    </g>
+    <g id="ytick_11">
+     <g id="line2d_13"/>
+    </g>
+    <g id="ytick_12">
+     <g id="line2d_14"/>
+    </g>
+   </g>
+   <g id="line2d_15">
+    <path d="M 656.057528 341.7552 
+L 656.057528 143.4528 
+" clip-path="url(#pfe715b086f)" style="fill: none; stroke: #dce3e8; stroke-linecap: square"/>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="784.261531" y="170.724037" transform="rotate(-0 784.261531 170.724037)">7,84</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="795.888989" y="220.299637" transform="rotate(-0 795.888989 220.299637)">8,59</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="701.460373" y="269.875238" transform="rotate(-0 701.460373 269.875238)">2,57</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="729.345868" y="319.450837" transform="rotate(-0 729.345868 319.450837)">4,35</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172a3b" transform="translate(656.057528 123.135206)">Ошибки прогноза</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172a3b" transform="translate(656.057528 135.4528)">% условных переходов</text>
+   </g>
+  </g>
+  <g id="text_20">
+   <text style="font-weight: 700; font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172a3b" x="38.88" y="25.3152" transform="rotate(-0 38.88 25.3152)">Callgrind · работа одного процесса</text>
+  </g>
+  <g id="text_21">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #506275" x="39.744" y="50.6304" transform="rotate(-0 39.744 50.6304)">Сцена захвата на стенде Windows под WSL. Инструкции считает инструмент, кэш и предсказатель переходов моделируются.</text>
+  </g>
+  <g id="text_22">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #506275" x="38.88" y="383.10336" transform="rotate(-0 38.88 383.10336)">Итоги охватывают запуск, 27 сцен, 810 кадров и освобождение памяти. Каждый вариант проходит один инструментированный запуск.</text>
+  </g>
+  <g id="text_23">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #506275" x="38.88" y="402.51168" transform="rotate(-0 38.88 402.51168)">Частота промахов L1D учитывает чтения и записи. Частота ошибок прогноза рассчитана для условных переходов.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p74ef50f373">
+   <rect x="190.08" y="143.4528" width="182.022472" height="198.3024"/>
+  </clipPath>
+  <clipPath id="p8014cf29b3">
+   <rect x="423.068764" y="143.4528" width="182.022472" height="198.3024"/>
+  </clipPath>
+  <clipPath id="pfe715b086f">
+   <rect x="656.057528" y="143.4528" width="182.022472" height="198.3024"/>
+  </clipPath>
+ </defs>
+</svg>

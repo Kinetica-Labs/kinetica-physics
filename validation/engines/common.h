@@ -40,6 +40,7 @@ struct SceneSpec { const char* key; const char* name; std::vector<BoxSpec> boxes
 struct State { V3 at; Q turn; V3 v, w; bool asleep = false; };
 
 constexpr int kVariants = 16;
+constexpr double kScenePi = 3.14159265358979323846;
 constexpr double kGravity = 9.81, kWallBudget = 20; // м/с²; с настоящего времени на прогон
 
 inline double massOf(const BoxSpec& b) { return 8 * b.density * b.half.x * b.half.y * b.half.z; }
@@ -144,8 +145,8 @@ inline std::vector<SceneSpec> scenes() {
     SceneSpec column{"column100", "столбик из 100 кубов, падают с 1 см", {floor}, {}, 5, false, 2};
     for (int k = 0; k < 100; ++k) column.boxes.push_back({{0.1, 0.1, 0.1}, {0, 0.11 + 0.21 * k, 0}});
     all.push_back(column);
-    const double release = 2 * M_PI / 3;
-    all.push_back({"pendulum120", "маятник 120°", {{{0.05, 0.05, 0.05}, pivot, 0}, {{0.4, 0.03, 0.03}, pivot + 0.4 * V3{std::sin(release), -std::cos(release), 0}, 1000, aboutZ(release - M_PI / 2)}}, {{0, 1, pivot, false}}, 10, true});
+    const double release = 2 * kScenePi / 3;
+    all.push_back({"pendulum120", "маятник 120°", {{{0.05, 0.05, 0.05}, pivot, 0}, {{0.4, 0.03, 0.03}, pivot + 0.4 * V3{std::sin(release), -std::cos(release), 0}, 1000, aboutZ(release - kScenePi / 2)}}, {{0, 1, pivot, false}}, 10, true});
     SceneSpec beam{"beam6", "балка из 6 сваренных брусков", {{{0.05, 0.05, 0.05}, pivot, 0}}, {}, 5}, chain{"chain100", "цепь из 10 шарниров, груз 100:1", {{{0.05, 0.05, 0.05}, pivot, 0}}, {}, 5};
     for (int i = 0; i < 6; ++i) beam.boxes.push_back({bar, pivot + V3{0.1 + 0.2 * i, 0, 0}}), beam.joints.push_back({i, i + 1, pivot + V3{0.2 * i, 0, 0}, true});
     for (int i = 0; i < 10; ++i) chain.boxes.push_back({bar, pivot + V3{0.1 + 0.2 * i, 0, 0}, i == 9 ? 100000.0 : 1000.0}), chain.joints.push_back({i, i + 1, pivot + V3{0.2 * i, 0, 0}, false});
@@ -179,7 +180,7 @@ inline SceneSpec variant(SceneSpec s, int index) {
     for (auto& [height, layer] : layers) {
         const V3 shift{0.5e-3 * noise.uniform(), 0, 0.5e-3 * noise.uniform()};
         lift += 0.25e-3 * (1 + noise.uniform());
-        const double yaw = layer.size() == 1 ? 0.2 * M_PI / 180 * noise.uniform() : 0;
+        const double yaw = layer.size() == 1 ? 0.2 * kScenePi / 180 * noise.uniform() : 0;
         for (BoxSpec* b : layer) b->at = b->at + shift + V3{0, lift, 0}, b->turn = aboutY(yaw);
     }
     return s;
@@ -269,7 +270,7 @@ inline Outcome play(const SceneSpec& s, const Step& step, const Read& read, std:
     else o.numbers["overlap_mm"] = 1e3 * overlap, o.numbers["overlap_peak_mm"] = 1e3 * overlapPeak;
     if (s.pendulum) {
         const V3 r = end[1].at - s.boxes[0].at;
-        o.numbers["angle_err_rad"] = std::fabs(std::atan2(r.x, -r.y) - pendulumAngle(2 * M_PI / 3, 0.4, 0.03, frames / 60.0));
+        o.numbers["angle_err_rad"] = std::fabs(std::atan2(r.x, -r.y) - pendulumAngle(2 * kScenePi / 3, 0.4, 0.03, frames / 60.0));
     }
     return o;
 }

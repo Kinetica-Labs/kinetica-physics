@@ -1,0 +1,32 @@
+{
+  "host": "DESKTOP-N3RC7NA, Intel Xeon E5-2690 v3, Windows x64",
+  "compiler": "llvm-mingw clang 23.1.6, C++17, -O3 -DNDEBUG -march=haswell -ffp-contract=off, LTO",
+  "precision": "double",
+  "physical_frame_s": "1/60",
+  "substeps": 8,
+  "contact_updates_setting": 4,
+  "threads": 1,
+  "sleep": false,
+  "drag": 0,
+  "gravity_m_s2": [
+    0,
+    -9.81,
+    0
+  ],
+  "late_window_s": [
+    78,
+    86
+  ],
+  "late_frame_delta_E_threshold_J": 1e-08,
+  "stage_trace_matches_full_recorded_baseline_rows": 15483,
+  "video_source": "Запись экрана от 23.11.2026 20:55:44.webm",
+  "video_sha256": "2f9157b8c60b7bdeac385f395d9e3472b6f5aaaf66399ca09cae10b3f12f1e7b",
+  "sources": {
+    "validation/studies/anatomy/bucket_energy.cpp": "c07dd479237f247f01c56d99375aafce7687c5b9389c11796bdfe35c8d8599e2",
+    "src/dynamics/time_stepping/SoftStep.cpp": "3f22b64e219b436feedf322f381c357c074b6134907dab749ea40c629f2578b8",
+    "src/dynamics/time_stepping/IslandNormals.cpp": "d7cda17eefd303c5f4053e2b1c309bc02b1e4c4cd95be0c555b6bc91f9a6e191",
+    "src/dynamics/time_stepping/EquilibriumStep.cpp": "720bc5ded0e8edf2f745a817e2c259f3a46d65de5b5e65f5e13c3d5cbf64e074",
+    "examples/scenes/StandardScenes.cpp": "ad4fd7ea3207eb048b233eae0f76c8d80f3bb278e53ceca3314a94b2d9dc726c",
+    "viewer/ContactOverlay.h": "23cf4cf5078f185d9201b0b9847cdebf4ae88326c03c395c08ffbe6817e7e056"
+  }
+}

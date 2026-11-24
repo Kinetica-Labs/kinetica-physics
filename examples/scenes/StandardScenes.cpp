@@ -2,6 +2,7 @@
 #include <collision/ContactPair.h>
 #include <collision/shapes/Meshes.h>
 #include "StandardScenes.h"
+#include "BucketRim.h"
 
 #include <algorithm>
 #include <cmath>
@@ -636,6 +637,8 @@ std::string driftVerdict(const World& start, const World& now) {
 
 } // namespace
 
+kp::World bucketsOnRim() { return bucket_rim::releaseOnRim(nestedBuckets()); }
+
 const std::vector<StandardScene>& standardScenes() {
     static const std::vector<StandardScene> all = {
         {"stack", "стопка из десяти кубов", stack, 5, 5, stackVerdict, nullptr, {0, 2, 0}, 8},
@@ -656,7 +659,7 @@ const std::vector<StandardScene>& standardScenes() {
         {"hills", "холмы по карте высот", hills, 8, 8, hillsVerdict, nullptr, {0, 0.6, 0}, 9},
         {"swing", "раскачанная цепь: энергия не растёт", swingingChain, 40, 40, swingVerdict, nullptr, {0, 2, 0}, 6},
         {"drift", "куча без тяжести: импульс сохраняется", weightlessPile, 5, 5, driftVerdict, nullptr, {0, 0, 0}, 6},
-        {"rail", "вагонетка на кольцевом пути и коробка на спирали", rail, 7, 7, railVerdict, nullptr, {1.5, 1.2, 0}, 6},
+        {"rail", "сплайны — вагонетка на кольце и груз на спирали", rail, 7, 7, railVerdict, nullptr, {1.5, 1.2, 0}, 6},
         {"thrust", "ящик под постоянной силой и шар, висящий на силе под моментом", thrust, 2, 2, thrustVerdict, thrustControl, {-0.5, 0.6, 0.5}, 9},
         {"platforms", "поворотный стол, подъёмник и толкатель: тела, движимые извне", platforms, 6, 6, platformsVerdict, platformsControl, {1.3, 0.4, 0}, 10},
     };

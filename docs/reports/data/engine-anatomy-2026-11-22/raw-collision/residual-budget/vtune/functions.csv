@@ -1,0 +1,165 @@
+Function,CPU Time,CPU Time:Effective Time,CPU Time:Spin Time,CPU Time:Overhead Time,Module,Function (Full),Source File,Start Address
+[pincrt.dll],0.371178,0.371178,0.0,0.0,pincrt.dll,[pincrt.dll],[Unknown],0x0
+func@0x180020b2c,0.061915,0.061915,0.0,0.0,ucrtbase.dll,func@0x180020b2c,[Unknown],0x180020b2c
+kp::StepMemory::take,0.040733,0.040733,0.0,0.0,grip-loaded.exe,kp::StepMemory::take(unsigned long long),StepMemory.cpp,0x1400119a0
+malloc_base,0.030642,0.030642,0.0,0.0,ucrtbase.dll,malloc_base,[Unknown],0x18000fdb0
+"std::__1::vector<kp::Bond,std::__1::allocator<kp::Bond> >::push_back",0.019487,0.019487,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::Bond,std::__1::allocator<kp::Bond> >::push_back",vector.h,0x140049034
+kp::UpdatedCholesky::append,0.018782,0.018782,0.0,0.0,grip-loaded.exe,"kp::UpdatedCholesky::append(int, std::__1::vector<double, kp::StepAllocator<double>> const&, double, double)",UpdatedCholesky.cpp,0x140072790
+kp::ContactSystem::responseMatrix,0.018573,0.018573,0.0,0.0,grip-loaded.exe,"kp::ContactSystem::responseMatrix(kp::Span<kp::Body>, std::__1::vector<kp::ContactSystem::Line, kp::StepAllocator<kp::ContactSystem::Line>> const&)",ContactSystem.cpp,0x140060400
+kp::SoftContact::takePoints,0.011714,0.011714,0.0,0.0,grip-loaded.exe,"kp::SoftContact::takePoints(kp::ContactPair const&, kp::Vector3, kp::Vector3, kp::SolverBody const&, kp::SolverBody const&, kp::Span<std::__1::pair<kp::ContactId, kp::ContactForce>>, double, bool)",SoftContact.cpp,0x14003e350
+"std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::push_back",0.010243,0.010243,0.0,0.0,grip-loaded.exe,"std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::push_back",vector.h,0x140049e7b
+kp::StepMemory::give,0.009878,0.009878,0.0,0.0,grip-loaded.exe,kp::StepMemory::give(void*),StepMemory.cpp,0x140012090
+"std::__1::vector<kp::Body,kp::StepAllocator<kp::Body> >::push_back",0.009404,0.009404,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::Body,kp::StepAllocator<kp::Body> >::push_back",vector.h,0x14004d44a
+"std::__1::vector<kp::Bond,std::__1::allocator<kp::Bond> >::push_back",0.009039,0.009039,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::Bond,std::__1::allocator<kp::Bond> >::push_back",vector.h,0x14000de0a
+kp::Body::Body,0.008284,0.008284,0.0,0.0,grip-loaded.exe,kp::Body::Body,Body.h,0x1400464bf
+kp::Joint::turnLine,0.008258,0.008258,0.0,0.0,grip-loaded.exe,kp::Joint::turnLine,Joint.cpp,0x14000dbc3
+kp::Vector3::cross,0.008018,0.008018,0.0,0.0,grip-loaded.exe,kp::Vector3::cross,Vector3.h,0x140040810
+"std::__1::vector<double,kp::StepAllocator<double> >::resize",0.007726,0.007726,0.0,0.0,grip-loaded.exe,"std::__1::vector<double,kp::StepAllocator<double> >::resize(unsigned __int64, const double & const)",vector.h,0x140018d70
+kp::ContactId::samePair,0.007687,0.007687,0.0,0.0,grip-loaded.exe,kp::ContactId::samePair,ContactForces.h,0x140026880
+std::__1::min,0.007583,0.007583,0.0,0.0,grip-loaded.exe,std::__1::min,min.h,0x140049267
+const,0.007007,0.007007,0.0,0.0,grip-loaded.exe,const,SoftContact.cpp,0x140042ee0
+"std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::push_back",0.006534,0.006534,0.0,0.0,grip-loaded.exe,"std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::push_back",vector.h,0x14006ecad
+kp::`anonymous namespace'::JointRows::build,0.006017,0.006017,0.0,0.0,grip-loaded.exe,"kp::`anonymous namespace'::JointRows::build(const class kp::JointSet & const, const class std::__1::vector<kp::Body,std::__1::allocator<kp::Body> > & const, const class std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> > & const, class std::__1::vector<std::__1::vector<double,std::__1::allocator<double> >,std::__1::allocator<std::__1::vector<double,std::__1::allocator<double> > > > & const, bool)",SoftStep.cpp,0x140024590
+kp::operator+=,0.005945,0.005945,0.0,0.0,grip-loaded.exe,kp::operator+=,Vector3.h,0x140043248
+kp::`anonymous namespace'::Moving::advance::<lambda1>::operator(),0.005776,0.005776,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::Moving::advance::<lambda1>::operator()(unsigned __int64),SoftStep.cpp,0x140024bc0
+kp::SetFactor::append,0.005732,0.005732,0.0,0.0,grip-loaded.exe,kp::SetFactor::append(unsigned long long),SetFactor.cpp,0x14006eb70
+kp::StepAllocator<int>::allocate,0.005697,0.005697,0.0,0.0,grip-loaded.exe,kp::StepAllocator<int>::allocate,StepMemory.h,0x140049632
+"std::__1::vector<kp::PairFinder::Found::Pair,kp::StepAllocator<kp::PairFinder::Found::Pair> >::~vector",0.005620,0.005620,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::PairFinder::Found::Pair,kp::StepAllocator<kp::PairFinder::Found::Pair> >::~vector",vector.h,0x14001cbbb
+kp::ContactPair::ContactPair,0.005220,0.005220,0.0,0.0,grip-loaded.exe,kp::ContactPair::ContactPair,ContactPair.h,0x14001e6a6
+kp::`anonymous namespace'::Reserve::take,0.005134,0.005134,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::Reserve::take,StepMemory.cpp,0x140011a2f
+"kp::solveFactored<std::__1::vector<char,kp::StepAllocator<char> >,std::__1::vector<double,kp::StepAllocator<double> > >",0.005075,0.005075,0.0,0.0,grip-loaded.exe,"kp::solveFactored<std::__1::vector<char,kp::StepAllocator<char> >,std::__1::vector<double,kp::StepAllocator<double> > >(const struct kp::ProfileMatrix & const, const class std::__1::vector<char,kp::StepAllocator<char> > & const, class std::__1::vector<double,kp::StepAllocator<double> > & const)",ProfileMatrix.h,0x14004a540
+"std::__1::vector<char,kp::StepAllocator<char> >::~vector",0.005027,0.005027,0.0,0.0,grip-loaded.exe,"std::__1::vector<char,kp::StepAllocator<char> >::~vector",vector.h,0x14005200a
+"std::__1::vector<kp::Bond,std::__1::allocator<kp::Bond> >::size",0.004829,0.004829,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::Bond,std::__1::allocator<kp::Bond> >::size",vector.h,0x140024747
+const,0.004726,0.004726,0.0,0.0,grip-loaded.exe,const,DirectJoints.cpp,0x140049a40
+kp::maxPointSpeed,0.004660,0.004660,0.0,0.0,grip-loaded.exe,kp::maxPointSpeed(kp::Body const&),ContactPair.cpp,0x140038e30
+"std::__1::vector<kp::Body,std::__1::allocator<kp::Body> >::operator[]",0.004584,0.004584,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::Body,std::__1::allocator<kp::Body> >::operator[]",vector.h,0x14000c4be
+std::__1::lock_guard<std::__1::mutex>::lock_guard,0.004546,0.004546,0.0,0.0,grip-loaded.exe,std::__1::lock_guard<std::__1::mutex>::lock_guard,lock_guard.h,0x140011840
+"kp::factorCholesky<std::__1::vector<char,kp::StepAllocator<char> > >",0.004482,0.004482,0.0,0.0,grip-loaded.exe,"kp::factorCholesky<std::__1::vector<char,kp::StepAllocator<char> > >(struct kp::ProfileMatrix & const, class std::__1::vector<char,kp::StepAllocator<char> > & const, double)",ProfileMatrix.h,0x140049f50
+const,0.004447,0.004447,0.0,0.0,grip-loaded.exe,const,CandidateMemory.cpp,0x14003b7b0
+kp::PairReach::allow,0.004389,0.004389,0.0,0.0,grip-loaded.exe,"kp::PairReach::allow(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, double)",PairReach.cpp,0x140046b10
+kp::Vector3::dot,0.004327,0.004327,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x140046c40
+"std::__1::vector<kp::PairFinder::Found,kp::StepAllocator<kp::PairFinder::Found> >::~vector",0.004313,0.004313,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::PairFinder::Found,kp::StepAllocator<kp::PairFinder::Found> >::~vector",vector.h,0x14001d32a
+const,0.004286,0.004286,0.0,0.0,grip-loaded.exe,const,SoftStep.cpp,0x1400203e0
+"std::__1::vector<kp::ContactSystem::Entry,kp::StepAllocator<kp::ContactSystem::Entry> >::assign",0.004215,0.004215,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::ContactSystem::Entry,kp::StepAllocator<kp::ContactSystem::Entry> >::assign",vector.h,0x140060e20
+[Unknown stack frame(s)],0.004201,0.004201,0.0,0.0,[Unknown],[Unknown stack frame(s)],[Unknown],0x0
+`anonymous namespace'::Rig::advance,0.004158,0.004158,0.0,0.0,grip-loaded.exe,`anonymous namespace'::Rig::advance,GripLimit.cpp,0x1400058c7
+RtlInitUnicodeString,0.004110,0.004110,0.0,0.0,ntdll.dll,RtlInitUnicodeString,[Unknown],0x18003ba40
+CreateMailslotA,0.004091,0.004091,0.0,0.0,KERNEL32.DLL,CreateMailslotA,[Unknown],0x18001c1a0
+kp::Vector3::dot,0.004013,0.004013,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x1400494a2
+kp::ActiveSet::descend,0.003941,0.003941,0.0,0.0,grip-loaded.exe,"kp::ActiveSet::descend(std::__1::vector<double, kp::StepAllocator<double>>&)",ActiveSet.cpp,0x140061ac0
+kp::Vector3::dot,0.003812,0.003812,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x1400494dc
+kp::maxPointSpeed::<lambda0>::operator(),0.003790,0.003790,0.0,0.0,grip-loaded.exe,kp::maxPointSpeed::<lambda0>::operator(),ContactPair.cpp,0x14003914c
+kp::abs,0.003789,0.003789,0.0,0.0,grip-loaded.exe,kp::abs,math_functions.h,0x1400661bf
+"std::__1::vector<double,kp::StepAllocator<double> >::operator[]",0.003784,0.003784,0.0,0.0,grip-loaded.exe,"std::__1::vector<double,kp::StepAllocator<double> >::operator[]",vector.h,0x1400657ec
+kp::CentreFriction::prepare,0.003781,0.003781,0.0,0.0,grip-loaded.exe,"kp::CentreFriction::prepare(kp::SolverBody const&, kp::SolverBody const&, kp::CentreFriction::Frame const&, kp::CentreFriction::Carried const&)",CentreFriction.cpp,0x14005ee40
+"std::__1::vector<int,kp::StepAllocator<int> >::push_back",0.003752,0.003752,0.0,0.0,grip-loaded.exe,"std::__1::vector<int,kp::StepAllocator<int> >::push_back",vector.h,0x140072a82
+grip::timeLoadedFrames,0.003744,0.003744,0.0,0.0,grip-loaded.exe,grip::timeLoadedFrames,GripLimit.h,0x140005682
+kp::DirectJoints::assemble,0.003723,0.003723,0.0,0.0,grip-loaded.exe,"kp::DirectJoints::assemble(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&)",DirectJoints.cpp,0x1400490d0
+const,0.003719,0.003719,0.0,0.0,grip-loaded.exe,const,DirectJoints.cpp,0x140049790
+kp::Vector3::dot,0.003704,0.003704,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x14005f3da
+const,0.003697,0.003697,0.0,0.0,grip-loaded.exe,const,IslandNormals.cpp,0x14004db40
+kp::operator*,0.003662,0.003662,0.0,0.0,grip-loaded.exe,kp::operator*,Vector3.h,0x14003d16b
+kp::IslandNormals::choose,0.003635,0.003635,0.0,0.0,grip-loaded.exe,"kp::IslandNormals::choose(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&)",IslandNormals.cpp,0x14004c7a0
+kp::StepAllocator<int>::allocate,0.003627,0.003627,0.0,0.0,grip-loaded.exe,kp::StepAllocator<int>::allocate,StepMemory.h,0x140043988
+std::__1::count,0.003604,0.003604,0.0,0.0,grip-loaded.exe,std::__1::count,count.h,0x14004dd0c
+kp::ProfileMatrix::addRow,0.003594,0.003594,0.0,0.0,grip-loaded.exe,kp::ProfileMatrix::addRow(int),ProfileMatrix.h,0x140049e50
+const,0.003574,0.003574,0.0,0.0,grip-loaded.exe,const,Joint.cpp,0x14000c3f0
+"std::__1::vector<char,std::__1::allocator<char> >::assign",0.003535,0.003535,0.0,0.0,grip-loaded.exe,"std::__1::vector<char,std::__1::allocator<char> >::assign",vector.h,0x140063a9a
+"std::__1::vector<double,kp::StepAllocator<double> >::reserve",0.003534,0.003534,0.0,0.0,grip-loaded.exe,"std::__1::vector<double,kp::StepAllocator<double> >::reserve",vector.h,0x1400446b9
+const,0.003525,0.003525,0.0,0.0,grip-loaded.exe,const,ConvexHull.cpp,0x140009bc0
+kp::IslandNormals::choose::<lambda0>::operator(),0.003505,0.003505,0.0,0.0,grip-loaded.exe,"kp::IslandNormals::choose::<lambda0>::operator()(struct kp::IslandNormals::Island & const, int)",IslandNormals.cpp,0x14004d270
+"std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::size",0.003467,0.003467,0.0,0.0,grip-loaded.exe,"std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::size",vector.h,0x14006ec47
+std::__1::sort,0.003442,0.003442,0.0,0.0,grip-loaded.exe,std::__1::sort,sort.h,0x140046965
+"std::__1::vector<kp::ContactSystem::Line,kp::StepAllocator<kp::ContactSystem::Line> >::operator[]",0.003312,0.003312,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::ContactSystem::Line,kp::StepAllocator<kp::ContactSystem::Line> >::operator[]",vector.h,0x140060c74
+kp::Vector3::cross,0.003235,0.003235,0.0,0.0,grip-loaded.exe,kp::Vector3::cross,Vector3.h,0x14000ee8e
+[libc++.dll],0.003131,0.003131,0.0,0.0,libc++.dll,[libc++.dll],[Unknown],0x0
+kp::sinCos,0.003129,0.003129,0.0,0.0,grip-loaded.exe,kp::sinCos,math_functions.h,0x14003653d
+kp::operator*,0.003072,0.003072,0.0,0.0,grip-loaded.exe,kp::operator*,Quaternion.h,0x140040238
+"std::__1::vector<int,kp::StepAllocator<int> >::push_back",0.003046,0.003046,0.0,0.0,grip-loaded.exe,"std::__1::vector<int,kp::StepAllocator<int> >::push_back",vector.h,0x140049ee2
+kp::Vector3::dot,0.003025,0.003025,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x140043231
+"std::__1::vector<kp::PairReach::Path,kp::StepAllocator<kp::PairReach::Path> >::assign",0.003010,0.003010,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::PairReach::Path,kp::StepAllocator<kp::PairReach::Path> >::assign(unsigned __int64, const struct kp::PairReach::Path & const)",vector.h,0x1400471c0
+kp::ProfileMatrix::at,0.002984,0.002984,0.0,0.0,grip-loaded.exe,kp::ProfileMatrix::at,ProfileMatrix.h,0x140063be0
+kp::operator*,0.002977,0.002977,0.0,0.0,grip-loaded.exe,kp::operator*,Vector3.h,0x1400251ed
+"std::__1::vector<kp::ContactSystem::Entry,kp::StepAllocator<kp::ContactSystem::Entry> >::end",0.002949,0.002949,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::ContactSystem::Entry,kp::StepAllocator<kp::ContactSystem::Entry> >::end",vector.h,0x14006ec06
+std::__1::__wrap_iter<const char *>::operator++,0.002841,0.002841,0.0,0.0,grip-loaded.exe,std::__1::__wrap_iter<const char *>::operator++,wrap_iter.h,0x1400126a7
+kp::Vector3::dot,0.002836,0.002836,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x1400493b6
+kp::Quaternion::rotate,0.002795,0.002795,0.0,0.0,grip-loaded.exe,kp::Quaternion::rotate,Quaternion.h,0x14000c739
+"std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::push_back",0.002764,0.002764,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::push_back",vector.h,0x14003f542
+kp::`anonymous namespace'::GuideRhs::operator-=,0.002745,0.002745,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::GuideRhs::operator-=,CoupledFriction.cpp,0x140065a03
+"std::__1::vector<double,kp::StepAllocator<double> >::resize",0.002723,0.002723,0.0,0.0,grip-loaded.exe,"std::__1::vector<double,kp::StepAllocator<double> >::resize(unsigned __int64)",vector.h,0x14006eed0
+kp::operator+,0.002669,0.002669,0.0,0.0,grip-loaded.exe,kp::operator+,Vector3.h,0x14002650c
+const,0.002645,0.002645,0.0,0.0,grip-loaded.exe,const,UpdatedCholesky.cpp,0x1400730c0
+kp::Vector3::dot,0.002592,0.002592,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x14006bdba
+"kp::factorCholesky<std::__1::vector<char,std::__1::allocator<char> > >",0.002592,0.002592,0.0,0.0,grip-loaded.exe,"kp::factorCholesky<std::__1::vector<char,std::__1::allocator<char> > >(struct kp::ProfileMatrix & const, class std::__1::vector<char,std::__1::allocator<char> > & const, double)",ProfileMatrix.h,0x140063a60
+[Import thunk memset],0.002571,0.002571,0.0,0.0,grip-loaded.exe,[Import thunk memset],[Unknown],0x14007af30
+kp::Vector3::length,0.002549,0.002549,0.0,0.0,grip-loaded.exe,kp::Vector3::length,Vector3.h,0x140046c9e
+const,0.002545,0.002545,0.0,0.0,grip-loaded.exe,const,World.cpp,0x14000f290
+"std::__1::vector<kp::Bond,std::__1::allocator<kp::Bond> >::push_back",0.002529,0.002529,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::Bond,std::__1::allocator<kp::Bond> >::push_back",vector.h,0x14000d9b7
+kp::Vector3::dot,0.002489,0.002489,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x140009bff
+"std::__1::vector<kp::MassProperties,std::__1::allocator<kp::MassProperties> >::resize",0.002445,0.002445,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::MassProperties,std::__1::allocator<kp::MassProperties> >::resize(unsigned __int64)",vector.h,0x140013e20
+std::__1::mutex::unlock,0.002397,0.002397,0.0,0.0,libc++.dll,std::__1::mutex::unlock(void),[Unknown],0x180053100
+kp::Vector3::dot,0.002367,0.002367,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x14003f782
+kp::StepAllocator<kp::SoftContact::Point>::allocate,0.002334,0.002334,0.0,0.0,grip-loaded.exe,kp::StepAllocator<kp::SoftContact::Point>::allocate,StepMemory.h,0x14003ed55
+std::__1::__wrap_iter<unsigned long long *>::operator++,0.002272,0.002272,0.0,0.0,grip-loaded.exe,std::__1::__wrap_iter<unsigned long long *>::operator++,wrap_iter.h,0x140062ec3
+std::__1::remove_if,0.002257,0.002257,0.0,0.0,grip-loaded.exe,std::__1::remove_if,remove_if.h,0x14001d8ea
+"std::__1::vector<kp::Bond,std::__1::allocator<kp::Bond> >::reserve",0.002220,0.002220,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::Bond,std::__1::allocator<kp::Bond> >::reserve",vector.h,0x1400245e6
+operator new,0.002215,0.002215,0.0,0.0,libc++.dll,operator new(unsigned long long),[Unknown],0x180024850
+const,0.002170,0.002170,0.0,0.0,grip-loaded.exe,const,CoupledFriction.cpp,0x1400642e0
+const,0.002140,0.002140,0.0,0.0,grip-loaded.exe,const,SliderJoint.cpp,0x1400108a0
+"std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::operator=",0.002126,0.002126,0.0,0.0,grip-loaded.exe,"std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::operator=",vector.h,0x140048fc6
+kp::`anonymous namespace'::freeSpinUp,0.002084,0.002084,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::freeSpinUp(const struct kp::Body & const),Joint.cpp,0x14000cd70
+std::__1::__wrap_iter<kp::ContactSystem::Entry *>::operator++,0.002030,0.002030,0.0,0.0,grip-loaded.exe,std::__1::__wrap_iter<kp::ContactSystem::Entry *>::operator++,wrap_iter.h,0x14004e8e6
+getenv,0.001915,0.001915,0.0,0.0,ucrtbase.dll,getenv,[Unknown],0x180020b20
+kp::RollingFriction::prepare,0.001901,0.001901,0.0,0.0,grip-loaded.exe,"kp::RollingFriction::prepare(kp::SolverBody const&, kp::SolverBody const&, kp::Vector3, kp::Vector3)",RollingFriction.cpp,0x14006bd50
+"std::__1::vector<char,kp::StepAllocator<char> >::push_back",0.001880,0.001880,0.0,0.0,grip-loaded.exe,"std::__1::vector<char,kp::StepAllocator<char> >::push_back",vector.h,0x14004e247
+kp::Vector3::Vector3,0.001876,0.001876,0.0,0.0,grip-loaded.exe,kp::Vector3::Vector3,Vector3.h,0x140020620
+"std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator[]",0.001834,0.001834,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::SolverBody,kp::StepAllocator<kp::SolverBody> >::operator[]",vector.h,0x1400216c7
+"std::__1::vector<kp::`anonymous namespace'::GuideRhs,kp::StepAllocator<kp::`anonymous namespace'::GuideRhs> >::vector",0.001819,0.001819,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::`anonymous namespace'::GuideRhs,kp::StepAllocator<kp::`anonymous namespace'::GuideRhs> >::vector",vector.h,0x140065765
+kp::operator+,0.001808,0.001808,0.0,0.0,grip-loaded.exe,kp::operator+,Vector3.h,0x14000ef85
+kp::`anonymous namespace'::projectedSystem,0.001796,0.001796,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::projectedSystem,CoupledFriction.cpp,0x140064b97
+kp::`anonymous namespace'::Moving::sync,0.001786,0.001786,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::Moving::sync,SoftStep.cpp,0x140021fa5
+"std::__1::vector<int,kp::StepAllocator<int> >::vector",0.001767,0.001767,0.0,0.0,grip-loaded.exe,"std::__1::vector<int,kp::StepAllocator<int> >::vector",vector.h,0x14004c87a
+kp::SoftContact::follow,0.001753,0.001753,0.0,0.0,grip-loaded.exe,"kp::SoftContact::follow(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&)",SoftContact.cpp,0x14003ffc0
+const,0.001703,0.001703,0.0,0.0,grip-loaded.exe,const,Body.h,0x14000ec20
+std::__1::function<void (unsigned long long)>::~function,0.001679,0.001679,0.0,0.0,grip-loaded.exe,std::__1::function<void (unsigned long long)>::~function,function.h,0x140051ff3
+kp::MissedContacts::find,0.001668,0.001668,0.0,0.0,grip-loaded.exe,"kp::MissedContacts::find(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, double, std::__1::function<kp::SoftContact (kp::ContactPair const&)> const&)",MissedContacts.cpp,0x140044dc0
+kp::Vector3::dot,0.001655,0.001655,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x14000d8b0
+kp::ProfileMatrix::at,0.001636,0.001636,0.0,0.0,grip-loaded.exe,kp::ProfileMatrix::at,ProfileMatrix.h,0x140049438
+"kp::solveFactored<std::__1::vector<char,std::__1::allocator<char> >,std::__1::array<double,4> >",0.001580,0.001580,0.0,0.0,grip-loaded.exe,"kp::solveFactored<std::__1::vector<char,std::__1::allocator<char> >,std::__1::array<double,4> >(const struct kp::ProfileMatrix & const, const class std::__1::vector<char,std::__1::allocator<char> > & const, struct std::__1::array<double,4> & const)",ProfileMatrix.h,0x140066cc0
+kp::Quaternion::fromRotationVector,0.001427,0.001427,0.0,0.0,grip-loaded.exe,kp::Quaternion::fromRotationVector(kp::Vector3),Quaternion.cpp,0x1400364e0
+kp::`anonymous namespace'::Components::join,0.001399,0.001399,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::Components::join,FrictionIslands.cpp,0x140051670
+"std::__1::vector<std::__1::vector<double,std::__1::allocator<double> >,std::__1::allocator<std::__1::vector<double,std::__1::allocator<double> > > >::resize",0.001368,0.001368,0.0,0.0,grip-loaded.exe,"std::__1::vector<std::__1::vector<double,std::__1::allocator<double> >,std::__1::allocator<std::__1::vector<double,std::__1::allocator<double> > > >::resize(unsigned __int64)",vector.h,0x140025da0
+"std::__1::vector<double,kp::StepAllocator<double> >::vector",0.001341,0.001341,0.0,0.0,grip-loaded.exe,"std::__1::vector<double,kp::StepAllocator<double> >::vector",vector.h,0x140049a7e
+kp::PairFinder::Found::Found,0.001327,0.001327,0.0,0.0,grip-loaded.exe,kp::PairFinder::Found::Found(kp::PairFinder::Found const&),PairFinder.h,0x14001dc50
+kp::Vector3::dot,0.001313,0.001313,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x14005f07a
+func@0x1800c5600,0.001300,0.0,0.001300,0.0,KERNELBASE.dll,func@0x1800c5600,[Unknown],0x1800c5600
+kp::IslandSleep::wakeTouched,0.001295,0.001295,0.0,0.0,grip-loaded.exe,"kp::IslandSleep::wakeTouched(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, kp::JointSet const&, kp::Vector3, double, bool)",IslandSleep.cpp,0x140012bc0
+"std::__1::vector<double,kp::StepAllocator<double> >::vector",0.001221,0.001221,0.0,0.0,grip-loaded.exe,"std::__1::vector<double,kp::StepAllocator<double> >::vector",vector.h,0x140044ef3
+"std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::push_back",0.001184,0.001184,0.0,0.0,grip-loaded.exe,"std::__1::vector<unsigned long long,kp::StepAllocator<unsigned long long> >::push_back",vector.h,0x140072abc
+kp::`anonymous namespace'::Moving::poses,0.001182,0.001182,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::Moving::poses,SoftStep.cpp,0x140021288
+kp::operator*,0.001142,0.001142,0.0,0.0,grip-loaded.exe,kp::operator*,Quaternion.h,0x14000c518
+"std::__1::vector<double *,kp::StepAllocator<double *> >::vector",0.001083,0.001083,0.0,0.0,grip-loaded.exe,"std::__1::vector<double *,kp::StepAllocator<double *> >::vector",vector.h,0x1400217b4
+kp::`anonymous namespace'::operator/,0.001079,0.001079,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::operator/,CoupledFriction.cpp,0x140065978
+kp::SoftContact::aim,0.001067,0.001067,0.0,0.0,grip-loaded.exe,"kp::SoftContact::aim(kp::BodyMotion const&, kp::BodyMotion const&, kp::Vector3, kp::ClosestPoints const*)",SoftContact.cpp,0x14003f930
+std::__1::shared_ptr<const kp::ConvexShape>::~shared_ptr,0.001064,0.001064,0.0,0.0,grip-loaded.exe,std::__1::shared_ptr<const kp::ConvexShape>::~shared_ptr,shared_ptr.h,0x140046684
+"std::__1::vector<char,kp::StepAllocator<char> >::assign",0.001005,0.001005,0.0,0.0,grip-loaded.exe,"std::__1::vector<char,kp::StepAllocator<char> >::assign",vector.h,0x140049f8a
+kp::Quaternion::rotate,0.000930,0.000930,0.0,0.0,grip-loaded.exe,kp::Quaternion::rotate,Quaternion.h,0x14003d029
+kp::operator+=,0.000922,0.000922,0.0,0.0,grip-loaded.exe,kp::operator+=,Vector3.h,0x1400650c4
+kp::`anonymous namespace'::eachOf,0.000834,0.000834,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::eachOf,SoftStep.cpp,0x140022e12
+"std::__1::vector<double,kp::StepAllocator<double> >::push_back",0.000742,0.000742,0.0,0.0,grip-loaded.exe,"std::__1::vector<double,kp::StepAllocator<double> >::push_back",vector.h,0x140044a7e
+kp::Vector3::cross,0.000719,0.000719,0.0,0.0,grip-loaded.exe,kp::Vector3::cross,Vector3.h,0x14004e3a0
+kp::`anonymous namespace'::UnitResponse::operator[],0.000696,0.000696,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::UnitResponse::operator[],CoupledFriction.cpp,0x14006556a
+kp::Quaternion::rotate,0.000692,0.000692,0.0,0.0,grip-loaded.exe,kp::Quaternion::rotate,Quaternion.h,0x1400408d4
+kp::Vector3::cross,0.000687,0.000687,0.0,0.0,grip-loaded.exe,kp::Vector3::cross,Vector3.h,0x14000c995
+kp::Body::Body,0.000670,0.000670,0.0,0.0,grip-loaded.exe,kp::Body::Body,Body.h,0x14004f8a0
+kp::`anonymous namespace'::mergeColumns,0.000632,0.000632,0.0,0.0,grip-loaded.exe,kp::`anonymous namespace'::mergeColumns,ContactSystem.cpp,0x140060e20
+kp::Vector3::dot,0.000482,0.000482,0.0,0.0,grip-loaded.exe,kp::Vector3::dot,Vector3.h,0x14003913a
+"std::__1::vector<double *,kp::StepAllocator<double *> >::push_back",0.000446,0.000446,0.0,0.0,grip-loaded.exe,"std::__1::vector<double *,kp::StepAllocator<double *> >::push_back",vector.h,0x140049074
+"std::__1::vector<kp::IslandNormals::Island,kp::StepAllocator<kp::IslandNormals::Island> >::emplace_back",0.000442,0.000442,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::IslandNormals::Island,kp::StepAllocator<kp::IslandNormals::Island> >::emplace_back",vector.h,0x14004ce58
+kp::CoupledFriction::solve,0.000440,0.000440,0.0,0.0,grip-loaded.exe,"kp::CoupledFriction::solve(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, double, double)",CoupledFriction.cpp,0x140064890
+std::__1::function<void (kp::StepStage)>::operator bool,0.000432,0.000432,0.0,0.0,grip-loaded.exe,std::__1::function<void (kp::StepStage)>::operator bool,function.h,0x14000f98f
+"std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::reserve",0.000397,0.000397,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::SoftContact::Point,kp::StepAllocator<kp::SoftContact::Point> >::reserve",vector.h,0x14003ed12
+kp::World::step,0.000355,0.000355,0.0,0.0,grip-loaded.exe,kp::World::step(double),World.cpp,0x14000f4b0
+"std::__1::vector<char,kp::StepAllocator<char> >::push_back",0.000288,0.000288,0.0,0.0,grip-loaded.exe,"std::__1::vector<char,kp::StepAllocator<char> >::push_back",vector.h,0x140072af6
+"std::__1::vector<kp::ContactSystem::Entry,kp::StepAllocator<kp::ContactSystem::Entry> >::push_back",0.000262,0.000262,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::ContactSystem::Entry,kp::StepAllocator<kp::ContactSystem::Entry> >::push_back",vector.h,0x140060f50
+"std::__1::vector<kp::ContactSystem::Line,kp::StepAllocator<kp::ContactSystem::Line> >::operator[]",0.000255,0.000255,0.0,0.0,grip-loaded.exe,"std::__1::vector<kp::ContactSystem::Line,kp::StepAllocator<kp::ContactSystem::Line> >::operator[]",vector.h,0x140060690

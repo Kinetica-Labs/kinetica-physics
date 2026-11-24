@@ -1,0 +1,66 @@
+Function,CPU Time,CPU Time:Effective Time,CPU Time:Spin Time,CPU Time:Overhead Time,Module,Function (Full),Source File,Start Address
+kp::PairFinder::collect,0.980191,0.980191,0.0,0.0,kinetica.exe,"kp::PairFinder::collect(double, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>>&) const",[Unknown],0x14001a630
+func@0x14005b190,0.498207,0.498207,0.0,0.0,kinetica.exe,func@0x14005b190,[Unknown],0x14005b190
+kp::scanAxes.llvm.6462570217296240778,0.342673,0.342673,0.0,0.0,kinetica.exe,"kp::scanAxes(kp::TransformedHull const&, kp::TransformedHull const&, double, double&).llvm.6462570217296240778",[Unknown],0x140059710
+kp::ConvexHull::support,0.233553,0.233553,0.0,0.0,kinetica.exe,kp::ConvexHull::support(kp::Vector3) const,[Unknown],0x140010fc0
+kp::DynamicTree::insert,0.218001,0.218001,0.0,0.0,kinetica.exe,"kp::DynamicTree::insert(kp::Bounds const&, int)",[Unknown],0x140032ec0
+kp::SoftContact::SoftContact,0.202231,0.202231,0.0,0.0,kinetica.exe,"kp::SoftContact::SoftContact(kp::ContactPair const&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, kp::Softness const&, kp::Span<std::__1::pair<kp::ContactId, kp::ContactForce>>, double, bool, bool)",[Unknown],0x1400410d0
+func@0x14006ec70,0.186652,0.186652,0.0,0.0,kinetica.exe,func@0x14006ec70,[Unknown],0x14006ec70
+func@0x14005a740,0.186537,0.186537,0.0,0.0,kinetica.exe,func@0x14005a740,[Unknown],0x14005a740
+func@0x14005aa70,0.140007,0.140007,0.0,0.0,kinetica.exe,func@0x14005aa70,[Unknown],0x14005aa70
+kp::StepMemory::take,0.124412,0.124412,0.0,0.0,kinetica.exe,kp::StepMemory::take(unsigned long long),[Unknown],0x1400175e0
+kp::SolverBody::push,0.108916,0.108916,0.0,0.0,kinetica.exe,"kp::SolverBody::push(kp::SolverBody&, kp::SolverBody&, kp::Vector3, kp::Vector3, kp::Vector3)",[Unknown],0x140034d90
+kp::IslandNormals::solve,0.108838,0.108838,0.0,0.0,kinetica.exe,"kp::IslandNormals::solve(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double, std::__1::vector<char, kp::StepAllocator<char>> const*)",[Unknown],0x14003b380
+kp::ManifoldMemory::valid,0.093252,0.093252,0.0,0.0,kinetica.exe,"kp::ManifoldMemory::valid(std::__1::array<int, (unsigned long long)4> const&, kp::Body const&, kp::Body const&, double) const",[Unknown],0x140030760
+func@0x1400461c0,0.078059,0.078059,0.0,0.0,kinetica.exe,func@0x1400461c0,[Unknown],0x1400461c0
+kp::ContactForces::operator[],0.077928,0.077928,0.0,0.0,kinetica.exe,kp::ContactForces::operator[](kp::ContactId const&),[Unknown],0x140045eb0
+kp::SoftContact::solveNormals,0.077876,0.077876,0.0,0.0,kinetica.exe,"kp::SoftContact::solveNormals(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, bool, double, double)",[Unknown],0x140043ea0
+func@0x180048b50,0.077849,0.077849,0.0,0.0,ucrtbase.dll,func@0x180048b50,[Unknown],0x180048b50
+kp::Body::pose,0.062388,0.062388,0.0,0.0,kinetica.exe,kp::Body::pose(void) const,[Unknown],0x140013150
+func@0x14001cf10,0.062231,0.062231,0.0,0.0,kinetica.exe,func@0x14001cf10,[Unknown],0x14001cf10
+_ZN2kp11SoftContactC1ERKNS_11ContactPairERKNSt3__16vectorINS_4BodyENS4_9allocatorIS6_EEEERKNS5_INS_10SolverBodyENS_13StepAllocatorISC_EEEERKNS_8SoftnessENS_4SpanINS4_4pairINS_9ContactIdENS_12ContactForceEEEEEdbb,0.062229,0.062229,0.0,0.0,kinetica.exe,_ZN2kp11SoftContactC1ERKNS_11ContactPairERKNSt3__16vectorINS_4BodyENS4_9allocatorIS6_EEEERKNS5_INS_10SolverBodyENS_13StepAllocatorISC_EEEERKNS_8SoftnessENS_4SpanINS4_4pairINS_9ContactIdENS_12ContactForceEEEEEdbb,[Unknown],0x1400410d0
+kp::CentreFriction::prepare,0.062139,0.062139,0.0,0.0,kinetica.exe,"kp::CentreFriction::prepare(kp::SolverBody const&, kp::SolverBody const&, kp::CentreFriction::Frame const&, kp::CentreFriction::Carried const&)",[Unknown],0x1400651b0
+func@0x1400702ef,0.046723,0.046723,0.0,0.0,kinetica.exe,func@0x1400702ef,[Unknown],0x1400702ef
+func@0x1400309a0,0.046693,0.046693,0.0,0.0,kinetica.exe,func@0x1400309a0,[Unknown],0x1400309a0
+func@0x14003ac90,0.046690,0.046690,0.0,0.0,kinetica.exe,func@0x14003ac90,[Unknown],0x14003ac90
+kp::gapAlong,0.046683,0.046683,0.0,0.0,kinetica.exe,"kp::gapAlong(kp::Body const&, kp::Body const&, kp::Vector3)",[Unknown],0x140032240
+func@0x14005cbc0,0.046664,0.046664,0.0,0.0,kinetica.exe,func@0x14005cbc0,[Unknown],0x14005cbc0
+kp::TransformedHull::TransformedHull,0.046663,0.046663,0.0,0.0,kinetica.exe,"kp::TransformedHull::TransformedHull(kp::ConvexHull const&, kp::Transform const&)",[Unknown],0x140031da0
+func@0x140043990,0.046628,0.046628,0.0,0.0,kinetica.exe,func@0x140043990,[Unknown],0x140043990
+kp::CentreFriction::solve,0.031156,0.031156,0.0,0.0,kinetica.exe,"kp::CentreFriction::solve(kp::SolverBody&, kp::SolverBody&, kp::CentreFriction::Frame const&, double, double, double)",[Unknown],0x140065be0
+func@0x14001ed60,0.031150,0.031150,0.0,0.0,kinetica.exe,func@0x14001ed60,[Unknown],0x14001ed60
+func@0x140040ed0,0.031148,0.031148,0.0,0.0,kinetica.exe,func@0x140040ed0,[Unknown],0x140040ed0
+memcpy,0.031146,0.031146,0.0,0.0,ucrtbase.dll,memcpy,[Unknown],0x180048b70
+kp::SolverBody::twist,0.031092,0.031092,0.0,0.0,kinetica.exe,"kp::SolverBody::twist(kp::SolverBody&, kp::SolverBody&, kp::Vector3)",[Unknown],0x140034f90
+kp::Quaternion::fromRotationVector,0.031080,0.031080,0.0,0.0,kinetica.exe,kp::Quaternion::fromRotationVector(kp::Vector3),[Unknown],0x140049d30
+func@0x14003eb90,0.015696,0.015696,0.0,0.0,kinetica.exe,func@0x14003eb90,[Unknown],0x14003eb90
+func@0x140033500,0.015663,0.015663,0.0,0.0,kinetica.exe,func@0x140033500,[Unknown],0x140033500
+kp::ContactLevels::each,0.015631,0.015631,0.0,0.0,kinetica.exe,"kp::ContactLevels::each(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, std::__1::function<void (unsigned long long)> const&)",[Unknown],0x140039ab0
+kp::SetFactor::follow,0.015611,0.015611,0.0,0.0,kinetica.exe,"kp::SetFactor::follow(std::__1::vector<char, kp::StepAllocator<char>> const&)",[Unknown],0x1400756d0
+kp::ContactSystem::responseMatrix,0.015604,0.015604,0.0,0.0,kinetica.exe,"kp::ContactSystem::responseMatrix(kp::Span<kp::Body>, std::__1::vector<kp::ContactSystem::Line, kp::StepAllocator<kp::ContactSystem::Line>> const&)",[Unknown],0x14005d010
+kp::UpdatedCholesky::solve,0.015591,0.015591,0.0,0.0,kinetica.exe,"kp::UpdatedCholesky::solve(std::__1::vector<double, kp::StepAllocator<double>>&) const",[Unknown],0x14007a540
+func@0x180048810,0.015588,0.015588,0.0,0.0,ucrtbase.dll,func@0x180048810,[Unknown],0x180048810
+kp::CoupledFriction::solve,0.015588,0.015588,0.0,0.0,kinetica.exe,"kp::CoupledFriction::solve(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, double, double)",[Unknown],0x140062060
+kp::Body::part,0.015586,0.015586,0.0,0.0,kinetica.exe,kp::Body::part(int) const,[Unknown],0x14001a280
+kp::maxPointSpeed,0.015584,0.015584,0.0,0.0,kinetica.exe,kp::maxPointSpeed(kp::Body const&),[Unknown],0x1400314a0
+func@0x140039850,0.015578,0.015578,0.0,0.0,kinetica.exe,func@0x140039850,[Unknown],0x140039850
+func@0x180020b2c,0.015571,0.015571,0.0,0.0,ucrtbase.dll,func@0x180020b2c,[Unknown],0x180020b2c
+kp::solveFrictionIslands,0.015570,0.015570,0.0,0.0,kinetica.exe,"kp::solveFrictionIslands(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>>&, kp::DirectJoints const&, std::__1::vector<kp::SoftJoint, kp::StepAllocator<kp::SoftJoint>> const&, kp::ContactLevels&, double, double)",[Unknown],0x14003ffa0
+func@0x1400357b0,0.015567,0.015567,0.0,0.0,kinetica.exe,func@0x1400357b0,[Unknown],0x1400357b0
+func@0x14001f640,0.015562,0.015562,0.0,0.0,kinetica.exe,func@0x14001f640,[Unknown],0x14001f640
+func@0x14003c500,0.015561,0.015561,0.0,0.0,kinetica.exe,func@0x14003c500,[Unknown],0x14003c500
+"std::__1::__find_vectorized[abi:nqe230106<int const, int>]",0.015561,0.015561,0.0,0.0,kinetica.exe,"std::__1::__find_vectorized[abi:nqe230106<int const, int>](int const*, int const, int const, int)",[Unknown],0x140012100
+kp::examinePairWithin,0.015556,0.015556,0.0,0.0,kinetica.exe,"kp::examinePairWithin(kp::Body const&, kp::Body const&, double, double)",[Unknown],0x140032950
+kp::PairReach::PairReach,0.015546,0.015546,0.0,0.0,kinetica.exe,"kp::PairReach::PairReach(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::Vector3, double, double)",[Unknown],0x140037250
+func@0x140037b10,0.015545,0.015545,0.0,0.0,kinetica.exe,func@0x140037b10,[Unknown],0x140037b10
+kp::ConvexHull::boundingRadius,0.015544,0.015544,0.0,0.0,kinetica.exe,kp::ConvexHull::boundingRadius(void) const,[Unknown],0x140011c40
+func@0x140019ebe,0.015540,0.015540,0.0,0.0,kinetica.exe,func@0x140019ebe,[Unknown],0x140019ebe
+"std::__1::vector<int, kp::StepAllocator<int>>::emplace_back[abi:nqe230106<int const&>](int&, int const&&&)::{lambda()#2}::operator()[abi:nqe230106]",0.015537,0.015537,0.0,0.0,kinetica.exe,"std::__1::vector<int, kp::StepAllocator<int>>::emplace_back[abi:nqe230106<int const&>](int&, int const&&&)::{lambda()#2}::operator()[abi:nqe230106](void) const",[Unknown],0x1400369d0
+"std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>::emplace_back[abi:nqe230106<unsigned long long const&>](unsigned long long&, unsigned long long const&&&)::{lambda()#2}::operator()[abi:nqe230106]",0.015536,0.015536,0.0,0.0,kinetica.exe,"std::__1::vector<unsigned long long, kp::StepAllocator<unsigned long long>>::emplace_back[abi:nqe230106<unsigned long long const&>](unsigned long long&, unsigned long long const&&&)::{lambda()#2}::operator()[abi:nqe230106](void) const",[Unknown],0x140026240
+kp::step_motion::advancePose,0.015533,0.015533,0.0,0.0,kinetica.exe,"kp::step_motion::advancePose(kp::Body&, kp::SolverBody const&, double)",[Unknown],0x140026db0
+kp::SoftContact::follow,0.015525,0.015525,0.0,0.0,kinetica.exe,"kp::SoftContact::follow(std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&)",[Unknown],0x140043270
+func@0x140030540,0.015521,0.015521,0.0,0.0,kinetica.exe,func@0x140030540,[Unknown],0x140030540
+kp::ContactCandidate::ordered,0.015512,0.015512,0.0,0.0,kinetica.exe,"kp::ContactCandidate::ordered(kp::SmallVector<kp::ContactCandidate, (unsigned long long)16> const&, double)",[Unknown],0x140076630
+kp::MissedContacts::find,0.015501,0.015501,0.0,0.0,kinetica.exe,"kp::MissedContacts::find(std::__1::vector<kp::SoftContact, kp::StepAllocator<kp::SoftContact>>&, std::__1::vector<kp::Body, std::__1::allocator<kp::Body>> const&, std::__1::vector<kp::SolverBody, kp::StepAllocator<kp::SolverBody>> const&, double, std::__1::function<kp::SoftContact (kp::ContactPair const&)> const&)",[Unknown],0x140035a00
+kp::RollingFriction::solve,0.015500,0.015500,0.0,0.0,kinetica.exe,"kp::RollingFriction::solve(kp::SolverBody&, kp::SolverBody&, kp::Vector3, kp::Vector3, double, double)",[Unknown],0x140076440
+kp::SoftStep::step,0.015477,0.015477,0.0,0.0,kinetica.exe,"kp::SoftStep::step(std::__1::vector<kp::Body, std::__1::allocator<kp::Body>>&, std::__1::vector<kp::ContactPair, std::__1::allocator<kp::ContactPair>> const&, kp::JointSet const&, kp::Vector3, double, kp::ContactForces&, std::__1::vector<std::__1::vector<double, std::__1::allocator<double>>, std::__1::allocator<std::__1::vector<double, std::__1::allocator<double>>>>&) const",[Unknown],0x140020870

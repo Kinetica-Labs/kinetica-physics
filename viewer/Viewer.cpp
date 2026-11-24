@@ -7,10 +7,13 @@
 using namespace kp;
 
 void Viewer::load(size_t index) {
+    contactOverlay.clear();
     scene = index;
     world = scenes()[index].build();
     world.sleeping = sleeping;
+    world.shockPropagation = shockPropagation;
     grab = {};
+    drive = {};
     placing = -1;
     camera.target = scenes()[index].lookAt;
     camera.distance = scenes()[index].distance;
@@ -34,16 +37,24 @@ void Viewer::step() {
     world.sleepTime = 2;
     const Real drag = scenes()[scene].exact ? Real(0) : Real(damping);
     for (size_t i = 0; i < world.bodies().size(); ++i) world.body(BodyId(int(i))).linearDamping = world.body(BodyId(int(i))).angularDamping = drag;
-    if (scenes()[scene].control) scenes()[scene].control(world, frame * double(kFrame));
-    world.soft.contactUpdates = contactUpdates, world.soft.substeps = substeps;
-    for (const ImpulseTool& tool : impulses)
-        if (tool.everyFrame) tool.fire(world, kFrame); // постоянная сила: импульс «сила × время кадра»
-    const auto start = std::chrono::steady_clock::now();
-    world.step(kFrame);
-    lastStep = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+    const Scene& current = scenes()[scene];
+    world.soft.contactUpdates = current.singleSubstep ? 1 : contactUpdates;
+    world.soft.substeps = current.singleSubstep ? 1 : substeps;
+    const Real dt = kFrame / current.updatesPerFrame;
+    lastStep = 0;
+    for (int update = 0; update < current.updatesPerFrame; ++update) {
+        if (current.control) current.control(world, frame * double(kFrame) + update * double(dt));
+        if (current.vehicle) current.vehicle->apply(world, drive);
+        for (const ImpulseTool& tool : impulses)
+            if (tool.everyFrame) tool.fire(world, dt); // Н × с = Н·с
+        const auto start = std::chrono::steady_clock::now();
+        world.step(dt);
+        lastStep += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+        mostSegments = std::max(mostSegments, world.report().segments);
+        lag += double(world.report().unfinished);
+    }
     slowestStep = std::max(slowestStep, lastStep);
-    mostSegments = std::max(mostSegments, world.report().segments);
-    lag += double(world.report().unfinished);
+    if (current.vehicle) camera.target = world.body(current.vehicle->chassis()).position;
     ++frame;
     worstGap = std::max(worstGap, double(world.joints().largestError(world.bodies())));
     if (const StandardScene* standard = scenes()[scene].standard; standard && !judged && frame * double(kFrame) >= standard->checkAt)
@@ -54,12 +65,13 @@ void Viewer::step() {
 
 bool Viewer::asMeasured() const {
     const SoftStep standard;
-    return damping == 0 && !sleeping && rollingResistance == 0 && !shockPropagation && substeps == standard.substeps && contactUpdates == standard.contactUpdates;
+    return damping == 0 && !sleeping && rollingResistance == 0 && shockPropagation == World::kDefaultShockPropagation && substeps == standard.substeps && contactUpdates == standard.contactUpdates;
 }
 
 void Viewer::measure() {
     const SoftStep standard;
-    damping = rollingResistance = 0, sleeping = shockPropagation = false;
+    damping = rollingResistance = 0, sleeping = false;
+    shockPropagation = World::kDefaultShockPropagation;
     substeps = standard.substeps, contactUpdates = standard.contactUpdates;
     load(scene);
 }
@@ -106,6 +118,14 @@ void Viewer::release() {
     if (grab.body < 0) return;
     grab.tether->stiffness = grab.tether->damping = 0;
     grab.body = -1;
+}
+
+DebugGeometry Viewer::geometry() {
+    DebugGeometry all = debugBodyGeometry(world, show[int(DebugKind::TreeNode)]);
+    const auto& markers = contactOverlay.sample(world, rawContactMarkers);
+    all.lines.insert(all.lines.end(), markers.lines.begin(), markers.lines.end());
+    all.points.insert(all.points.end(), markers.points.begin(), markers.points.end());
+    return all;
 }
 
 DebugGeometry Viewer::visible(const DebugGeometry& all) const {

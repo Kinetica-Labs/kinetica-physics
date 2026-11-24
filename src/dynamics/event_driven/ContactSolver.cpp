@@ -55,7 +55,7 @@ ContactRows::Row rowOf(const ContactPair& pair, const ContactPoint& p, const Bod
 
 ContactSolver::ContactSolver(std::vector<Body>& bodies, const std::vector<ContactPair>& pairs, Vector3 up, Real restBounceSpeed, const ContactForces* pressure,
                              const JointSet* joints)
-    : state_(bodies, pressure, up, restBounceSpeed, joints), friction_(state_), assembly_(state_), coupled_(state_, friction_), slides_(state_, friction_), warm_(state_, friction_), shock_(state_, friction_) {
+    : state_(bodies, pressure, up, restBounceSpeed, joints), friction_(state_), assembly_(state_), coupled_(state_, friction_), slides_(state_, friction_), warm_(state_, friction_), shock_(state_) {
     for (const ContactPair* each : bottomUp(pairs, up)) {
         const ContactPair& pair = *each;
         const Body &a = state_.bodies[size_t(pair.a)], &b = state_.bodies[size_t(pair.b)];

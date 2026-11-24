@@ -1,0 +1,14 @@
+{
+    "utc_start":  "2026-11-22T14:35:08.8078990Z",
+    "system":  "DESKTOP-N3RC7NA",
+    "cpu":  "Intel(R) Xeon(R) CPU E5-2690 v3 @ 2.60GHz",
+    "os":  "Microsoft Windows NT 10.0.19045.0",
+    "inherited_affinity_mask":  256,
+    "worker_threads":  1,
+    "A":  "baseline",
+    "B":  "candidate",
+    "design":  "successive AB and BA, 10 pairs of each order per scene",
+    "grip":  "shared8, coupled enabled, 8 public steps at 1/480 s per frame; mu .5, squeeze 10 N per jaw, vertical load 10 N; 15 preload frames, 15 loaded frames, 3 warmup and 24 timed rigs per sample",
+    "pyramid":  "BENCH=7 compare-ours realtime 8; 140 free cubes, 60 frames, 8 internal substeps, sleep off, default (uncoupled) solver; reported to 0.01 ms",
+    "utc_end":  "2026-11-22T14:35:36.3567749Z"
+}

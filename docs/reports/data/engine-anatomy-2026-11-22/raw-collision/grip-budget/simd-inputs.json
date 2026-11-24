@@ -1,0 +1,41 @@
+{
+  "exe_sha256": {
+    "stock": "e87852abfca6acca4fac6acf95fe5cb0dfda7daa7aa29aa1d01eef0d67b82fc4",
+    "compiler-avx2": "0fb63babd037c9ee227ffa533248a1f354fcca3335a756cfdee38a42074222ba",
+    "packed-four": "b272aa1807bdc53ba7deb09afa220f3af413749932afcb442bcac15a6c863b8a"
+  },
+  "parity": {
+    "stock": {
+      "-grid.csv": true,
+      "-matrix.csv": true,
+      "-energy.csv": true
+    },
+    "compiler-avx2": {
+      "-grid.csv": true,
+      "-matrix.csv": true,
+      "-energy.csv": true
+    },
+    "packed-four": {
+      "-grid.csv": true,
+      "-matrix.csv": true,
+      "-energy.csv": true
+    }
+  },
+  "source_sha256": "6326ad0ae8a5b5b6b2a5d082558ba1babdbfba6831acbc630ec669c38cc1f5af",
+  "parent_archive_sha256": "49b37513fd0602b75d6ba9a25ac5f52a4c8dd6c117a49c312bea294b4c16ef25",
+  "candidate_sha256": "ac3f104f881620eba3a8ac14122ebde0d33df91fa7d425890923cda855bac3b6",
+  "affinity": "0x100",
+  "seed": 20261123,
+  "flags": [
+    "-O3",
+    "-DNDEBUG",
+    "-g",
+    "-gcodeview",
+    "-ffp-contract=off"
+  ],
+  "variant_flags": [
+    "-mavx2"
+  ],
+  "solver_threads": 1,
+  "cpu_compiler": "clang version 23.1.6 (https://github.com/llvm/llvm-project.git 5b10d2d74929eae78912771222c9855af97496f4)"
+}

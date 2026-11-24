@@ -1,0 +1,610 @@
+{
+  "backtraceGraph" : 
+  {
+    "commands" : 
+    [
+      "add_test"
+    ],
+    "files" : 
+    [
+      "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/CMakeLists.txt",
+      "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/examples/CMakeLists.txt",
+      "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/validation/studies/CMakeLists.txt"
+    ],
+    "nodes" : 
+    [
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 5,
+        "parent" : 0
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 7,
+        "parent" : 2
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 10,
+        "parent" : 4
+      },
+      {
+        "file" : 1
+      },
+      {
+        "command" : 0,
+        "file" : 1,
+        "line" : 21,
+        "parent" : 6
+      },
+      {
+        "file" : 1
+      },
+      {
+        "command" : 0,
+        "file" : 1,
+        "line" : 22,
+        "parent" : 8
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 8,
+        "parent" : 10
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 9,
+        "parent" : 12
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 10,
+        "parent" : 14
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 11,
+        "parent" : 16
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 12,
+        "parent" : 18
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 13,
+        "parent" : 20
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 14,
+        "parent" : 22
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 25,
+        "parent" : 24
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 28,
+        "parent" : 26
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 31,
+        "parent" : 28
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 32,
+        "parent" : 30
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 35,
+        "parent" : 32
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 38,
+        "parent" : 34
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 43,
+        "parent" : 36
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 44,
+        "parent" : 38
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 48,
+        "parent" : 40
+      },
+      {
+        "file" : 2
+      },
+      {
+        "command" : 0,
+        "file" : 2,
+        "line" : 49,
+        "parent" : 42
+      }
+    ]
+  },
+  "kind" : "ctestInfo",
+  "tests" : 
+  [
+    {
+      "backtrace" : 1,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/tests/unit-tests.exe"
+      ],
+      "name" : "unit-tests",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/tests"
+        }
+      ]
+    },
+    {
+      "backtrace" : 3,
+      "command" : 
+      [
+        "C:/Program Files/Git/bin/bash.exe",
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/check_no_libm.sh",
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/src/libkinetica-physics.a"
+      ],
+      "name" : "no-libm",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/tests"
+        }
+      ]
+    },
+    {
+      "backtrace" : 5,
+      "command" : 
+      [
+        "C:/Program Files/Git/bin/bash.exe",
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/tests/check_no_libm.sh",
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/examples/libkinetica-scenes.a"
+      ],
+      "name" : "no-libm-scenes",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/tests"
+        }
+      ]
+    },
+    {
+      "backtrace" : 7,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/examples/FloatingBox.exe"
+      ],
+      "name" : "floating-box",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/examples"
+        }
+      ]
+    },
+    {
+      "backtrace" : 9,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/examples/GearTrain.exe"
+      ],
+      "name" : "gear-train",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/examples"
+        }
+      ]
+    },
+    {
+      "backtrace" : 11,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-grip-limit.exe",
+        "exact"
+      ],
+      "name" : "grip-limit-exact",
+      "properties" : 
+      [
+        {
+          "name" : "ENVIRONMENT",
+          "value" : 
+          [
+            "KP_GRIP_TIMING=0"
+          ]
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 13,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-grip-limit.exe",
+        "realtime32"
+      ],
+      "name" : "grip-limit-realtime32",
+      "properties" : 
+      [
+        {
+          "name" : "ENVIRONMENT",
+          "value" : 
+          [
+            "KP_GRIP_TIMING=0"
+          ]
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 15,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-grip-limit.exe",
+        "trace-order"
+      ],
+      "name" : "grip-order-balance",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 17,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-grip-limit.exe",
+        "islands"
+      ],
+      "name" : "grip-island-independence",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 19,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-slip-to-roll.exe"
+      ],
+      "name" : "slip-to-roll",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 21,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-oblique-grip.exe"
+      ],
+      "name" : "coupled-oblique-grip",
+      "properties" : 
+      [
+        {
+          "name" : "ENVIRONMENT",
+          "value" : 
+          [
+            "KP_COUPLED_FRICTION=1",
+            "KP_THREADS=1"
+          ]
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 23,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-grip-limit.exe",
+        "island-joints"
+      ],
+      "name" : "coupled-island-joints",
+      "properties" : 
+      [
+        {
+          "name" : "ENVIRONMENT",
+          "value" : 
+          [
+            "KP_COUPLED_FRICTION=1",
+            "KP_THREADS=1"
+          ]
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 25,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-rest-overlay.exe"
+      ],
+      "name" : "viewer-rest-overlay",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 27,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-playback-clock.exe"
+      ],
+      "name" : "viewer-playback-clock",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 29,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-hull-events.exe",
+        "--fail-only"
+      ],
+      "name" : "hull-feature-pairs",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 31,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-hull-events.exe",
+        "--swapped"
+      ],
+      "name" : "hull-feature-pairs-swapped",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 33,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-hull-motion.exe"
+      ],
+      "name" : "hull-motion-events",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 35,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-collision-contract.exe"
+      ],
+      "name" : "collision-contract",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 37,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-bucket-pairs.exe",
+        "--check-walls",
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/validation/studies/anatomy/bucket_seam_poses.csv"
+      ],
+      "name" : "bucket-wall-witnesses",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 39,
+      "command" : 
+      [
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies/study-bucket-pairs.exe",
+        "--check-rest"
+      ],
+      "name" : "bucket-rest-geometry",
+      "properties" : 
+      [
+        {
+          "name" : "ENVIRONMENT",
+          "value" : 
+          [
+            "KP_THREADS=1"
+          ]
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 41,
+      "command" : 
+      [
+        "C:/Users/PC/AppData/Local/Python/pythoncore-3.14-64/python.exe",
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/validation/studies/anatomy/translation_certificate.py",
+        "--self-test"
+      ],
+      "name" : "exact-translation-intervals",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    },
+    {
+      "backtrace" : 43,
+      "command" : 
+      [
+        "C:/Users/PC/AppData/Local/Python/pythoncore-3.14-64/python.exe",
+        "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-src/validation/studies/anatomy/rotation_certificate.py",
+        "--self-test"
+      ],
+      "name" : "certified-rotation-intervals",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/combined-core-build/validation/studies"
+        }
+      ]
+    }
+  ],
+  "version" : 
+  {
+    "major" : 1,
+    "minor" : 0
+  }
+}

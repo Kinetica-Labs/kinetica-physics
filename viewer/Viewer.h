@@ -2,6 +2,7 @@
 // Состояние окна просмотра: какая сцена идёт, её мир, камера и что показывать.
 
 #include "Camera.h"
+#include "ContactOverlay.h"
 #include "ImpulseTool.h"
 #include "Scenes.h"
 #include <debug/DebugGeometry.h>
@@ -12,11 +13,14 @@ struct Viewer {
     size_t scene = 0;
     kp::World world;
     Camera camera;
+    kp::VehicleInput drive;
     bool paused = false, stepOnce = false;
     bool show[6] = {true, true, true, true, true, false}; // по одному флагу на DebugKind
     bool showBodyNumbers = true;
+    bool rawContactMarkers = false;
+    ContactOverlay contactOverlay;
     bool fill = true;              // тела закрашены: свет и клетка в осях тела (GlRenderer)
-    bool shockPropagation = false; // необязательный проход ударной волны в решателе
+    bool shockPropagation = kp::World::kDefaultShockPropagation;
     bool sleeping = true;          // покоящиеся острова тел засыпают (World::sleeping)
     int segmentLimit = 8;          // отрезков на кадр точного шага, не больше (World::maxSegments)
     bool realtime = true;          // шаг с постоянной ценой кадра (World::realtime); без него шаг точный
@@ -74,4 +78,5 @@ struct Viewer {
     // Та же геометрия без видов, выключенных галочками.
     // Видимая часть геометрии; к ней добавлена натянутая привязь.
     kp::DebugGeometry visible(const kp::DebugGeometry& all) const;
+    kp::DebugGeometry geometry();
 };

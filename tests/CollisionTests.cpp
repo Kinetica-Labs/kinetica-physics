@@ -122,8 +122,29 @@ void carriedManifoldMatchesSearch() {
 
 } // namespace
 
+// Эталон — все i<j с включённой границей AABB. Сортировка сохраняет возможные дубликаты.
+static void treeEmitsEachOverlapOnce() {
+    const Bounds cube{{0, 0, 0}, {1, 1, 1}};
+    const Bounds corner{{1, 1, 1}, {2, 2, 2}};
+    const Bounds point{{1, 1, 1}, {1, 1, 1}};
+    const Bounds far{{3, 3, 3}, {4, 4, 4}};
+    for (const auto& boxes : std::vector<std::vector<Bounds>>{{}, {cube}, {cube, far},
+             {cube, corner, point, far}, std::vector<Bounds>(32, cube)}) {
+        DynamicTree tree;
+        std::vector<std::pair<int, int>> expected, actual;
+        for (int i = int(boxes.size()) - 1; i >= 0; --i) tree.insert(boxes[size_t(i)], i);
+        for (int i = 0; i < int(boxes.size()); ++i)
+            for (int j = i + 1; j < int(boxes.size()); ++j)
+                if (overlapping(boxes[size_t(i)], boxes[size_t(j)])) expected.emplace_back(i, j);
+        tree.queryPairs([&](int a, int b) { actual.emplace_back(std::min(a, b), std::max(a, b)); });
+        std::sort(actual.begin(), actual.end());
+        CHECK(actual == expected, "дерево: %zu пар, ожидалось %zu", actual.size(), expected.size());
+    }
+}
+
 void collisionTests() {
     carriedManifoldMatchesSearch();
     treeFindsEveryPair();
+    treeEmitsEachOverlapOnce();
     treeStaysBalanced();
 }

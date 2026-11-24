@@ -1,0 +1,23 @@
+--- a/src/joints/Joint.cpp
++++ b/src/joints/Joint.cpp
+@@ -7,8 +7,8 @@
+ 
+ // Угловое ускорение свободного тела: у тела с неравными моментами инерции угловая скорость
+ // меняется и без сил, α = I⁻¹ (L × ω).
+-Vector3 freeSpinUp(const Body& body) {
+-    return body.isStatic() ? Vector3{} : inverseInertiaTimes(body, body.angularMomentum.cross(body.angularVelocity()));
++Vector3 freeSpinUp(const Body& body, Vector3 angularVelocity) {
++    return body.isStatic() ? Vector3{} : inverseInertiaTimes(body, body.angularMomentum.cross(angularVelocity));
+ }
+ 
+ } // namespace
+@@ -39,7 +39,8 @@
+     Motion m;
+     m.bodyA = &bodyA, m.bodyB = &bodyB;
+     m.frameA = bodyA.orientation * frameA, m.frameB = bodyB.orientation * frameB;
+-    m.wa = ma.angularVelocity(), m.wb = mb.angularVelocity(), m.spinUpA = freeSpinUp(ma), m.spinUpB = freeSpinUp(mb);
++    m.wa = ma.angularVelocity(), m.wb = mb.angularVelocity();
++    m.spinUpA = freeSpinUp(ma, m.wa), m.spinUpB = freeSpinUp(mb, m.wb);
+     // Перемещения. Нарушение — C = e · (p_b − p_a), где p — точки сочленения тел, e — ось тела a.
+     // Его производная — разность скоростей точек двух тел, взятых в одной точке p_b, вдоль e:
+     // слагаемое от поворота самой оси e как раз и переносит плечо тела a из p_a в p_b.

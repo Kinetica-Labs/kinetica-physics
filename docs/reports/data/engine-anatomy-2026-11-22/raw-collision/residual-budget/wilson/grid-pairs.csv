@@ -1,0 +1,5 @@
+peer,both_pass,only_kinetica,only_peer,both_fail
+control,33,0,0,3
+rp3d,27,6,0,3
+box3d,23,10,0,3
+bullet-f64,30,3,0,3

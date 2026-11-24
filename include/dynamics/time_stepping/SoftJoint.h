@@ -21,6 +21,7 @@ class SoftJoint {
 public:
     // impulses — место накопленных импульсов этих связей; оно переживает кадр.
     SoftJoint(const Bond* bonds, int count, const StepArray<SolverBody>& states, Real* impulses);
+    const Bond& firstRow() const { return bonds_[0]; }
     bool responds() const { return responds_; }
     void warmStart(StepArray<SolverBody>& states) const;
     void solve(StepArray<SolverBody>& states, bool withBias, Real h, const Softness& soft, Real pushSpeed);

@@ -1,0 +1,7 @@
+two_rotating_separated,SAFE,3
+positive_gap_budget_exhausted,UNKNOWN,1
+clear_endpoint_0,SAFE,1
+clear_endpoint_1,SAFE,1
+endpoints_clear_interior_crossing,UNKNOWN,1
+stationary_touch,UNKNOWN,1
+zero_quaternion_path,INVALID,0

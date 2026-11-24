@@ -1,0 +1,49 @@
+Test project C:/Users/PC/kp-2326667-mwrev8ox/sieve-20261122-100223/engine-anatomy-nov22/sg-build
+      Start  1: unit-tests
+      Start  2: no-libm
+ 1/22 Test  #2: no-libm ..........................   Passed    0.12 sec
+      Start  3: no-libm-scenes
+ 2/22 Test  #3: no-libm-scenes ...................   Passed    0.08 sec
+      Start  4: floating-box
+ 3/22 Test  #4: floating-box .....................   Passed    0.02 sec
+      Start  5: gear-train
+ 4/22 Test  #5: gear-train .......................   Passed    0.02 sec
+      Start  6: grip-limit-exact
+ 5/22 Test  #6: grip-limit-exact .................   Passed    0.52 sec
+      Start  7: grip-limit-realtime32
+ 6/22 Test  #7: grip-limit-realtime32 ............   Passed    1.06 sec
+      Start  8: grip-order-balance
+ 7/22 Test  #8: grip-order-balance ...............   Passed    0.10 sec
+      Start  9: grip-island-independence
+ 8/22 Test  #9: grip-island-independence .........   Passed    0.05 sec
+      Start 10: slip-to-roll
+ 9/22 Test #10: slip-to-roll .....................   Passed    0.02 sec
+      Start 11: coupled-oblique-grip
+10/22 Test #11: coupled-oblique-grip .............   Passed    0.18 sec
+      Start 12: coupled-island-joints
+11/22 Test #12: coupled-island-joints ............   Passed    0.05 sec
+      Start 13: viewer-rest-overlay
+12/22 Test #13: viewer-rest-overlay ..............   Passed   11.03 sec
+      Start 14: viewer-playback-clock
+13/22 Test #14: viewer-playback-clock ............   Passed    0.01 sec
+      Start 15: hull-feature-pairs
+14/22 Test #15: hull-feature-pairs ...............   Passed    1.00 sec
+      Start 16: hull-feature-pairs-swapped
+15/22 Test #16: hull-feature-pairs-swapped .......   Passed    1.27 sec
+      Start 17: hull-motion-events
+16/22 Test #17: hull-motion-events ...............   Passed    0.03 sec
+      Start 18: collision-contract
+17/22 Test #18: collision-contract ...............   Passed    0.11 sec
+      Start 19: bucket-wall-witnesses
+18/22 Test #19: bucket-wall-witnesses ............   Passed    0.02 sec
+      Start 20: bucket-rest-geometry
+19/22 Test  #1: unit-tests .......................   Passed   17.38 sec
+      Start 21: exact-translation-intervals
+20/22 Test #21: exact-translation-intervals ......   Passed    0.21 sec
+      Start 22: certified-rotation-intervals
+21/22 Test #22: certified-rotation-intervals .....   Passed    0.26 sec
+22/22 Test #20: bucket-rest-geometry .............   Passed    6.26 sec
+
+100% tests passed, 0 tests failed out of 22
+
+Total Test time (real) =  22.01 sec
