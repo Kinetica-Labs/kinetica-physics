@@ -9,11 +9,14 @@
 Числа сравнимы между прогонами, но это не компилятор: макросы и шаблонные трюки он не видит.
 """
 import json
+import os
+import posixpath
 import re
 import subprocess
 import sys
 import zlib
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 FUNCTION_LINES, CLASS_LINES, PUBLIC_METHODS = 40, 300, 12
@@ -102,12 +105,22 @@ def upwardIncludes(files):
 
 
 def brokenLinks():
+    """Локальная ссылка должна вести к файлу или каталогу, доступному читателю репозитория."""
+    listed = subprocess.check_output(["git", "ls-files", "-z", "--cached"], cwd=ROOT)
+    if not listed:  # Измерители распаковывают снимок в новый git-каталог без индекса.
+        listed = subprocess.check_output(["git", "ls-files", "-z", "--others", "--exclude-standard"], cwd=ROOT)
+    files = {name for name in os.fsdecode(listed).split("\0") if name and (ROOT / name).is_file()}
+    targets = files | {parent.as_posix() for name in files for parent in Path(name).parents}
+    links = re.compile(r'\]\(\s*(?:<([^>\n]+)>|([^\s)]+))(?:\s+["\'][^\n]*?["\'])?\s*\)')
     found = []
-    tracked = subprocess.run(["git", "ls-files", "*.md"], cwd=ROOT, capture_output=True, text=True).stdout.split()
-    others = subprocess.run(["git", "ls-files", "--others", "--exclude-standard", "*.md"], cwd=ROOT, capture_output=True, text=True).stdout.split()
-    for doc in sorted(set(tracked + others)):
-        for target in re.findall(r"\]\(([^)\s]+)\)", (ROOT / doc).read_text(encoding="utf-8")):
-            if not re.match(r"[a-z]+:|#", target) and not ((ROOT / doc).parent / target.split("#")[0]).exists():
+    for doc in sorted(name for name in files if name.endswith(".md")):
+        for match in links.finditer((ROOT / doc).read_text(encoding="utf-8")):
+            target = match.group(1) or match.group(2)
+            url = urlsplit(target)
+            if url.scheme or url.netloc or not url.path:
+                continue
+            path = posixpath.normpath(posixpath.join(posixpath.dirname(doc), unquote(url.path)))
+            if path not in targets:
                 found.append((doc, target))
     return found
 
