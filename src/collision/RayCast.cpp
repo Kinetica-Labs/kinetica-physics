@@ -53,7 +53,7 @@ RayHit castRay(const std::vector<Body>& bodies, const Ray& ray, const Body* excl
     RayHit nearest;
     for (size_t index = 0; index < bodies.size(); ++index) {
         const Body& body = bodies[index];
-        if (&body == excluded || !body.shape || !nearRay(origin, unit, reach, body.position, body.boundingRadius())) continue;
+        if (&body == excluded || (excluded && !mayTouch(*excluded, body)) || !body.shape || !nearRay(origin, unit, reach, body.position, body.boundingRadius())) continue;
         for (int p = 0; p < body.partCount(); ++p) {
             const Body piece = body.part(p);
             const Transform pose = piece.pose();

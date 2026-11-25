@@ -23,6 +23,7 @@
 #include <collision/broadphase/DynamicTree.h>
 #include <math/Transform.h>
 
+#include <cstdint>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -73,6 +74,12 @@ struct Body {
     // скорости выводятся из импульсов, и эти поля не читаются.
     Vector3 drivenVelocity;
     Vector3 drivenSpin;
+    // Кто с кем не сталкивается. Тела одной группы (group > 0) друг друга не касаются — так звенья одного
+    // робота проходят друг сквозь друга, а с остальным миром сталкиваются. Тела a и b не касаются и тогда,
+    // когда в ignoreBits одного есть бит из categoryBits другого: категории как у Box2D и Box3D, а маска
+    // наоборот — ноль касается всего, и одного общего бита хватает, чтобы не касаться. Нули — касается всего.
+    int group = 0;
+    std::uint64_t categoryBits = 0, ignoreBits = 0;
 
     // Однородный брусок с полуразмерами halfExtents. Нулевая плотность — неподвижное тело.
     static Body box(Vector3 halfExtents, Real density, Vector3 position = {}) {
@@ -138,6 +145,11 @@ struct Body {
     Vector3 linearVelocity() const { return isStatic() ? drivenVelocity : mass.inverseMass * linearMomentum; }
     Vector3 angularVelocity() const { return isStatic() ? drivenSpin : orientation.rotate(mass.inverseInertia.scaled(orientation.rotateInverse(angularMomentum))); }
 };
+
+// Могут ли тела коснуться друг друга (Body::group, categoryBits, ignoreBits).
+inline bool mayTouch(const Body& a, const Body& b) {
+    return !(a.group > 0 && a.group == b.group) && (a.ignoreBits & b.categoryBits) == 0 && (b.ignoreBits & a.categoryBits) == 0;
+}
 
 // Идёт ли тело без массы с заданной скоростью (Body::drivenVelocity, drivenSpin).
 inline bool isDriven(const Body& body) {

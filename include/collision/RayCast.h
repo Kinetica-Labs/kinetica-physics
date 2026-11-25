@@ -21,6 +21,8 @@ struct RayHit {
 // Ближайшее к началу луча пересечение с поверхностями тел. Начало луча внутри тела — попадание
 // на нулевом расстоянии.
 RayHit castRay(const std::vector<Body>& bodies, const Ray& ray);
+// excluded — тело, которого луч не видит, а с ним и тела, которых оно не касается (mayTouch): датчик
+// видит то, во что упёрлось бы его тело.
 RayHit castRay(const std::vector<Body>& bodies, const Ray& ray, const Body* excluded);
 
 } // namespace kp

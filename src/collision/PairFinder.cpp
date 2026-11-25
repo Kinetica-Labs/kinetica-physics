@@ -45,21 +45,28 @@ DynamicTree reachTree(const std::vector<Body>& bodies, const StepArray<Real>& fa
 DynamicTree PairFinder::tree(Real h) const { return reachTree(bodies_, speedsOf(bodies_, h), gravity_, h, 0); }
 
 // Кандидаты — пары тел, чьи бруски досягаемости за время h пересеклись; отбирает их дерево брусков.
-// Идут по возрастанию номеров: порядок пар не должен зависеть от формы дерева.
+// Идут по возрастанию номеров: порядок пар не должен зависеть от формы дерева. Пары тел, которые друг
+// друга не касаются (mayTouch), отброшены и здесь, и из памяти кандидатов: у тела мог смениться фильтр.
 StepArray<std::pair<int, int>> PairFinder::candidates(Real h, const StepArray<Real>& fastest) const {
+    const auto touching = [&](StepArray<std::pair<int, int>> pairs) {
+        pairs.erase(std::remove_if(pairs.begin(), pairs.end(), [&](const std::pair<int, int>& p) {
+            return !mayTouch(bodies_[size_t(p.first)], bodies_[size_t(p.second)]);
+        }), pairs.end());
+        return pairs;
+    };
     StepArray<Real> path;
     if (remembered) {
         path.resize(bodies_.size());
         const Real gravitySpeed = gravity_.length() * h;
         for (size_t i = 0; i < path.size(); ++i) path[i] = (fastest[i] + gravitySpeed) * h + kContactDistance;
-        if (const auto* kept = remembered->valid(bodies_, path)) return {kept->begin(), kept->end()};
+        if (const auto* kept = remembered->valid(bodies_, path)) return touching({kept->begin(), kept->end()});
     }
     const DynamicTree tree = reachTree(bodies_, fastest, gravity_, h, remembered ? CandidateMemory::kSlack : Real(0));
     StepArray<std::pair<int, int>> candidates;
     tree.queryPairs([&](int a, int b) { candidates.emplace_back(std::min(a, b), std::max(a, b)); });
     std::sort(candidates.begin(), candidates.end());
     if (remembered) remembered->replace(bodies_, path, candidates);
-    return candidates;
+    return touching(std::move(candidates));
 }
 
 namespace {

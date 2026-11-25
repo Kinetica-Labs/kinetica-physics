@@ -1084,6 +1084,40 @@ void islandsSleepAndWake() {
 }
 
 // Сухое трение, демпфер и пружина в сочленении.
+// Кто с кем не сталкивается (Body::group, categoryBits, ignoreBits). Два бруска, поставленные один в другой, без
+// фильтра расталкиваются; из одной группы, или когда один пропускает метки другого, — стоят, как стояли, а
+// с полом сталкиваются оба. Луч с исключённым телом не видит и тех, кого оно не касается.
+void collisionFilter() {
+    const auto overlapped = [](int groupA, int groupB, std::uint64_t categoryB, std::uint64_t ignoreA) {
+        World world;
+        world.gravity = {};
+        Body a = Body::box({0.5, 0.5, 0.5}, 1000, {0, 0.5, 0}), b = Body::box({0.5, 0.5, 0.5}, 1000, {0.6, 0.5, 0});
+        a.group = groupA, b.group = groupB, b.categoryBits = categoryB, a.ignoreBits = ignoreA;
+        const BodyId first = world.addBody(a), second = world.addBody(b);
+        for (int step = 0; step < 30; ++step) world.step(Real(1) / 60);
+        return double((world.body(second).position - world.body(first).position).length());
+    };
+    CHECK(overlapped(0, 0, 0, 0) > 0.9, "бруски без фильтра не растолкались: между центрами %.3f м", overlapped(0, 0, 0, 0));
+    CHECK_NEAR(overlapped(1, 1, 0, 0), 0.6, 1e-9);
+    CHECK_NEAR(overlapped(0, 0, 0b10, 0b10), 0.6, 1e-9);
+    CHECK(overlapped(1, 2, 0b10, 0b01) > 0.9, "бруски разных групп с непересекающимися метками не растолкались");
+    {
+        World world;
+        world.addBody(Body::box({5, 0.5, 5}, 0, {0, -0.5, 0}));
+        Body link = Body::box({0.2, 0.2, 0.2}, 1000, {0, 1, 0});
+        link.group = 3;
+        const BodyId falling = world.addBody(link);
+        for (int step = 0; step < 120; ++step) world.step(Real(1) / 60);
+        CHECK_NEAR(world.body(falling).position.y, 0.2, 2e-3); // своя группа не мешает падать на пол
+        Body car = Body::box({0.2, 0.2, 0.2}, 1000, {3, 1, 0}), wall = Body::box({0.1, 1, 1}, 0, {4, 1, 0}), other = Body::box({0.2, 0.2, 0.2}, 0, {3.5, 1, 0});
+        car.ignoreBits = 0b1, other.categoryBits = 0b1;
+        const BodyId sensor = world.addBody(car), behind = world.addBody(wall), otherCar = world.addBody(other);
+        (void)otherCar;
+        const RayHit seen = castRay(world.bodies(), {{3, 1, 0}, {1, 0, 0}}, &world.body(sensor));
+        CHECK(seen.body == int(behind), "луч датчика упёрся в тело %d, которого его тело не касается, а не в стену", seen.body);
+    }
+}
+
 // Луч через сцену и упругая привязь: то, чем тело выбирают и тянут мышью.
 void rayAndTether() {
     {
@@ -1662,6 +1696,7 @@ void dynamicsTests() {
     jointsResistMotion();
     realtimeStep();
     rayAndTether();
+    collisionFilter();
     stepMemoryReturnsPerThread();
     forcesAct();
     drivenBodies();
